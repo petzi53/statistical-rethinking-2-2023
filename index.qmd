@@ -1,9 +1,173 @@
-# Preface {.unnumbered}
+# Package Installation {.unnumbered}
 
-This is a Quarto book. And my first try to work with Quarto.
+## Install necessary packages
 
-To learn more about Quarto books visit <https://quarto.org/docs/books>.
+In contrast to the sparse and partly outdated remarks in the book use
+the installation section from the `rethinking` [package at
+GitHub](https://github.com/rmcelreath/rethinking#installation "Installation of 'rethinking' package").
+
+### Step 1
+
+From the three steps I had already successfully installed the first one
+(`rstan` and the `C++` toolchain), so I had no need to follow the
+detailed instructions of the `rstan` installation at
+<https://mc-stan.org/users/interfaces/rstan.html>.
+
+### Step 2
+
+To install the `cmdstanr` package I visited
+<https://mc-stan.org/cmdstanr/>. This is an addition to my previous
+installation with the older version (2nd ed., 2022). As I installed the
+latest beta version of `cmdstanr` the first time I also needed to
+compile the libraries with `cmdstanr::install_cmdstan()`.
+
+To check the result of my installation I ran
+`check_cmdstan_toolchain()`.
 
 ```{r}
-1 + 1
+#| label: install-cmdstanr
+#| eval: false
+
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+cmdstanr::install_cmdstan()
+cmdstanr::check_cmdstan_toolchain()
+
 ```
+
+The command for downloaded `cmdstanr` did not install the vignettes,
+which take a long time to build, but they are always available online at
+<https://mc-stan.org/cmdstanr/articles/>.
+
+The vignette [Getting started with
+CmdStanR](https://mc-stan.org/cmdstanr/articles/cmdstanr.html) also
+recommend to load the `bayesplot` and `posterior` packages, which are
+used later in the `CmdStanR`-examples. But I believe these two packages
+are not necessary if you just plan to stick with the book.
+
+### Step 3
+
+Once the infrastructure is installed one can install the packages used
+by the book. With the exception of rethinking --- the companion package
+of the book -- they can all be downloaded from CRAN.
+
+I had already devtools installed, therefore I deleted it from the list
+of installed packages.
+
+```{r}
+#| label: install-packages
+#| eval: false
+
+install.packages(c("coda","mvtnorm", "loo","dagitty","shape"))
+devtools::install_github("rmcelreath/rethinking")
+
+```
+
+## Get Code Examples
+
+Go to the [book website](https://xcelab.net/rm/statistical-rethinking/)
+and download the [R code
+examples](http://xcelab.net/rmpubs/sr2/code.txt) for the book.
+
+```{r}
+#| label: download-code-examples
+#| eval: false
+
+dir.create("R")
+download.file("http://xcelab.net/rmpubs/sr2/code.txt", "R/code.R")
+
+```
+
+::: {.callout-caution style="color: orange;"}
+## Caution
+
+There are big differences between the code snippets of the 2nd edition
+collected in [code.txt](http://xcelab.net/rmpubs/sr2/code.txt) and the
+new version preparing the 3rd book version. These new code snippets can
+be found in the slides and/or in the videos. I will always refer to the
+place where they can be found.
+
+Additionally you will find all the scripts supporting the animation in
+the lectures at the [new 2023 github
+repo](https://github.com/rmcelreath/stat_rethinking_2023).
+:::
+
+The style of the code snippets is not the tidyverse style. For instance:
+The equal sign `=` is not embedded between spaces but a list of
+variables, separated by comas has in front and before the coma a space.
+
+```{r}
+#| label: code-style-orig
+#| eval: false
+
+sample <- c("W","L","W","W","W","L","W","L","W")
+W <- sum(sample=="W") # number of W observed
+L <- sum(sample=="L") # number of L observed
+p <- c(0,0.25,0.5,0.75,1) # proportions W
+ways <- sapply( p , function(q) (q*4)^W * ((1-q)*4)^L )
+prob <- ways/sum(ways)
+cbind( p , ways , prob )
+
+```
+
+I will always convert the original code style with the RStudio addin
+styler package to tidyverse style: Assuming that the default value of
+the style transformer is `styler::tidyverse_style()` I select the code
+snippet I want to convert and call the addin which runs
+`styler:::style_selection()`. The transformation of the above code
+snippet results into the code below:
+
+```{r}
+#| label: code-style-new
+#| eval: false
+
+sample <- c("W", "L", "W", "W", "W", "L", "W", "L", "W")
+W <- sum(sample == "W") # number of W observed
+L <- sum(sample == "L") # number of L observed
+p <- c(0, 0.25, 0.5, 0.75, 1) # proportions W
+ways <- sapply(p, function(q) (q * 4)^W * ((1 - q) * 4)^L)
+prob <- ways / sum(ways)
+cbind(p, ways, prob)
+```
+
+As copy & paste from the slides does not work I downloaded the PDF of
+the Speaker deck slides. But still, it does not work always. In that
+case I use
+[TextSniper](https://textsniper.app/ "App for text recognition") and
+format manually.
+
+## Overview of the Course Schedule
+
+The following tables matches the lectures ([videos
+2023](https://www.youtube.com/playlist?list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus)
+and [slides 2023](https://speakerdeck.com/rmcelreath)) with the book
+chapters of the [second edition
+(2020)](https://www.amazon.de/Statistical-Rethinking-Bayesian-Examples-Chapman/dp/036713991X/ref=pd_ci_mcx_mh_mcx_views_0?pd_rd_w=0hXcF&content-id=amzn1.sym.0cbf7d14-5630-4ffd-8c03-015d34863840&pf_rd_p=0cbf7d14-5630-4ffd-8c03-015d34863840&pf_rd_r=K9KW83V635VKRVDS2J6S&pd_rd_wg=cRN8V&pd_rd_r=d2928c40-3fdf-4b68-a23b-6d7484f0e11c&pd_rd_i=036713991X).
+It was generated by a screenshot from **Statistical Rethinking 2023 -
+01 - The Golem of Prague
+(**[50:09](https://www.youtube.com/watch?v=FdnMWdICdRs&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=1&t=50m9s)),
+but can also be found [as a
+slide](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-01?slide=63)
+in **Statistical Rethinking 2023 - Lecture 01**.
+
+![](img/SR2-Course-Schedule-min.png)
+
+## Important links
+
+-   **The `rethinking` package**: Statistical Rethinking course and book
+    package: <https://github.com/rmcelreath/rethinking>. I am using
+    version 2.31.
+
+-   **Statistical rethinking 2023**: Course material for January -
+    March 2023. <https://github.com/rmcelreath/stat_rethinking_2023>. It
+    contains a link to the new [Video playlist
+    2023](https://www.youtube.com/watch?v=FdnMWdICdRs&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus),
+    and to the [slide deck
+    collection](https://speakerdeck.com/rmcelreath/). Furthermore it
+    displays a table with the readings per week including the links to
+    the appropriate video and slides. The repo also inlcudes [PDFs for
+    the
+    homework](https://github.com/petzi53/stat_rethinking_2023/tree/main/homework)
+    and the [scripts for the lecture
+    animations](https://github.com/petzi53/stat_rethinking_2023/tree/main/homework).
+    --- I could not find the new R scripts associated with the (new)
+    book text. They need to be collected from the slide lectures.

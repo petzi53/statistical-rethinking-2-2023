@@ -1,0 +1,244 @@
+# Small and Large Worlds
+
+-   The **small world** is the self-contained logical world of the
+    model.
+-   The **large world** is the broader context in which one deploys a
+    model.
+
+## Bayesian Probability of the Water Proportion
+
+[R Code snippet
+2.1](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=50):
+Statistical Rethinking 2023 - Lecture 02, Slide 50.
+
+```{r}
+#| label: probability-water
+
+sample <- c("W", "L", "W", "W", "W", "L", "W", "L", "W")
+W <- sum(sample == "W") # number of W observed
+L <- sum(sample == "L") # number of L observed
+p <- c(0, 0.25, 0.5, 0.75, 1) # proportions W
+
+# using vectorized version instead of sapply()
+# see: https://github.com/rmcelreath/stat_rethinking_2023/issues/6
+get_ways <- function(q) (q * 4)^W * ((1 - q) * 4)^L
+ways <- get_ways(p)
+prob <- ways / sum(ways)
+cbind(p, ways, prob)
+
+```
+
+`prob` is called the **posterior distribution** because it's posterior
+to the sample to the updating we did in light of the data.
+
+This estimator is optimal you cannot do better than thisif your model is
+correct and the model here doesn't mean the particular value of P - it
+means the generative hypothesis about how the garden is drawn given a
+particular value of P.
+
+## Test Before You Est(imate)
+
+We want to worry about the correctness of code in scientific data
+analysis as well because scientific data analysis is in the vast
+majority of fields a kind of amateur software development. There is
+scripting and we want to document our code and we need to worry about
+errors and want to have a reliable workflow that does some quality
+assurance. So we've coded a generative simulation and we've coded an
+estimator and now we'd like to test our estimator with our generative
+simulation.
+([37:40](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=37m40s))
+
+1.  Code a generative simulation
+2.  Code an estimator
+3.  Test (2) with (1)
+
+### Simulating the Globe Tossing
+
+[![R Code 2.3, Statistical Rethinking 2023 - Lecture 02, \[Slide
+54\](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54).](img/code-sim-globe-tossing-min.png){fig-alt="code snippet for a simulation of globe tossing"}](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54)
+
+```{r}
+#| label: sim-globe-tossing
+
+# function to toss a globe covered p by water N times
+sim_globe <- function(p = 0.7, N = 9) {
+  sample(c("W", "L"), size = N, prob = c(p, 1 - p), replace = TRUE)
+}
+sim_globe()
+```
+
+You can simulate the experiment arbitrary times for any particular
+proportion of water you like. This is a way to explore the design of an
+experiment as well as debug the code.
+([39:55](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=39m55s)).
+
+```{r}
+#| label: replicate-sim
+#| lst-cap: "R code snippet 2.4: Replicate simulation"
+
+# replicate simulation 10 times with different p values (here: p = 0.5)
+replicate(sim_globe(p = 0.5, N = 9), n = 10) 
+```
+
+::: {.callout-warning style="color: red"}
+## Quarto bug
+
+2023-05-08: lst-label and lst-cap are only working in display code
+snippets but not in snippets to execute. See [lst-cap and lst-label in
+Quarto?](https://community.rstudio.com/t/lst-cap-and-lst-label-in-quarto/157173)
+and [lst-label and lst-cap do not produce listing caption and
+reference](https://github.com/quarto-dev/quarto-cli/issues/1580).
+:::
+
+### Test the simulation at extreme values
+
+R code snippets 2.5 and 2.6: [Slide
+57](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=57).
+
+```{r}
+#| label: test-sim-extrem-values
+sim_globe(p = 1, N = 10) # test, when p = 1
+
+sum(sim_globe(p = 0.5, N = 1e4) == "W") / 1e4 # test 1e4 (10.000) times
+```
+
+### Code an estimator and test it with the simulation
+
+In the following compute_posterior() function I could not manage to get
+working the part with the bars. As far as I understand it comes from the
+`animint` or `animint2` packagae but I did not know how to fill in the
+second required parameter `x.name`.
+
+```{r}
+#| label: test-est-with-sim
+
+# function to compute posterior distribution 
+compute_posterior <- function(the_sample, poss = c(0, 0.25, 0.5, 0.75, 1)) {
+  W <- sum(the_sample == "W") # number of W observed
+  L <- sum(the_sample == "L") # number of L observed
+  get_ways <- function(q) (q * 4)^W * ((1 - q) * 4)^L
+  ways <- get_ways(poss)
+  # ways <- sapply(poss, function(q) (q * 4)^W * ((1 - q) * 4)^L)
+  post <- ways / sum(ways)
+  # cannot find second parameter of function make_bar()
+  # bars <- sapply(post, function(q) animint2::make_bar(q)) 
+  data.frame(poss, ways, post = round(post, 3))
+}
+
+compute_posterior(sim_globe())
+```
+
+### Summary
+
+\(1\) Test the estimator where the answer is known
+
+\(2\) Explore different sampling designs
+
+\(3\) Develop intuition for sampling and estimation
+
+## Numerical techniques for computing posterior distributions
+
+1.  Grid approximation
+2.  Quadratic approximation
+3.  Markov chain Monte Carlo (MCMC)
+
+### Grid approximation
+
+#### Concept
+
+At any particular value of a parameter, *p*', it's a simple matter to
+compute the posterior probability: just multiply the prior probability
+of *p*' by the likelihood at *p*'. Repeating this procedure for each
+value in the grid generates an approximate picture of the exact
+posterior distribution. This procedure is called **GRID APPROXIMATION**.
+
+Grid approximation is very useful as a pedagogical tool. But in most of
+your real modeling, grid approximation isn't practical because it scales
+poorly, as the number of parameters increases.
+
+1.  Define the grid. This means you decide how many points to use in
+    estimating the posterior, and then you make a list of the parameter
+    values on the grid.
+2.  Compute the value of the prior at each parameter value on the grid.
+3.  Compute the likelihood at each parameter value.
+4.  Compute the unstandardized posterior at each parameter value, by
+    multiplying the prior by the likelihood.
+5.  Finally, standardize the posterior, by dividing each value by the
+    sum of all values.
+
+```{r}
+#| label: grid-approx
+
+library(ggplot2)
+
+# 1. define grid
+p_grid <- seq(from = 0, to = 1, length.out = 20)
+
+# 2. define prior
+prior <- rep(1, 20)
+
+# 3. compute likelihood at each value in grid
+likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
+
+# 4. compute product of likelihood and prior
+unstd.posterior <- likelihood * prior
+
+# 5. standardize the posterior, so it sums to 1
+posterior <- unstd.posterior / sum(unstd.posterior)
+
+# 6 display the posterior distribution 
+# using ggplot2::ggplot instead of books base::plot 
+df <- dplyr::bind_cols("prob" = p_grid, "post" = posterior)
+ggplot(df, aes(x = prob, y = post)) +
+    geom_line() +
+    geom_point()
+```
+
+#### Change likelihood parameters
+
+The parameters for the calculated likelihood is based on the binomial
+distribution and is shaping the above plot:
+
+-   x = number of water events `W`
+-   size = number of sample trials = number of observations
+-   prob = success probability on each trial = probability of `W` (water
+    event)
+
+In the code example above it does not matter what prior probability is
+chosen in the range from 0 to 1, if the probability of `W` is greater
+than zero and --- and by definition of the binomial function --- equal
+for all 20 events.
+
+The book example features 6 `W` of 9 obs. You can produce the sequence
+of diagrams from Figure 2.5 by changing the likelyhood parameters `x`
+and `size` according to the sample: `WLWWWLWLW`. The `prior probability`
+in this step-by-step version is always the previous PDF ([Probability
+density
+function](https://en.wikipedia.org/wiki/Probability_density_function)).
+
+``` r
+likelihood1 <- dbinom(x = 1, size = 1, prob = p_grid) # event Water
+likelihood2 <- dbinom(x = 1, size = 2, prob = p_grid) # event Land
+likelihood3 <- dbinom(x = 2, size = 3, prob = p_grid) # event Water
+likelihood4 <- dbinom(x = 3, size = 4, prob = p_grid) # event Water
+likelihood5 <- dbinom(x = 4, size = 5, prob = p_grid) # event Water
+likelihood6 <- dbinom(x = 4, size = 6, prob = p_grid) # event Land
+likelihood7 <- dbinom(x = 5, size = 7, prob = p_grid) # event Water
+likelihood8 <- dbinom(x = 5, size = 8, prob = p_grid) # event Land
+likelihood9 <- dbinom(x = 6, size = 9, prob = p_grid) # event Water
+```
+
+![Replicated Figure 2.5 from the 2nd book
+edition](img/bayesian_model_learns_step_by_step-min.png)
+
+#### Changing prior parameters
+
+To see the influence of the prior probability on the postrior
+probability by using the same likelihood the book offers two code
+snippets. Replace the definition of the prior (number 2 in the code
+snippet) ---one at a time --- with the following lines of code:
+
+``` r
+prior <- ifelse(p_grid < 0.5, 0, 1)
+prior <- exp(-5 * abs(p_grid - 0.5))
+```
