@@ -133,7 +133,10 @@ As copy & paste from the slides does not work I downloaded the PDF of
 the Speaker deck slides. But still, it does not work always. In that
 case I use
 [TextSniper](https://textsniper.app/ "App for text recognition") and
-format manually.
+format manually. But these copy & paste problems only arise when using
+new code, prepared for the 3rd edition. With the book (2nd ed.) I do not
+have problems to copy the code snippets via calibre with the ePUB eBook
+version.
 
 ## Overview of the Course Schedule
 
