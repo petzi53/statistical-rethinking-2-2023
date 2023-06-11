@@ -33,6 +33,8 @@ install.packages(c("coda", "mvtnorm", "devtools", "dagitty"))
 library(devtools)
 devtools::install_github("rmcelreath/rethinking")
 
+####################   Chapter 2   ##############################
+
 ## R code 2.1
 ways <- c(0, 3, 8, 9, 0)
 ways / sum(ways)
@@ -107,6 +109,7 @@ for (i in 2:n_samples) {
 dens(p, xlim = c(0, 1))
 curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
 
+####################   Chapter 3   ##############################
 ## R code 3.1
 Pr_Positive_Vampire <- 0.95
 Pr_Positive_Mortal <- 0.01
@@ -233,6 +236,8 @@ data(homeworkch3)
 
 ## R code 3.30
 sum(birth1) + sum(birth2)
+
+####################   Chapter 4   ##############################
 
 ## R code 4.1
 pos <- replicate(1000, sum(runif(16, -1, 1)))
@@ -757,6 +762,8 @@ m4.7alt <- quap(
   start = list(w = rep(0, ncol(B)))
 )
 
+####################   Chapter 5   ##############################
+
 ## R code 5.1
 # load data and copy
 library(rethinking)
@@ -1194,6 +1201,8 @@ m5.10 <- quap(
   data = d
 )
 
+####################   Chapter 6   ##############################
+
 ## R code 6.1
 set.seed(1914)
 N <- 200 # num grant proposals
@@ -1322,10 +1331,12 @@ sim.coll <- function(r = 0.9) {
   m <- lm(kcal.per.g ~ perc.fat + x, data = d)
   sqrt(diag(vcov(m)))[2] # stddev of parameter
 }
+
 rep.sim.coll <- function(r = 0.9, n = 100) {
   stddev <- replicate(n, sim.coll(r))
   mean(stddev)
 }
+
 r.seq <- seq(from = 0, to = 0.99, by = 0.01)
 stddev <- sapply(r.seq, function(z) rep.sim.coll(r = z, n = 100))
 plot(stddev ~ r.seq, type = "l", col = rangi2, lwd = 2, xlab = "correlation")
@@ -1517,6 +1528,8 @@ adjustmentSets(dag_6.2, exposure = "W", outcome = "D")
 
 ## R code 6.31
 impliedConditionalIndependencies(dag_6.2)
+
+####################   Chapter 7   ##############################
 
 ## R code 7.1
 sppnames <- c(
@@ -1825,6 +1838,8 @@ m5.3t <- quap(
   data = d
 )
 
+####################   Chapter 8   ##############################
+
 ## R code 8.1
 library(rethinking)
 data(rugged)
@@ -2049,6 +2064,8 @@ prior <- extract.prior(m8.5)
 
 ## R code 8.27
 d$lang.per.cap <- d$num.lang / d$k.pop
+
+####################   Chapter 9   ##############################
 
 ## R code 9.1
 num_weeks <- 1e5
@@ -2357,6 +2374,8 @@ m5.8s2 <- ulam(
   start = list(a = 10, bl = 0, br = 0.1, sigma = 1)
 )
 
+####################   Chapter 10   #############################
+
 ## R code 10.1
 p <- list()
 p$A <- c(0, 0, 10, 0, 0)
@@ -2419,6 +2438,8 @@ max(entropies)
 
 ## R code 10.13
 distributions[which.max(entropies)]
+
+####################   Chapter 11   #############################
 
 ## R code 11.1
 library(rethinking)
@@ -3028,6 +3049,8 @@ a1 <- k["a1"]
 a2 <- k["a2"]
 exp(a1) / (exp(a1) + exp(a2))
 
+####################   Chapter 12   #############################
+
 ## R code 12.1
 pbar <- 0.5
 theta <- 5
@@ -3338,6 +3361,8 @@ precis(m12.7)
 ## R code 12.38
 library(rethinking)
 data(Hurricanes)
+
+####################   Chapter 13   #############################
 
 ## R code 13.1
 library(rethinking)
@@ -3707,6 +3732,9 @@ for (i in 1:100) lines(1:4, p_raw_asim[i, ], col = grau(0.25), lwd = 2)
 
 ## R code 13.40
 ## R code 13.41
+
+####################   Chapter 14   #############################
+
 ## R code 14.1
 a <- 3.5 # average morning wait time
 b <- (-1) # average difference afternoon wait time
@@ -4425,6 +4453,8 @@ text(0.2, 0.1, "posterior", col = rangi2)
 ## R code 14.54
 S <- matrix(c(sa^2, sa * sb * rho, sa * sb * rho, sb^2), nrow = 2)
 
+####################   Chapter 15   #############################
+
 ## R code 15.1
 # simulate a pancake and return randomly ordered sides
 sim_pancake <- function() {
@@ -4811,6 +4841,9 @@ d <- list(x = x, y = y)
 ## R code 15.37
 ## R code 15.38
 ## R code 15.39
+
+####################   Chapter 16   #############################
+
 ## R code 16.1
 library(rethinking)
 data(Howell1)
