@@ -1,11 +1,11 @@
-# Small and Large Worlds
+# 2a: Small and Large Worlds
 
 -   The **small world** is the self-contained logical world of the
     model.
 -   The **large world** is the broader context in which one deploys a
     model.
 
-## Bayesian Probability of the Water Proportion
+## 2.1a Bayesian Probability of the Water Proportion
 
 [R Code snippet
 2.1](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=50):
@@ -36,7 +36,7 @@ correct and the model here doesn't mean the particular value of P - it
 means the generative hypothesis about how the garden is drawn given a
 particular value of P.
 
-## Test Before You Est(imate)
+## 2.2a Test Before You Est(imate)
 
 We want to worry about the correctness of code in scientific data
 analysis as well because scientific data analysis is in the vast
@@ -52,7 +52,7 @@ simulation.
 2.  Code an estimator
 3.  Test (2) with (1)
 
-### Simulating the Globe Tossing
+### 2.2.1a Simulating the Globe Tossing
 
 [![R Code 2.3, Statistical Rethinking 2023 - Lecture 02, \[Slide
 54\](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54).](img/code-sim-globe-tossing-min.png){fig-alt="code snippet for a simulation of globe tossing"}](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54)
@@ -90,7 +90,7 @@ and [lst-label and lst-cap do not produce listing caption and
 reference](https://github.com/quarto-dev/quarto-cli/issues/1580).
 :::
 
-### Test the simulation at extreme values
+### 2.2.2a Test the simulation at extreme values
 
 R code snippets 2.5 and 2.6: [Slide
 57](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=57).
@@ -102,7 +102,7 @@ sim_globe(p = 1, N = 10) # test, when p = 1
 sum(sim_globe(p = 0.5, N = 1e4) == "W") / 1e4 # test 1e4 (10.000) times
 ```
 
-### Code an estimator and test it with the simulation
+### 2.2.3a Code an estimator and test it with the simulation
 
 In the following compute_posterior() function I could not manage to get
 working the part with the bars. As far as I understand it comes from the
@@ -128,7 +128,7 @@ compute_posterior <- function(the_sample, poss = c(0, 0.25, 0.5, 0.75, 1)) {
 compute_posterior(sim_globe())
 ```
 
-### Summary
+### 2.2.4a Summary
 
 \(1\) Test the estimator where the answer is known
 
@@ -136,15 +136,15 @@ compute_posterior(sim_globe())
 
 \(3\) Develop intuition for sampling and estimation
 
-## Numerical techniques for computing posterior distributions
+## 2.3a Numerical techniques for computing posterior distributions
 
 1.  Grid approximation
 2.  Quadratic approximation
 3.  Markov chain Monte Carlo (MCMC)
 
-### Grid approximation
+### 2.3.1a Grid approximation
 
-#### Concept
+#### 2.3.1.1a Concept
 
 At any particular value of a parameter, *p*', it's a simple matter to
 compute the posterior probability: just multiply the prior probability
@@ -194,7 +194,7 @@ ggplot(df, aes(x = prob, y = post)) +
     geom_point()
 ```
 
-#### Change likelihood parameters
+#### 2.3.1.2a Change likelihood parameters
 
 The parameters for the calculated likelihood is based on the binomial
 distribution and is shaping the above plot:
@@ -231,7 +231,7 @@ likelihood9 <- dbinom(x = 6, size = 9, prob = p_grid) # event Water
 ![Replicated Figure 2.5 from the 2nd book
 edition](img/bayesian_model_learns_step_by_step-min.png)
 
-#### Changing prior parameters
+#### 2.3.1.3a Changing prior parameters
 
 To see the influence of the prior probability on the postrior
 probability by using the same likelihood the book offers two code
@@ -243,7 +243,7 @@ prior <- ifelse(p_grid < 0.5, 0, 1)
 prior <- exp(-5 * abs(p_grid - 0.5))
 ```
 
-#### Disadvantage
+#### 2.3.1.4a Disadvantage
 
 Grid approximation is very expansive. The number of unique values to
 consider in the grid grows rapidly as the number of parameters in the
@@ -256,9 +256,9 @@ parameters. The grid approximation strategy scales very poorly with
 model complexity, so it won't get us very far. But it is a very useful
 didactically as it help to understand the general principle.
 
-### Quadratic Approximation
+### 2.3.2a Quadratic Approximation
 
-#### Concept
+#### 2.3.2.1a Concept
 
 Under quite general conditions, the region near the peak of the
 posterior distribution will be nearly Gaussian---or "normal"---in shape.
@@ -310,7 +310,7 @@ See my [bug report](https://github.com/rstudio/rstudio/issues/13227).
 Read the result as: *Assuming the posterior is Gaussian, it is maximized
 at 0.67, and its standard deviation is 0.16*.
 
-#### Compare quadratic approximation with analytic calculation
+#### 2.3.2.2a Compare quadratic approximation with analytic calculation
 
 ```{r}
 #| label: analytical-calc
@@ -324,13 +324,12 @@ curve(dbeta(x, W + 1, L + 1), from = 0, to = 1)
 curve(dnorm(x, 0.67, 0.16), lty = 2, add = TRUE)
 ```
 
-#### Disadvantage
+#### 2.3.2.3a Disadvantage
 
 As the amount of data increases, however, the quadratic approximation
 gets better. This phenomenon, where the quadratic approximation improves
-with the amount of data, is very common. It\'s one of the reasons that
-so many classical statistical procedures are nervous about small
-samples.
+with the amount of data, is very common. It's one of the reasons that so
+many classical statistical procedures are nervous about small samples.
 
 Using the quadratic approximation in a Bayesian context brings with it
 all the same concerns. But you can always lean on some algorithm other
@@ -350,7 +349,7 @@ trying to compute the Hessian.
 Some other drawbacks will be explicated in later chapter. Therefore MCMC
 seems generally the best option for complex models.
 
-### Markov Chain Monte Carlo (MCMC)
+### 2.3.3a Markov Chain Monte Carlo (MCMC)
 
 There are lots of important model types, like multilevel (mixed-effects)
 models, for which neither grid approximation nor quadratic approximation
@@ -390,5 +389,41 @@ curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
 
 ```
 
-It\'s weird. But it works. The **METROPOLIS ALGORITHM** is explained in
-[Chapter 9](javascript:void(0)).
+It's weird. But it works. The above **METROPOLIS ALGORITHM** is
+explained in [Chapter 9](javascript:void(0)).
+
+## 2.4a Bayesian Inference: Some Lessons to Draw
+
+The following list summarizes differences between Bayesian and
+Non-Bayesian inference ("Frequentism"):
+
+1.  **No minimum sampling size**: The minimum sampling size in Bayesian
+    inference is one. You are going to update each data point at its
+    time. For instance you got an estimate every time when you toss the
+    globe and the estimate is updated. --- Well, the sample size of one
+    is not very informative but that is the power of Bayesian inference
+    in not getting over confident. It is always accurately representing
+    the relative confidence of plausability we should assign to each of
+    the possible proportions.
+2.  **Shape embodies sample size**: The shape of the posterior
+    distribution embodies all the information that the sample has about
+    the process of the proportions. Therefore you do not need to go back
+    to the original dataset for new observations. Just take the
+    posterior distribution and update it by multiplying the number fo
+    ways the new data could produce.
+3.  **No point estimates**: The estimate is the whole distribution. It
+    may be fine for communication purposes to talk about some summary
+    points of the distribution like the mode and mean. But neither of
+    these points is special as a point of estimate. When we do
+    calculations we draw predictions from the whole distribution, never
+    just from a point of it.
+4.  **No one true interval**: Intervals are not important in Bayesian
+    inference. They are merely summaries of the shape of the
+    distribution. There is nothing special in any of these intervals
+    because the endpoints of the intervals are not special. Nothing
+    happens of the endpoints of the intervals because the interval is
+    arbitrary. (The 95% in Non-Bayesian inference is essentially a
+    dogma, a superstition. Even in Non-Bayesian statistics it is
+    conceptualized as an arbitrary interval.)
+
+## 2.5a Practice

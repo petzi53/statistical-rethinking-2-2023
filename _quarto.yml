@@ -7,15 +7,16 @@ book:
   date: "2023-06-05"
   chapters:
     - index.qmd
-    - 01-golem-of-prague.qmd
-    - 02-small-and-large-worlds.qmd
-    - references.qmd
+    - 01a-golem-of-prague.qmd
+    - 02a-small-and-large-worlds.qmd
+    - 95a-references.qmd
 
 bibliography: references.bib
 
 format:
   html:
     theme: cosmo
+    number-sections: false
   pdf:
     documentclass: scrreprt
 

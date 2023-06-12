@@ -1,6 +1,66 @@
-# Package Installation {.unnumbered}
+# Preface
 
-## Install necessary packages
+## Content and Goals of this Book
+
+This book collects personal notes during reading of Statistical
+Rethinking by Richard McElreath. I am using the [second
+edition](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919)
+published 2020 by [CRC Press](https://en.wikipedia.org/wiki/CRC_Press)
+an imprint of Routledge of the Taylor & Francis Group. Additionally I am
+using [Statistical Rethinking
+2023](https://www.youtube.com/playlist?list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus),
+the most recent set of free YouTube video lectures.
+
+You can find other material on Richards [website about the
+book](https://xcelab.net/rm/statistical-rethinking/). Of special
+interest for me are the
+[brms+tidyverse](https://bookdown.org/content/4857/) and the
+[Stan+tidyverse](https://vincentarelbundock.github.io/rethinking2/)
+conversion of his code. As I am not very experienced with R and
+completely new to Bayesian statistics and their tools this additional
+material is for me also very challenging. I am planning to read them
+simultaneously and will dedicate parallel chapters for their approaches.
+Chapters with the
+
+-   suffix `a` refers to the original book,
+-   suffix `b` to the brms conversion and
+-   suffix `c` to the Stan conversion.
+
+My text consists mostly of quotes from the 2020 book edition or from the
+text of the video lectures 2023. Sometimes I made minor editing (e.g.,
+shorting the text), but almost all of my text of this Quarto book are
+not mine, but is coming from the book or video lectures by Richard
+McElreath. Therefore I am not going to indicate these quotes and I am
+also not using exact text snippets for my replications.
+
+I am not only replicating the code to see how it works but also to
+change the values of parameters to observe their influences. Sometimes I
+am changing the code myself to tidyverse conventions. Especially when it
+comes to plotting I try use
+[ggplot2](https://ggplot2.tidyverse.org/reference/index.html) instead
+the base plotting system I have no experience at all.
+
+As this is my first book using [Quarto](https://quarto.org/) instead of
+[bookdown](https://bookdown.org/yihui/bookdown/) I am using these notes
+also to learn Quarto. Therefore you will find sometimes remarks to my
+Quarto experiences.
+
+::: {.callout-note style="color: orange;"}
+## Warning
+
+I wrote this book as a text for others to read because that forces me to
+be become explicit and explain all my learning more carefully. Please
+keep in mind that this text is not written by an expert but by a
+learner. In spite of replicating most of the content it may contain many
+mistakes. All these misapprehensions and errors are my responsibility.
+:::
+
+If you find errors please do not hesitate to write issues or PRs on my
+[GitHub site](https://github.com/petzi53/statistical-rethinking-2-2023).
+I really appreciate it to learn from more experienced R users! It
+shortens the learning paths of self-directed learners.
+
+## Package Installation {.unnumbered}
 
 In contrast to the sparse and partly outdated remarks in the book use
 the installation section from the `rethinking` [package at
@@ -91,9 +151,10 @@ the lectures at the [new 2023 github
 repo](https://github.com/rmcelreath/stat_rethinking_2023).
 :::
 
-The style of the code snippets is not the tidyverse style. For instance:
-The equal sign `=` is not embedded between spaces but a list of
-variables, separated by comas has in front and before the coma a space.
+The style of the code snippets is not the [tidyverse
+style](https://style.tidyverse.org/index.html). For instance: The equal
+sign `=` is not embedded between spaces but a list of variables,
+separated by comas has in front and before the coma a space.
 
 ```{r}
 #| label: code-style-orig
@@ -130,13 +191,12 @@ cbind(p, ways, prob)
 ```
 
 As copy & paste from the slides does not work I downloaded the PDF of
-the Speaker deck slides. But still, it does not work always. In that
-case I use
-[TextSniper](https://textsniper.app/ "App for text recognition") and
-format manually. But these copy & paste problems only arise when using
-new code, prepared for the 3rd edition. With the book (2nd ed.) I do not
-have problems to copy the code snippets via calibre with the ePUB eBook
-version.
+the Speaker deck slides. But still, it didn't work always. In that case
+I used [TextSniper](https://textsniper.app/ "App for text recognition")
+and formated manually. But these copy & paste problems only arise when
+using new code, prepared for the 3rd edition. With the book (2nd ed.) I
+do not have problems to copy the code snippets via calibre with the ePUB
+eBook version.
 
 ## Overview of the Course Schedule
 
@@ -156,10 +216,12 @@ in **Statistical Rethinking 2023 - Lecture 01**.
 
 ## Important links
 
+-   You can purchase *Statistical Rethinking: A Bayesian Course in R and
+    Stan* from [CRC
+    Press](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919?utm_source=crcpress.com&utm_medium=referral).
 -   **The `rethinking` package**: Statistical Rethinking course and book
     package: <https://github.com/rmcelreath/rethinking>. I am using
     version 2.31.
-
 -   **Statistical rethinking 2023**: Course material for January -
     March 2023. <https://github.com/rmcelreath/stat_rethinking_2023>. It
     contains a link to the new [Video playlist
@@ -174,3 +236,34 @@ in **Statistical Rethinking 2023 - Lecture 01**.
     animations](https://github.com/petzi53/stat_rethinking_2023/tree/main/homework).
     --- I could not find the new R scripts associated with the (new)
     book text. They need to be collected from the slide lectures.
+-   **Statistical rethinking with brms, ggplot2, and the tidyverse**:
+    [brms/tidyverse-Conversion](https://bookdown.org/content/4857/) of
+    Statistical Rethinking using bookdown by *A Solomon Kurz*
+    (2023-01-26)
+
+**Solutions**:
+
+There are two different bookdown websites with book solutions:
+
+-   [Solutions for the 1st
+    edition](https://bookdown.org/bgautijonsson/statistical_rethinking_solutions/)
+    by *Brynjólfur Gauti Jónsson* and
+-   [Solutions for the 2nd
+    edition](https://github.com/wjakethompson/sr2-solutions) by *Jake
+    Thompson.*
+
+I have also found two GitHub repos with solutions:
+
+-   [GitHub solutions by *Taras
+    Svirskyi*](https://github.com/jffist/statistical-rethinking-solutions)
+    *(jffist)*
+-   [GitHub solutions by William
+    Wolf](https://github.com/cavaunpeu/statistical-rethinking)
+    *(cavaunpeu)*
+
+::: {.callout-caution style="color: orange;"}
+## Caution
+
+These solutions are written by members of the #RStats community and are
+not authorized by the author.
+:::
