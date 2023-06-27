@@ -1,1 +1,129 @@
 # 2b: Small and Large Worlds
+
+The work by Solomon Kurz has many references to R specifics, so that
+people new to R can follow the course. Most of these references are not
+new to me, so I will not include them in my personal notes. There are
+also very important references to other relevant articles I do not know.
+But I will put these kind of references for now aside and will me mostly
+concentrate on the replication and understanding the code examples.
+
+Even if I have some plotting experiences with ggplot2 I will replicate
+this code as well. It seems to me that the author is an graphics and
+plotting expert and I want to get more experience in using ggplot2.
+
+```{r}
+#| label: setup
+
+library(conflicted)
+library(tidyverse)
+```
+
+## 2.1b Counting Possibilities
+
+> If we're willing to code the marbles as 0 = "white" 1 = "blue", we can
+> arrange the possibility data in a tibble as follows.
+
+```{r}
+#| label: create-marble-data
+
+d <-
+  tibble(p1 = 0,
+         p2 = rep(1:0, times = c(1, 3)),
+         p3 = rep(1:0, times = c(2, 2)),
+         p4 = rep(1:0, times = c(3, 1)),
+         p5 = 1)
+
+head(d)
+```
+
+> You might depict the possibility data in a plot.
+
+```{r}
+#| label: depict-marble-data
+
+d %>% 
+  set_names(1:5) %>% 
+  mutate(x = 1:4) %>% 
+  pivot_longer(-x, names_to = "possibility") %>% 
+  mutate(value = value %>% as.character()) %>% 
+  
+  ggplot(aes(x = x, y = possibility, fill = value)) +
+  geom_point(shape = 21, size = 5) +
+  scale_fill_manual(values = c("white", "navy")) +
+  scale_x_discrete(NULL, breaks = NULL) +
+  theme(legend.position = "none")
+
+```
+
+At first I could not understand the code lines 4 to 7. In particular I
+could not see what the code of lines 4 and 6 does. I had to execute line
+by line to see what happens:
+
+```{r}
+#| labels: using-set-names
+
+set_names(d, 1:5)
+```
+
+`set_names()` comes from **rlang** and is exported to **purrr**. It is
+equivalent to `stats::setNames()` but has more features and stricter
+argument checking. I does nothing more as to change the column names
+from p\<number\> to \<number\>. If one had used just numbers for the
+probability columns this line wouldn't have been necessary. (I omitted
+the `head()` argument of the last line as it is not necessary.)
+
+```{r}
+#| label: create-marble-data-2
+
+df <-
+  tibble(`1` = 0,
+         `2` = rep(1:0, times = c(1, 3)),
+         `3` = rep(1:0, times = c(2, 2)),
+         `4` = rep(1:0, times = c(3, 1)),
+         `5` = 1)
+
+df
+```
+
+It is interesting to see that the first and last column are doubles and
+not integers. I believe that the reason is that these two columns do not
+have variations so that R assumes the more general type of numbers.
+
+After understanding what set_names() does the next line with `mutate()`
+is easy. It adds a new column with the values 1 to 4 for each row.
+
+Another difficulty for me was line 6: I understood that the data frame
+is converted from a wide to a long structure. But together with the pipe
+and not naming the first parameter `-x` I did not catch the essence of
+the command.
+
+```{r}
+#| label: try-different-pivots
+
+(df <- mutate(df, x = 1:4))
+(pivot_longer(data = df, cols = -x, names_to = "possibility"))
+# this is equivalent with:
+(pivot_longer(data = df, cols = c(`1`, `2`, `3`, `4`, `5`), names_to = "possibility"))
+# to see the difference when all columns are transformed to longer
+pivot_longer(data = df, cols = everything(), names_to = "possibility") |> print(n = 24)
+```
+
+This different code lines demonstrate: The `-x` parameter excludes the
+`x` column from the wide to long transformation. It is a shorthand for
+naming all 5 columns that should be transformed.
+
+> Here's the basic structure of the possibilities per marble draw.
+
+```{r}
+
+library(flextable)
+
+tibble(draw    = 1:3,
+       marbles = 4) %>% 
+  mutate(possibilities = marbles ^ draw) %>% 
+  flextable()
+
+```
+
+I am completely new to the **flextable** package. Until now I had only
+use

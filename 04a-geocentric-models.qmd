@@ -1,0 +1,462 @@
+# 04a: Geocentric Models
+
+```{r}
+#| label: setup
+
+library(conflicted)
+library(rethinking)
+library(tidyverse)
+library(brms)
+library(skimr)
+
+conflicts_prefer(dplyr::filter)
+```
+
+## 4.1a Normal Distributions
+
+### 4.1.1a Normal by addition
+
+> Suppose you and a thousand of your closest friends line up on the
+> halfway line of a soccer field (football pitch). Each of you has a
+> coin in your hand. At the sound of the whistle, you begin flipping the
+> coins. Each time a coin comes up heads, that person moves one step
+> towards the left-hand goal. Each time a coin comes up tails, that
+> person moves one step towards the right-hand goal. Each person flips
+> the coin 16 times, follows the implied moves, and then stands still.
+> Now we measure the distance of each person from the halfway line. Can
+> you predict what proportion of the thousand people who are standing on
+> the halfway line? How about the proportion 5 yards left of the line?
+
+Showing that there's nothing special about the underlying coin flip:
+
+> Assume ... that each step is different from all the others, a random
+> distance between zero and one yard. Thus a coin is flipped, a distance
+> between zero and one yard is taken in the indicated direction, and the
+> process repeats. To simulate this, we generate for each person a list
+> of 16 random numbers between −1 and 1. These are the individual steps.
+> Then we add these steps together to get the position after 16 steps.
+> Then we need to replicate this procedure 1000 times.
+
+```{r}
+#| label: sim-step-experiment-a
+
+# to replicate with the b-model
+set.seed(4)
+
+## R code 4.1
+pos_a1 <- replicate(1000, sum(runif(16, -1, 1)))
+pos_a2 <- replicate(1000, sum(runif(32, -1, 1)))
+
+par(mfrow = c(2, 2)) # 2-by-2 grid of plots
+hist(pos_a1)
+hist(pos_a2)
+
+plot(density(pos_a1))
+plot(density(pos_a2))
+```
+
+> Any process that adds together random values from the same
+> distribution converges to a normal. ... It doesn't matter what shape
+> the underlying distribution possesses. It could be uniform, like in
+> our example above, or it could be (nearly) anything else. Depending
+> upon the underlying distribution, the convergence might be slow, but
+> it will be inevitable.
+
+### 4.1.2a Normal by multiplication
+
+```{r}
+#| label: random-sample-growth
+
+## R code 4.2
+prod(1 + runif(12, 0, 0.1))
+```
+
+```{r}
+#| label: normal-by-multiplaction
+
+## R code 4.3
+growth <- replicate(10000, prod(1 + runif(12, 0, 0.1)))
+dens(growth, norm.comp = TRUE)
+```
+
+> ... small effects that multiply together are approximately additive,
+> and so they also tend to stabilize on Gaussian distributions.
+
+```{r}
+#| label: compare-small-big-growth
+
+## R code 4.4
+big <- replicate(10000, prod(1 + runif(12, 0, 0.5)))
+small <- replicate(10000, prod(1 + runif(12, 0, 0.01)))
+
+par(mfrow = c(2, 2)) # 2-by-2 grid of plots
+dens(big, norm.comp = TRUE)
+dens(small, norm.comp = TRUE)
+
+```
+
+> The interacting growth deviations, as long as they are sufficiently
+> small, converge to a Gaussian distribution. In this way, the range of
+> causal forces that tend towards Gaussian distributions extends well
+> beyond purely additive interactions.
+
+### 4.1.3a Normal by log-multiplication
+
+> Large deviates that are multiplied together do not produce Gaussian
+> distributions, but they do tend to produce Gaussian distributions on
+> the log scale.
+
+```{r}
+#| label: normal-by-log-multi
+
+## R code 4.5
+log.big <- replicate(10000, log(prod(1 + runif(12, 0, 0.5))))
+
+par(mfrow = c(2, 2)) # 2-by-2 grid of plots
+dens(big, norm.comp = TRUE)
+dens(log.big, norm.comp = TRUE)
+
+```
+
+> We get the Gaussian distribution back, because adding logs is
+> equivalent to multiplying the original numbers. So even multiplicative
+> interactions of large deviations can produce Gaussian distributions,
+> once we measure the outcomes on the log scale. Since measurement
+> scales are arbitrary, there's nothing suspicious about this
+> transformation.
+
+### 4.1.4a Using Gaussian Distribution
+
+**Ontological Reasons**: the world is full of Gaussian distributions,
+approximately. We're never going to experience a perfect Gaussian
+distribution. But it is a widespread pattern, appearing again and again
+at different scales and in different domains. ... The Gaussian is a
+member of a family of fundamental natural distributions known as the
+**EXPONENTIAL FAMILY**. All of the members of this family are important
+for working science, because they populate our world.
+
+**Epistemological Reasons**: the Gaussian represents a particular state
+of ignorance. When all we know or are willing to say about a
+distribution of measures (measures are continuous values on the real
+number line) is their mean and variance, then the Gaussian distribution
+arises as the most consistent with our assumptions.
+
+::: callout-tip
+## Gaussian distribution
+
+The Gaussian is a continuous distribution, unlike the discrete
+distributions of earlier chapters. Probability distributions with only
+discrete outcomes, like the binomial, are called *probability mass*
+functions and denoted `Pr`. Continuous ones like the Gaussian are called
+*probability density* functions, denoted with *`p`* or just plain old
+*`f`*, depending upon author and tradition. For mathematical reasons,
+probability densities can be greater than 1. Try dnorm(0,0,0.1), for
+example, which is the way to make R calculate *`p`*`(0|0, 0.1)`. The
+answer, about 4, is no mistake. Probability *density* is the rate of
+change in cumulative probability. So where cumulative probability is
+increasing rapidly, density can easily exceed 1. But if we calculate the
+area under the density function, it will never exceed 1. Such areas are
+also called *probability mass*.
+:::
+
+## 4.2a Language describing models
+
+> (1)  First, we recognize a set of variables to work with. Some of
+> these variables are observable. We call these *data*. Others are
+> unobservable things like rates and averages. We call these
+> *parameters*.
+>
+> (2)  We define each variable either in terms of the other variables or
+> in terms of a probability distribution.
+>
+> (3)  The combination of variables and their probability distributions
+> defines a *joint generative model* that can be used both to simulate
+> hypothetical observations as well as analyze real ones.
+
+## 4.3a Gaussian model of height
+
+### 4.3.1a The data
+
+```{r}
+#| label: load-howell-data-a
+
+## R code 4.7
+data(Howell1)
+d_a <- Howell1
+```
+
+#### 4.3.1.1a Show the data
+
+```{r}
+#| label: show-howell-data-a
+
+## R code 4.8
+str(d_a)
+
+## R code 4.9
+precis(d_a)
+```
+
+#### 4.3.1.2a Select the height data of adults
+
+```{r}
+#| label: select-height-adults-a
+
+## R code 4.10
+head(d_a$height)
+ 
+## R code 4.11
+d2_a <- d_a[d_a$age >= 18, ]
+
+```
+
+### 4.3.2a The model
+
+> Our goal is to model these values using a Gaussian distribution.
+
+#### 4.3.2.1a Plot the priors
+
+```{r}
+#| label: print-height-dist
+
+dens(d2_a$height, norm.comp = TRUE)
+
+```
+
+**Plot the mu prior (mean)**
+
+```{r}
+#| label: plot-mean-prior-a
+
+## R code 4.12
+curve(dnorm(x, 178, 20), from = 100, to = 250)
+```
+
+**Plot the sigma prior (standard deviation)**
+
+```{r}
+#| label: plot-sd-prior-a
+
+## R code 4.13
+curve(dunif(x, 0, 50), from = -10, to = 60)
+```
+
+#### 4.3.2.2a Prior predictive simulation
+
+> Once you've chosen priors for *h, μ*, and *σ*, these imply a joint
+> prior distribution of individual heights. By simulating from this
+> distribution, you can see what your choices imply about observable
+> height. This helps you diagnose bad choices.
+
+**Simulate heights by sampling from the prior**
+
+```{r}
+#| label: prior-predictive-sim-a
+
+## R code 4.14
+sample_mu_a <- rnorm(1e4, 178, 20)
+sample_sigma_a <- runif(1e4, 0, 50)
+prior_h_a <- rnorm(1e4, sample_mu_a, sample_sigma_a)
+dens(prior_h_a)
+```
+
+Playing around with different priors coming from scientific background
+knowledge about heights of adults:
+
+```{r}
+#| label: prior2-predictive-sim-a
+
+## R code 4.14
+sample_mu2_a <- rnorm(1e4, 170, 20)
+sample_sigma2_a <- runif(1e4, 0, 35)
+prior2_h_a <- rnorm(1e4, sample_mu2_a, sample_sigma2_a)
+dens(prior2_h_a)
+```
+
+**Simulate heights from priors with large sd**
+
+> Priors with ... large standard deviations are quite common in Bayesian
+> models, but they are hardly ever sensible.
+
+```{r}
+#| label: plot-predictive-sim2-a
+
+sample_mu3_a <- rnorm(1e4, 178, 100)
+prior_h3_a <- rnorm(1e4, sample_mu3_a, sample_sigma_a)
+dens(prior_h3_a)
+```
+
+#### 4.3.2.3a Personal comment
+
+Both simulation show unsensitive data with negative height to the left
+and gigantic humans in comparison to the tallest person --- [Robert
+Pershing Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow)
+(1918--1940) --- ever measured (272cm).
+
+So what? Are the priors chosen wrongly? Or does these impossibilities
+not matter?
+
+> Does this matter? In this case, we have so much data that the silly
+> prior is harmless. But that won't always be the case. There are plenty
+> of inference problems for which the data alone are not sufficient, no
+> matter how numerous. Bayes lets us proceed in these cases. But only if
+> **we use our scientific knowledge to construct sensible priors**.
+> Using scientific knowledge to build priors is not cheating. The
+> important thing is that your prior not be based on the values in the
+> data, but only on what you know about the data before you see it.
+> (emphasis is mine)
+
+### 4.3.3a Grid approximation of the posterior distribution
+
+> mapping out the posterior distribution through brute force
+> calculations.
+
+This is not recommended because it is
+
+-   laborious and computationally expensive
+-   usually so impractical as to be essentially impossible.
+
+```{r}
+#| label: grid-approx-posterior-a
+
+## R code 4.16
+
+# establish range of μ and σ values, respectively, to calculate over # as well as how many points to calculate in-between. 
+mu.list <- seq(from = 150, to = 160, length.out = 100)
+sigma.list <- seq(from = 7, to = 9, length.out = 100)
+
+# expands μ & σ values into a matrix of all of the combinations
+post <- expand.grid(mu = mu.list, sigma = sigma.list)
+
+# compute the log-likelihood at each combination of μ and σ
+post$LL <- sapply(1:nrow(post), function(i) {
+  sum(
+    dnorm(d2_a$height, post$mu[i], post$sigma[i], log = TRUE)
+  )
+})
+
+# multiply the prior by the likelihood
+# as the priors are on the log scale adding = multiplying
+post$prod <- post$LL + dnorm(post$mu, 178, 20, TRUE) +
+  dunif(post$sigma, 0, 50, TRUE)
+
+# getting back on the probability scale without rounding error 
+post$prob <- exp(post$prod - max(post$prod))
+
+```
+
+> **Comment to the last line**: the obstacle for getting back on the
+> probability scale is that rounding error is always a threat when
+> moving from log-probability to probability. If you use the obvious
+> approach, like `exp( post$prod )`, you'll get a vector full of zeros,
+> which isn't very helpful. This is a result of R's rounding very small
+> probabilities to zero.
+
+**Plot contour lines**
+
+```{r}
+#| label: contour-plot-a
+
+## R code 4.17
+rethinking::contour_xyz(post$mu, post$sigma, post$prob)
+
+```
+
+**Plot heat map**
+
+```{r}
+#| label: plot-heat-map-a
+
+## R code 4.18
+rethinking::image_xyz(post$mu, post$sigma, post$prob)
+
+```
+
+### 4.3.4a Sampling from the posterior
+
+```{r}
+#| label: posterior-sample-a
+
+## R code 4.19
+
+# randomly sample row numbers in post 
+# in proportion to the values in post$prob. 
+sample.rows <- sample(1:nrow(post),
+  size = 1e4, replace = TRUE,
+  prob = post$prob
+)
+
+# pull out the parameter values
+sample.mu4_a <- post$mu[sample.rows]
+sample.sigma4_a <- post$sigma[sample.rows]
+
+## R code 4.20
+plot(sample.mu4_a, sample.sigma4_a, cex = 0.8, pch = 21, col = col.alpha(rangi2, 0.1))
+
+```
+
+**Marginal Posterior Density**
+
+```{r}
+#| label: marg-post-density-a
+
+## R code 4.21
+dens(sample.mu4_a)
+dens(sample.sigma4_a)
+
+```
+
+**Posterior Compatibility Intervals (PIs)**
+
+```{r}
+#| label: post-comp-intervals-a
+
+## R code 4.22
+PI(sample.mu4_a)
+PI(sample.sigma4_a)
+```
+
+#### 4.3.4.1a Sample Size & Sigma Posterior
+
+```{r}
+#| label: sample-only-20
+
+## R code 4.23
+d3_a <- sample(d2_a$height, size = 20)
+
+## R code 4.24
+mu.list <- seq(from = 150, to = 170, length.out = 200)
+sigma.list <- seq(from = 4, to = 20, length.out = 200)
+post2 <- expand.grid(mu = mu.list, sigma = sigma.list)
+post2$LL <- sapply(1:nrow(post2), function(i) {
+  sum(dnorm(d3_a,
+    mean = post2$mu[i], sd = post2$sigma[i],
+    log = TRUE
+  ))
+})
+post2$prod <- post2$LL + dnorm(post2$mu, 178, 20, TRUE) +
+  dunif(post2$sigma, 0, 50, TRUE)
+post2$prob <- exp(post2$prod - max(post2$prod))
+sample2.rows <- sample(1:nrow(post2),
+  size = 1e4, replace = TRUE,
+  prob = post2$prob
+)
+sample2.mu <- post2$mu[sample2.rows]
+sample2.sigma <- post2$sigma[sample2.rows]
+plot(sample2.mu, sample2.sigma,
+  cex = 0.5,
+  col = col.alpha(rangi2, 0.1),
+  xlab = "mu", ylab = "sigma", pch = 16
+)
+
+```
+
+**Marginal Posterior Density with only 20 rows**
+
+```{r}
+#| label: marg-post-density-a2
+
+## R code 4.25
+dens(sample2.sigma, norm.comp = TRUE)
+
+```

@@ -1,0 +1,234 @@
+# 3a: Sampling the Imaginary
+
+**Medical Test Scenario with Bayes theorem**
+
+1.  Suppose there is a blood test that correctly detects vampirism 95%
+    of the time.$Pr(positivetest|vampire) = 0.95$.
+2.  It's a very accurate test, nearly always catching real vampires. It
+    also make mistakes, though, in the form of false positives. One
+    percent of the time, it incorrectly diagnoses normal people as
+    vampires, $Pr(positive test result| mortal) = 0.01$.
+3.  The final bit of information we are told is that vampires are rather
+    rare, being only 0.1% of the population, implying
+    $Pr(vampire) = 0.001$.
+
+Suppose now that someone tests positive for vampirism. What's the
+probability that he or she is a bloodsucking immortal?
+
+```{r}
+#| label: scenario-bayes-theorem-a
+## R code 3.1
+
+Pr_Positive_Vampire_a <- 0.95
+Pr_Positive_Mortal_a <- 0.01
+Pr_Vampire_a <- 0.001
+Pr_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a +
+  Pr_Positive_Mortal_a * (1 - Pr_Vampire_a)
+(Pr_Vampire_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a / Pr_Positive_a)
+```
+
+**Medical test scenario with natural frequencies**
+
+```         
+(1)  In a population of 100,000 people, 100 of them are vampires.
+(2)  Of the 100 who are vampires, 95 of them will test positive for vampirism.
+(3)  Of the 99,900 mortals, 999 of them will test positive for vampirism.
+```
+
+There are 999 + 95 = `r 999 + 95` people tested positive. But from these
+people only 95 / (999 + 95) = `r (95 / (999 + 95)) * 100` % vampires.
+
+## 3.1a Sampling from Grid
+
+::: callout-note
+## prob_data & prob_p
+
+I have `prob_data` and `prob_p` not changed to the `_a`-version because
+these two variable names are not used in the `_b`-version. In the
+`_b`-version `prob_p` was named to `prior` and `prob_data` to
+`likelihood`.
+:::
+
+```{r}
+#| label: sampling-grid-a
+
+## R code 3.2
+p_grid_a <- seq(from = 0, to = 1, length.out = 1000)
+prob_p <- rep(1, 1000) # = prior, assumed as uniform distribution
+prob_data <- dbinom(6, size = 9, prob = p_grid_a) # = likelihood
+posterior_a <- prob_data * prob_p
+posterior_a <- posterior_a / sum(posterior_a)
+
+## R code 3.3
+samples_a <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+
+# display start of results to compare with variant b
+head(p_grid_a)
+head(posterior_a)
+head(samples_a)
+
+## R code 3.4
+plot(samples_a)
+
+## R code 3.5
+library(rethinking)
+dens(samples_a)
+```
+
+## 3.2a Sampling to Summarize
+
+After you have gotten the posterior distribution the model's work is
+done. But now you have to interpret and summarize this posterior
+distribution. There are three kind of questions you may ask:
+
+1.  Questions about intervals of defined boundaries.
+2.  Questions about intervals of defined probability mass.
+3.  Questions about point estimates.
+
+### 3.2.1a Intervals of Defined Boundaries
+
+For instance: What is the probability that the proportion of water is
+less than 0.5?
+
+```{r}
+#| label: grid-boundaries-a
+## R code 3.6
+# add up posterior probability where p < 0.5
+sum(posterior_a[p_grid_a < 0.5])
+```
+
+The posterior probability that the proportion of water\< 0.5 (50%) is
+relatively low, just about 17%. Remember: The true proportion is around
+0.7 or 70%.
+
+But this easy calculation based on grid approximation is often not
+practical when there are more parameters. So let's try the sampling
+approach:
+
+To use the samples from the posterior you have to add up all of the
+samples below 0.5, but also divide the resulting count by the total
+number of samples. In other words, find the frequency of parameter
+values below 0.5:
+
+```{r}
+#| label: sample-boundaries-a
+## R code 3.7
+(p_a <- sum(samples_a < 0.5) / 1e4)
+```
+
+Using the same approach, you can ask how much posterior probability lies
+between 0.5 and 0.75:
+
+```{r}
+#| label: sample-boundaries2-a
+## R code 3.8
+(p_a2 <- sum(samples_a > 0.5 & samples_a < 0.75) / 1e4)
+```
+
+In contrast to the analytical grid calculation my values in the sampling
+approach `r p_a2` are slightly different from the values of McElreath
+(0.6059). McElreath didn't use the `set.seed()` command so that I could
+not produce the exactly same sample values.
+
+### 3.2.2a Intervals of Defined Probability Mass
+
+Reporting an interval of defined mass is usually known as a **CONFIDENCE
+INTERVAL**. An interval of posterior probability, such as the ones we
+are working with, may instead be called a **CREDIBLE INTERVAL**.
+
+We're going to call it a **COMPATIBILITY INTERVAL** instead, in order to
+avoid the unwarranted implications of "confidence" and "credibility."
+What the interval indicates is a range of parameter values compatible
+with the model and data. The model and data themselves may not inspire
+confidence, in which case the interval will not either.
+
+The difference between intervals of defined boundaries and intervals of
+defined probability mass is that in the first case we ask for a
+**probability of frequencies** whereas in the second case we calculate a
+specified **amount of posterior probability**. As result from the first
+question we get the percentage of the probability whereas the result of
+the second question is the probability value of the percentage of
+frequencies looked for.
+
+For this type of interval, it is easier to find the answer by using
+samples from the posterior than by using a grid approximation. Suppose
+for example you want to know the boundaries of the lower 80% posterior
+probability. You know this interval starts at $p = 0$. To find out where
+it stops, think of the samples as data and ask where the 80th percentile
+lies:
+
+```{r}
+#| label: sample-quantile-a
+## R code 3.9
+quantile(samples_a, 0.8)
+```
+
+Similarly, the middle 80% interval lies between the 10th percentile and
+the 90th percentile. These boundaries are found using the same approach:
+
+```{r}
+#| label: sample-quantile2-a
+## R code 3.10
+quantile(samples_a, c(0.1, 0.9))
+```
+
+Intervals of this sort, which assign equal probability mass to each
+tail, are very common in the scientific literature. We'll call them
+**PERCENTILE INTERVALS** (PI). These intervals do a good job of
+communicating the shape of a distribution, as long as the distribution
+isn't too asymmetrical. But in terms of describing the shape of the
+posterior distribution---which is really all these intervals are asked
+to do---the percentile interval can be misleading.
+
+```{r}
+#| label: pi-skewed-a
+
+library(rethinking)
+
+## R code 3.11
+p_grid_a <- seq(from = 0, to = 1, length.out = 1000)
+prior_a <- rep(1, 1000)
+likelihood_a <- dbinom(3, size = 3, prob = p_grid_a)
+posterior_a <- likelihood_a * prior_a
+posterior_a <- posterior_a / sum(posterior_a)
+samples_a <- sample(p_grid_a, size = 1e4, replace = TRUE, prob = posterior_a)
+
+## R code 3.12
+PI(samples_a, prob = 0.5)
+
+## R code 3.13
+HPDI(samples_a, prob = 0.5)
+```
+
+### 3.2.3a Point Estimates
+
+```{r}
+#| label: point-estimates-a
+
+## R code 3.14
+p_grid_a[which.max(posterior_a)]
+
+## R code 3.15
+rethinking::chainmode(samples_a, adj = 0.01)
+
+## R code 3.16
+mean(samples_a)
+median(samples_a)
+
+
+```
+
+```{r}
+#| label: loss-function-a
+
+## R code 3.17
+sum(posterior_a * abs(0.5 - p_grid_a))
+
+## R code 3.18
+loss <- sapply(p_grid_a, function(d) sum(posterior_a * abs(d - p_grid_a)))
+
+## R code 3.19
+p_grid_a[which.min(loss)]
+
+median(samples_a)
+```
