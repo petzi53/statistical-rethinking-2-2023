@@ -16,6 +16,8 @@ plotting expert and I want to get more experience in using ggplot2.
 
 library(conflicted)
 library(tidyverse)
+
+conflicts_prefer(dplyr::lag)
 ```
 
 ## 2.1b Counting Possibilities
@@ -63,7 +65,7 @@ could not see what the code of lines 4 and 6 does. I had to execute line
 by line to see what happens:
 
 ```{r}
-#| labels: using-set-names
+#| label: using-set-names-b
 
 set_names(d, 1:5)
 ```
@@ -117,7 +119,16 @@ naming all 5 columns that should be transformed.
 
 > Here's the basic structure of the possibilities per marble draw.
 
+::: callout-note
+## Adding tbl-cap
+
+If you label the chunk using fl`extable()` then you have also to add
+`tbl-cap` to the chunk options.
+:::
+
 ```{r}
+#| label: basic-prob-struct-b
+#| tbl-cap: probility-strcuture
 
 library(flextable)
 
@@ -128,5 +139,172 @@ tibble(draw    = 1:3,
 
 ```
 
-I am completely new to the **flextable** package. Until now I had only
-use
+**Tables**:
+
+I am completely new to the
+[**flextable**](https://davidgohel.github.io/flextable/) package. Until
+now I had used most of the time
+[kableExtra](https://haozhu233.github.io/kableExtra/) and sometimes
+[DT](https://rstudio.github.io/DT/). But there are also
+[gt](https://github.com/rstudio/gt),
+[formattable](https://renkun-ken.github.io/formattable/),
+[reactable](https://glin.github.io/reactable/) and
+[reactablefmtr](https://kcuilla.github.io/reactablefmtr/). It seems to
+me that I should especially have a look into the {**gt**} package as it
+is developed by the RStudio/Posit team.
+
+See the short description quoted below from [Top 7 Packages for Making
+Beautiful Tables in
+R](https://towardsdatascience.com/top-7-packages-for-making-beautiful-tables-in-r-7683d054e541)
+by Devashree Madhugiri:
+
+-   **gt**: The gt package offers a different and easy-to-use set of
+    functions that helps us build display tables from tabular data. The
+    gt philosophy states that a comprehensive collection of table parts
+    can be used to create a broad range of functional tables. These are
+    the table body, the table footer, the spanner column labels, the
+    column labels, and the table header.
+
+    ![](https://gt.rstudio.com/reference/figures/gt_parts_of_a_table.svg)
+
+-   **formattable**: Formattable data frames are data frames that will
+    be displayed in HTML tables using formatter functions. This package
+    includes techniques to produce data structures with predefined
+    formatting rules, such that the objects maintain the original data
+    but are formatted. The package consists of several standard
+    formattable objects, including percent, comma, currency, accounting,
+    and scientific.
+
+-   **kableExtra**: The kableExtra package is used to extend the basic
+    functionality of `knitr::kable tables()`. Although `knitr::kable()`
+    is simple by design, it has many features missing which are usually
+    available in other packages, and kableExtra has filled the gap
+    nicely for `knitr::kable().` The best thing about kableExtra is that
+    most of its table capabilities work for both HTML and PDF formats.
+
+-   **DT**: dt is an abbreviation of \'DataTables.\' Data objects in R
+    can be rendered as HTML tables using the JavaScript library
+    \'DataTables\' (typically via R Markdown or Shiny).
+
+-   **flextable**: flextable package helps you to create reporting table
+    from a dataframe easily. You can merge cells, add headers, add
+    footers, change formatting, and set how data in cells is displayed.
+    Table content can also contain mixed types of text and image
+    content. Tables can be embedded from R Markdown documents into HTML,
+    PDF, Word, and PowerPoint documents and can be embedded using
+    Package Officer for Microsoft Word or PowerPoint documents. Tables
+    can also be exported as R plots or graphic files, e.g., png, pdf,
+    and jpeg.
+
+-   **reactable**: `reactable()` creates a data table from tabular data
+    with sorting and pagination by default. The data table is an HTML
+    widget that can be used in R Markdown documents and Shiny
+    applications or viewed from an R console. It is based on the React
+    Table library and made with reactR. Features are:
+
+    -   It creates a data table with sorting, filtering, and pagination
+    -   It has built-in column formatting
+    -   It supports custom rendering via R or JavaScript
+    -   It works seamlessly within R Markdown documents and the Shiny
+        app
+
+-   **ractablefmtr**: The
+    [reactablefmtr](https://kcuilla.github.io/reactablefmtr/index.html)
+    package improves the appearance and formatting of tables created
+    using the reactable R library. The reactablefmtr package includes
+    many conditional formatters that are highly customizable and easy to
+    use.
+
+I am not sure if there are other packages as well. But the above seven
+packages are a first starting point to learn creating and displaying
+sophisticated data tables in R.
+
+## 2.2b Building a Model
+
+**Globe tossing**
+
+Data: `W L W W W L W L W` (W indicates water and L indicates land. )
+
+We save our globe-tossing data in a tibble.
+
+```{r}
+#| label: globe-tossing-data
+
+(d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")))
+```
+
+### 2.2.1b A Data Story
+
+### 2.2.2b Bayesian Updating
+
+For the updating process we need to add to the data the cumulative
+number of trials, `n_trials`, and the cumulative number of successes,
+`n_successes` (i.e., `toss == "w"`),
+
+```{r}
+#| label: bayesian-updating-1b
+
+(
+  d <-
+  d %>% 
+  mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+  )
+
+```
+
+::: callout-warning
+## Warning
+
+The skills for the next graph are explained later in this chapter. I
+plan to come back here and fill in the details.
+:::
+
+The next R chunk uses the `dplyr::lag()` command: To find the "previous"
+(`lag()`) values in a vector (time series) is useful for comparing
+values behind of the current values. See [Compute lagged or leading
+values](https://dplyr.tidyverse.org/reference/lead-lag.html).
+
+::: callout-important
+## Change parameter name
+
+I had to change the parameter `k` to `default`. Maybe `k` was the name
+of the parameter of a previous dplyr version.
+:::
+
+```{r}
+#| label: bayesian-updating-2b
+
+sequence_length <- 50
+
+d %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
+  group_by(p_water) %>% 
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup() %>% 
+  mutate(prior      = ifelse(n_trials == 1, .5,
+                             dbinom(x    = lagged_n_success, 
+                                    size = lagged_n_trials, 
+                                    prob = p_water)),
+         likelihood = dbinom(x    = n_success, 
+                             size = n_trials, 
+                             prob = p_water),
+         strip      = str_c("n = ", n_trials)) %>% 
+  # the next three lines allow us to normalize the prior and the likelihood, 
+  # putting them both in a probability metric 
+  group_by(n_trials) %>% 
+  mutate(prior      = prior / sum(prior),
+         likelihood = likelihood / sum(likelihood)) %>%   
+  
+  # plot!
+  ggplot(aes(x = p_water)) +
+  geom_line(aes(y = prior), 
+            linetype = 2) +
+  geom_line(aes(y = likelihood)) +
+  scale_x_continuous("proportion water", breaks = c(0, .5, 1)) +
+  scale_y_continuous("plausibility", breaks = NULL) +
+  theme(panel.grid = element_blank()) +
+  facet_wrap(~ strip, scales = "free_y")
+
+```

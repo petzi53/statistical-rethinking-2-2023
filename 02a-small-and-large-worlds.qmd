@@ -184,3 +184,61 @@ Data = ⚫⚪⚫.
     **PRIOR PROBABILITY**. For instance: `0, 3, 8, 9, 0`
 -   The new, updated plausibility of any specific *p* is usually called
     the **POSTERIOR PROBABILITY**. For instance: `0, 3, 16, 27, 0`
+
+## 2.2a Building a Model
+
+**Globe tossing**
+
+Data: `W L W W W L W L W` (W indicates water and L indicates land. )
+
+1.  **Data story**: Motivate the model by narrating how the data might
+    arise.
+2.  **Update**: Educate your model by feeding it the data.
+3.  **Evaluate**: All statistical models require supervision, leading to
+    model revision.
+
+### 2.2.1a A Data Story
+
+> Bayesian data analysis usually means producing a story for how the
+> data came to be. This story may be *descriptive*, specifying
+> associations that can be used to predict outcomes, given observations.
+> Or it may be *causal*, a theory of how some events produce other
+> events.
+
+All data stories have to be complete in the sense that they are
+sufficient for specifying an algorithm for simulating new data.
+
+> You can motivate your data story by trying to explain how each piece
+> of data is born. This usually means describing aspects of the
+> underlying reality as well as the sampling process. The data story in
+> this case is simply a restatement of the sampling process:
+>
+> 1.  The true proportion of water covering the globe is *`p`*.
+> 2.  A single toss of the globe has a probability *`p`* of producing a
+>     water (W) observation. It has a probability `1 – p` of producing a
+>     land (L) observation.
+> 3.  Each toss of the globe is independent of the others.
+
+### 2.2.2a Bayesian Updating
+
+> A Bayesian model begins with one set of plausibilities assigned to
+> each of these possibilities. These are the prior plausibilities. Then
+> it updates them in light of the data, to produce the posterior
+> plausibilities. This updating process is a kind of learning, called
+> **BAYESIAN UPDATING**.
+>
+> ...
+>
+> For the sake of the example only, let\'s program our Bayesian machine
+> to initially assign the same plausibility to every proportion of
+> water, every value of *p*. We\'ll do better than this later.
+>
+> ...
+>
+> Every time a \"W\" is seen, the peak of the plausibility curve moves
+> to the right, towards larger values of *p*. Every time an \"L\" is
+> seen, it moves the other direction. The maximum height of the curve
+> increases with each sample, meaning that fewer values of *p* amass
+> more plausibility as the amount of evidence increases. As each new
+> observation is added, the curve is updated consistent with all
+> previous observations.
