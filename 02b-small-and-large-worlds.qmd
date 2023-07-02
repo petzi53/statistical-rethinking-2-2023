@@ -23,15 +23,18 @@ library(tidyverse)
 > If we're willing to code the marbles as 0 = "white" 1 = "blue", we can
 > arrange the possibility data in a tibble as follows.
 
+(I changed `rep()` to `rep.int()` and added L to the value of p1 resp.
+p5 to get integer (instead of doubles).
+
 ```{r}
 #| label: create-marble-data
 
 d <-
-  tibble(p1 = 0,
-         p2 = rep(1:0, times = c(1, 3)),
-         p3 = rep(1:0, times = c(2, 2)),
-         p4 = rep(1:0, times = c(3, 1)),
-         p5 = 1)
+  tibble(p1 = 0L,
+         p2 = rep.int(1:0, times = c(1, 3)),
+         p3 = rep.int(1:0, times = c(2, 2)),
+         p4 = rep.int(1:0, times = c(3, 1)),
+         p5 = 1L)
 
 head(d)
 ```

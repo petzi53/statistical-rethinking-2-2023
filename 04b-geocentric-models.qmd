@@ -1,15 +1,16 @@
 # 04b: Geocentric Models
 
-## 4.1b Why Normal Distributions Are Normal
+## 4.0b Why Normal Distributions Are Normal
 
 ```{r}
 #| label: setup
 
-library(conflicted)
 library(tidyverse)
-library(rethinking)
-library(brms)
+library(skimr)
+
 ```
+
+**What follows is my own approach/trial:**
 
 > Suppose you and a thousand of your closest friends line up on the
 > halfway line of a soccer field (football pitch). Each of you has a
@@ -20,9 +21,9 @@ library(brms)
 > the coin 16 times, follows the implied moves, and then stands still.
 > Now we measure the distance of each person from the halfway line. Can
 > you predict what proportion of the thousand people who are standing on
-> the halfway line? How about the proportion 5 yards left of the line?
-
-Showing that there's nothing special about the underlying coin flip:
+> the halfway line? How about the proportion 5 yards left of the
+> line?Showing that there's nothing special about the underlying coin
+> flip:
 
 > Assume ... that each step is different from all the others, a random
 > distance between zero and one ~~yard~~ meter. Thus a coin is flipped,
@@ -158,7 +159,7 @@ set.seed(4)
 
 pos_b <- 
   # make data with 3 people, 16 steps each with a starting point of `step_b == 0` (i.e., 17 rows per person)
-  crossing(person = 1:1,
+  crossing(person = 1:3,
            step = 0:16) |>  
   # for all steps above `step == 0` simulate a `deviation`
   mutate(deviation = 
@@ -223,12 +224,35 @@ ggplot(data = (pos_b), aes(value)) +
     geom_histogram()
 ```
 
+## 4.1b Normal by Adding
+
+```{r}
+#| label: normal-by-adding
+
+# we set the seed to make the results of `runif()` reproducible.
+set.seed(4)
+
+pos <- 
+  # make data with 100 people, 16 steps each with a starting point of `step == 0` (i.e., 17 rows per person)
+  crossing(person = 1:100,
+           step   = 0:16) %>% 
+  # for all steps above `step == 0` simulate a `deviation`
+  mutate(deviation = map_dbl(step, ~if_else(. == 0, 0, runif(1, -1, 1)))) %>% 
+  # after grouping by `person`, compute the cumulative sum of the deviations, then `ungroup()`
+  group_by(person) %>%
+  mutate(position = cumsum(deviation)) %>% 
+  ungroup() 
+
+```
+
 ## 4.3b Gaussian Model of Height
 
 ### 4.3.1b The data
 
 ```{r}
 #| label: load-howell-data-b
+
+library(rethinking)
 
 data(Howell1)
 d_b <- Howell1
@@ -256,6 +280,24 @@ In contrast to the bmrs-version I have chosen two different approaches:
     this assumption as this is not necessary to understand the content
     of SR2.
 
+::: callout-warning
+## Function conflicts
+
+My first change (to use the **`conflicted`** package instead `unload()`
+did not work. I believe that the reason was that I used the
+**`rethinking`** package in the `setup` chunk. Therefore I will go with
+the Kurz version (= detaching **`rethinking`**).
+:::
+
+```{r}
+#| label: unload-rethinking
+
+rm(Howell1)
+detach(package:rethinking, unload = T)
+library(brms)
+
+```
+
 #### **4.3.1.1b Show the data**
 
 ```{r}
@@ -272,12 +314,12 @@ skim(d_b)
 ```{r}
 #| label: select-height-adults-b
 
-d |> 
+d_b |> 
     select(height) |> 
     glimpse() # as tidyverse equivalent of `str()`
 
 d2_b <- 
-    d |> 
+    d_b |> 
     filter(age >= 18)
 
 d2_b |> 
@@ -293,7 +335,7 @@ Using `identical(d2_a, d2_b)` produces `FALSE` and
 `returns`TRUE`.`
 :::
 
-### 4.3.2a The Model
+### 4.3.2b The Model
 
 ```{r}
 #| label: plot-mean-prior-b
@@ -303,7 +345,7 @@ p1 <-
   
   ggplot(aes(x = x, y = dnorm(x, mean = 178, sd = 20))) +
   geom_line() +
-  scale_x_continuous(breaks = seq(from = 100, to = 250, by = 75)) +
+  scale_x_continuous(breaks = seq(from = 100, to = 250, by = 25)) +
   labs(title = "mu ~ dnorm(178, 20)",
        y = "density")
 
@@ -312,7 +354,7 @@ p1
 ```
 
 ```{r}
-#| label: plot-sd-prior-b
+#| label: plot-sigma-prior-b
 
 p2 <-
   tibble(x = seq(from = -10, to = 60, by = .1)) %>%
@@ -320,7 +362,7 @@ p2 <-
   ggplot(aes(x = x, y = dunif(x, min = 0, max = 50))) +
   geom_line() +
   scale_x_continuous(breaks = c(0, 50)) +
-  # scale_y_continuous(breaks = c(0., 0.05)) +
+  scale_y_continuous(NULL, breaks = NULL) +
   ggtitle("sigma ~ dunif(0, 50)")
 
 p2
@@ -340,3 +382,87 @@ frames into rows and columns.
 
 -   Instead of `rethinking::contour_xyz()` use `geom_contour()`
 -   Instead of `rethinking::image_xyz()` use `geom_raster()`
+
+### 4.3.5b Finding the posterior distribution
+
+> In the text, McElreath indexed his models with names like `m4.1`. I
+> will largely follow that convention, but will replace the *m* with a
+> *b* to stand for the **`brms`** package.
+
+Here's how to fit the first model for this chapter.
+
+```{r}
+#| label: using-brms
+
+b4.1 <- 
+  brm(data = d2_b, 
+      family = gaussian,
+      height ~ 1,
+      prior = c(prior(normal(178, 20), class = Intercept),
+                prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brms-fits/b04.01")
+
+plot(b4.1)
+```
+
+```{r}
+#| label: detailled-diganostic
+#| eval: false
+
+launch_shinystan(b4.1)
+
+```
+
+```{r}
+#| label: print-summary
+
+print(b4.1)
+
+```
+
+```{r}
+#| label: stan-like-summary
+
+b4.1$fit
+```
+
+```{r}
+#| label: interval-89
+
+summary(b4.1, prob = .89)
+
+```
+
+```{r}
+#| label: narrow-prior
+
+b4.2 <- 
+  brm(data = d2_b, 
+      family = gaussian,
+      height ~ 1,
+      prior = c(prior(normal(178, 0.1), class = Intercept),
+                prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brms-fits/b04.02")
+
+plot(b4.2, widths = c(1, 2))
+
+```
+
+```{r}
+#| label: summary-narrow-prior
+
+summary(b4.2)
+
+```
+
+```{r}
+#| label: compare-summaries
+
+rbind(summary(b4.1)$fixed,
+      summary(b4.2)$fixed)
+
+```

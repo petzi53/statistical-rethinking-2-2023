@@ -460,3 +460,129 @@ plot(sample2.mu, sample2.sigma,
 dens(sample2.sigma, norm.comp = TRUE)
 
 ```
+
+### 4.3.5a Using `quap()`
+
+> To build the **quadratic approximation**, we'll use quap, a command in
+> the `rethinking` package. The `quap` function works by using the model
+> definition you were introduced to earlier in this chapter. Each line
+> in the definition has a corresponding definition in the form of R
+> code. The engine inside quap then uses these definitions to define the
+> posterior probability at each combination of parameter values. Then it
+> can climb the posterior distribution and find the peak, its MAP
+> (**Maximum A Posteriori** estimate). Finally, it estimates the
+> quadratic curvature at the MAP to produce an approximation of the
+> posterior distribution. (parenthesis and emphasis are mine)
+
+1.  We start with the Howell data frame for adults `d2_a` (age \>= 18).
+    We will place the R code equivalents into an `alist` (4.27).
+2.  Then we fit the model to the data in the data frame `d2_a` (4.28) to
+    `m4.1`.
+3.  Now we can have a look at the posterior distribution (4.29).
+
+```{r}
+#| label: using-quap
+
+## R code 4.27
+flist <- alist(
+  height ~ dnorm(mu, sigma),
+  mu ~ dnorm(178, 20),
+  sigma ~ dunif(0, 50)
+)
+
+## R code 4.28
+m4.1 <- quap(flist, data = d2_a)
+
+## R code 4.29
+precis(m4.1)
+
+```
+
+> These numbers provide Gaussian approximations for each parameter's
+> *marginal* distribution. This means the plausibility of each value of
+> μ, after averaging over the plausibilities of each value of *σ*, is
+> given by a Gaussian distribution with mean 154.6 and standard
+> deviation 0.4.
+>
+> The 5.5% and 94.5% quantiles are percentile interval boundaries,
+> corresponding to an 89% compatibility interval. Why 89%? It's just the
+> default. It displays a quite wide interval, so it shows a
+> high-probability range of parameter values. If you want another
+> interval, such as the conventional and mindless 95%, you can use
+> `precis(m4.1,prob=0.95)`. But I don't recommend 95% intervals, because
+> readers will have a hard time not viewing them as significance tests.
+> 89 is also a prime number, so if someone asks you to justify it, you
+> can stare at them meaningfully and incant, "Because it is prime."
+> That's no worse justification than the conventional justification for
+> 95%.
+
+Mean and standard deviation are good values to start values for hill
+climbing. If you don't specify `quap()` will use a random value.
+
+```{r}
+#| label: start-values-for-quap
+
+## R code 4.30
+start <- list(
+  mu = mean(d2_a$height),
+  sigma = sd(d2_a$height)
+)
+m4.1_2 <- quap(flist, data = d2_a, start = start)
+precis(m4.1_2)
+
+```
+
+::: callout-note
+## list() and alist()
+
+Note that the list of start values is a regular `list`, not an `alist`
+like the formula list is. The two functions `alist` and `list` do the
+same basic thing: allow you to make a collection of arbitrary R objects.
+They differ in one important respect: `list` evaluates the code you
+embed inside it, while `alist` does not. So when you define a list of
+formulas, you should use `alist`, so the code isn't executed. But when
+you define a list of start values for parameters, you should use `list`,
+so that code like `mean(d2$height)` will be evaluated to a numeric
+value.
+:::
+
+**Slicing in more information**
+
+> The priors we used before are very weak, both because they are nearly
+> flat and because there is so much data. So I'll splice in a more
+> informative prior for *μ*, so you can see the effect. All I'm going to
+> do is change the standard deviation of the prior to 0.1, so it's a
+> very narrow prior. I'll also build the formula right into the call to
+> `quap` this time.
+
+```{r}
+#| label: smaller-prior
+
+## R code 4.31
+m4.2 <- quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu ~ dnorm(178, 0.1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = d2_a
+)
+precis(m4.2)
+
+```
+
+> Notice that the estimate for *μ* has hardly moved off the prior. The
+> prior was very concentrated around 178. So this is not surprising. But
+> also notice that the estimate for *σ* has changed quite a lot, even
+> though we didn't change its prior at all. Once the golem is certain
+> that the mean is near 178---as the prior insists---then the golem has
+> to estimate *σ* conditional on that fact. This results in a different
+> posterior for σ, even though all we changed is prior information about
+> the other parameter.
+
+::: callout-caution
+## Change of μ?
+
+I do not understand the hint, that "*μ* has hardly moved off the prior",
+because for me *μ* has changed considerably from 154 to 177.
+:::

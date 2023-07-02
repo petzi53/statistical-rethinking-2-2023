@@ -5,425 +5,182 @@
 -   The **large world** is the broader context in which one deploys a
     model.
 
-## 2.1a Bayesian Probability of the Water Proportion
+**Meta Remark (Study Guide)**
 
-[R Code snippet
-2.1](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=50):
-Statistical Rethinking 2023 - Lecture 02, Slide 50.
+> This chapter focuses on the small world. It explains probability
+> theory in its essential form: counting the ways things can happen.
+> Bayesian inference arises automatically from this perspective. Then
+> the chapter presents the stylized components of a Bayesian statistical
+> model, a model for learning from data. Then it shows you how to
+> animate the model, to produce estimates.
+>
+> All this work provides a foundation for the next chapter, in which
+> you'll learn to summarize Bayesian estimates, as well as begin to
+> consider large world obligations.
 
-```{r}
-#| label: probability-water
+## 2.1a The Garden of Forking Data
 
-sample <- c("W", "L", "W", "W", "W", "L", "W", "L", "W")
-W <- sum(sample == "W") # number of W observed
-L <- sum(sample == "L") # number of L observed
-p <- c(0, 0.25, 0.5, 0.75, 1) # proportions W
-
-# using vectorized version instead of sapply()
-# see: https://github.com/rmcelreath/stat_rethinking_2023/issues/6
-get_ways <- function(q) (q * 4)^W * ((1 - q) * 4)^L
-ways <- get_ways(p)
-prob <- ways / sum(ways)
-cbind(p, ways, prob)
-
-```
-
-`prob` is called the **posterior distribution** because it's posterior
-to the sample to the updating we did in light of the data.
-
-This estimator is optimal you cannot do better than thisif your model is
-correct and the model here doesn't mean the particular value of P - it
-means the generative hypothesis about how the garden is drawn given a
-particular value of P.
-
-## 2.2a Test Before You Est(imate)
-
-We want to worry about the correctness of code in scientific data
-analysis as well because scientific data analysis is in the vast
-majority of fields a kind of amateur software development. There is
-scripting and we want to document our code and we need to worry about
-errors and want to have a reliable workflow that does some quality
-assurance. So we've coded a generative simulation and we've coded an
-estimator and now we'd like to test our estimator with our generative
-simulation.
-([37:40](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=37m40s))
-
-1.  Code a generative simulation
-2.  Code an estimator
-3.  Test (2) with (1)
-
-### 2.2.1a Simulating the Globe Tossing
-
-[![R Code 2.3, Statistical Rethinking 2023 - Lecture 02, \[Slide
-54\](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54).](img/code-sim-globe-tossing-min.png){fig-alt="code snippet for a simulation of globe tossing"}](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54)
-
-```{r}
-#| label: sim-globe-tossing
-
-# function to toss a globe covered p by water N times
-sim_globe <- function(p = 0.7, N = 9) {
-  sample(c("W", "L"), size = N, prob = c(p, 1 - p), replace = TRUE)
-}
-sim_globe()
-```
-
-You can simulate the experiment arbitrary times for any particular
-proportion of water you like. This is a way to explore the design of an
-experiment as well as debug the code.
-([39:55](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=39m55s)).
-
-```{r}
-#| label: replicate-sim
-#| lst-cap: "R code snippet 2.4: Replicate simulation"
-
-# replicate simulation 10 times with different p values (here: p = 0.5)
-replicate(sim_globe(p = 0.5, N = 9), n = 10) 
-```
-
-::: {.callout-warning style="color: red"}
-## Quarto bug
-
-2023-05-08: lst-label and lst-cap are only working in display code
-snippets but not in snippets to execute. See [lst-cap and lst-label in
-Quarto?](https://community.rstudio.com/t/lst-cap-and-lst-label-in-quarto/157173)
-and [lst-label and lst-cap do not produce listing caption and
-reference](https://github.com/quarto-dev/quarto-cli/issues/1580).
+::: callout-important
+Bayesian inference is really just counting and comparing of
+possibilities. ... In order to make good inference about what actually
+happened, it helps to consider everything that could have happened. A
+Bayesian analysis is a garden of forking data, in which alternative
+sequences of events are cultivated. As we learn about what did happen,
+some of these alternative sequences are pruned. In the end, what remains
+is only what is logically consistent with our knowledge.
 :::
 
-### 2.2.2a Test the simulation at extreme values
+### 2.1.1a Counting possibilites
 
-R code snippets 2.5 and 2.6: [Slide
-57](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=57).
+> Suppose there's a bag, and it contains four marbles. These marbles
+> come in two colors: blue and white. We know there are four marbles in
+> the bag, but we don't know how many are of each color. We do know that
+> there are five possibilities: (1) \[⚪⚪⚪⚪\], (2) \[⚫⚪⚪⚪\], (3)
+> \[⚫⚫⚪⚪\], (4) \[⚫⚫⚫⚪\], (5) \[⚫⚫⚫⚫\]. These are the only
+> possibilities consistent with what we know about the contents of the
+> bag. **Call these five possibilities the *conjectures*.**
+>
+> Our goal is to figure out which of these conjectures is most
+> plausible, given some evidence about the contents of the bag. We do
+> have some evidence: A sequence of three marbles is pulled from the
+> bag, one at a time, replacing the marble each time and shaking the bag
+> before drawing another marble. **The sequence that emerges is: ⚫⚪⚫,
+> in that order. These are the data.** (bold emphasis pb)
+>
+> So now let's plant the garden and see how to use the data to infer
+> what's in the bag. Let's begin by considering just the single
+> conjecture, \[⚫⚪⚪⚪\], that the bag contains one blue and three
+> white marbles. ...
+>
+> ...
+>
+> Notice that even though the three white marbles look the same from a
+> data perspective---we just record the color of the marbles, after
+> all---they are really different events. This is important, because it
+> means that there are three more ways to see ⚪ than to see ⚫.
 
-```{r}
-#| label: test-sim-extrem-values
-sim_globe(p = 1, N = 10) # test, when p = 1
+|              |                        |
+|--------------|------------------------|
+| Conjecture   | Ways to produce ⚫⚪⚫ |
+| \[⚪⚪⚪⚪\] | 0 × 4 × 0 = 0          |
+| \[⚫⚪⚪⚪\] | 1 × 3 × 1 = 3          |
+| \[⚫⚫⚪⚪\] | 2 × 2 × 2 = 8          |
+| \[⚫⚫⚫⚪\] | 3 × 1 × 3 = 9          |
+| \[⚫⚫⚫⚫\] | 4 × 0 × 4 = 0          |
 
-sum(sim_globe(p = 0.5, N = 1e4) == "W") / 1e4 # test 1e4 (10.000) times
-```
+> Notice that the number of ways to produce the data, for each
+> conjecture, can be computed by first counting the number of paths in
+> each "ring" of the garden and then by multiplying these counts
+> together. ... The fact that numbers are multiplied during calculation
+> doesn't change the fact that this is still just counting of logically
+> possible paths. This point will come up again, when you meet a formal
+> representation of Bayesian inference.
 
-### 2.2.3a Code an estimator and test it with the simulation
+### 2.1.2a Combining Other Information
 
-In the following compute_posterior() function I could not manage to get
-working the part with the bars. As far as I understand it comes from the
-`animint` or `animint2` packagae but I did not know how to fill in the
-second required parameter `x.name`.
+> We may have additional information about the relative plausibility of
+> each conjecture. This information could arise from knowledge of how
+> the contents of the bag were generated. It could also arise from
+> previous data. Whatever the source, it would help to have a way to
+> combine different sources of information to update the plausibilities.
+> Luckily there is a natural solution: Just multiply the counts.
+>
+> To grasp this solution, suppose we're willing to say each conjecture
+> is equally plausible at the start. So we just compare the counts of
+> ways in which each conjecture is compatible with the observed data.
+> This comparison suggests that \[⚫⚫⚫⚪\] is slightly more plausible
+> than \[⚫⚫⚪⚪\], and both are about three times more plausible than
+> \[⚫⚪⚪⚪\]. **Since these are our initial counts, and we are going
+> to update them next, let's label them *prior*.** (bold emphasis are
+> mine)
 
-```{r}
-#| label: test-est-with-sim
+Here's how to do it. First we count the numbers of ways each conjecture
+could produce the new observation, ⚫. Then we multiply each of these
+new counts by the prior numbers of ways for each conjecture. In table
+form:
 
-# function to compute posterior distribution 
-compute_posterior <- function(the_sample, poss = c(0, 0.25, 0.5, 0.75, 1)) {
-  W <- sum(the_sample == "W") # number of W observed
-  L <- sum(the_sample == "L") # number of L observed
-  get_ways <- function(q) (q * 4)^W * ((1 - q) * 4)^L
-  ways <- get_ways(poss)
-  # ways <- sapply(poss, function(q) (q * 4)^W * ((1 - q) * 4)^L)
-  post <- ways / sum(ways)
-  # cannot find second parameter of function make_bar()
-  # bars <- sapply(post, function(q) animint2::make_bar(q)) 
-  data.frame(poss, ways, post = round(post, 3))
-}
+|     |              |     |                    |     |              |     |            |     |
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+|     |              |     |                    |     |              |     |            |     |
+|     | Conjecture   |     | Ways to produce ⚫ |     | Prior counts |     | New count  |     |
+|     | \[⚪⚪⚪⚪\] |     | 0                  |     | 0            |     | 0 × 0 = 0  |     |
+|     | \[⚫⚪⚪⚪\] |     | 1                  |     | 3            |     | 3 × 1 = 3  |     |
+|     | \[⚫⚫⚪⚪\] |     | 2                  |     | 8            |     | 8 × 2 = 16 |     |
+|     | \[⚫⚫⚫⚪\] |     | 3                  |     | 9            |     | 9 × 3 = 27 |     |
+|     | \[⚫⚫⚫⚫\] |     | 4                  |     | 0            |     | 0 × 4 = 0  |     |
 
-compute_posterior(sim_globe())
-```
+In the book the table header "Ways to produce" includes ⚪ instead of
+--- as I think is correct --- ⚫.
 
-### 2.2.4a Summary
+**Principle of Indifference**
 
-\(1\) Test the estimator where the answer is known
+::: callout-tip
+## Principle of Indifference
 
-\(2\) Explore different sampling designs
-
-\(3\) Develop intuition for sampling and estimation
-
-## 2.3a Numerical techniques for computing posterior distributions
-
-1.  Grid approximation
-2.  Quadratic approximation
-3.  Markov chain Monte Carlo (MCMC)
-
-### 2.3.1a Grid approximation
-
-#### 2.3.1.1a Concept
-
-At any particular value of a parameter, *p*', it's a simple matter to
-compute the posterior probability: just multiply the prior probability
-of *p*' by the likelihood at *p*'. Repeating this procedure for each
-value in the grid generates an approximate picture of the exact
-posterior distribution. This procedure is called **GRID APPROXIMATION**.
-
-Grid approximation is very useful as a pedagogical tool. But in most of
-your real modeling, grid approximation isn't practical because it scales
-poorly, as the number of parameters increases.
-
-1.  Define the grid. This means you decide how many points to use in
-    estimating the posterior, and then you make a list of the parameter
-    values on the grid.
-2.  Compute the value of the prior at each parameter value on the grid.
-3.  Compute the likelihood at each parameter value.
-4.  Compute the unstandardized posterior at each parameter value, by
-    multiplying the prior by the likelihood.
-5.  Finally, standardize the posterior, by dividing each value by the
-    sum of all values.
-
-```{r}
-#| label: grid-approx
-
-library(ggplot2)
-
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- rep(1, 20)
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-# using ggplot2::ggplot instead of books base::plot 
-df <- dplyr::bind_cols("prob" = p_grid, "post" = posterior)
-ggplot(df, aes(x = prob, y = post)) +
-    geom_line() +
-    geom_point()
-```
-
-#### 2.3.1.2a Change likelihood parameters
-
-The parameters for the calculated likelihood is based on the binomial
-distribution and is shaping the above plot:
-
--   x = number of water events `W`
--   size = number of sample trials = number of observations
--   prob = success probability on each trial = probability of `W` (water
-    event)
-
-In the code example above it does not matter what prior probability is
-chosen in the range from 0 to 1, if the probability of `W` is greater
-than zero and --- and by definition of the binomial function --- equal
-for all 20 events.
-
-The book example features 6 `W` of 9 obs. You can produce the sequence
-of diagrams from Figure 2.5 by changing the likelyhood parameters `x`
-and `size` according to the sample: `WLWWWLWLW`. The `prior probability`
-in this step-by-step version is always the previous PDF ([Probability
-density
-function](https://en.wikipedia.org/wiki/Probability_density_function)).
-
-``` r
-likelihood1 <- dbinom(x = 1, size = 1, prob = p_grid) # event Water
-likelihood2 <- dbinom(x = 1, size = 2, prob = p_grid) # event Land
-likelihood3 <- dbinom(x = 2, size = 3, prob = p_grid) # event Water
-likelihood4 <- dbinom(x = 3, size = 4, prob = p_grid) # event Water
-likelihood5 <- dbinom(x = 4, size = 5, prob = p_grid) # event Water
-likelihood6 <- dbinom(x = 4, size = 6, prob = p_grid) # event Land
-likelihood7 <- dbinom(x = 5, size = 7, prob = p_grid) # event Water
-likelihood8 <- dbinom(x = 5, size = 8, prob = p_grid) # event Land
-likelihood9 <- dbinom(x = 6, size = 9, prob = p_grid) # event Water
-```
-
-![Replicated Figure 2.5 from the 2nd book
-edition](img/bayesian_model_learns_step_by_step-min.png)
-
-#### 2.3.1.3a Changing prior parameters
-
-To see the influence of the prior probability on the postrior
-probability by using the same likelihood the book offers two code
-snippets. Replace the definition of the prior (number 2 in the code
-snippet) ---one at a time --- with the following lines of code:
-
-``` r
-prior <- ifelse(p_grid < 0.5, 0, 1)
-prior <- exp(-5 * abs(p_grid - 0.5))
-```
-
-#### 2.3.1.4a Disadvantage
-
-Grid approximation is very expansive. The number of unique values to
-consider in the grid grows rapidly as the number of parameters in the
-model increases. For the single-parameter globe tossing model, it's no
-problem to compute a grid of 100 or 1000 values. But for two parameters
-approximated by 100 values each, that's already 100^2^ = 10.000 values
-to compute. For 10 parameters, the grid becomes many billions of values.
-These days, it's routine to have models with hundreds or thousands of
-parameters. The grid approximation strategy scales very poorly with
-model complexity, so it won't get us very far. But it is a very useful
-didactically as it help to understand the general principle.
-
-### 2.3.2a Quadratic Approximation
-
-#### 2.3.2.1a Concept
-
-Under quite general conditions, the region near the peak of the
-posterior distribution will be nearly Gaussian---or "normal"---in shape.
-This means the posterior distribution can be usefully approximated by a
-Gaussian distribution. A Gaussian distribution is convenient, because it
-can be completely described by only two numbers: the location of its
-center (mean) and its spread (variance).
-
-A Gaussian approximation is called "quadratic approximation" because the
-logarithm of a Gaussian distribution forms a parabola. And a parabola is
-a quadratic function.
-
-1.  Find the posterior mode with some algorithm. The procedure does not
-    know where the peak is but it knows the slope under it feet.
-2.  Estimate the curvature near the peak to calculate a quadratic
-    approximation. This computation is done by some numerical technique.
-
-```{r}
-#| label: quadratic-approx
-
-library(rethinking)
-
-globe.qa <- quap(
-  alist(
-    W ~ dbinom(W + L, p), # binomial likelihood
-    p ~ dunif(0, 1) # uniform prior
-  ),
-  data = list(W = 6, L = 3)
-)
-
-# display summary of quadratic approximation
-# precis(globe.qa)
-print(precis(globe.qa))
-```
-
-::: {.callout-warning style="color: red;"}
-## precis results not displayed correctly
-
-The result of `precis()` does not display visually correctly in
-Quarto/RStudio. . The columns of the table are too narrow so that you
-can't see the header and inspect the values. Printing to the console or
-the display in the RStudio environment variable is correct.
-
-A workaround is wrapping the result with `print()`.
-
-See my [bug report](https://github.com/rstudio/rstudio/issues/13227).
+Before seeing any data the most common solution is to assign an equal
+number of ways that each conjecture could be correct.
 :::
 
-Read the result as: *Assuming the posterior is Gaussian, it is maximized
-at 0.67, and its standard deviation is 0.16*.
+> Which assumption should we use, when there is no previous information
+> about the conjectures? The most common solution is to assign an equal
+> number of ways that each conjecture could be correct, before seeing
+> any data. This is sometimes known as the **PRINCIPLE OF
+> INDIFFERENCE**: When there is no reason to say that one conjecture is
+> more plausible than another, weigh all of the conjectures equally. ...
+>
+> For the sort of problems we examine in this book, the principle of
+> indifference results in inferences very comparable to mainstream
+> non-Bayesian approaches, most of which contain implicit equal
+> weighting of possibilities. For example a typical non-Bayesian
+> confidence interval weighs equally all of the possible values a
+> parameter could take, regardless of how implausible some of them are.
+> In addition, many non-Bayesian procedures have moved away from equal
+> weighting, through the use of penalized likelihood and other methods.
 
-#### 2.3.2.2a Compare quadratic approximation with analytic calculation
+### 2.1.3a From Counts to Probability
 
-```{r}
-#| label: analytical-calc
+::: callout-tip
+## Principle of honest ignorance
 
-# analytical calculation
-W <- 6
-L <- 3
-curve(dbeta(x, W + 1, L + 1), from = 0, to = 1)
+*When we don\'t know what caused the data, potential causes that may
+produce the data in more ways are more plausible*.
+:::
 
-# quadratic approximation
-curve(dnorm(x, 0.67, 0.16), lty = 2, add = TRUE)
-```
+Two reasons for using probabilities instead of counts:
 
-#### 2.3.2.3a Disadvantage
+1.  Only relative value matters.
+2.  Counts will very fast grow very large and difficult to manipulate.
 
-As the amount of data increases, however, the quadratic approximation
-gets better. This phenomenon, where the quadratic approximation improves
-with the amount of data, is very common. It's one of the reasons that so
-many classical statistical procedures are nervous about small samples.
+![](img/plausability-formula-1-min.png){fig-align="center"}
 
-Using the quadratic approximation in a Bayesian context brings with it
-all the same concerns. But you can always lean on some algorithm other
-than quadratic approximation, if you have doubts. Indeed, grid
-approximation works very well with small samples, because in such cases
-the model must be simple and the computations will be quite fast. You
-can also use MCMC.
+**Standardizing the plausability**
 
-Sometimes the quadratic approximation fails and you will get an error
-message about the "Hessian". A *Hessian* --- named after mathematician
-Ludwig Otto Hesse (1811--1874) --- is a square matrix of second
-derivatives. The standard deviation is typically computed from the
-Hessian, so computing the Hessian is nearly always a necessary step. But
-sometimes the computation goes wrong, and your golem will choke while
-trying to compute the Hessian.
-
-Some other drawbacks will be explicated in later chapter. Therefore MCMC
-seems generally the best option for complex models.
-
-### 2.3.3a Markov Chain Monte Carlo (MCMC)
-
-There are lots of important model types, like multilevel (mixed-effects)
-models, for which neither grid approximation nor quadratic approximation
-is always satisfactory. As a result, various counterintuitive model
-fitting techniques have arisen. The most popular of these is **MARKOV
-CHAIN MONTE CARLO** (MCMC), which is a family of conditioning engines
-capable of handling highly complex models.
-
-The understanding of this not intuitive technique is postponed to
-chapter 9. Instead of attempting to compute or approximate the posterior
-distribution directly, MCMC techniques merely draw samples from the
-posterior. You end up with a collection of parameter values, and the
-frequencies of these values correspond to the posterior plausibilities.
-You can then build a picture of the posterior from the histogram of
-these samples.
+![](img/plausability-formula-2-min.png){fig-align="center"}
 
 ```{r}
-#| label: MCMC-globe-tossing
+#| label: compute-plausabilities-a1
 
-n_samples <- 1000
-p <- rep(NA, n_samples)
-p[1] <- 0.5
-W <- 6
-L <- 3
-
-for (i in 2:n_samples) {
-  p_new <- rnorm(1, p[i - 1], 0.1)
-  if (p_new < 0) p_new <- abs(p_new)
-  if (p_new > 1) p_new <- 2 - p_new
-  q0 <- dbinom(W, W + L, p[i - 1])
-  q1 <- dbinom(W, W + L, p_new)
-  p[i] <- ifelse(runif(1) < q1 / q0, p_new, p[i - 1])
-}
-
-rethinking::dens(p, xlim = c(0, 1))
-curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
-
+## R code 2.1
+ways <- c(0, 3, 8, 9, 0)
+ways / sum(ways)
 ```
 
-It's weird. But it works. The above **METROPOLIS ALGORITHM** is
-explained in [Chapter 9](javascript:void(0)).
+**Names of the different parts of the formula**
 
-## 2.4a Bayesian Inference: Some Lessons to Draw
+Data = ⚫⚪⚫.
 
-The following list summarizes differences between Bayesian and
-Non-Bayesian inference ("Frequentism"):
-
-1.  **No minimum sampling size**: The minimum sampling size in Bayesian
-    inference is one. You are going to update each data point at its
-    time. For instance you got an estimate every time when you toss the
-    globe and the estimate is updated. --- Well, the sample size of one
-    is not very informative but that is the power of Bayesian inference
-    in not getting over confident. It is always accurately representing
-    the relative confidence of plausability we should assign to each of
-    the possible proportions.
-2.  **Shape embodies sample size**: The shape of the posterior
-    distribution embodies all the information that the sample has about
-    the process of the proportions. Therefore you do not need to go back
-    to the original dataset for new observations. Just take the
-    posterior distribution and update it by multiplying the number fo
-    ways the new data could produce.
-3.  **No point estimates**: The estimate is the whole distribution. It
-    may be fine for communication purposes to talk about some summary
-    points of the distribution like the mode and mean. But neither of
-    these points is special as a point of estimate. When we do
-    calculations we draw predictions from the whole distribution, never
-    just from a point of it.
-4.  **No one true interval**: Intervals are not important in Bayesian
-    inference. They are merely summaries of the shape of the
-    distribution. There is nothing special in any of these intervals
-    because the endpoints of the intervals are not special. Nothing
-    happens of the endpoints of the intervals because the interval is
-    arbitrary. (The 95% in Non-Bayesian inference is essentially a
-    dogma, a superstition. Even in Non-Bayesian statistics it is
-    conceptualized as an arbitrary interval.)
-
-## 2.5a Practice
+-   A conjectured proportion of blue marbles, *p*, is usually called a
+    **PARAMETER** value. It\'s just a way of indexing possible
+    explanations of the data. For instance one conjectured proportion of
+    one blue marble could be: ⚫⚪⚪⚪ (`p = 1`). The others are:
+    ⚪⚪⚪⚪ (`p = 0`), ⚫⚫⚪⚪ (`p = 2` , ⚫⚫⚫⚪ (`p = 3`), and
+    ⚫⚫⚫⚫ (`p = 4` ways).
+-   The relative number of ways that a value *p* can produce the data is
+    usually called a **LIKELIHOOD**. It is derived by enumerating all
+    the possible data sequences that could have happened and then
+    eliminating those sequences inconsistent with the data. For
+    instance: `0.00, 0.15, 0.40, 0.45, 0.00`
+-   The prior plausibility of any specific *p* is usually called the
+    **PRIOR PROBABILITY**. For instance: `0, 3, 8, 9, 0`
+-   The new, updated plausibility of any specific *p* is usually called
+    the **POSTERIOR PROBABILITY**. For instance: `0, 3, 16, 27, 0`
