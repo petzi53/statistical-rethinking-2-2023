@@ -1,5 +1,9 @@
 # Preface
 
+::: callout-note
+## Finished about 10%
+:::
+
 ## Content and Goals of this Book
 
 This book collects personal notes during reading of Statistical

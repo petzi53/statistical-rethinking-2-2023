@@ -4,7 +4,7 @@ project:
 book:
   title: "Statistical Rethinking (2nd ed. 2023)"
   author: "Peter Baumgartner"
-  date: "2023-06-05"
+  date: "2023-07-02"
   chapters:
     - index.qmd
     - 01a-golem-of-prague.qmd
