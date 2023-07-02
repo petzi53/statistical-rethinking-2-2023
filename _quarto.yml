@@ -36,3 +36,5 @@ knitr:
 
 editor: visual
 
+execute:
+    echo: fenced
