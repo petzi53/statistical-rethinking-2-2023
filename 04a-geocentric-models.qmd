@@ -1,4 +1,4 @@
-# 04a: Geocentric Models
+# 4a: Geocentric Models
 
 ```{r}
 #| label: setup

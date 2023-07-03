@@ -1,4 +1,4 @@
-# 04b: Geocentric Models
+# 4b: Geocentric Models
 
 ## 4.0b Why Normal Distributions Are Normal
 
