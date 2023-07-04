@@ -142,7 +142,7 @@ number of ways that each conjecture could be correct.
 ::: callout-tip
 ## Principle of honest ignorance
 
-*When we don\'t know what caused the data, potential causes that may
+*When we don't know what caused the data, potential causes that may
 produce the data in more ways are more plausible*.
 :::
 
@@ -170,7 +170,7 @@ ways / sum(ways)
 Data = ⚫⚪⚫.
 
 -   A conjectured proportion of blue marbles, *p*, is usually called a
-    **PARAMETER** value. It\'s just a way of indexing possible
+    **PARAMETER** value. It's just a way of indexing possible
     explanations of the data. For instance one conjectured proportion of
     one blue marble could be: ⚫⚪⚪⚪ (`p = 1`). The others are:
     ⚪⚪⚪⚪ (`p = 0`), ⚫⚫⚪⚪ (`p = 2` , ⚫⚫⚫⚪ (`p = 3`), and
@@ -229,16 +229,213 @@ sufficient for specifying an algorithm for simulating new data.
 >
 > ...
 >
-> For the sake of the example only, let\'s program our Bayesian machine
+> For the sake of the example only, let's program our Bayesian machine
 > to initially assign the same plausibility to every proportion of
-> water, every value of *p*. We\'ll do better than this later.
+> water, every value of *p*. We'll do better than this later.
 >
 > ...
 >
-> Every time a \"W\" is seen, the peak of the plausibility curve moves
-> to the right, towards larger values of *p*. Every time an \"L\" is
-> seen, it moves the other direction. The maximum height of the curve
-> increases with each sample, meaning that fewer values of *p* amass
-> more plausibility as the amount of evidence increases. As each new
+> Every time a "W" is seen, the peak of the plausibility curve moves to
+> the right, towards larger values of *p*. Every time an "L" is seen, it
+> moves the other direction. The maximum height of the curve increases
+> with each sample, meaning that fewer values of *p* amass more
+> plausibility as the amount of evidence increases. As each new
 > observation is added, the curve is updated consistent with all
 > previous observations.
+
+Figure 2.5 (How a Bayesian model learns) of the book is reproduced in my
+notes of the brms-version.
+
+## 2.2.3a Evaluate
+
+Keep in mind two cautious principles:
+
+1.  First, **the model\'s certainty is no guarantee that the model is a
+    good one**. ... \[M\]odels of all sorts---Bayesian or not---can be
+    very confident about an inference, even when the model is seriously
+    misleading. This is because the inferences are conditional on the
+    model. What your model is telling you is that, given a commitment to
+    this particular model, it can be very sure that the plausible values
+    are in a narrow range. Under a different model, things might look
+    differently.
+2.  Second, **it is important to supervise and critique your model\'s
+    work**. ... When something is irrelevant to the machine, it won\'t
+    affect the inference directly. But it may affect it indirectly ...
+    So it is important to check the model\'s inferences in light of
+    aspects of the data it does not know about. Such checks are an
+    inherently creative enterprise, left to the analyst and the
+    scientific community. Golems are very bad at it. (emphasis are mine)
+
+Further keep in mind that
+
+> the goal is not to test the truth value of the model\'s assumptions.
+> We know the model\'s assumptions are never exactly right, in the sense
+> of matching the true data generating process. ... Moreover, models do
+> not need to be exactly true in order to produce highly precise and
+> useful inferences.
+>
+> Instead, the objective is to check the model\'s adequacy for some
+> purpose. This usually means asking and answering additional questions,
+> beyond those that originally constructed the model. Both the questions
+> and answers will depend upon the scientific context. So it\'s hard to
+> provide general advice.
+
+## 2.3a Components of the Model
+
+We observed three components of the model:
+
+1.  a **likelihood function**: \"the number of ways each conjecture
+    could produce an observation,\"
+
+2.  one or more **parameters**: \"the accumulated number of ways each
+    conjecture could produce the entire data,\" and
+
+3.  **a prior**: \"the initial plausibility of each conjectured cause of
+    the data\"
+
+### 2.3.1a List the Variables
+
+> Variables are just symbols that can take on different values. In a
+> scientific context, variables include things we wish to infer, such as
+> proportions and rates, as well as things we might observe, the
+> data....
+>
+> Unobserved variables are usually called **parameters**. (emphasis in
+> the original)
+
+Take as example the globe tossing models: There are three variables: `W`
+and `L` (water or land) and the proportion of water and land `p`. We
+observe the events of water or land but we calculate (do not observe
+directly) the proportion of water and land. So `p` is a parameter as
+defined above.
+
+### 2.3.2a Define the Variables
+
+> In defining each \[variable\], we build a model that relates the
+> variables to one another. Remember, the goal is to count all the ways
+> the data could arise, given the assumptions.
+
+#### 2.3.2.1a Observed Variables
+
+For each unobserved variable (parameter) we need to define the relative
+number of ways---the probability---that the values of each observed
+variable could arise. And then for each unobserved variable, we need to
+define the prior plausibility of each value it could take.
+
+For the count of water *W* and land *L* in the globe tossing model, we
+**define how plausible any combination of *W* and *L* would be, for a
+specific value of *p*.** (emphasis is mine)
+
+This idea is implemented in the functions of `expand()`, `expand_grid()`
+and `crossing()` of the {**tidyr**} package: They generate all
+combinations of variables found as is demonstrated in the section
+[Bayesian Updating of the
+brms-variant](02b-small-and-large-worlds.html#sec-expand_grid).
+
+Instead of counting we can also use a mathemtical function to calculate
+the probability of all combinations. A distribution function assigned to
+an observed variable is usually called a **LIKELIHOOD**.
+
+In the case of the globe-tossing model the appropriate distributional
+function is the **binomial distribution**. (Does this means that I have
+to know more on probability theory to decide when to choose which
+distribution?)
+
+##### 2.3.2.1.1a Likelihood for p= 0.5
+
+The likelihood in the globe-tossing example (9 trials, 6 with `W` and 3
+with `L`) is easily computed:
+
+```{r}
+#| label: likelihood-1
+
+## R code 2.2
+dbinom(6, size = 9, prob = 0.5)
+```
+
+In this example it is assumed that the probability of `W` and `L` are
+equal distributed. We calculated how plausible the combination of *6W*
+and *3L* would be, for the specific value of *p = 0.5*. The result is
+with 16% a pretty low probability.
+
+##### 2.3.2.1.2a Likelihood for many p-values
+
+To get a better idea what the best estimation of the probability is, we
+could vary systematically the `p` value and look for the maximum.
+
+A demonstration how this is done can be seen in the brms-variant
+reproduced in my notes
+[here](02b-small-and-large-worlds.html#sec-likelihood-for-many-p-values-b).
+It shows a maximum at about *p = 0.7*.
+
+#### 2.3.2.2a Unobserved Variables
+
+Even variables (= parameters) are not observed we need to define them.
+In the globe-tossing model there is only one parameter (p), but most
+models have more than one unobserved variables.
+
+> In statistical modeling, many of the most common questions we ask
+> about data are answered directly by parameters:
+>
+> -   What is the average difference between treatment groups?
+> -   How strong is the association between a treatment and an outcome?
+> -   Does the effect of the treatment depend upon a covariate?
+> -   How much variation is there among groups?
+>
+> \[We will\] see how these questions become extra parameters inside the
+> distribution function we assign to the data.
+
+::: callout-important
+## Parameter & Prior
+
+For every parameter we must provide a distribution of prior
+plausibility, its Prior. This is also true when the number of trials is
+null (N = 0), e.g. even in the initial state of information we need a
+prior.
+:::
+
+When you have a previous estimate, that can become the prior. As a
+result, each estimate (posterior probility) becomes then the prior for
+the next step. Where do priors come from? They are both engineering
+assumptions, chosen to help the machine learn, and scientific
+assumptions, chosen to reflect what we know about a phenomenon. Because
+the prior is an assumption, it should be interrogated like other
+assumptions: by altering it and checking how sensitive inference is to
+the assumption.
+
+::: callout-note
+## Data or Parameters
+
+Data are measured and known; parameters are unknown and must be
+estimated from data. But there is a deep identity between certainty
+(data) and uncertainty (parameters): Sometimes we observe a variable
+(data), sometimes not (parameter) but it could be that the same
+distribution function applies. An exploitation of the identity between
+data & parameters is it to incorporate measurement error and missing
+data into your modeling.
+
+::: callout-tip
+For more in this topic, check out McElreath\'s lecture, [*Understanding
+Bayesian statistics without frequentist
+language*](https://youtu.be/yakg94HyWdE).
+:::
+:::
+
+### 2.3.3a A Model is Born
+
+> The observed variables *W* and *L* are given relative counts through
+> the binomial distribution.
+
+$$W∼Binomial(n,p)\space where\space N = W + L$$
+
+The above is just a convention for communicating the assumption that the
+relative counts of ways to realize *W* in *N* trials with probability
+*p* on each trial comes from the binomial distribution.
+
+Our binomial likelihood contains a parameter for an unobserved variable,
+*p*. Parameters in Bayesian models are assigned priors:
+
+$$p∼Uniform(0,1)$$
+
+which expresses the model assumption that the entire range of possible
+values for p are equally plausible.

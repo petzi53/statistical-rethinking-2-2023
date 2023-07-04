@@ -182,9 +182,9 @@ by Devashree Madhugiri:
     nicely for `knitr::kable().` The best thing about kableExtra is that
     most of its table capabilities work for both HTML and PDF formats.
 
--   **DT**: dt is an abbreviation of \'DataTables.\' Data objects in R
-    can be rendered as HTML tables using the JavaScript library
-    \'DataTables\' (typically via R Markdown or Shiny).
+-   **DT**: dt is an abbreviation of 'DataTables.' Data objects in R can
+    be rendered as HTML tables using the JavaScript library 'DataTables'
+    (typically via R Markdown or Shiny).
 
 -   **flextable**: flextable package helps you to create reporting table
     from a dataframe easily. You can merge cells, add headers, add
@@ -235,7 +235,7 @@ We save our globe-tossing data in a tibble.
 
 ### 2.2.1b A Data Story
 
-### 2.2.2b Bayesian Updating
+### 2.2.2b Bayesian Updating {#sec-expand_grid}
 
 For the updating process we need to add to the data the cumulative
 number of trials, `n_trials`, and the cumulative number of successes,
@@ -253,23 +253,11 @@ number of trials, `n_trials`, and the cumulative number of successes,
 
 ```
 
-::: callout-warning
-## Warning
-
-The skills for the next graph are explained later in this chapter. I
-plan to come back here and fill in the details.
-:::
-
-The next R chunk uses the `dplyr::lag()` command: To find the "previous"
-(`lag()`) values in a vector (time series) is useful for comparing
-values behind of the current values. See [Compute lagged or leading
-values](https://dplyr.tidyverse.org/reference/lead-lag.html).
-
 ::: callout-important
 ## Change parameter name
 
 I had to change the parameter `k` to `default`. Maybe `k` was the name
-of the parameter of a previous dplyr version.
+of the parameter of a previous {**dplyr**} version?
 :::
 
 ```{r}
@@ -308,3 +296,157 @@ d %>%
   facet_wrap(~ strip, scales = "free_y")
 
 ```
+
+::: callout-warning
+## Warning
+
+The skills for the next graph are explained later in this chapter. I
+plan to come back here and fill in the details.
+:::
+
+In the meanwhile I called the code from the above code chunk line by
+line and inspected the result to understand what it does. These are my
+preliminary thoughts:
+
+-   `tidyr::expand_grid()` creates a tibble from all combinations of
+    inputs. Input are generalized vectors in contrast to `expand()` that
+    generates all combination of variables as well but needs as input a
+    dataset. The range between 0 and 1 is divided into 50 part and then
+    it generates all combinations by varying all columns from left to
+    right. The first column is the slowest, the second is faster and so
+    on.). It generates 450 data points (50 \* 9 trials).
+-   I do not understand why the data has to be grouped `group_by()` the
+    variable `p_water` as every row has a different value. But as I
+    tested: There is a difference between grouped and not grouped.
+    Apparently it has to do with the `lag()` command because the first
+    51 records are identical than beginning in row number 52
+    `lagged_n_trials` is FALSE until 100. 101 is TRUE and beginning with
+    row 102 `lagged_n_trials` and `lagged_n_success` are FALSE. From
+    here every 50th records are TRUE/TRUE (e.g., 151, 201, 251 etc.) all
+    the other rows are FALSE/FALSE.
+-   The next line uses the `dplyr::lag()` command: To find the
+    "previous" (`lag()`) values in a vector (time series) is useful for
+    comparing values behind of the current values. See [Compute lagged
+    or leading
+    values](https://dplyr.tidyverse.org/reference/lead-lag.html). I
+    think this is necessary to get the previous values (prior
+    probabilities) in relation with the posterior probabilities.
+-   The next two lines with `mutate()` calculate prior and likelihood.
+    There is no prior for the first trial, so it is assumed that it is
+    0.5. The formula for the binomial distribution uses for the prior
+    the lagged-version whereas the likelihood uses the current version.
+    These two lines provide the essential calculations: They match the
+    50 grid points as assumed water probabilities of every trial to
+    their trial outcome (`W` or `L`) probabilities.
+-   The third `mutate()` generates the `strip` variable consisting of
+    the prefix "N =" followed by the counts the number of trials. This
+    will later provide the title for the the different facets of the
+    plot.
+-   The next three lines normalize the prior and the likelihood by
+    grouping the data by n_trials. Dividing every prior and likelihood
+    values by their respective sum puts them both in a probability
+    metric.
+-   The remainder of the code prepares the plot by using the 50 grid
+    points in the range from 0 to 1 as the x-axis; prior and likelihood
+    as y-axis. To distinguish the prior from the likelihood is uses a
+    dashed line for the prior (`linetyp = 2`) and a full line (default)
+    for the likelihood. The x-axis has three breaks (`0, 0.5, 1`)
+    whereas the y-axis has no break and no scale (`scales = "free_y"`).
+
+> If it wasn\'t clear in the code, the dashed curves are normalized
+> prior densities. The solid ones are normalized likelihoods. If you
+> don\'t normalize (i.e., divide the density by the sum of the density),
+> their respective heights don\'t match up with those in the text.
+> Furthermore, it\'s the normalization that makes them directly
+> comparable.
+
+#### **Likelihood for many p-values-b**  {#sec-likelihood-for-many-p-values-b}
+
+```{r}
+#| label: likelihood-many
+
+tibble(prob = seq(from = 0, to = 1, by = .01)) %>% 
+  ggplot(aes(x = prob, y = dbinom(x = 6, size = 9, prob = prob))) +
+  geom_line() +
+  labs(x = "probability",
+       y = "binomial likelihood") +
+  theme(panel.grid = element_blank())
+
+```
+
+In contrast to *p = 0.5* with a probability of 0.16% the graph above
+shows a maximum at about *p = 0.7* and a probability of about 0.28%. We
+will get more detailed data later in the book.
+
+It is interesting to see that even the maximum probability is not very
+high. The reason is that there are many other configurations
+(distributions of Ws and Ls) to produce the result of *6W* and *3L*.
+Even if all these other distributions have a small probability they
+"eat" all with their share from the maximum.
+
+(I wanted to write "from the maximum of 1.0" but I think this would not
+be correct as the above graph displays the rate of change in cumulative
+probability (the **probability density**) and not the probability itself
+(the **probability mass**). See the following quote:
+
+> For mathematical reasons, probability densities can be greater than 1.
+> ... Probability *density* is the rate of change in cumulative
+> probability. So where cumulative probability is increasing rapidly,
+> density can easily exceed 1. But if we calculate the area under the
+> density function, it will never exceed 1. Such areas are also called
+> *probability mass*. (11.47 in calibre ebook-viewer reference mode)
+
+In the literature often the abbreviation **PDF ([probability density
+function](https://en.wikipedia.org/wiki/Probability_density_function))**
+is often used for the (probability) density. See also th wikipedia entry
+about [probability
+distribution](https://en.wikipedia.org/wiki/Probability_distribution).
+
+McElreath says:
+
+> The prior is a probability distribution for the parameter. In general,
+> for a uniform prior from *a* to *b*, the probability of any point in
+> the interval is 1/(*b -- a*). If you\'re bothered by the fact that the
+> probability of every value of *p* is 1, remember that every
+> probability distribution must sum (integrate) to 1. The expression
+> 1/(*b -- a*) ensures that the area under the flat line from *a* to *b*
+> is equal to 1.
+
+Kurz demonstrated the truth of this quote in the brms-version with
+several *b* values while holding *a* constant:
+
+```{r}
+#| label: uniform-prior-1b
+
+tibble(a = 0,
+       b = c(1, 1.5, 2, 3, 9)) %>% 
+  mutate(prob = 1 / (b - a))
+```
+
+Verified with a plot he divides the range of the *b* parameter (*0-9*)
+into 500 segments (*parameter_space*) and uses the `dunif()`
+distribution to calculate the probabilities:
+
+```{r}
+#| label: uniform-prior-2b
+
+tibble(a = 0,
+       b = c(1, 1.5, 2, 3, 9)) %>% 
+  expand_grid(parameter_space = seq(from = 0, to = 9, length.out = 500)) %>% 
+  mutate(prob = dunif(parameter_space, a, b),
+         b    = str_c("b = ", b)) %>% 
+  
+  ggplot(aes(x = parameter_space, y = prob)) +
+  geom_area() +
+  scale_x_continuous(breaks = c(0, 1:3, 9)) +
+  scale_y_continuous(breaks = c(0, 1/9, 1/3, 1/2, 2/3, 1),
+                     labels = c("0", "1/9", "1/3", "1/2", "2/3", "1")) +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  facet_wrap(~ b, ncol = 5)
+
+```
+
+This figure demonstrates that the area in the whole paramatere space is
+*1.0*. It is a nice example how to calculate the probability *mass* (in
+contrast to the curve of the probability *density*).
