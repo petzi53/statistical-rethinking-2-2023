@@ -16,8 +16,10 @@ plotting expert and I want to get more experience in using ggplot2.
 
 library(conflicted)
 library(tidyverse)
+library(patchwork)
 
 conflicts_prefer(dplyr::lag)
+conflicts_prefer(dplyr::filter)
 ```
 
 ## 2.1b Counting Possibilities
@@ -261,7 +263,8 @@ of the parameter of a previous {**dplyr**} version?
 :::
 
 ```{r}
-#| label: bayesian-updating-2b
+#| lst-label: mytest
+#| lst-cap: "How a Bayesian model learns"
 
 sequence_length <- 50
 
@@ -353,14 +356,15 @@ preliminary thoughts:
     for the likelihood. The x-axis has three breaks (`0, 0.5, 1`)
     whereas the y-axis has no break and no scale (`scales = "free_y"`).
 
-> If it wasn\'t clear in the code, the dashed curves are normalized
-> prior densities. The solid ones are normalized likelihoods. If you
-> don\'t normalize (i.e., divide the density by the sum of the density),
-> their respective heights don\'t match up with those in the text.
-> Furthermore, it\'s the normalization that makes them directly
-> comparable.
+> If it wasn't clear in the code, the dashed curves are normalized prior
+> densities. The solid ones are normalized likelihoods. If you don't
+> normalize (i.e., divide the density by the sum of the density), their
+> respective heights don't match up with those in the text. Furthermore,
+> it's the normalization that makes them directly comparable.
 
-#### **Likelihood for many p-values-b**  {#sec-likelihood-for-many-p-values-b}
+## 2.3b Components of the Model
+
+#### **Likelihood for many p-values-b** {#sec-likelihood-for-many-p-values-b}
 
 ```{r}
 #| label: likelihood-many
@@ -406,7 +410,7 @@ McElreath says:
 
 > The prior is a probability distribution for the parameter. In general,
 > for a uniform prior from *a* to *b*, the probability of any point in
-> the interval is 1/(*b -- a*). If you\'re bothered by the fact that the
+> the interval is 1/(*b -- a*). If you're bothered by the fact that the
 > probability of every value of *p* is 1, remember that every
 > probability distribution must sum (integrate) to 1. The expression
 > 1/(*b -- a*) ensures that the area under the flat line from *a* to *b*
@@ -450,3 +454,230 @@ tibble(a = 0,
 This figure demonstrates that the area in the whole paramatere space is
 *1.0*. It is a nice example how to calculate the probability *mass* (in
 contrast to the curve of the probability *density*).
+
+## 2.4b Making the Model Go
+
+### 2.4.1b Bayes' Theorem
+
+> \[The following graph\] illustrates the multiplicative interaction of
+> a prior and a probability of data. On each row, a prior on the left is
+> multiplied by the probability of data in the middle to produce a
+> posterior on the right. The probability of data in each case is the
+> same. The priors however vary. As a result, the posterior
+> distributions vary.
+
+```{r}
+#| label: prepare-model
+
+sequence_length <- 1e3
+
+d <-
+  tibble(probability = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
+  expand_grid(row = c("flat", "stepped", "Laplace"))  %>% 
+  arrange(row, probability) %>% 
+  mutate(prior = ifelse(row == "flat", 1,
+                        ifelse(row == "stepped", rep(0:1, each = sequence_length / 2),
+                               exp(-abs(probability - 0.5) / .25) / ( 2 * 0.25))),
+         likelihood = dbinom(x = 6, size = 9, prob = probability)) %>% 
+  group_by(row) %>% 
+  mutate(posterior = prior * likelihood / sum(prior * likelihood)) %>% 
+  pivot_longer(prior:posterior)  %>% 
+  ungroup() %>% 
+  mutate(name = factor(name, levels = c("prior", "likelihood", "posterior")),
+         row  = factor(row, levels = c("flat", "stepped", "Laplace")))
+
+```
+
+```{r}
+#| label: plot-model
+
+p1 <-
+  d %>%
+  filter(row == "flat") %>% 
+  ggplot(aes(x = probability, y = value)) +
+  geom_line() +
+  scale_x_continuous(NULL, breaks = NULL) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(panel.grid = element_blank()) +
+  facet_wrap(~ name, scales = "free_y")
+
+p2 <-
+  d %>%
+  filter(row == "stepped") %>% 
+  ggplot(aes(x = probability, y = value)) +
+  geom_line() +
+  scale_x_continuous(NULL, breaks = NULL) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank()) +
+  facet_wrap(~ name, scales = "free_y")
+
+p3 <-
+  d %>%
+  filter(row == "Laplace") %>% 
+  ggplot(aes(x = probability, y = value)) +
+  geom_line() +
+  scale_x_continuous(NULL, breaks = c(0, .5, 1)) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(panel.grid = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank()) +
+  facet_wrap(~ name, scales = "free_y")
+
+# combine
+# library(patchwork) # defined in setup chunk
+p1 / p2 / p3
+
+```
+
+The graph above shows the posterior distribution as a product of the
+prior distribution and likelihood. Top: A flat prior constructs a
+posterior that is simply proportional to the likelihood. Middle: A step
+prior, assigning zero probability to all values less than 0.5, results
+in a truncated posterior. Bottom: A peaked prior that shifts and skews
+the posterior, relative to the likelihood.
+
+### 2.4.2b Motors
+
+McElreath describes three different conditioning engines, numerical
+techniques for computing posterior distributions:
+
+1.  Grid approximation
+2.  Quadratic approximation
+3.  Markov chain Monte Carlo (MCMC)
+
+But in the {**brms**}-version to concentration is in the MCMC procedure.
+
+::: callout-caution
+## Caution
+
+> The consequence is that this version will jump rather quickly into
+> MCMC. This will be awkward at times because it will force us to
+> contend with technical issues in earlier problems in the text than
+> McElreath originally did.
+:::
+
+### 2.4.3b Grid Approximation
+
+> We just employed grid approximation over the last figure. To get nice
+> smooth lines, we computed the posterior over 1,000 evenly-spaced
+> points on the probability space.
+
+Here we'll prepare for the left panel of Figure 2.7 with just 5
+evenly-spaced points.
+
+There are five steps for the grid approximation procedure.
+
+```{r}
+#| label: grid-approx-b1
+
+(
+  d <-
+    # 1. define grid
+    tibble(p_grid = seq(from = 0, to = 1, length.out = 5), 
+           
+    # 2. define (compute) prior  
+           prior  = 1) %>%
+        
+    # 3. compute likelihood at each value in grid
+    mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>% 
+        
+    # 4. compute product of likelihood and prior
+    mutate(unstd_posterior = likelihood * prior) %>%  
+        
+    # 5. standardize the posterior, so it sums to 1
+    mutate(posterior = unstd_posterior / sum(unstd_posterior))   
+)
+
+```
+
+The next step is to plot the above results to get the left panel of
+Figure 2.5
+
+```{r}
+#| label: plot-grid-approx-b1
+
+p1 <- 
+    d |> 
+    ggplot(aes(x = p_grid, y = posterior)) +
+      geom_point() +
+      geom_line() +
+      labs(subtitle = "5 points",
+           x = "probability of water",
+           y = "posterior probability") +
+      theme(panel.grid = element_blank())
+p1
+```
+
+Now the same with 20 evenly spaced points to get the right panel of
+Figure 2.7.
+
+```{r}
+#| label: grid-approx-b2
+
+p2 <-
+  tibble(p_grid = seq(from = 0, to = 1, length.out = 20),
+         prior  = 1) %>%
+  mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>%
+  mutate(unstd_posterior = likelihood * prior) %>%
+  mutate(posterior = unstd_posterior / sum(unstd_posterior)) %>% 
+  
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_point() +
+  geom_line() +
+  labs(subtitle = "20 points",
+       x = "probability of water",
+       y = "posterior probability") +
+  theme(panel.grid = element_blank())
+p2
+```
+
+And finally we combine the two graphics into one:
+
+```{r}
+#| label: plot-grid-approx-b2
+
+# needs library(patchwork) = defined in setup chunk
+
+p1 + p2 + plot_annotation(title = "More grid points make for smoother approximations")
+```
+
+To see the influence of the prior probability on the posterior
+probability by using the same likelihood the book offers two code
+snippets. Replace the definition of the prior (number 2 in the code
+snippet) --- one at a time --- with the following lines of code:
+
+prior \<- ifelse(p_grid \< 0.5, 0, 1) prior \<- exp(-5 \* abs(p_grid -
+0.5))
+
+The rest of the code remains the same.
+
+What follows is a condensed way to make the four plots all at once. It
+is a pretty complex program snippet not only using `expand_grid()` ---
+as already explained ---, but also `unnest()` which expands a
+list-column containing data frames into rows and columns.
+
+```{r}
+# make the data
+tibble(n_points = c(5, 20)) %>% 
+  mutate(p_grid = map(n_points, ~seq(from = 0, to = 1, length.out = .))) %>% 
+  unnest(p_grid) %>% 
+  expand_grid(priors = c("ifelse(p_grid < 0.5, 0, 1)", "exp(-5 * abs(p_grid - 0.5))")) %>% 
+  mutate(prior = ifelse(priors == "ifelse(p_grid < 0.5, 0, 1)", 
+                        ifelse(p_grid < 0.5, 0, 1),
+                        exp(-5 * abs(p_grid - 0.5)))) %>% 
+  mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>% 
+  mutate(posterior = likelihood * prior / sum(likelihood * prior)) %>% 
+  mutate(n_points = str_c("# points = ", n_points),
+         priors   = str_c("prior = ", priors)) %>% 
+  
+  # plot!
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "probability of water",
+       y = "posterior probability") +
+  theme(panel.grid = element_blank()) +
+  facet_grid(n_points ~ priors, scales = "free")
+```
