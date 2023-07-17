@@ -1,20 +1,7 @@
 # Preface {.unnumbered}
 
-::: callout-note
+::: {.callout-note style="color: blue;"}
 ## Finished about 15%
-:::
-
-::: callout-caution
-I am in the process of re-organizing the content I have written so far
-(chapter 1-4). Instead of separating the original from the brms-version
-I am going to integrate it into one chapter. This has the advantage that
-the chapter numbers of this document conforms to the chapter numbers of
-the second edition of the printed [Statistical Rethinking
-book](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
-
-This will take some time. In the meanwhile keep in mind that there is a
-mixture of old and new structure and that some cross references do not
-work.
 :::
 
 ## Content and Goals of this Book
@@ -28,7 +15,7 @@ using [Statistical Rethinking
 2023](https://www.youtube.com/playlist?list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus),
 the most recent set of free YouTube video lectures.
 
-You can find other material on Richards [website about the
+You can find links to other material on Richards [website about the
 book](https://xcelab.net/rm/statistical-rethinking/). Of special
 interest for me are the
 [brms+tidyverse](https://bookdown.org/content/4857/) and the
@@ -42,6 +29,21 @@ Chapters with the
 -   suffix `a` refers to the original book,
 -   suffix `b` to the brms conversion and
 -   suffix `c` to the Stan conversion.
+
+::: {.callout-caution style="color: orange;"}
+## Caution (2023-17-07)
+
+I am in the process of re-organizing the content I have written so far
+(chapter 1-4). Instead of separating the original from the brms-version
+I am going to integrate it into one chapter. This has the advantage that
+the chapter numbers of this document conforms to the chapter numbers of
+the second edition of the printed [Statistical Rethinking
+book](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
+
+This will take some time. In the meanwhile keep in mind that there is a
+mixture of old and new structure and that some cross references do not
+work.
+:::
 
 My text consists mostly of quotes from the 2020 book edition or from the
 text of the video lectures 2023. Sometimes I made minor editing (e.g.,
