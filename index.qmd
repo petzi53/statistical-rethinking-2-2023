@@ -37,7 +37,7 @@ I am in the process of re-organizing the content I have written so far
 (chapter 1-4). Instead of separating the original from the brms-version
 I am going to integrate it into one chapter. This has the advantage that
 the chapter numbers of this document conforms to the chapter numbers of
-the second edition of the printed [Statistical Rethinking
+the [second edition of the printed
 book](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
 
 This will take some time. In the meanwhile keep in mind that there is a
