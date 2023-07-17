@@ -4,12 +4,12 @@ project:
 book:
   title: "Statistical Rethinking (2nd ed. 2023)"
   author: "Peter Baumgartner"
-  date: "2023-07-04"
+  date: last-modified
+  date-format: YYYY-MM-DD HH:mm
   chapters:
     - index.qmd
-    - 01a-golem-of-prague.qmd
-    - 02a-small-and-large-worlds.qmd
-    - 02b-small-and-large-worlds.qmd
+    - 01-golem-of-prague.qmd
+    - 02-small-and-large-worlds.qmd
     - 02v-small-and-large-worlds.qmd
     - 03a-sampling-the-imaginary.qmd
     - 03b-sampling-the-imaginary.qmd
@@ -23,14 +23,15 @@ format:
   html:
     theme: cosmo
     number-sections: true
+    toc-depth: 5
   pdf:
     documentclass: scrreprt
 
 knitr:
   opts_chunk:
     collapse: true
-    code-line-numbers: true
     comment: "#>"
+    code-line-numbers: true
     R.options:
       knitr.graphics.auto_pdf: true
 
