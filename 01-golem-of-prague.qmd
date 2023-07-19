@@ -4,3 +4,5 @@ A golem (goh-lem) is a clay robot from Jewish folklore. It stands as a
 metaphor for scientific models. Like in the folklore they are made of
 dust (silicon chips), are very powerful but also very dumb and therefore
 dangerous.
+
+There is nothing more in this chapter. I opened this file only to get the same header numbers as in the book.
