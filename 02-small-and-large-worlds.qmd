@@ -172,8 +172,8 @@ following way:
 As we will see later: the choice of the prior is not relevant for the
 final result. This is called the *Principle of Indifference*.
 
-The only difference between a good or bad choice is the time (the
-different steps) the updating process needs to produce the final result.
+The only difference between a good or bad choice is the time (the number
+of steps) the updating process needs to produce the final result.
 
 Before seeing any data the most common solution is to assign an equal
 number of ways that each conjecture could be correct.
@@ -214,7 +214,7 @@ Here's how we do the updating:
 |     | \[⚫⚫⚫⚪\] |     | 3                  |     | 9            |     | 9 × 3 = 27 |     |
 |     | \[⚫⚫⚫⚫\] |     | 4                  |     | 0            |     | 0 × 4 = 0  |     |
 
-::: callout-note
+::: {.callout-note style="color: blue;"}
 ###### Typo
 
 In the book the table header "Ways to produce" includes ⚪ instead of
@@ -223,7 +223,7 @@ In the book the table header "Ways to produce" includes ⚪ instead of
 
 #### From Counts to Probability
 
-::: callout-tip
+::: {.callout-tip style="color: green"}
 ###### Principle of honest ignorance
 
 *When we don't know what caused the data, potential causes that may
@@ -303,7 +303,7 @@ Data = ⚫⚪⚫.
 > If we're willing to code the marbles as 0 = "white" 1 = "blue", we can
 > arrange the possibility data in a tibble as follows.
 
-::: callout-note
+::: {.callout-note style="color: blue;"}
 ###### Changed code slightly
 
 I changed `rep()` to `rep.int()` and added `L` to the value of p1 resp.
@@ -325,14 +325,14 @@ head(d)
 
 > You might depict the possibility data in a plot.
 
-
-``` r
+```{r}
 #| label: fig-show-marble-data
 #| fig-cap: "Marble Data"
+#| attr-source: '#lst-marble-data lst-cap="Code listing to show the marble data as graph"'
 
 d %>% 
   set_names(1:5) %>%    # <1>
-  mutate(x = 1:4) %>%.  # <2> 
+  mutate(x = 1:4) %>%  # <2> 
   pivot_longer(-x, names_to = "possibility") %>%  # <3>
   mutate(value = value %>% as.character()) %>%    # <4>
   
@@ -341,6 +341,7 @@ d %>%
   scale_fill_manual(values = c("white", "navy")) + # <5>
   scale_x_discrete(NULL, breaks = NULL) + # <5>
   theme(legend.position = "none") # <5>
+ 
 ```
 
 1.  Change the column names from p\<number\> to \<number\>.
@@ -463,7 +464,7 @@ blog post from Sharla Gelfand. But keep in mind that the publication
 date is 2020-02-17 and that therefore some commands are outdated. Most
 important: use `base::all.equal()` instead of `dplyr::all_equal()`.
 
-::: callout-warning
+::: {.callout-warning style="color: orange;"}
 > `all_equal()` allows you to compare data frames, optionally ignoring
 > row and column names. It is deprecated as of dplyr 1.1.0, because it
 > makes it too easy to ignore important differences.
@@ -479,11 +480,14 @@ The current version of the {dplyr) packages is 1.1.2.
     mutate(value = value %>% as.character()))
 ```
 
-The `value` column is of type `double` as can be seen in the result of Annotation (3). For the plot it has to be changed to the type of `character`. Otherwise it could not be used with the `fill` option.
+The `value` column is of type `double` as can be seen in the result of
+Annotation (3). For the plot it has to be changed to the type of
+`character`. Otherwise it could not be used with the `fill` option.
 
 ##### Annotation (5)
 
-The plot uses code from the {**ggplot2**} package, which I do understand and will therefore not explain here.
+The plot uses code from the {**ggplot2**} package, which I do understand
+and will therefore not explain here.
 
 ```{r}
 #| label: plot-possibilities-conjectures
@@ -496,92 +500,92 @@ d |>
   theme(legend.position = "none")
 ```
 
-
 ##### Summarize the Possiblity Structure
+
 > Here's the basic structure of the possibilities per marble draw.
 
-::: callout-note
-###### Using flextable() and labeling the chunk requires table capture as well
-
-If you label the chunk using `flextable()` then you have also to add
-`tbl-cap` to the chunk options.
-:::
-
 ```{r}
-#| label: basic-prob-struct
+#| label: tbl-basic-prob-struct
 #| tbl-cap: possibility-structure
-
-library(flextable)
 
 tibble(draw    = 1:3,
        marbles = 4) %>% 
   mutate(possibilities = marbles ^ draw) %>% 
-  flextable()
+  kableExtra::kbl() |> 
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::kable_classic()
 
 ```
 
+::: {.callout-note style="color: blue"}
+## Table Packages Used
+
+Kurz employed the {**flextable**} package to print tables. As I have no
+experience with this package, I will apply {**kableExtra**} in this
+document.\
+\
+Until now I had used most of the time kableExtra and sometimes DT. For a
+short compilation of available table packages see the section on [Other
+packages for creating
+tables](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html)
+in the R Markdown Cookbook. The following excursion on tables follows
+the blog article [Top 7 Packages for Making Beautiful Tables in
+R](https://towardsdatascience.com/top-7-packages-for-making-beautiful-tables-in-r-7683d054e541)
+by Devashree Madhugiri.
+:::
+
 #### Excursion: Tables
 
-I am completely new to the
-[**flextable**](https://davidgohel.github.io/flextable/) package. Until
-now I had used most of the time
-[kableExtra](https://haozhu233.github.io/kableExtra/) and sometimes
-[DT](https://rstudio.github.io/DT/). But there are also
-[gt](https://github.com/rstudio/gt),
-[formattable](https://renkun-ken.github.io/formattable/),
-[reactable](https://glin.github.io/reactable/) and
-[reactablefmtr](https://kcuilla.github.io/reactablefmtr/). It seems to
-me that I should especially have a look into the {**gt**} package as it
-is developed by the RStudio/Posit team.
-
-See the short description quoted below from [Top 7 Packages for Making
-Beautiful Tables in
-R](https://towardsdatascience.com/top-7-packages-for-making-beautiful-tables-in-r-7683d054e541)
-by Devashree Madhugiri:
-
--   **gt**: The gt package offers a different and easy-to-use set of
-    functions that helps us build display tables from tabular data. The
-    gt philosophy states that a comprehensive collection of table parts
-    can be used to create a broad range of functional tables. These are
-    the table body, the table footer, the spanner column labels, the
-    column labels, and the table header.
+-   [{**gt**}](https://gt.rstudio.com/): The gt package offers a
+    different and easy-to-use set of functions that helps us build
+    display tables from tabular data. The gt philosophy states that a
+    comprehensive collection of table parts can be used to create a
+    broad range of functional tables. These are the table body, the
+    table footer, the spanner column labels, the column labels, and the
+    table header. (I should look into the {**gt**} package in more
+    detail as it is developed by the RStudio/Posit team, that stands not
+    only for high quality but also for tidyverse compatibility.)
 
     ![](https://gt.rstudio.com/reference/figures/gt_parts_of_a_table.svg)
 
--   **formattable**: Formattable data frames are data frames that will
-    be displayed in HTML tables using formatter functions. This package
-    includes techniques to produce data structures with predefined
-    formatting rules, such that the objects maintain the original data
-    but are formatted. The package consists of several standard
-    formattable objects, including percent, comma, currency, accounting,
-    and scientific.
+-   [{**formattable**}](https://renkun-ken.github.io/formattable/):
+    Formattable data frames are data frames that will be displayed in
+    HTML tables using formatter functions. This package includes
+    techniques to produce data structures with predefined formatting
+    rules, such that the objects maintain the original data but are
+    formatted. The package consists of several standard formattable
+    objects, including percent, comma, currency, accounting, and
+    scientific.
 
--   **kableExtra**: The kableExtra package is used to extend the basic
-    functionality of `knitr::kable tables()`. Although `knitr::kable()`
-    is simple by design, it has many features missing which are usually
-    available in other packages, and kableExtra has filled the gap
-    nicely for `knitr::kable().` The best thing about kableExtra is that
-    most of its table capabilities work for both HTML and PDF formats.
+-   [{**kableExtra**}](https://haozhu233.github.io/kableExtra/): It
+    extends the basic functionality of `knitr::kable()` tables. Although
+    `knitr::kable()` is simple by design, it has many features missing
+    which are usually available in other packages. {**kableExtra**} has
+    filled the gap nicely. One of the best thing about {**kableExtra**}
+    is that most of its table capabilities work for both HTML and PDF
+    formats.
 
--   **DT**: dt is an abbreviation of 'DataTables.' Data objects in R can
-    be rendered as HTML tables using the JavaScript library 'DataTables'
-    (typically via R Markdown or Shiny).
+-   [{**DT**}](https://rstudio.github.io/DT/): dt is an abbreviation of
+    'DataTables.' Data objects in R can be rendered as HTML tables using
+    the JavaScript library 'DataTables' (typically via R Markdown or
+    Shiny).
 
--   **flextable**: flextable package helps you to create reporting table
-    from a dataframe easily. You can merge cells, add headers, add
-    footers, change formatting, and set how data in cells is displayed.
-    Table content can also contain mixed types of text and image
-    content. Tables can be embedded from R Markdown documents into HTML,
-    PDF, Word, and PowerPoint documents and can be embedded using
-    Package Officer for Microsoft Word or PowerPoint documents. Tables
-    can also be exported as R plots or graphic files, e.g., png, pdf,
-    and jpeg.
+-   [{**flextable**}](https://davidgohel.github.io/flextable/): This
+    package helps you to create reporting table from a data frame
+    easily. You can merge cells, add headers, add footers, change
+    formatting, and set how data in cells is displayed. Table content
+    can also contain mixed types of text and image content. Tables can
+    be embedded from R Markdown documents into HTML, PDF, Word, and
+    PowerPoint documents and can be embedded using Package Officer for
+    Microsoft Word or PowerPoint documents. Tables can also be exported
+    as R plots or graphic files, e.g., png, pdf, and jpeg.
 
--   **reactable**: `reactable()` creates a data table from tabular data
-    with sorting and pagination by default. The data table is an HTML
-    widget that can be used in R Markdown documents and Shiny
-    applications or viewed from an R console. It is based on the React
-    Table library and made with reactR. Features are:
+-   [{**reactable**}](https://glin.github.io/reactable/): `reactable()`
+    creates a data table from tabular data with sorting and pagination
+    by default. The data table is an HTML widget that can be used in R
+    Markdown documents and Shiny applications or viewed from an R
+    console. It is based on the React Table library and made with
+    reactR. Features are:
 
     -   It creates a data table with sorting, filtering, and pagination
     -   It has built-in column formatting
@@ -589,24 +593,74 @@ by Devashree Madhugiri:
     -   It works seamlessly within R Markdown documents and the Shiny
         app
 
--   **ractablefmtr**: The
-    [reactablefmtr](https://kcuilla.github.io/reactablefmtr/index.html)
-    package improves the appearance and formatting of tables created
-    using the reactable R library. The reactablefmtr package includes
-    many conditional formatters that are highly customizable and easy to
-    use.
+-   [{**ractablefmtr**}](https://kcuilla.github.io/reactablefmtr/index.html):
+    The package improves the appearance and formatting of tables created
+    using the reactable R library. It includes many conditional
+    formatters that are highly customizable and easy to use.
 
-I am not sure if there are other packages as well. But the above seven
-packages are a first starting point to learn creating and displaying
+I sure there are other packages as well. But the above seven packages
+are a first starting point to learn creating and displaying
 sophisticated data tables in R.
+
+> The authors of R Markdown Cookbook (Yihui Xie, Christophe Dervieux,
+> Emily Riederer) mention also several other table packages in the
+> section [Other packages for creating
+> tables](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html):
+>
+> -   **rhandsontable** ([Owen
+>     2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-rhandsontable)):
+>     Also similar to **DT**, and has an Excel feel (e.g., you can edit
+>     data directly in the table). Visit
+>     <https://jrowen.github.io/rhandsontable/> to learn more about it.
+>
+> -   **pixiedust** ([Nutter
+>     2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-pixiedust)):
+>     Features creating tables for models (such as linear models)
+>     converted through the **broom** package ([Robinson, Hayes, and
+>     Couch
+>     2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-broom)).
+>     It supports Markdown, HTML, and LaTeX output formats. Its
+>     repository is at <https://github.com/nutterb/pixiedust>.
+>
+> -   **stargazer** ([Hlavac
+>     2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-stargazer)):
+>     Features formatting regression models and summary statistics
+>     tables. The package is available on CRAN at
+>     <https://cran.r-project.org/package=stargazer>.
+>
+> -   **xtable** ([Dahl et al.
+>     2019](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-xtable)):
+>     Perhaps the oldest package for creating tables---the first release
+>     was made in 2000. It supports both LaTeX and HTML formats. The
+>     package is available on CRAN at
+>     <https://cran.r-project.org/package=xtable>.
+>
+> I\'m not going to introduce the rest of packages, but will just list
+> them here: **tables** ([Murdoch
+> 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tables)),
+> **pander** ([Daróczi and Tsegelskyi
+> 2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-pander)),
+> **tangram** ([S. Garbett
+> 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tangram)),
+> **ztable** ([Moon
+> 2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-ztable)),
+> and **condformat** ([Oller Moreno
+> 2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-condformat)).
 
 ## Building a Model
 
 ### Original
 
-**Globe tossing**
+**Globe-tossing**
 
-Data: `W L W W W L W L W` (W indicates water and L indicates land. )
+We are going to use a toy example, but it has the same structure as a
+typical statistical analyses. The first nine samples produce the
+following data:
+
+`W L W W W L W L W` (W indicates water and L indicates land.)
+
+Designing a simple Bayesian model benefits from a design loop with three
+steps.
 
 1.  **Data story**: Motivate the model by narrating how the data might
     arise.
@@ -628,7 +682,8 @@ sufficient for specifying an algorithm for simulating new data.
 > You can motivate your data story by trying to explain how each piece
 > of data is born. This usually means describing aspects of the
 > underlying reality as well as the sampling process. The data story in
-> this case is simply a restatement of the sampling process:
+> ... \[our toy case of globe-tossing\] is simply a restatement of the
+> sampling process:
 >
 > 1.  The true proportion of water covering the globe is *`p`*.
 > 2.  A single toss of the globe has a probability *`p`* of producing a
@@ -660,28 +715,42 @@ sufficient for specifying an algorithm for simulating new data.
 > observation is added, the curve is updated consistent with all
 > previous observations.
 
-Figure 2.5 (How a Bayesian model learns) of the book is reproduced in my
-notes of the brms-version.
+To see the results of the different (updating) steps I am going to
+reproduce Figure 2.5 (How a Bayesian model learns) of the book. In the
+tidyverse-version we will learn how to write R code to reproduce the
+graphic.
+
+![Copy of Figure 2.5: **How a Bayesian model learns**. In each plot,
+previous plausibilities (dashed curve) are updated in light of the
+latest observation to produce a new set of plausibilities (solid
+curve).](img/bayesian_model_learns_step_by_step-min.png){#fig-2-5-book-copy
+fig-alt="Nine small diagrams to show the relationship between plausibility against proportion of water after each sample."}
 
 #### Evaluate
 
 Keep in mind two cautious principles:
 
-1.  First, **the model's certainty is no guarantee that the model is a
-    good one**. ... \[M\]odels of all sorts---Bayesian or not---can be
-    very confident about an inference, even when the model is seriously
-    misleading. This is because the inferences are conditional on the
-    model. What your model is telling you is that, given a commitment to
-    this particular model, it can be very sure that the plausible values
-    are in a narrow range. Under a different model, things might look
-    differently.
-2.  Second, **it is important to supervise and critique your model's
-    work**. ... When something is irrelevant to the machine, it won't
-    affect the inference directly. But it may affect it indirectly ...
-    So it is important to check the model's inferences in light of
-    aspects of the data it does not know about. Such checks are an
-    inherently creative enterprise, left to the analyst and the
-    scientific community. Golems are very bad at it. (emphasis are mine)
+1.  <div>
+
+    > -   First, **the model's certainty is no guarantee that the model
+    >     is a good one**. ... \[M\]odels of all sorts---Bayesian or
+    >     not---can be very confident about an inference, even when the
+    >     model is seriously misleading. This is because the inferences
+    >     are conditional on the model. What your model is telling you
+    >     is that, given a commitment to this particular model, it can
+    >     be very sure that the plausible values are in a narrow range.
+    >     Under a different model, things might look differently.
+    >
+    > -   Second, **it is important to supervise and critique your
+    >     model's work**. ... When something is irrelevant to the
+    >     machine, it won't affect the inference directly. But it may
+    >     affect it indirectly ... So it is important to check the
+    >     model's inferences in light of aspects of the data it does not
+    >     know about. Such checks are an inherently creative enterprise,
+    >     left to the analyst and the scientific community. Golems are
+    >     very bad at it. (emphasis pb)
+
+    </div>
 
 Further keep in mind that
 
@@ -699,11 +768,7 @@ Further keep in mind that
 
 ### Tidyverse
 
-**Globe tossing**
-
-Data: `W L W W W L W L W` (W indicates water and L indicates land. )
-
-We save our globe-tossing data in a tibble.
+Let's save our globe-tossing data `W L W W W L W L W` in a tibble:
 
 ```{r}
 #| label: globe-tossing-data
@@ -717,10 +782,10 @@ We save our globe-tossing data in a tibble.
 
 For the updating process we need to add to the data the cumulative
 number of trials, `n_trials`, and the cumulative number of successes,
-`n_successes` (i.e., `toss == "w"`),
+`n_successes` (i.e., `toss == "w"`).
 
 ```{r}
-#| label: bayesian-updating-1b
+#| label: bayesian-updating-start
 
 (
   d <-
@@ -731,20 +796,333 @@ number of trials, `n_trials`, and the cumulative number of successes,
 
 ```
 
-::: callout-important
-###### Change parameter name
+The program code for reproducing the Figure 2.5 of the book (here in in
+this document it is @fig-2-5-book-copy) is pretty complex. Again I have
+to inspect the results line by line as I had done for the
+@lst-marble-data. At first I will give a short introduction what each
+line does. In the next steps I will explain each step more in detail and
+show the result of the corresponding lines of code.
 
-I had to change the parameter `k` to `default`. Maybe `k` was the name
-of the parameter of a previous {**dplyr**} version?
+::: {.callout-warning style="color: orange;"}
+###### Preliminary Explanation of the Next Graph
+
+The grid approximation used for the Bayesian updating in the next graph
+are explained later in this chapter. \
+\
+In the meanwhile I called the code from the following code chunk line by
+line and inspected the result to understand what it does.
+:::
+
+::: {.callout-note style="color: blue;"}
+###### Changed parameter name
+
+In the following listing I had to change in the `lag()` function the
+parameter `k` of the Kurz'sche version to `default` as it is described
+in the corresponding [help
+file](https://dplyr.tidyverse.org/reference/lead-lag.html). I don't
+understand why `k`\`was used. Maybe `k` was the name of the parameter of
+a previous {**dplyr**} version?
 :::
 
 ```{r}
 #| label: bayesian-model-learning
 #| lst-cap: "How a Bayesian model learns"
 
-sequence_length <- 50
+# starting data
+d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+sequence_length <- 50 #<1>
 
 d %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% # <1>
+  group_by(p_water) %>% # <2>
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% # <3>
+  ungroup() %>% # <4>
+  mutate(prior      = ifelse(n_trials == 1, .5,
+                             dbinom(x    = lagged_n_success, 
+                                    size = lagged_n_trials, 
+                                    prob = p_water)),
+         likelihood = dbinom(x    = n_success, 
+                             size = n_trials, 
+                             prob = p_water),
+         strip      = str_c("n = ", n_trials)) %>% # <5>
+  
+  # normalize prior and likelihood 
+  group_by(n_trials) %>% # <6>
+  mutate(prior      = prior / sum(prior),
+         likelihood = likelihood / sum(likelihood)) %>% # <6>
+  
+  # plot the result
+  ggplot(aes(x = p_water)) + # <7>
+  geom_line(aes(y = prior), 
+            linetype = 2) + # <7>
+  geom_line(aes(y = likelihood)) + # <7>
+  scale_x_continuous("proportion water", breaks = c(0, .5, 1)) + # <7>
+  scale_y_continuous("plausibility", breaks = NULL) + # <7>
+  theme(panel.grid = element_blank()) + # <7>
+  facet_wrap(~ strip, scales = "free_y") # <7>
+
+```
+
+1.  Creates a tibble from all combinations of inputs. @sec-annotation-1-expand-grid.
+2.  Group data by the parameter `p-water`. @sec-annotation-2-group_by.
+3.  Create two columns filled with the value of the previous row using
+    the `lag()` function. @sec-annotation-3-lag.
+4.  Restore the original ungrouped data structure. @sec-annotation-4-ungroup.
+5.  Calculate Prior and Likelihood and create a column for each
+    parameter. @sec-annotation-5-dbinom.
+6.  Normalize Prior and Likelihood to put both of them in a probability
+    metric. @sec-annotation-6-normalize.
+7.  Plot the result. @sec-annotation-7-ggplot.
+
+##### Annotation (1): `tidyr::expand_grid()` {#sec-annotation-1-expand-grid}
+
+`tidyr::expand_grid()` creates a tibble from all combinations of inputs.
+Input are generalized vectors in contrast to `expand()` that generates
+all combination of variables as well but needs as input a dataset. The
+range between 0 and 1 is divided into 50 part and then it generates all
+combinations by varying all columns from left to right. The first column
+is the slowest, the second is faster and so on.). It generates 450 data
+points (50 \* 9 trials).
+
+```{r}
+#| label: bayesian-model-learning-anno1
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling
+
+### add code lines of annotation <1> #####################################
+# add code lines of annotation <1>
+sequence_length <- 50
+
+tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length))
+```
+
+##### Annotation (2): `dplyr::group_by()` {#sec-annotation-2-group_by}
+
+At first I did not understand the line `group_by(p_water)`. Why has the
+data to be grouped when every row has a different value --- as I have
+thought from a cursory inspection of the result? But it turned out that
+after 100 records the parameter `p_water` is repeating its value.
+
+::: {.callout-tip style="color: green;"}
+## Special table format
+
+For a better comparison (and for a later cross reference I will append
+to the next code chunk a new column ID with line number and a table
+format where one can scroll the long table with it 450 rows.
+:::
+
+```{r}
+#| label: tbl-bayesian-model-learning-anno2-1
+#| tbl-cap: "Bayesian Updating: Lagged with groupping"
+
+# starting data
+tbl1 <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl1 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
+    
+  #### add code lines to show effect of annoation <2> ######################
+  group_by(p_water) %>% 
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup() |> 
+    
+
+  # add new column ID with row numbers and relocate it as first column
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
+
+ # provide a different format and a scroll box for the table
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
+tbl1
+```
+
+I want to see the differences in detail. So I will provide also the
+ungrouped version.
+
+```{r}
+#| label: tbl-bayesian-model-learning-anno2-2
+#| tbl-cap: "Bayesian Updating: Lagged without groupping (FALSE)"
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling without grouping
+sequence_length <- 50
+
+tbl2 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) |> 
+    
+  ### add code lines to show effect without annotation <2> ##################
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) |> 
+  
+  # add new column ID with row numbers and relocate it as first column
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
+
+  # provide a different format and a scroll box for the table
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
+tbl2
+```
+
+It turned out that the two version differ after 51 records. (Not after
+50 as one would have assumed. Apparently this has to do with the `lag()`
+command because the first 51 records are identical. Beginning with row
+number 52 there are differences in the column `lagged_n_trials`:
+
+-   In the original version `lagged_n_trials` remains `1` until 100
+    (included), then it changes to `2`.
+-   In the version without grouping however `lagged_n_trials` changes to
+    `2` with record 52. (not 51)
+-   This pattern is repeated: Original version always changes after 100
+    records. The version without grouping changes after 50 rows but
+    starting with row 51.
+-   The same differences appear with `lagged_n_success` but 50 records
+    later: The first difference appears after row 101.
+
+##### Annotation (3): `dplyr::lag()` {#sec-annotation-3-lag}
+
+The next line uses the `dplyr::lag()` command: The function (`lag()`)
+finds the "previous" values in a vector (time series). This is useful
+for comparing values behind of the current values. See [Compute lagged
+or leading values](https://dplyr.tidyverse.org/reference/lead-lag.html).
+
+We need to get the immediately previous values for drawing the prior
+probabilities in the current graph (= dashed line or `linetype = 2` in
+ggplot parlance). In the relation with the posterior probabilities the
+difference form the prior possibility is always `1`\` (this is the
+option `default = 1` in the `lag()` function. This is now the correct
+explanation for the differences starting with rows 52 resp. 102 (and not
+51 resp. 101).
+
+The result is already shown under @sec-annotation-2-group_by in the result of the code listing @tbl-bayesian-model-learning-anno2-1.
+
+```{r}
+#| label: bayesian-model-learning-anno3
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl3 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
+  group_by(p_water) %>% 
+    
+  ### add code lines of annotation <3> ##########################
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup()
+tbl3
+```
+
+##### Annotation (4): `dplyr::ungroup()` {#sec-annotation-4-ungroup}
+
+This is just the reversion of the grouping command `group_by(p_water)`
+mentioned in @sec-annotation-2-group_by.
+
+##### Annotation (5): dbinom() {#sec-annotation-5-dbinom}
+
+This is the core of the prior and likelihood calculation. It uses
+`base::dbinom()`, to calculate two alternative events and will be
+explained later in more detail. REFERENCE??
+
+The results of each of the different calculation (prior and pikelihood)
+are collected in with `mutate()` into two new generated columns.
+
+There is no prior for the first trial, so it is assumed that it is 0.5.
+The formula for the binomial distribution uses for the prior the
+lagged-version whereas the likelihood uses the current version. These
+two lines provide the essential calculations: They match the 50 grid
+points as assumed water probabilities of every trial to their trial
+outcome (`W` or `L`) probabilities.
+
+The third `mutate()` generates the `strip` variable consisting of the
+prefix "N =" followed by the counts of the number of trials. This will
+later provide the title for the the different facets of the plot.
+
+```{r}
+#| label: tbl-bayesian-model-learning-anno5
+#| tbl-cap: "Bayesian Updating: Calculating prior and likelihood"
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl5 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
+  group_by(p_water) %>% 
+    
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup() %>% 
+    
+  ### add code lines of annotation <5> ########################
+  mutate(prior      = ifelse(n_trials == 1, .5,
+                             dbinom(x    = lagged_n_success, 
+                                    size = lagged_n_trials, 
+                                    prob = p_water)),
+         likelihood = dbinom(x    = n_success, 
+                             size = n_trials, 
+                             prob = p_water),
+         strip      = str_c("n = ", n_trials)) |> 
+ 
+  # provide table scroll box
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
+tbl5
+```
+
+##### Annotation (6): Normalizing {#sec-annotation-6-normalize}
+
+The code lines in annotation 6 normalize the prior and the likelihood by
+grouping the data by `n_trials`. Dividing every prior and likelihood
+values by their respective sum puts them both in a probability metric.
+This metric is important for the comparisons of different probabilities.
+
+> If you don't normalize (i.e., divide the density by the sum of the
+> density), their respective heights don't match up with those in the
+> text. Furthermore, it's the normalization that makes them directly
+> comparable.
+
+```{r}
+#| label: tbl-bayesian-model-learning-anno6
+#| tbl-cap: "Bayesian Updating: Normalizing prior and likelihood"
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl6 <- tbl %>% 
   expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
   group_by(p_water) %>% 
   mutate(lagged_n_trials  = lag(n_trials, default = 1),
@@ -757,86 +1135,71 @@ d %>%
          likelihood = dbinom(x    = n_success, 
                              size = n_trials, 
                              prob = p_water),
-         strip      = str_c("n = ", n_trials)) %>% 
-  # the next three lines allow us to normalize the prior and the likelihood, 
-  # putting them both in a probability metric 
+         strip      = str_c("n = ", n_trials)) |> 
+    
+  ### add code lines of annotation <6> ################## 
   group_by(n_trials) %>% 
   mutate(prior      = prior / sum(prior),
-         likelihood = likelihood / sum(likelihood)) %>%   
-  
-  # plot!
-  ggplot(aes(x = p_water)) +
-  geom_line(aes(y = prior), 
-            linetype = 2) +
-  geom_line(aes(y = likelihood)) +
-  scale_x_continuous("proportion water", breaks = c(0, .5, 1)) +
-  scale_y_continuous("plausibility", breaks = NULL) +
-  theme(panel.grid = element_blank()) +
-  facet_wrap(~ strip, scales = "free_y")
-
+         likelihood = likelihood / sum(likelihood)) %>% 
+    
+  # provide table scrool box for better comparison of the results
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
+tbl6
 ```
 
-::: callout-warning
-###### Preliminary Explanation of the Next Graph
+##### Annotation (7): {#sec-annotation-7-ggplot}
 
-The skills for the next graph are explained later in this chapter. I
-plan to come back here and fill in the details.
-:::
+The remainder of the code prepares the plot by using the 50 grid points
+in the range from 0 to 1 as the x-axis; prior and likelihood as y-axis.
+To distinguish the prior from the likelihood is uses a dashed line for
+the prior (`linetyp = 2`) and a full line (default) for the likelihood.
+The x-axis has three breaks (`0, 0.5, 1`) whereas the y-axis has no
+break and no scale (`scales = "free_y"`).
 
-In the meanwhile I called the code from the above code chunk line by
-line and inspected the result to understand what it does. These are my
-preliminary thoughts:
+```{r}
+#| label: fig-bayesian-model-learning-anno7
+#| fig-cap: "Demonstrating Bayesian Updating"
 
--   `tidyr::expand_grid()` creates a tibble from all combinations of
-    inputs. Input are generalized vectors in contrast to `expand()` that
-    generates all combination of variables as well but needs as input a
-    dataset. The range between 0 and 1 is divided into 50 part and then
-    it generates all combinations by varying all columns from left to
-    right. The first column is the slowest, the second is faster and so
-    on.). It generates 450 data points (50 \* 9 trials).
--   I do not understand why the data has to be grouped `group_by()` the
-    variable `p_water` as every row has a different value. But as I
-    tested: There is a difference between grouped and not grouped.
-    Apparently it has to do with the `lag()` command because the first
-    51 records are identical than beginning in row number 52
-    `lagged_n_trials` is FALSE until 100. 101 is TRUE and beginning with
-    row 102 `lagged_n_trials` and `lagged_n_success` are FALSE. From
-    here every 50th records are TRUE/TRUE (e.g., 151, 201, 251 etc.) all
-    the other rows are FALSE/FALSE.
--   The next line uses the `dplyr::lag()` command: To find the
-    "previous" (`lag()`) values in a vector (time series) is useful for
-    comparing values behind of the current values. See [Compute lagged
-    or leading
-    values](https://dplyr.tidyverse.org/reference/lead-lag.html). I
-    think this is necessary to get the previous values (prior
-    probabilities) in relation with the posterior probabilities.
--   The next two lines with `mutate()` calculate prior and likelihood.
-    There is no prior for the first trial, so it is assumed that it is
-    0.5. The formula for the binomial distribution uses for the prior
-    the lagged-version whereas the likelihood uses the current version.
-    These two lines provide the essential calculations: They match the
-    50 grid points as assumed water probabilities of every trial to
-    their trial outcome (`W` or `L`) probabilities.
--   The third `mutate()` generates the `strip` variable consisting of
-    the prefix "N =" followed by the counts the number of trials. This
-    will later provide the title for the the different facets of the
-    plot.
--   The next three lines normalize the prior and the likelihood by
-    grouping the data by n_trials. Dividing every prior and likelihood
-    values by their respective sum puts them both in a probability
-    metric.
--   The remainder of the code prepares the plot by using the 50 grid
-    points in the range from 0 to 1 as the x-axis; prior and likelihood
-    as y-axis. To distinguish the prior from the likelihood is uses a
-    dashed line for the prior (`linetyp = 2`) and a full line (default)
-    for the likelihood. The x-axis has three breaks (`0, 0.5, 1`)
-    whereas the y-axis has no break and no scale (`scales = "free_y"`).
+# starting data
+d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
+         n_success = cumsum(toss == "w"))
 
-> If it wasn't clear in the code, the dashed curves are normalized prior
-> densities. The solid ones are normalized likelihoods. If you don't
-> normalize (i.e., divide the density by the sum of the density), their
-> respective heights don't match up with those in the text. Furthermore,
-> it's the normalization that makes them directly comparable.
+sequence_length <- 50
+
+d %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% # <1>
+  group_by(p_water) %>% # <2>
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% # <3>
+  ungroup() %>% # <4>
+  mutate(prior      = ifelse(n_trials == 1, .5,
+                             dbinom(x    = lagged_n_success, 
+                                    size = lagged_n_trials, 
+                                    prob = p_water)),
+         likelihood = dbinom(x    = n_success, 
+                             size = n_trials, 
+                             prob = p_water),
+         strip      = str_c("n = ", n_trials)) %>% # <5>
+  
+  group_by(n_trials) %>% # <6>
+  mutate(prior      = prior / sum(prior),
+         likelihood = likelihood / sum(likelihood)) %>% # <6>
+  
+  ### add code for annotation <7> for plotting the result ##########
+  ggplot(aes(x = p_water)) + # <7>
+  geom_line(aes(y = prior), 
+            linetype = 2) + # <7>
+  geom_line(aes(y = likelihood)) + # <7>
+  scale_x_continuous("proportion water", breaks = c(0, .5, 1)) + # <7>
+  scale_y_continuous("plausibility", breaks = NULL) + # <7>
+  theme(panel.grid = element_blank()) + # <7>
+  facet_wrap(~ strip, scales = "free_y") # <7>
+
+```
 
 ## Components of the Model
 

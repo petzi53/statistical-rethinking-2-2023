@@ -1,0 +1,84 @@
+# Tests
+
+::: {.callout-warning style="color: orange;"}
+###### Warning
+
+If you want to exclude this file, remove it from the mentioned chapters
+in `_quarto.yml`.
+:::
+
+## Code Annotation with echo: fenced
+
+```{r}
+#| label: test-code-annotation
+#| echo: fenced
+1 + 1 # <1>
+2 + 2 # <2>
+```
+
+1.  Simple
+2.  Very simple
+
+## Cross Reference to a Tibble
+
+Cross references to the internal printing mode of tibbles do not work.
+Maybe there are option you can set up with {**pillar**}?
+
+To cross reference the output of a tibble you need to convert it to a
+table.
+
+```{r}
+#| label: tbl-mytable
+#| tbl-cap: "This is a test"
+
+library(knitr)
+myTable <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w"))
+kable(myTable)
+```
+
+See @tbl-mytable
+
+## Table Width with kableExtra
+
+```{r}
+#| label: table-width
+
+library(kableExtra)
+
+dt <- mtcars[1:5, 1:3]
+
+dt %>%
+  kbl(caption = "Recreating booktabs style table") %>%
+  kable_classic(full_width = F, html_font = "Cambria")
+```
+
+## Cross Reference to Code Listing (not working)
+
+```{r}
+#| lst-label: lst-code1
+#| lst-cap: "Some R code 1"
+
+a <- 1
+a + 1
+```
+
+I'd like to be able to reference the code chunk @lst-code1.
+
+## Cross Reference to Code Listing (working!)
+
+``` {#lst-code .r lst-cap="Some R code"}
+a <- 1
+a + 1
+```
+
+I'd like to be able to reference the code chunk @lst-code2.
+
+```{r}
+#| echo: true
+#| eval: true
+#| label: test-chunk
+#| attr-source: '#lst-summarize lst-cap="Sum of five and five"'
+5 + 5
+```
+
+You refer to the listing of this code chunk with @list-summarize.

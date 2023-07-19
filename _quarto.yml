@@ -6,11 +6,11 @@ book:
   author: "Peter Baumgartner"
   date: last-modified
   date-format: YYYY-MM-DD HH:mm
+
   chapters:
     - index.qmd
     - 01-golem-of-prague.qmd
     - 02-small-and-large-worlds.qmd
-    - 02v-small-and-large-worlds.qmd
     - 03a-sampling-the-imaginary.qmd
     - 03b-sampling-the-imaginary.qmd
     - 04a-geocentric-models.qmd
@@ -31,7 +31,7 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
-    code-line-numbers: true
+    code-line-numbers: false
     R.options:
       knitr.graphics.auto_pdf: true
 
@@ -39,3 +39,4 @@ editor: visual
 
 execute:
     echo: fenced
+    freeze: auto
