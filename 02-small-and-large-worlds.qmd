@@ -635,7 +635,7 @@ sophisticated data tables in R.
 >     package is available on CRAN at
 >     <https://cran.r-project.org/package=xtable>.
 >
-> I\'m not going to introduce the rest of packages, but will just list
+> I'm not going to introduce the rest of packages, but will just list
 > them here: **tables** ([Murdoch
 > 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tables)),
 > **pander** ([Daróczi and Tsegelskyi
@@ -807,7 +807,7 @@ show the result of the corresponding lines of code.
 ###### Preliminary Explanation of the Next Graph
 
 The grid approximation used for the Bayesian updating in the next graph
-are explained later in this chapter. \
+are explained later in this chapter.\
 \
 In the meanwhile I called the code from the following code chunk line by
 line and inspected the result to understand what it does.
@@ -866,11 +866,13 @@ d %>%
 
 ```
 
-1.  Creates a tibble from all combinations of inputs. @sec-annotation-1-expand-grid.
+1.  Creates a tibble from all combinations of inputs.
+    @sec-annotation-1-expand-grid.
 2.  Group data by the parameter `p-water`. @sec-annotation-2-group_by.
 3.  Create two columns filled with the value of the previous row using
     the `lag()` function. @sec-annotation-3-lag.
-4.  Restore the original ungrouped data structure. @sec-annotation-4-ungroup.
+4.  Restore the original ungrouped data structure.
+    @sec-annotation-4-ungroup.
 5.  Calculate Prior and Likelihood and create a column for each
     parameter. @sec-annotation-5-dbinom.
 6.  Normalize Prior and Likelihood to put both of them in a probability
@@ -1013,7 +1015,8 @@ option `default = 1` in the `lag()` function. This is now the correct
 explanation for the differences starting with rows 52 resp. 102 (and not
 51 resp. 101).
 
-The result is already shown under @sec-annotation-2-group_by in the result of the code listing @tbl-bayesian-model-learning-anno2-1.
+The result is already shown under @sec-annotation-2-group_by in the
+result of the code listing @tbl-bayesian-model-learning-anno2-1.
 
 ```{r}
 #| label: bayesian-model-learning-anno3
@@ -1044,8 +1047,20 @@ mentioned in @sec-annotation-2-group_by.
 ##### Annotation (5): dbinom() {#sec-annotation-5-dbinom}
 
 This is the core of the prior and likelihood calculation. It uses
-`base::dbinom()`, to calculate two alternative events and will be
-explained later in more detail. REFERENCE??
+`base::dbinom()`, to calculate two alternative events. `dbinom()` is the
+R function for the binomial distribution, a distribution provided by the
+probability theory for "coin tossing" problems.
+
+The \"`d`\" in `dbinom()` stands for *density*. Functions named in this
+way almost always have corresponding partners that begin with \"`r`\"
+for random samples and that begin with \"`p`\" for cumulative
+probabilities. See for example the [help
+file](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Binomial.html).
+See also the blog entries [An Introduction to the Binomial
+Distribution](https://www.statology.org/binomial-distribution/) and [A
+Guide to dbinom, pbinom, qbinom, and rbinom in
+R](https://www.statology.org/dbinom-pbinom-qbinom-rbinom-in-r/) of the
+Statalogy website.
 
 The results of each of the different calculation (prior and pikelihood)
 are collected in with `mutate()` into two new generated columns.
@@ -1249,13 +1264,13 @@ For the count of water *W* and land *L* in the globe tossing model, we
 **define how plausible any combination of *W* and *L* would be, for a
 specific value of *p*.** (emphasis is mine)
 
-This idea is implemented in the functions of `expand()`, `expand_grid()`
-and `crossing()` of the {**tidyr**} package: They generate all
-combinations of variables found as is demonstrated in the section
-[Bayesian Updating of the
+**CHANGE OR MOVE THIS PARAGRAPH**: This idea is implemented in the
+functions of `expand()`, `expand_grid()` and `crossing()` of the
+{**tidyr**} package: They generate all combinations of variables found
+as is demonstrated in the section [Bayesian Updating of the
 brms-variant](02b-small-and-large-worlds.html#sec-expand_grid).
 
-Instead of counting we can also use a mathemtical function to calculate
+Instead of counting we can also use a mathematical function to calculate
 the probability of all combinations. A distribution function assigned to
 an observed variable is usually called a **LIKELIHOOD**.
 
@@ -1270,7 +1285,7 @@ The likelihood in the globe-tossing example (9 trials, 6 with `W` and 3
 with `L`) is easily computed:
 
 ```{r}
-#| label: likelihood-1
+#| label: likelihood-prob-0.5-a
 
 ## R code 2.2
 dbinom(6, size = 9, prob = 0.5)
@@ -1286,19 +1301,20 @@ with 16% a pretty low probability.
 To get a better idea what the best estimation of the probability is, we
 could vary systematically the `p` value and look for the maximum.
 
-A demonstration how this is done can be seen in the brms-variant
-reproduced in my notes
+**CHANGE OR MOVE THIS PARAGRAPH**: A demonstration how this is done can
+be seen in the brms-variant reproduced in my notes
 [here](02b-small-and-large-worlds.html#sec-likelihood-for-many-p-values-b).
 It shows a maximum at about *p = 0.7*.
 
 ##### Unobserved Variables
 
-Even variables (= parameters) are not observed we need to define them.
-In the globe-tossing model there is only one parameter (p), but most
-models have more than one unobserved variables.
+Even variables that are not observed (= parameters) we need to define
+them. In the globe-tossing model there is only one parameter (p), but
+most models have more than one unobserved variables.
 
-> In statistical modeling, many of the most common questions we ask
-> about data are answered directly by parameters:
+> In future chapters, there will be more parameters in your models. In
+> statistical modeling, many of the most common questions we ask about
+> data are answered directly by parameters:
 >
 > -   What is the average difference between treatment groups?
 > -   How strong is the association between a treatment and an outcome?
@@ -1318,7 +1334,7 @@ prior.
 :::
 
 When you have a previous estimate, that can become the prior. As a
-result, each estimate (posterior probility) becomes then the prior for
+result, each estimate (posterior probability) becomes then the prior for
 the next step. Where do priors come from? They are both engineering
 assumptions, chosen to help the machine learn, and scientific
 assumptions, chosen to reflect what we know about a phenomenon. Because
@@ -1365,10 +1381,52 @@ values for p are equally plausible.
 
 ### Tidyverse
 
-#### Likelihood for many p-values-b {#sec-likelihood-for-many-p-values-b}
+Given a probability of .5, (e.g. equal probability to both events `W`
+and `L`) we can use the `dbinom()` function to determine the likelihood
+of 6 out of 9 tosses coming out water.
 
 ```{r}
-#| label: likelihood-many
+#| label: likelihood-prob-0.5-b
+
+dbinom(x = 6, size = 9, prob = 0.5)
+
+```
+
+McElreath suggests:
+
+> Change the 0.5 to any other value, to see how the value changes.
+
+#### Calculation likelihood with 10 different values of prob
+
+```{r}
+#| label: likelihood-10-probs
+
+dbinom(x = 6, size = 9, prob = seq(from = 0, to = 1, by = .1))
+
+```
+
+In the serie of values you will notice several point:
+
+1.  The values start with zero until a maximum of 0.267 and decline to
+    zero again. The maximus is with `prob = 0.7`, a proportion of `W`
+    and `L` that is --- as we know from our large world knowledge
+    (knowledge outside the small world of the model) --- already pretty
+    near the real distribution of about 0.71. (see [How Much of the
+    Earth Is Covered by
+    Water?](https://www.thedailyeco.com/how-much-of-the-earth-is-covered-by-water-122.html))
+2.  You see that the first prob (0) and last prob (1) values are both
+    zero. From the result (6 `W` and 3 `L`) prob cannot be 0 or 1
+    because there a both `W` and `L` in the observed sample.
+
+The above code chunk is my interpretation from the quote "Change the 0.5
+to any other value, to see how the value changes." Kurz has another
+interpretation when he draws a graph of 100 prob values from 0 to 1:
+
+#### Plot likelihood for 100 values of prob {#sec-likelihood-for-many-p-values-b}
+
+```{r}
+#| label: fig-likelihood-100-prob
+#| fig-cap: "Likelihood for 100 values of prob, from 0 to 1, by steps of 0.01"
 
 tibble(prob = seq(from = 0, to = 1, by = .01)) %>% 
   ggplot(aes(x = prob, y = dbinom(x = 6, size = 9, prob = prob))) +
@@ -1379,13 +1437,14 @@ tibble(prob = seq(from = 0, to = 1, by = .01)) %>%
 
 ```
 
-In contrast to *p = 0.5* with a probability of 0.16% the graph above
-shows a maximum at about *p = 0.7* and a probability of about 0.28%. We
-will get more detailed data later in the book.
+In contrast to *p = 0.5* with a probability of 0.16 the
+@fig-likelihood-100-prob shows a maximum at about *p = 0.7* and a
+probability estimated from the graph of about 0.26-0.28. We will get
+more detailed data later in the book.
 
 It is interesting to see that even the maximum probability is not very
 high. The reason is that there are many other configurations
-(distributions of Ws and Ls) to produce the result of *6W* and *3L*.
+(distributions of `W`s and `L`s) to produce the result of *6W* and *3L*.
 Even if all these other distributions have a small probability they
 "eat" all with their share from the maximum.
 
@@ -1401,9 +1460,9 @@ probability (the **probability density**) and not the probability itself
 > density function, it will never exceed 1. Such areas are also called
 > *probability mass*. (11.47 in calibre ebook-viewer reference mode)
 
-In the literature often the abbreviation **PDF ([probability density
+In the literature the abbreviation **PDF ([probability density
 function](https://en.wikipedia.org/wiki/Probability_density_function))**
-is often used for the (probability) density. See also th wikipedia entry
+is often used for the (probability) density. See also th Wikipedia entry
 about [probability
 distribution](https://en.wikipedia.org/wiki/Probability_distribution).
 
@@ -1417,11 +1476,11 @@ McElreath says:
 > 1/(*b -- a*) ensures that the area under the flat line from *a* to *b*
 > is equal to 1.
 
-Kurz demonstrated the truth of this quote in the brms-version with
-several *b* values while holding *a* constant:
+Kurz demonstrated the truth of this quote with several *b* values while
+holding *a* constant:
 
 ```{r}
-#| label: uniform-prior-1b
+#| label: uniform-prior1
 
 tibble(a = 0,
        b = c(1, 1.5, 2, 3, 9)) %>% 
@@ -1430,10 +1489,10 @@ tibble(a = 0,
 
 Verified with a plot he divides the range of the *b* parameter (*0-9*)
 into 500 segments (*parameter_space*) and uses the `dunif()`
-distribution to calculate the probabilities:
+distribution to calculate the probabilities for a uniform distribution:
 
 ```{r}
-#| label: uniform-prior-2b
+#| label: uniform-prior2
 
 tibble(a = 0,
        b = c(1, 1.5, 2, 3, 9)) %>% 
@@ -1452,9 +1511,12 @@ tibble(a = 0,
 
 ```
 
-This figure demonstrates that the area in the whole paramatere space is
+This figure demonstrates that the area in the whole paramater space is
 *1.0*. It is a nice example how to calculate the probability *mass* (in
 contrast to the curve of the probability *density*).
+
+I will skip the exursory note and plot about the equivalnce of
+`Uniform(0,1)` and the beta distribution calculated with `dbeta().`
 
 ## Making the Model Go
 
