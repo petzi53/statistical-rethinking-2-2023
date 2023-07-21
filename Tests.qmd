@@ -82,3 +82,46 @@ I'd like to be able to reference the code chunk @lst-code2.
 ```
 
 You refer to the listing of this code chunk with @list-summarize.
+
+## Annotations with Cross References
+
+```{r}
+
+1 + 1 # <1>
+2 + 2 # <2>
+3 + 3 # <3>
+4 + 4 # <4>
+5 + 5 # <5>
+6 + 6 # <6>
+```
+
+1.  My first annotation. More in @sec-annotation-1
+2.  My second annotation. More in @sec-annotation-2
+3.  My third annotation. More in @sec-annotation-3
+4.  My fourth annotation. More in @sec-annotation-4
+5.  My fifth annotation. More in @sec-annotation-5
+6.  My sixth annotation. More in @sec-annotation-6
+
+### Annotation \<1\> {#sec-annotation-1}
+
+More explaining text.
+
+### Annotation \<2\> {#sec-annotation-2}
+
+More explaining text.
+
+### Annotation \<3\> {#sec-annotation-3}
+
+More explaining text.
+
+### Annotation \<4\> {#sec-annotation-4}
+
+More explaining text.
+
+### Annotation \<5\> {#sec-annotation-5}
+
+More explaining text.
+
+### Annotation \<6\> {#sec-annotation-6}
+
+More explaining text.

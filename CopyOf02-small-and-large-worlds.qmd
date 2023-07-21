@@ -512,11 +512,13 @@ tibble(draw    = 1:3,
        marbles = 4) %>% 
   mutate(possibilities = marbles ^ draw) %>% 
   kableExtra::kbl() |> 
-  kableExtra::kable_classic(full_width = F)
+  kableExtra::kable_styling(full_width = F) |> 
+  kableExtra::kable_classic()
+
 ```
 
 ::: {.callout-note style="color: blue"}
-###### Table Packages Used
+## Table Packages Used
 
 Kurz employed the {**flextable**} package to print tables. As I have no
 experience with this package, I will apply {**kableExtra**} in this
@@ -805,8 +807,8 @@ show the result of the corresponding lines of code.
 ###### Preliminary Explanation of the Next Graph
 
 The grid approximation used for the Bayesian updating in the next graph
-are explained later in this chapter.#
-
+are explained later in this chapter.\
+\
 In the meanwhile I called the code from the following code chunk line by
 line and inspected the result to understand what it does.
 :::
@@ -823,14 +825,14 @@ a previous {**dplyr**} version?
 :::
 
 ```{r}
-#| label: fig-bayesian-model-learning
-#| fig-cap: "How a Bayesian model learns"
+#| label: bayesian-model-learning
+#| lst-cap: "How a Bayesian model learns"
 
 # starting data
 d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
          n_success = cumsum(toss == "w"))
 
-sequence_length <- 50 # <1>
+sequence_length <- 50 #<1>
 
 d %>% 
   expand_grid(p_water = seq(from = 0, to = 1, length.out = sequence_length)) %>% # <1>
@@ -865,10 +867,12 @@ d %>%
 ```
 
 1.  Creates a tibble from all combinations of inputs.
-2.  Group data by the parameter `p-water`.
+    @sec-annotation-1-expand-grid.
+2.  Group data by the parameter `p-water`. @sec-annotation-2-group_by.
 3.  Create two columns filled with the value of the previous row using
-    the `lag()` function.
+    the `lag()` function. @sec-annotation-3-lag.
 4.  Restore the original ungrouped data structure.
+    @sec-annotation-4-ungroup.
 5.  Calculate Prior and Likelihood and create a column for each
     parameter. @sec-annotation-5-dbinom.
 6.  Normalize Prior and Likelihood to put both of them in a probability
@@ -1047,10 +1051,10 @@ This is the core of the prior and likelihood calculation. It uses
 R function for the binomial distribution, a distribution provided by the
 probability theory for "coin tossing" problems.
 
-The "`d`" in `dbinom()` stands for *density*. Functions named in this
-way almost always have corresponding partners that begin with "`r`" for
-random samples and that begin with "`p`" for cumulative probabilities.
-See for example the [help
+The \"`d`\" in `dbinom()` stands for *density*. Functions named in this
+way almost always have corresponding partners that begin with \"`r`\"
+for random samples and that begin with \"`p`\" for cumulative
+probabilities. See for example the [help
 file](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Binomial.html).
 See also the blog entries [An Introduction to the Binomial
 Distribution](https://www.statology.org/binomial-distribution/) and [A
@@ -1275,7 +1279,7 @@ function is the **binomial distribution**. (Does this means that I have
 to know more on probability theory to decide when to choose which
 distribution?)
 
-**Likelihood for prob = 0.5**
+**Likelihood for p= 0.5**
 
 The likelihood in the globe-tossing example (9 trials, 6 with `W` and 3
 with `L`) is easily computed:
@@ -1292,12 +1296,15 @@ equal distributed. We calculated how plausible the combination of *6W*
 and *3L* would be, for the specific value of *p = 0.5*. The result is
 with 16% a pretty low probability.
 
-**Likelihood for many prob values**
+**Likelihood for many p-values**
 
 To get a better idea what the best estimation of the probability is, we
-could vary systematically the `p` value and look for the maximum. A
-demonstration how this is done can be seen in @sec-calcu-10-probs. It
-shows a maximum at *prob = 0.7*.
+could vary systematically the `p` value and look for the maximum.
+
+**CHANGE OR MOVE THIS PARAGRAPH**: A demonstration how this is done can
+be seen in the brms-variant reproduced in my notes
+[here](02b-small-and-large-worlds.html#sec-likelihood-for-many-p-values-b).
+It shows a maximum at about *p = 0.7*.
 
 ##### Unobserved Variables
 
@@ -1389,30 +1396,19 @@ McElreath suggests:
 
 > Change the 0.5 to any other value, to see how the value changes.
 
-#### Calculation likelihood with 10 different values of prob {#sec-calcu-10-probs}
+#### Calculation likelihood with 10 different values of prob
 
 ```{r}
 #| label: likelihood-10-probs
 
-(d <- tibble(prob = seq(from = 0, to = 1, by = .1)) |> 
-    mutate(likelihood = dbinom(x = 6, size = 9, prob = prob))
-)
+dbinom(x = 6, size = 9, prob = seq(from = 0, to = 1, by = .1))
 
 ```
 
-Filter the row with the `prob` maximum.
-
-```{r}
-#| label: filter-max
-
-d  |>  
-    filter(likelihood == max(likelihood))
-```
-
-In the series of values you will notice several point:
+In the serie of values you will notice several point:
 
 1.  The values start with zero until a maximum of 0.267 and decline to
-    zero again. The maximum is with `prob = 0.7`, a proportion of `W`
+    zero again. The maximus is with `prob = 0.7`, a proportion of `W`
     and `L` that is --- as we know from our large world knowledge
     (knowledge outside the small world of the model) --- already pretty
     near the real distribution of about 0.71. (see [How Much of the
@@ -1571,7 +1567,7 @@ Other names for the *average probability of the data*:
 The job of the average probability of the data is just to standardize
 the posterior, to ensure it sums (integrates) to one.
 
-::: callout-important
+::: {.callout-important style="color: green;"}
 ###### Key lesson
 
 The posterior is proportional to the product of the prior and the
@@ -1584,15 +1580,15 @@ probability of the data.
 > The average probability on the bottom just standardizes the counts so
 > they sum to one. (emphasis is mine)
 
-> \[The following graph\] illustrates the multiplicative interaction of
-> a prior and a probability of data. On each row, a prior on the left is
-> multiplied by the probability of data in the middle to produce a
-> posterior on the right. The probability of data in each case is the
-> same. The priors however vary. As a result, the posterior
-> distributions vary.
+> \[The following graph\] illustrates the multiplicative
+interaction of a prior and a probability of data. On each row, a prior
+on the left is multiplied by the probability of data in the middle to
+produce a posterior on the right. The probability of data in each case
+is the same. The priors however vary. As a result, the posterior
+distributions vary.
 
-![Figure 2.6 of the original book](img/SR2-fig2_6-min.jpg){#fig-2-6-book
-fig-alt="The posterior distribution as a product of the prior distribution and likelihood. Top: A flat prior constructs a posterior that is simply proportional to the likelihood. Middle: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. Bottom: A peaked prior that shifts and skews the posterior, relative to the likelihood."}
+![Figure 2.6 of the original
+book](img/SR2-fig2_6-min.jpg){fig-alt="The posterior distribution as a product of the prior distribution and likelihood. Top: A flat prior constructs a posterior that is simply proportional to the likelihood. Middle: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. Bottom: A peaked prior that shifts and skews the posterior, relative to the likelihood."}
 
 For my understanding it is important to reproduce the above graph with R
 code as it is shown in the next section.
@@ -1628,20 +1624,11 @@ d <-
 
 ```
 
-In comparison to my very detailed code annotations of
-@fig-bayesian-model-learning there are different lines of code, but
-generally there is nothing conceptually new: We use again
-`expand_grid()` to create a tibble of input combinations and create with
-`mutate()` two columns for prior and likelihood. We do not use the
-`lag()` functions as we calculate only for one prior and one likelihood.
-Kurz advises us that is "easier to just make each column of the plot
-separately. We can then use the elegant and powerful syntax from [Thomas
-Lin Pedersen](https://www.data-imaginist.com/)'s (2022) [patchwork
-package](https://patchwork.data-imaginist.com/) to combine them."
+In order to avoid unnecessary facet labels for the rows, it was easier to just make each column of the plot separately. We can then use the elegant and powerful syntax from Thomas Lin Pedersen’s (2022) patchwork package to combine them.
+
 
 ```{r}
-#| label: fig-plot-model
-#| fig-cap: "Figure 2.6 from book reproduced with tidyverse code shows the posterior distribution as a product of the prior distribution and likelihood. Top: A flat prior constructs a posterior that is simply proportional to the likelihood. Middle: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. Bottom: A peaked prior that shifts and skews the posterior, relative to the likelihood. Cormpare it with @fig-2-6-book."
+#| label: plot-model
 
 p1 <-
   d %>%
@@ -1683,12 +1670,14 @@ p1 / p2 / p3
 
 ```
 
-@fig-plot-model shows that the same likelihood with a different prior
-results in a different posterior.
+The graph above shows the posterior distribution as a product of the
+prior distribution and likelihood. Top: A flat prior constructs a
+posterior that is simply proportional to the likelihood. Middle: A step
+prior, assigning zero probability to all values less than 0.5, results
+in a truncated posterior. Bottom: A peaked prior that shifts and skews
+the posterior, relative to the likelihood.
 
-### Motors
-
-#### Original
+#### Motors
 
 > Recall that your Bayesian model is a machine, a figurative golem. It
 > has built-in definitions for the likelihood, the parameters, and the
@@ -1721,61 +1710,7 @@ explained in the book?
 2.  Quadratic approximation
 3.  Markov chain Monte Carlo (MCMC)
 
-> There are many other engines, and new ones are being invented all the
-> time. But the three you'll get to know here are common and widely
-> useful. (p. 39)
-
-::: callout-tip
-**Rethinking: How you fit the model is part of the model**. Earlier in
-this chapter, I implicitly defined the model as a composite of a prior
-and a likelihood. That definition is typical. But in practical terms, we
-should also consider how the model is fit to data as part of the model.
-In very simple problems, like the globe tossing example that consumes
-this chapter, calculation of the posterior density is trivial and
-foolproof. In even moderately complex problems, however, the details of
-fitting the model to data force us to recognize that our numerical
-technique influences our inferences. This is because different mistakes
-and compromises arise under different techniques. The same model fit to
-the same data using different techniques may produce different answers.
-When something goes wrong, every piece of the machine may be suspect.
-And so our golems carry with them their updating engines, as much slaves
-to their engineering as they are to the priors and likelihoods we
-program into them.
-:::
-
-#### Tidyverse
-
-In my own words: Processing the built-in definitions for the likelihood,
-the parameters, and the prior produces the posterior distribution. This
-process is governed by the rule of probability theory. But knowing the
-mathematics does generally not help for two reasons:
-
--   Many of the interesting models in contemporary science cannot be
-    conditioned formally
--   Though some broadly useful models like linear regression can be
-    conditioned formally, this is only possible if you constrain your
-    choice of prior to special forms that are easy to do mathematics
-    with.
-
-Therefore are various numerical techniques needed to approximate the
-mathematics that follows from the definition of Bayes' theorem. From the
-three widely useful methods (grid approximation, quadratic approximation
-and MCMC) covered in the SR2-book the tidyverse version of this material
-concentrates on using the [{**brms**}
-package](https://paul-buerkner.github.io/brms/).
-
-::: {.callout-caution style="color: orange;"}
-###### Jumping quickly into MCMC
-
-> The consequence is that this version will jump rather quickly into
-> MCMC. This will be awkward at times because it will force us to
-> contend with technical issues in earlier problems in the text than
-> McElreath originally did.
-:::
-
-### Grid approximation
-
-#### Original
+#### Grid approximation
 
 > While most parameters are *continuous*, capable of taking on an
 > infinite number of values, it turns out that we can achieve an
@@ -1804,8 +1739,7 @@ poorly, as the number of parameters increases.
 In the globe tossing model the five steps are as follows:
 
 ```{r}
-#| label: fig-grid-approx-base1
-#| fig-cap: "Grid Approximation with 20 points with `prior = 1`"
+#| label: grid-approx-a
 
 # 1. define grid
 p_grid <- seq(from = 0, to = 1, length.out = 20)
@@ -1822,21 +1756,18 @@ unstd.posterior <- likelihood * prior
 # 5. standardize the posterior, so it sums to 1
 posterior <- unstd.posterior / sum(unstd.posterior)
 
-# 6 display the posterior distribution
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points with "prior = 1"')
-
-### Just for learning purposes ##########################################
-# # instead of books R code 2.4 I will use a tidyverse approach
-# df <- dplyr::bind_cols("prob" = p_grid, "post" = posterior)
-# ggplot2::ggplot(df, ggplot2::aes(x = prob, y = post)) +
-#     ggplot2::geom_line() +
-#     ggplot2::geom_point()
+# 6 display the posterior distribution 
+# as an exception I am using here in the original version ggplot2::ggplot 
+# instead of books base::plot (to see & learn how the code has to be changed) 
+df <- dplyr::bind_cols("prob" = p_grid, "post" = posterior)
+ggplot2::ggplot(df, ggplot2::aes(x = prob, y = post)) +
+    ggplot2::geom_line() +
+    ggplot2::geom_point()
 ```
+
+::: callout-important
+###### Effectively agreeing
+:::
 
 ##### Change likelihood parameters
 
@@ -1848,39 +1779,33 @@ distribution and is shaping the above plot:
 -   prob = success probability on each trial = probability of `W` (water
     event)
 
-It does not matter in the code for @fig-grid-approx-base1 what prior
-probability is chosen in the range from 0 to 1, if the probability of
-`W` is greater than zero and --- and by definition of the binomial
-function --- equal for all 20 events. This does not only conform to
-values but also for functions.
+In the code example above it does not matter what prior probability is
+chosen in the range from 0 to 1, if the probability of `W` is greater
+than zero and --- and by definition of the binomial function --- equal
+for all 20 events.
+
+The book example features 6 `W` of 9 obs. You can produce the sequence
+of diagrams from Figure 2.5 by changing the likelyhood parameters `x`
+and `size` according to the sample: `WLWWWLWLW`. The `prior probability`
+in this step-by-step version is always the previous PDF ([Probability
+density
+function](https://en.wikipedia.org/wiki/Probability_density_function)).
 
 ```{r}
-#| label: fig-grid-approx-base1a
-#| fig-cap: "Grid Approximation with 20 points with `prior = 0.1`"
-
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- rep(0.1, 20)
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points with "prior = 0.1"')
+#| label: different-likelihoods
+likelihood1 <- dbinom(x = 1, size = 1, prob = p_grid) # event Water
+likelihood2 <- dbinom(x = 1, size = 2, prob = p_grid) # event Land
+likelihood3 <- dbinom(x = 2, size = 3, prob = p_grid) # event Water
+likelihood4 <- dbinom(x = 3, size = 4, prob = p_grid) # event Water
+likelihood5 <- dbinom(x = 4, size = 5, prob = p_grid) # event Water
+likelihood6 <- dbinom(x = 4, size = 6, prob = p_grid) # event Land
+likelihood7 <- dbinom(x = 5, size = 7, prob = p_grid) # event Water
+likelihood8 <- dbinom(x = 5, size = 8, prob = p_grid) # event Land
+likelihood9 <- dbinom(x = 6, size = 9, prob = p_grid) # event Water
 ```
+
+![Replicated Figure 2.5 from the 2nd book
+edition](img/bayesian_model_learns_step_by_step-min.png)
 
 ##### Changing prior parameters
 
@@ -1898,8 +1823,7 @@ prior <- exp(-5 * abs(p_grid - 0.5))
 The rest of the code remains the same.
 
 ```{r}
-#| label: fig-grid-approx-base2
-#| fig-cap: "Grid Approximation with prior of `ifelse(p_grid < 0.5, 0, 1)`"
+#| label: grid-approx-a2
 
 # 1. define grid
 p_grid <- seq(from = 0, to = 1, length.out = 20)
@@ -1917,21 +1841,17 @@ unstd.posterior <- likelihood * prior
 posterior <- unstd.posterior / sum(unstd.posterior)
 
 # 6 display the posterior distribution 
+# using ggplot2::ggplot instead of books base::plot 
 ## R code 2.4
 plot(p_grid, posterior,
   type = "b",
   xlab = "probability of water", ylab = "posterior probability"
 )
-mtext('20 points with a prior of "ifelse(p_grid < 0.5, 0, 1)"')
+mtext("20 points")
 ```
 
-@fig-grid-approx-base2 employs as prior `ifelse(p_grid < 0.5, 0, 1)`,
-meaning that if `prob` is smaller than 0.5 use zero as prior otherwise
-1.
-
 ```{r}
-#| label: fig-grid-approx-base3
-#| fig-cap: "Grid Approximation with prior of `exp(-5 * abs(p_grid - 0.5))`"
+#| label: grid-approx-a3
 
 # 1. define grid
 p_grid <- seq(from = 0, to = 1, length.out = 20)
@@ -1954,8 +1874,116 @@ plot(p_grid, posterior,
   type = "b",
   xlab = "probability of water", ylab = "posterior probability"
 )
-mtext('20 points with prior of "exp(-5 * abs(p_grid - 0.5))"')
+mtext("20 points")
 ```
+
+::: callout-caution
+###### Puzzlement
+
+I thought that the chosen prior did not have any effect the outcome. But
+it turns out that different priors results in different PDFs.\
+My explication: I have only 9 trials. With many more trials the
+difference in the density would balance out bit by bit.
+:::
+
+The next graph uses the same proprotion 6:9 of success (`W`) to number
+of trials but with an increase of 10 times (= 60:90). I use the second
+of the different prior calculations
+(`prior <- exp(-5 * abs(p_grid - 0.5))`) because it has definitely a
+different result as the calculation with `prior = 1` (about 0.5 versus
+aproximately 0.7).
+
+To get a better comparison I need to increase the number of points also
+10 times in each variant.
+
+```{r}
+#| label: grid-approx-a4
+
+# 1. define grid
+p_grid <- seq(from = 0, to = 1, length.out = 200)
+
+# 2. define prior
+prior <- rep(1, 20)
+
+# 3. compute likelihood at each value in grid
+likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
+
+# 4. compute product of likelihood and prior
+unstd.posterior <- likelihood * prior
+
+# 5. standardize the posterior, so it sums to 1
+posterior <- unstd.posterior / sum(unstd.posterior)
+
+# 6 display the posterior distribution 
+## R code 2.4
+plot(p_grid, posterior,
+  type = "b",
+  xlab = "probability of water", ylab = "posterior probability"
+)
+mtext("200 points; prior = 1")
+```
+
+```{r}
+#| label: grid-approx-a5
+
+# 1. define grid
+p_grid <- seq(from = 0, to = 1, length.out = 200)
+
+# 2. define prior
+prior <- exp(-5 * abs(p_grid - 0.5))
+
+# 3. compute likelihood at each value in grid
+likelihood <- dbinom(x = 60, size = 90, prob = p_grid)
+
+# 4. compute product of likelihood and prior
+unstd.posterior <- likelihood * prior
+
+# 5. standardize the posterior, so it sums to 1
+posterior <- unstd.posterior / sum(unstd.posterior)
+
+# 6 display the posterior distribution 
+## R code 2.4
+plot(p_grid, posterior,
+  type = "b",
+  xlab = "probability of water", ylab = "posterior probability"
+)
+mtext("200 points: prior = exp(-5 * abs(p_grid - 0.5))")
+```
+
+```{r}
+#| label: grid-approx-a6
+
+# 1. define grid
+p_grid <- seq(from = 0, to = 1, length.out = 200)
+
+# 2. define prior
+prior <- ifelse(p_grid < 0.5, 0, 1)
+
+# 3. compute likelihood at each value in grid
+likelihood <- dbinom(x = 60, size = 90, prob = p_grid)
+
+# 4. compute product of likelihood and prior
+unstd.posterior <- likelihood * prior
+
+# 5. standardize the posterior, so it sums to 1
+posterior <- unstd.posterior / sum(unstd.posterior)
+
+# 6 display the posterior distribution 
+## R code 2.4
+plot(p_grid, posterior,
+  type = "b",
+  xlab = "probability of water", ylab = "posterior probability"
+)
+mtext("200 points: prior = prior <- ifelse(p_grid < 0.5, 0, 1)")
+```
+
+::: callout-note
+###### Effectively agreeing
+
+Indeed! The modus of both curve now very similar (about 6.5). The shape
+is still different but that is explicable: The second prior is
+:::
+
 ##### Disadvantage
 
 Grid approximation is very expansive. The number of unique values to
@@ -1969,104 +1997,7 @@ parameters. The grid approximation strategy scales very poorly with
 model complexity, so it won't get us very far. But it is a very useful
 didactically as it help to understand the general principle.
 
-
-#### Rethinking myself
-
-::: callout-caution
-###### Puzzlement
-
-As demonstrated in @fig-plot-model a different prior with the same
-likelihood has different posteriors. So the curves of all three examples
-are different.
-
-But what I do not understand is the fact that in the third example the
-result is very different from the other two priors: About 0.5 and not
-0.7. My explication: I have only 9 trials. With many more trials the
-difference in the density would balance out bit by bit.
-
-But it turns out, that all three show about the same maximum I thought
-that the chosen prior did not have any effect the outcome. But it turns
-out that different priors results in different PDFs.\
-My explication: I have only 9 trials. With many more trials the
-difference in the density would balance out bit by bit.
-:::
-
-I am going to test my hypothesis. To demonstrate that with more Bayesian updates we will approach the correct result 0b about 0.7 I will work with 1000 samples.
-
-```{r}
-#| label: fig-grid-approx-base4
-#| fig-cap: "Grid Approximation with prior of `exp(-5 * abs(p_grid - 0.5))`"
-
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- exp(-5 * abs(p_grid - 0.5))
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 600, size = 1e3, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points for a 1000 samples with prior of "exp(-5 * abs(p_grid - 0.5))"')
-```
-
-In fact the posterior distribution is nearer to the correct result of 0.7. In @fig-grid-approx-base3 we have a maximum at about 0.52 and in @fig-grid-approx-base4 we have already 0.58. We should also taking into account that with more samples our proportion of W to L will approach the real Water:Land proportion of about 0.71 too.
-
-I will demonstrate this with 10000 samples and a W:L proportion of 7:3. 
-
-```{r}
-#| label: fig-grid-approx-base5
-#| fig-cap: "Grid Approximation with prior of `exp(-5 * abs(p_grid - 0.5))`"
-
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- exp(-5 * abs(p_grid - 0.5))
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 7e3, size = 1e4, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points for a 10000 samples with prior of "exp(-5 * abs(p_grid - 0.5))" and W:L = 7:3.' )
-```
-In this example the maximum of probability is already 0.68! We can say that **with every chosen prior we will get finally the correct result!**.
-
-But the choice of the prior is still important as it
-determines how many Bayesian updates we need to get the right
-result. If we have an awkward prior and not the appropriate size of the
-sample we will get a posterior distribution showing us a wrong maximum
-of probability. In that case the process of approximation has not reached a state where the probability maximum is near the correct result. The problem is: Most time we do not know the correct solution and can't therefore decide if we have had enough Bayesian updates.
-
-#### Tidyverse
-
-**STOPPED HERE! (2023-07-21)**
-
-### Quadratic Approximation
-
-#### Original
+#### Quadratic Approximation
 
 ##### Concept
 

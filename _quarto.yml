@@ -24,6 +24,7 @@ format:
     theme: cosmo
     number-sections: true
     toc-depth: 5
+    df-print: default
   pdf:
     documentclass: scrreprt
 

@@ -246,12 +246,93 @@ Warning
 </section>
 <section id="cross-reference-to-code-listing-working" class="level2">
 <h2 class="anchored" data-anchor-id="cross-reference-to-code-listing-working">Cross Reference to Code Listing (working!)</h2>
-<div id="lst-code2" class="listing">
-<p>Listing&nbsp;1: Some R code 2</p>
-<div class="sourceCode" id="lst-code2" data-lst-cap="Some R code 2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="lst-code2-1"><a href="#lst-code2-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="lst-code2-2"><a href="#lst-code2-2" aria-hidden="true" tabindex="-1"></a>a <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="lst-code" class="listing">
+<p>Listing&nbsp;1: Some R code</p>
+<div class="sourceCode" id="lst-code" data-lst-cap="Some R code"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="lst-code-1"><a href="#lst-code-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="lst-code-2"><a href="#lst-code-2" aria-hidden="true" tabindex="-1"></a>a <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>I’d like to be able to reference the code chunk <a href="#lst-code2" class="quarto-xref">Listing&nbsp;1</a>.</p>
+<p>I’d like to be able to reference the code chunk <strong>?@lst-code2</strong>.</p>
+<div class="cell">
+<div id="lst-summarize" class="listing">
+<p>Listing&nbsp;2: Sum of five and five</p>
+<div class="sourceCode cell-code" id="lst-summarize" data-lst-cap="Sum of five and five"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="lst-summarize-1"><a href="#lst-summarize-1" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span> <span class="sc">+</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10</code></pre>
+</div>
+</div>
+<p>You refer to the listing of this code chunk with <span class="citation" data-cites="list-summarize">@list-summarize</span>.</p>
+</section>
+<section id="annotations-with-cross-references" class="level2">
+<h2 class="anchored" data-anchor-id="annotations-with-cross-references">Annotations with Cross References</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-4"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-4-1" class="code-annotation-target"><a href="#annotated-cell-4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2" onclick="event.preventDefault();" href="">2</a><span id="annotated-cell-4-2" class="code-annotation-target"><a href="#annotated-cell-4-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">+</span> <span class="dv">2</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="3" onclick="event.preventDefault();" href="">3</a><span id="annotated-cell-4-3" class="code-annotation-target"><a href="#annotated-cell-4-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="sc">+</span> <span class="dv">3</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="4" onclick="event.preventDefault();" href="">4</a><span id="annotated-cell-4-4" class="code-annotation-target"><a href="#annotated-cell-4-4" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span> <span class="sc">+</span> <span class="dv">4</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="5" onclick="event.preventDefault();" href="">5</a><span id="annotated-cell-4-5" class="code-annotation-target"><a href="#annotated-cell-4-5" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span> <span class="sc">+</span> <span class="dv">5</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="6" onclick="event.preventDefault();" href="">6</a><span id="annotated-cell-4-6" class="code-annotation-target"><a href="#annotated-cell-4-6" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span> <span class="sc">+</span> <span class="dv">6</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="1" data-code-annotation="1">My first annotation. More in <a href="#sec-annotation-1" class="quarto-xref">Section&nbsp;1.6.1</a></span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="2" data-code-annotation="2">My second annotation. More in <a href="#sec-annotation-2" class="quarto-xref">Section&nbsp;1.6.2</a></span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="3">3</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="3" data-code-annotation="3">My third annotation. More in <a href="#sec-annotation-3" class="quarto-xref">Section&nbsp;1.6.3</a></span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="4">4</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="4" data-code-annotation="4">My fourth annotation. More in <a href="#sec-annotation-4" class="quarto-xref">Section&nbsp;1.6.4</a></span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="5">5</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="5" data-code-annotation="5">My fifth annotation. More in <a href="#sec-annotation-5" class="quarto-xref">Section&nbsp;1.6.5</a></span>
+</dd>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="6">6</dt>
+<dd>
+<span data-code-cell="annotated-cell-4" data-code-lines="6" data-code-annotation="6">My sixth annotation. More in <a href="#sec-annotation-6" class="quarto-xref">Section&nbsp;1.6.6</a></span>
+</dd>
+</dl>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2
+[1] 4
+[1] 6
+[1] 8
+[1] 10
+[1] 12</code></pre>
+</div>
+</div>
+<section id="sec-annotation-1" class="level3">
+<h3 class="anchored" data-anchor-id="sec-annotation-1">Annotation &lt;1&gt;</h3>
+<p>More explaining text.</p>
+</section>
+<section id="sec-annotation-2" class="level3">
+<h3 class="anchored" data-anchor-id="sec-annotation-2">Annotation &lt;2&gt;</h3>
+<p>More explaining text.</p>
+</section>
+<section id="sec-annotation-3" class="level3">
+<h3 class="anchored" data-anchor-id="sec-annotation-3">Annotation &lt;3&gt;</h3>
+<p>More explaining text.</p>
+</section>
+<section id="sec-annotation-4" class="level3">
+<h3 class="anchored" data-anchor-id="sec-annotation-4">Annotation &lt;4&gt;</h3>
+<p>More explaining text.</p>
+</section>
+<section id="sec-annotation-5" class="level3">
+<h3 class="anchored" data-anchor-id="sec-annotation-5">Annotation &lt;5&gt;</h3>
+<p>More explaining text.</p>
+</section>
+<section id="sec-annotation-6" class="level3">
+<h3 class="anchored" data-anchor-id="sec-annotation-6">Annotation &lt;6&gt;</h3>
+<p>More explaining text.</p>
+</section>
 </section>
 </section>
 
