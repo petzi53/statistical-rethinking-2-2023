@@ -6,6 +6,7 @@ book:
   author: "Peter Baumgartner"
   date: last-modified
   date-format: YYYY-MM-DD HH:mm
+  favicon: "img/favicon.ico"
 
   chapters:
     - index.qmd
@@ -24,6 +25,11 @@ format:
     theme: cosmo
     number-sections: true
     toc-depth: 5
+    toc-expand: true
+    code-fold: show
+    code-tools: true
+    code-overflow: scroll
+    code-link: true
     df-print: default
   pdf:
     documentclass: scrreprt
@@ -32,7 +38,6 @@ knitr:
   opts_chunk:
     collapse: true
     comment: "#>"
-    code-line-numbers: false
     R.options:
       knitr.graphics.auto_pdf: true
 
