@@ -827,6 +827,7 @@ a previous {**dplyr**} version?
 ```{r}
 #| label: bayesian-model-learning
 #| lst-cap: "How a Bayesian model learns"
+#| code-summary: "How a Bayesian model learns"
 
 # starting data
 d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> mutate(n_trials  = 1:9,
