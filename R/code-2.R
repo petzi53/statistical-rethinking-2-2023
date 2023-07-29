@@ -157,6 +157,7 @@ prior <- rep(1, 1000)
 likelihood <- dbinom(3, size = 3, prob = p_grid)
 posterior <- likelihood * prior
 posterior <- posterior / sum(posterior)
+set.seed(3)
 samples <- sample(p_grid, size = 1e4, replace = TRUE, prob = posterior)
 
 ## R code 3.12

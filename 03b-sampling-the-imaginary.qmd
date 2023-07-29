@@ -3,13 +3,8 @@
 ```{r}
 #| label: setup
 
-
-library(conflicted)
 library(tidyverse)
-library(rethinking)
 library(tidybayes)
-
-conflicts_prefer(dplyr::filter)
 ```
 
 **Medical Test Scenario with Bayes theorem**
@@ -23,10 +18,6 @@ $$ This is Bayes theorem.
 
 ```{r}
 #| label: scenario-bayes-theorem-b
-
-library(conflicted)
-library(tidyverse)
-conflicts_prefer(dplyr::filter)
 
 tibble(pr_positive_vampire_b = .95,
        pr_positive_mortal_b  = .01,
@@ -394,7 +385,7 @@ set.seed(3)
 
 ```
 
-v
+**************************** CHANGED resp. DELETED ***************
 
 ```{r}
 #| label: hdi-normal
@@ -425,6 +416,10 @@ hdi(d_skewed$p_grid_b_skewed, .width = .5)
 rethinking::HPDI(d_skewed$p_grid_b_skewed, prob = .5)
 
 ```
+
+************** END of CHANGED resp. DELETED **********************
+
+
 
 ```{r}
 #| label: figure-3-3
@@ -469,8 +464,7 @@ for two reasons:
 
 1.  PI and HPDI are only very different if the distribution is very
     skewed.
-2.  The author will primarily stick to the PI-based intervals in this
-    ebook.
+2.  Kurz will primarily stick to the PI-based intervals.
 
 ### 3.2.3b Point Estimates
 
@@ -539,3 +533,39 @@ samples_update %>%
             mean  = mean(p_grid_b),
             median = median(p_grid_b))
 ```
+
+
+## Addition from old file
+
+
+
+```{r}
+#| label: hdi-normal2
+
+library(tidybayes)
+mode_hdi(samples_b$p_grid_samples_b, .width = .5)
+qi(samples_b$p_grid_samples_b, .width = .5)
+hdi(samples_b$p_grid_samples_b, .width = .5)
+
+
+```
+
+```{r}
+#| label: hdi-skewed2
+
+# # can't reproduce
+# # Error in quantile.default(dist_y, probs = 1 - .width) :
+# # missing values and NaN's not allowed if 'na.rm' is FALSE
+# # it works with n = 9400 but not with n >= 9500.
+
+library(tidybayes) 
+mode_hdi(d_skewed_b$p_grid_skewed_b, .width = .5)
+qi(d_skewed_b$p_grid_skewed_b, .width = .5)
+# mode_hdi and hdi is not correct
+# hdi results in two lines instead as one line
+# hdi first value is far too low
+hdi(d_skewed_b$p_grid_skewed_b, .width = .5)
+rethinking::HPDI(d_skewed_b$p_grid_skewed_b, prob = .5)
+
+```
+
