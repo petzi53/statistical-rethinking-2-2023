@@ -30,8 +30,6 @@ format:
     code-overflow: scroll
     code-link: true
     df-print: default
-  pdf:
-    documentclass: scrreprt
 
 knitr:
   opts_chunk:
