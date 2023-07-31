@@ -481,7 +481,7 @@ less than 0.5?
 ```{r}
 #| label: grid-boundaries-a
 
-## R code 3.6
+## R code 3.6 ##############################
 # add up posterior probability where p < 0.5
 sum(posterior_a[p_grid_a < 0.5])
 ```
@@ -502,7 +502,7 @@ values below 0.5:
 ```{r}
 #| label: sample-boundaries-0.5-a
 
-## R code 3.7
+## R code 3.7 #############################
 (p_boundary_a <- sum(samples_a < 0.5) / 1e4)
 ```
 
@@ -562,7 +562,7 @@ between 0.5 and 0.75:
 #| label: sample-boundaries-0.5-0.75-a
 #| attr-source: '#sample-boundaries2-a lst-cap="Find the frequency of parameter values below 0.5 with `base::set.seed(3)`"'
 #| 
-## R code 3.8
+## R code 3.8 #########################################
 (p_boundary_a8 <- sum(samples_a > 0.5 & samples_a < 0.75) / 1e4)
 ```
 
@@ -700,7 +700,7 @@ p1 + p2
 ```{r}
 #| label: samples-quantile-a
 
-## R code 3.9
+## R code 3.9 #######################
 quantile(samples_a, 0.8)
 ```
 
@@ -710,7 +710,7 @@ the 90th percentile. These boundaries are found using the same approach:
 ```{r}
 #| label: sample-quantile-a2
 
-## R code 3.10
+## R code 3.10 ###################
 quantile(samples_a, c(0.1, 0.9))
 ```
 
@@ -734,7 +734,7 @@ via grid approximation.
 #| label: fig-skewed-dist-a
 #| fig-cap: "Skewed posterior distribution observing three waters in three tosses and a uniform (flat) prior. It is highly skewed, having its maximum value at the boundary where p equals 1."
 
-## R code 3.11
+## R code 3.11 #####################
 p_grid_skewed_a <- seq(from = 0, to = 1, length.out = 1000)
 prior_skewed_a <- rep(1, 1000)
 likelihood_skewed_a <- dbinom(3, size = 3, prob = p_grid_skewed_a)
@@ -755,7 +755,7 @@ rethinking::dens(samples_skewed_a)
 ```{r}
 #| label: rethinking-PI-a
 
-## R code 3.12
+## R code 3.12 ############################
 rethinking::PI(samples_skewed_a, prob = 0.5)
 ```
 
@@ -809,7 +809,7 @@ to do---the percentile interval can be misleading.
 #| label: rethinking-HPDI-a
 #| attr-source: '#lst-rethinking-HPDI-a lst-cap="Compute the HPDI from the samples distribution"'
 
-## R code 3.13
+## R code 3.13 ###############################
 rethinking::HPDI(samples_skewed_a, prob = 0.5)
 ```
 
@@ -1510,7 +1510,7 @@ skewed distribution.
 
 ### actually the grid is not skewed. I should change the names accordingly.
 
-## R code 3.14
+## R code 3.14 ###############
 p_grid_skewed_a[which.max(posterior_skewed_a)]
 ```
 
@@ -1520,7 +1520,7 @@ approximate the same point:
 ```{r}
 #| label: calculate-skewed-MAP-samples-a
 
-## R code 3.15
+## R code 3.15 ################
 rethinking::chainmode(samples_skewed_a, adj = 0.01)
 ```
 
@@ -1533,7 +1533,7 @@ posterior mean or median?
 #| label: mean-median-skewed-samples-a
 #| attr-source: '#lst-mean-median-skewed-samples lst-cap="Posterior mean and median of the skewed distribution (all three draws are `W`)"'
 
-## R code 3.16
+## R code 3.16 #############
 mean(samples_skewed_a)
 median(samples_skewed_a)
 ```
@@ -1569,7 +1569,7 @@ scientists hardly ever use them explicitly. The key insight is that
 ```{r}
 #| label: loss-expected-0.5-a
 
-## R code 3.17
+## R code 3.17 ##################
 sum(posterior_skewed_a * abs(0.5 - p_grid_skewed_a))
 
 ```
@@ -1582,7 +1582,7 @@ sum(posterior_skewed_a * abs(0.5 - p_grid_skewed_a))
 ```{r}
 #| label: loss-function-a
 
-## R code 3.18
+## R code 3.18 #############################
 loss_a <- sapply(p_grid_skewed_a, function(d) sum(posterior_skewed_a * abs(d - p_grid_skewed_a)))
 head(loss_a)
 ```
@@ -1594,7 +1594,7 @@ head(loss_a)
 ```{r}
 #| label: minimize-loss-a
 
-## R code 3.19
+## R code 3.19 #############################
 p_grid_skewed_a[which.min(loss_a)]
 ```
 
@@ -1963,7 +1963,7 @@ five reasons:
 ```{r}
 #| label: dummy-data-a
 
-## R code 3.20
+## R code 3.20 #############################
 dbinom(0:2, size = 2, prob = 0.7)
 ```
 
@@ -1980,7 +1980,7 @@ dbinom(0:2, size = 2, prob = 0.7)
 
 set.seed(3) # for reproducibility
 
-## R code 3.21
+## R code 3.21 #############################
 rbinom(1, size = 2, prob = 0.7)
 ```
 
@@ -1996,7 +1996,7 @@ value of $2$.)
 #| label: simulate-10-obs-a
 
 set.seed(3)
-## R code 3.22
+## R code 3.22 #############################
 rbinom(10, size = 2, prob = 0.7)
 ```
 
@@ -2007,7 +2007,7 @@ rbinom(10, size = 2, prob = 0.7)
 #| label: simulate-1e5-obs-a
 
 set.seed(3)
-## R code 3.23
+## R code 3.23 #############################
 dummy_w_a <- rbinom(1e5, size = 2, prob = 0.7)
 table(dummy_w_a) / 1e5
 ```
@@ -2022,7 +2022,6 @@ book --- the `rethinking::simplehist()` function.
 #| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. The plot uses the base R `hist()` function"
 
 set.seed(3)
-## R code 3.24
 dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
 hist(dummy_w_a, xlab = "dummy water count")
 ```
@@ -2032,7 +2031,7 @@ hist(dummy_w_a, xlab = "dummy water count")
 #| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. the plot uses the rethinking::simplehist() function"
 
 set.seed(3)
-## R code 3.24
+## R code 3.24 #############################
 dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
 rethinking::simplehist(dummy_w_a, xlab = "dummy water count")
 ```
@@ -2072,7 +2071,7 @@ So how do you actually do the calculations?
 #| label: sim-pred-values-a
 
 set.seed(3)
-## R code 3.25
+## R code 3.25 #############################
 w_a <- rbinom(1e4, size = 9, prob = 0.6)
 rethinking::simplehist(w_a)
 ```
@@ -2088,7 +2087,7 @@ We used `rethinking::`simplehist(w_a)` to get a clean histogram of the simulated
 #| attr-source: '#lst-sim-pred-samples-a lst-cap="Generate 1e4 random binomial samples to simulate predicted observations for $p = 0.6$"'
 
 set.seed(3)
-## R code 3.26
+## R code 3.26 #############################
 w2_a <- rbinom(1e4, size = 9, prob = samples_a)
 rethinking::simplehist(w2_a)
 ```
