@@ -1,4 +1,4 @@
-# Small and Large Worlds
+# Small and Large Worlds {#sec-small-and-large-worlds}
 
 ```{r}
 #| label: setup

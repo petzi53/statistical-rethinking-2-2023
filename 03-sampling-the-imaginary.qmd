@@ -1,4 +1,4 @@
-# Sampling the Imaginary
+# Sampling the Imaginary {#sec-sampling-the-imaginary}
 
 ```{r}
 #| label: setup
@@ -222,7 +222,7 @@ posterior_a <- posterior_a / sum(posterior_a)
 
 ```{r}
 #| label: draw-samples-a
-#| attr-source: '#draw-samples-a lst-cap="Draw 1000 Samples from the posterior distribution, using `base::set.seed(3)`"'
+#| attr-source: '#lst-draw-samples-a lst-cap="Draw 1000 Samples from the posterior distribution, using `base::set.seed(3)`"'
 
 n_samples_a <- 1e4
 
@@ -234,15 +234,19 @@ samples_a <- sample(p_grid_a, prob = posterior_a,
 ```
 
 1.  I have included the `base::set.seed()` command myself to provide
-    reproducibility. With this code line you will get the same results in your sampling
-    process because it is not really a random procedure but the outcome
-    of a complex algorithm that can be configured by the `set.seed()` function.
+    reproducibility. With this code line you will get the same results
+    in your sampling process because it is not really a random procedure
+    but the outcome of a complex algorithm that can be configured by the
+    `set.seed()` function.
 2.  The workhorse here is `base::sample`, which randomly pulls values
     from a vector. The vector in this case is `p_grid_a`, the grid of
-    1000 (1e3) parameter values. The probability of each value is given by
-    `posterior_a`, which we computed with @lst-grid-approx-a.
-    
-To compare the calculated values with variant b (the tidyverse version), I bound the three vectors with `base::cbind()` together into a matrix and displayed the first six lines with `utils::head()`. Additionally I also displayed the first 10 values of `samples_a` vector.
+    1000 (1e3) parameter values. The probability of each value is given
+    by `posterior_a`, which we computed with @lst-grid-approx-a.
+
+To compare the calculated values with variant b (the tidyverse version),
+I bound the three vectors with `base::cbind()` together into a matrix
+and displayed the first six lines with `utils::head()`. Additionally I
+also displayed the first 10 values of `samples_a` vector.
 
 ```{r}
 #| label: display-grid_result_a
@@ -260,7 +264,6 @@ Furthermore I also displayed the first 10 values of `samples_a` vector.
 # display sample results to compare with variant b
 head(samples_a, 10)
 ```
-
 
 #### Plot samples distribution
 
@@ -288,7 +291,8 @@ Plot @fig-density-samples-a shows the density estimate computed from our
 sampling process. The estimated density is very similar to ideal
 posterior you computed via grid approximation. If you draw even more
 samples, maybe 1e5 or 1e6, the density estimate will get more and more
-similar to the ideal. This is shown in the tidyverse version @fig-density-samples-b2.
+similar to the ideal. This is shown in the tidyverse version
+@fig-density-samples-b2.
 
 ### Tidyverse
 
@@ -296,6 +300,7 @@ similar to the ideal. This is shown in the tidyverse version @fig-density-sample
 
 ```{r}
 #| label: grid-approx-b
+#| attr-source: '#lst-grid-approx-b lst-cap="Grid aproximation"'
 
 # how many grid points would you like?
 n_grid_b <- 1000L
@@ -322,11 +327,14 @@ We've renamed McElreath's `prob_p` and `prob_data` as `prior_b` and
 `likelihood_b`, respectively. Now we'll use the `dplyr::slice_sample()`
 function to sample rows from `d_b`, saving them as `samples_b`.
 
-To get the same variable name of the sample results in version a and b
-I will change in the following code chunk `p_grid_b` to `samples_b`.
-So I can compare the vector `samples_a` with the column `samples_b`of the tibble with the same name (`samples_b`). 
+To get the same variable name of the sample results in version a and b I
+will change in the following code chunk `p_grid_b` to `samples_b`. So I
+can compare the vector `samples_a` with the column `samples_b`of the
+tibble with the same name (`samples_b`).
 
-Additionally: To see the difference between grid and samples I will add "_sample" to all the other variable names. For reasons of consistence I will also change the name of "prior_b"
+Additionally: To see the difference between grid and samples I will add
+"\_sample" to all the other variable names. For reasons of consistence I
+will also change the name of "prior_b"
 :::
 
 ```{r}
@@ -352,14 +360,16 @@ samples_b <-
 )
 ```
 
-The column `samples_b` of the tibble with the same name (watch out not to confuse these two objects) is identical with the vector `samples_a`. This `base::identical()` results in different sampling processes was the work of `set.seed(3)`. 
+The column `samples_b` of the tibble with the same name (watch out not
+to confuse these two objects) is identical with the vector `samples_a`.
+This `base::identical()` results in different sampling processes was the
+work of `set.seed(3)`.
 
 ```{r}
 #| label: test-if-samples-identical
 
 identical(samples_a, samples_b$samples_b)
 ```
-
 
 With the `utils::str()` function you will get a result with shorter
 figures that is better adapted to a small screen.
@@ -369,6 +379,7 @@ figures that is better adapted to a small screen.
 
 str(samples_b)
 ```
+
 An alternative of the tidyverse approach is `dplyr::glimpse()`.
 
 ```{r}
@@ -377,7 +388,9 @@ An alternative of the tidyverse approach is `dplyr::glimpse()`.
 glimpse(samples_b)
 ```
 
-Now we can plot the left panel of Figure 3.1 with `ggplot2::geom_point()`. But before we do, we'll need to add a variable numbering the samples.
+Now we can plot the left panel of Figure 3.1 with
+`ggplot2::geom_point()`. But before we do, we'll need to add a variable
+numbering the samples.
 
 #### Plot samples distribution
 
@@ -395,7 +408,8 @@ samples_b %>%
 
 ```
 
-We'll make the density in the right panel with `ggplot2::geom_density()`.
+We'll make the density in the right panel with
+`ggplot2::geom_density()`.
 
 ```{r}
 #| label: fig-density-samples-b
@@ -408,7 +422,8 @@ samples_b %>%
 
 ```
 
-Compare this somewhat smoother @fig-density-samples-b with @fig-density-samples-a.
+Compare this somewhat smoother @fig-density-samples-b with
+@fig-density-samples-a.
 
 If we keep increasing the number of samples we will get a better
 approximation to the ideal posterior distribution we have computed via
@@ -495,14 +510,14 @@ values below 0.5:
 ###### Attention: Different values
 
 In comparison with the value in the original book (0.1726) our value of
-0.1629 is different. 
-17%.
+0.1629 is different. 17%.
 
 The reason for the difference is that you can't get the same values in
-sampling processes. This is the nature of randomness. And McElreath did not include the set.sedd() function for (exact) reproducibility. What additionally
-happened is that our `set.seed()`\` value of 3 results in a somewhat
-untypical sampling distribution. I will demonstrate this with additional
-three samples with different `set.seed()`\` values.
+sampling processes. This is the nature of randomness. And McElreath did
+not include the set.sedd() function for (exact) reproducibility. What
+additionally happened is that our `set.seed()`\` value of 3 results in a
+somewhat untypical sampling distribution. I will demonstrate this with
+additional three samples with different `set.seed()`\` values.
 :::
 
 ##### Different sampling distributions
@@ -555,9 +570,9 @@ between 0.5 and 0.75:
 
 ##### Grid approach
 
-> To get the proportion of water less than some value of `p_grid_b` within
-> the {**tidyverse}**, you might first `filter()` by that value and then
-> take the `sum()` within `summarise()`.
+> To get the proportion of water less than some value of `p_grid_b`
+> within the {**tidyverse}**, you might first `filter()` by that value
+> and then take the `sum()` within `summarise()`.
 
 ```{r}
 #| label: grid-boundaries-b
@@ -570,8 +585,8 @@ d_b |> filter(p_grid_b < 0.5) |>
 
 ##### Sampling approach
 
-If what you want a frequency based on filtering by `samples_b`, then
-you might use `n()` within `summarise()`.
+If what you want a frequency based on filtering by `samples_b`, then you
+might use `n()` within `summarise()`.
 
 ```{r}
 #| label: samples-boundaries-b
@@ -606,7 +621,8 @@ samples_b |>
 ```
 
 To determine the posterior probability between 0.5 and 0.75, you can use
-`&` within `filter()`. Just multiply that result by 100 to get the value in percent.
+`&` within `filter()`. Just multiply that result by 100 to get the value
+in percent.
 
 ```{r}
 #| label: samples-boundaries-b4
@@ -626,7 +642,6 @@ samples_b %>%
   summarise(percent = 100 * mean(samples_b > .5 & samples_b < .75))
 ```
 
-
 ##### Plot interval of defined boundaries
 
 To produce Figure 3.2 of the book we apply following code lines:
@@ -640,7 +655,7 @@ p1 <-
   samples_b %>% 
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = samples_b %>% filter(samples_b < .5), fill = "blue") +
+  geom_area(data = samples_b %>% filter(samples_b < .5), fill = "deepskyblue") +
   labs(x = "proportion of water (p)",
        y = "density")
 
@@ -649,7 +664,7 @@ p2 <-
   samples_b %>% 
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = samples_b %>% filter(samples_b > .5 & samples_b < .75), fill = "blue") +
+  geom_area(data = samples_b %>% filter(samples_b > .5 & samples_b < .75), fill = "deepskyblue") +
   labs(x = "proportion of water (p)",
        y = "density")
 
@@ -890,9 +905,8 @@ results in probability values.
 
 ##### Quantiles
 
-Since we saved our `samples_b` samples within the well-named
-`samples_b` tibble, we'll have to index with `$` within
-`stats::quantile()`.
+Since we saved our `samples_b` samples within the well-named `samples_b`
+tibble, we'll have to index with `$` within `stats::quantile()`.
 
 ```{r}
 #| label: sample-quantile-b
@@ -1015,7 +1029,7 @@ p1 <-
   samples_b %>% 
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = samples_b %>% filter(samples_b < q80), fill = "blue") +
+  geom_area(data = samples_b %>% filter(samples_b < q80), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "lower 80%") +
@@ -1027,7 +1041,7 @@ p2 <-
   samples_b %>% 
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = samples_b %>% filter(samples_b > q10_q90[[1]] & samples_b < q10_q90[[2]]), fill = "blue") +
+  geom_area(data = samples_b %>% filter(samples_b > q10_q90[[1]] & samples_b < q10_q90[[2]]), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "middle 80%") +
@@ -1072,7 +1086,6 @@ set.seed(3)
     slice_sample(n = n_samples_skewed_b, weight_by = posterior_skewed_b, replace = T)
 )
 ```
-
 
 ```{r}
 #| label: skewed-dist-b
@@ -1120,7 +1133,7 @@ p1 <-
   samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
   geom_line() +
-  geom_area(data = samples_skewed_b %>% filter(p_skewed_b < q80), fill = "blue") +
+  geom_area(data = samples_skewed_b %>% filter(p_skewed_b < q80), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "lower 80%") +
@@ -1132,7 +1145,7 @@ p2 <-
   samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
   geom_line() +
-  geom_area(data = samples_skewed_b %>% filter(p_skewed_b > q10_q90[[1]] & p_skewed_b < q10_q90[[2]]), fill = "blue") +
+  geom_area(data = samples_skewed_b %>% filter(p_skewed_b > q10_q90[[1]] & p_skewed_b < q10_q90[[2]]), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "middle 80%") +
@@ -1281,8 +1294,10 @@ offers the handy `qi()` and `hdi()` functions.
 tidybayes::qi(samples_skewed_b$p_skewed_b, .width = .5)
 ```
 
-The `qi()` function worked for me and results in the same values as in the Kurz's version. But with `hdi()` I get an error message in the skewed version. (Tt worked in the normal version.)
-completely different result:
+The `qi()` function worked for me and results in the same values as in
+the Kurz's version. But with `hdi()` I get an error message in the
+skewed version. (Tt worked in the normal version.) completely different
+result:
 
 ```{r}
 #| label: tidybayes-hdi-skewed-dist-error
@@ -1302,13 +1317,15 @@ To work correctly I am calling always `hdci()` instead of `hdi()`:
 
 tidybayes::hdci(samples_skewed_b$p_skewed_b, .width = .5)
 ```
-These are the same values as in Kurz's version. 
 
+These are the same values as in Kurz's version.
 
 ::: callout-warning
 ###### Error with `tidybayes::hdi()`
 
-In the skewed version `tidybayes::hdi()` does not work for me in the skewed version. I do not know why this is the case. But if I used `tidybayes::hdci()` I've got the same result as Kurz.
+In the skewed version `tidybayes::hdi()` does not work for me in the
+skewed version. I do not know why this is the case. But if I used
+`tidybayes::hdci()` I've got the same result as Kurz.
 :::
 
 ```{r}
@@ -1324,7 +1341,7 @@ p1 <-
                 tidybayes::qi(samples_skewed_b$p_skewed_b, .width = .5)[1] & 
                      p_skewed_b <
                 tidybayes::qi(samples_skewed_b$p_skewed_b, .width = .5)[2]),
-                fill = "blue") +
+                fill = "deepskyblue") +
   geom_line() +
   labs(subtitle = "50% Percentile Interval",
        x = "proportion of water (p)",
@@ -1339,7 +1356,7 @@ p2 <-
                  tidybayes::hdci(samples_skewed_b$p_skewed_b, .width = .5)[1] & 
                        p_skewed_b < 
                  tidybayes::hdci(samples_skewed_b$p_skewed_b, .width = .5)[2]),
-                 fill = "blue") +
+                 fill = "deepskyblue") +
   geom_line() +
   labs(subtitle = "50% HPDI",
        x = "proportion of water (p)",
@@ -1352,9 +1369,11 @@ p1 | p2
 ```
 
 Again I had to change Kurz's version for the correct result: Instead of
-`tidybayes::hci()` one must use `tidybayes::hdci()` for the right hand plot.
+`tidybayes::hci()` one must use `tidybayes::hdci()` for the right hand
+plot.
 
-Comparing the two panels of the plot you can see that in contrast to the 50% HPDI the 50% of PI does not include the highest probability value.
+Comparing the two panels of the plot you can see that in contrast to the
+50% HPDI the 50% of PI does not include the highest probability value.
 
 ##### Dots and the Pipe
 
@@ -1387,15 +1406,18 @@ distribution. Otherwise they are pretty similar. Let's check this
 assertion:
 
 ::: callout-note
-In this file we have named the variables in the version of the data frame of 6`W` with 9 trials different than the variables of the version of 3`W` with 3 trials. Therefore we do not need (re)calculate (= update) the simulation as in Kurz's version.
+In this file we have named the variables in the version of the data
+frame of 6`W` with 9 trials different than the variables of the version
+of 3`W` with 3 trials. Therefore we do not need (re)calculate (= update)
+the simulation as in Kurz's version.
 
-Furthermore besides `tidybayes::mean_qi()` I will use `tidybayes::mean_hdi()` and `tidybayes::mean_hdci()`.
+Furthermore besides `tidybayes::mean_qi()` I will use
+`tidybayes::mean_hdi()` and `tidybayes::mean_hdci()`.
 :::
-
 
 Try out my own variable names:
 
-a) Results rounded
+a)  Results rounded
 
 ```{r}
 #| label: intervals-6-9-not-skewed-rounded
@@ -1408,15 +1430,19 @@ bind_rows(tidybayes::mean_hdci(samples_b$samples_b, .width = c(.8, .95)),
   mutate_if(is.double, round, digits = 2)
 ```
 
-Sampling from a somewhat Gaussian distribution shows that there are absolut no differences between `tidybayes::mean_hdci()` and `tidybayes::mean_hdi()`.
+Sampling from a somewhat Gaussian distribution shows that there are
+absolut no differences between `tidybayes::mean_hdci()` and
+`tidybayes::mean_hdi()`.
 
-There are two differences to Kurz's version: 
-1. `ymin` of 0.80 `hdi` is in my version 0.48 and not 0.49. 
-2. `ymax` of 0.95 `hdi` is in my version 0.90 and not 0.89.
+There are two differences to Kurz's version: 1. `ymin` of 0.80 `hdi` is
+in my version 0.48 and not 0.49. 2. `ymax` of 0.95 `hdi` is in my
+version 0.90 and not 0.89.
 
-I believe that this (very small) differences are rounding errors. But not rounding errors in the result values but during the complex `hdi` calculations as the following not rounded display of values demonstrate:
+I believe that this (very small) differences are rounding errors. But
+not rounding errors in the result values but during the complex `hdi`
+calculations as the following not rounded display of values demonstrate:
 
-b) Results not rounded
+b)  Results not rounded
 
 ```{r}
 #| label: intervals-6-9-not-skewed-not-rounded
@@ -1427,10 +1453,14 @@ bind_rows(tidybayes::mean_hdci(samples_b$samples_b, .width = c(.8, .95)),
   select(.width, .interval, ymin:ymax) %>% 
   arrange(.width)
 ```
-But these small differences are not important. In McElreath words:
-> Remember, we’re not launching rockets or calibrating atom smashers, so fetishizing precision to the 5th decimal place will not improve your science.
 
-The same is true of the small differences between `qi` and `hdi`. They difference is only 2 resp. 3 percent. 
+But these small differences are not important. In McElreath words: \>
+Remember, we're not launching rockets or calibrating atom smashers, so
+fetishizing precision to the 5th decimal place will not improve your
+science.
+
+The same is true of the small differences between `qi` and `hdi`. They
+difference is only 2 resp. 3 percent.
 
 ```{r}
 #| label: intervals-3-9-skewed-version
@@ -1441,22 +1471,39 @@ bind_rows(tidybayes::mean_hdci(samples_skewed_b$p_skewed_b, .width = c(.8, .95))
   arrange(.width) %>% 
   mutate_if(is.double, round, digits = 2)
 ```
-The skewed version shows bigger differences of 10% resp. 8% between `mean_hdci()` and `mean_qi()`. (This calculation is missing in Kurz's version.)
 
-Because of the disadvantages of HPDI (more computationally intensive, greater simulation variance and harder to understand) we’ll primarily stick to the PI-based intervals.
+The skewed version shows bigger differences of 10% resp. 8% between
+`mean_hdci()` and `mean_qi()`. (This calculation is missing in Kurz's
+version.)
 
+Because of the disadvantages of HPDI (more computationally intensive,
+greater simulation variance and harder to understand) we'll primarily
+stick to the PI-based intervals.
 
 ### Point Estimates
 
 #### Original
 
-> The third and final common summary task for the posterior is to produce point estimates of some kind. Given the entire posterior distribution, what value should you report? This seems like an innocent question, but it is difficult to answer. **The Bayesian parameter estimate is precisely the entire posterior distribution, which is not a single number, but instead a function that maps each unique parameter value onto a plausibility value.** So really the most important thing to note is that you don’t have to choose a point estimate. It’s hardly ever necessary and often harmful. It discards information. (emphasis is mine, pb)
+> The third and final common summary task for the posterior is to
+> produce point estimates of some kind. Given the entire posterior
+> distribution, what value should you report? This seems like an
+> innocent question, but it is difficult to answer. **The Bayesian
+> parameter estimate is precisely the entire posterior distribution,
+> which is not a single number, but instead a function that maps each
+> unique parameter value onto a plausibility value.** So really the most
+> important thing to note is that you don't have to choose a point
+> estimate. It's hardly ever necessary and often harmful. It discards
+> information. (emphasis is mine, pb)
 
-But if you must do it … we will take again the globe tossing experiment in which we observe 3 waters out of 3 tosses, e.g. the very skewed distribution.
+But if you must do it ... we will take again the globe tossing
+experiment in which we observe 3 waters out of 3 tosses, e.g. the very
+skewed distribution.
 
 ##### Calcualte MAP
 
-> First, it is very common for scientists to report the parameter value with highest posterior probability, a _maximum a posteriori_ (MAP) estimate.
+> First, it is very common for scientists to report the parameter value
+> with highest posterior probability, a *maximum a posteriori* (MAP)
+> estimate.
 
 ```{r}
 #| label: calculate-skewed-MAP-grid-a
@@ -1466,7 +1513,9 @@ But if you must do it … we will take again the globe tossing experiment in whi
 ## R code 3.14
 p_grid_skewed_a[which.max(posterior_skewed_a)]
 ```
-Or if you instead have samples from the posterior, you can still approximate the same point:
+
+Or if you instead have samples from the posterior, you can still
+approximate the same point:
 
 ```{r}
 #| label: calculate-skewed-MAP-samples-a
@@ -1477,7 +1526,8 @@ rethinking::chainmode(samples_skewed_a, adj = 0.01)
 
 ##### Calculate measures of central tendency
 
-But why is the MAP, the mode, so interesting? Why not report the posterior mean or median?
+But why is the MAP, the mode, so interesting? Why not report the
+posterior mean or median?
 
 ```{r}
 #| label: mean-median-skewed-samples-a
@@ -1490,15 +1540,31 @@ median(samples_skewed_a)
 
 ##### Plot postponend
 
-The graphical representation as shown in Figure 3.4 will be calculated in the tidyverse version of this section. See: @fig-minimum-loss-b for the left panel and @fig-minimum-loss2-b for the right panel of Figure 3.4.
+The graphical representation as shown in Figure 3.4 will be calculated
+in the tidyverse version of this section. See: @fig-minimum-loss-b for
+the left panel and @fig-minimum-loss2-b for the right panel of Figure
+3.4.
 
-> These are also point estimates, and they also summarize the posterior. But all three—the mode (MAP), mean, and median—are different in this case. How can we choose?
+> These are also point estimates, and they also summarize the posterior.
+> But all three---the mode (MAP), mean, and median---are different in
+> this case. How can we choose?
 
 ##### Loss function
 
-One principled way to go beyond using the entire posterior as the estimate is to choose a **LOSS FUNCTION**. A loss function is a rule that tells you the cost associated with using any particular point estimate. While statisticians and game theorists have long been interested in loss functions, and how Bayesian inference supports them, scientists hardly ever use them explicitly. The key insight is that _different loss functions imply different point estimates_.
+One principled way to go beyond using the entire posterior as the
+estimate is to choose a **LOSS FUNCTION**. A loss function is a rule
+that tells you the cost associated with using any particular point
+estimate. While statisticians and game theorists have long been
+interested in loss functions, and how Bayesian inference supports them,
+scientists hardly ever use them explicitly. The key insight is that
+*different loss functions imply different point estimates*.
 
-> Calculating expected loss for any given decision means using the posterior to average over our uncertainty in the true value. Of course we don’t know the true value, in most cases. But if we are going to use our model’s information about the parameter, that means using the entire posterior distribution. So suppose we decide $p = 0.5$ will be our decision. Then the expected loss will be:
+> Calculating expected loss for any given decision means using the
+> posterior to average over our uncertainty in the true value. Of course
+> we don't know the true value, in most cases. But if we are going to
+> use our model's information about the parameter, that means using the
+> entire posterior distribution. So suppose we decide $p = 0.5$ will be
+> our decision. Then the expected loss will be:
 
 ```{r}
 #| label: loss-expected-0.5-a
@@ -1507,8 +1573,11 @@ One principled way to go beyond using the entire posterior as the estimate is to
 sum(posterior_skewed_a * abs(0.5 - p_grid_skewed_a))
 
 ```
-> All the code above does is compute the weighted average loss, where each loss is weighted by its corresponding posterior probability. There’s a trick for repeating this calculation for every possible decision, using the function sapply.
 
+> All the code above does is compute the weighted average loss, where
+> each loss is weighted by its corresponding posterior probability.
+> There's a trick for repeating this calculation for every possible
+> decision, using the function sapply.
 
 ```{r}
 #| label: loss-function-a
@@ -1518,7 +1587,9 @@ loss_a <- sapply(p_grid_skewed_a, function(d) sum(posterior_skewed_a * abs(d - p
 head(loss_a)
 ```
 
-> Now the symbol `loss_a` contains a list of loss values, one for each possible decision, corresponding the values in `p_grid_skewed_a`. From here, it’s easy to find the parameter value that minimizes the loss:
+> Now the symbol `loss_a` contains a list of loss values, one for each
+> possible decision, corresponding the values in `p_grid_skewed_a`. From
+> here, it's easy to find the parameter value that minimizes the loss:
 
 ```{r}
 #| label: minimize-loss-a
@@ -1526,33 +1597,54 @@ head(loss_a)
 ## R code 3.19
 p_grid_skewed_a[which.min(loss_a)]
 ```
-> And this is actually the posterior median, the parameter value that splits the posterior density such that half of the mass is above it and half below it. 
 
-We have already calculated the posterior median in @lst-mean-median-skewed-samples. Because of sampling variation it is not identical but pretty close (0.8428428 vs. 0.8408408).
+> And this is actually the posterior median, the parameter value that
+> splits the posterior density such that half of the mass is above it
+> and half below it.
 
-**Learnings**: 
+We have already calculated the posterior median in
+@lst-mean-median-skewed-samples. Because of sampling variation it is not
+identical but pretty close (0.8428428 vs. 0.8408408).
 
-> In order to decide upon a point estimate, a single-value summary of the posterior distribution, we need to pick a loss function. Different loss functions nominate different point estimates. The two most common examples are the absolute loss as above, which leads to the median as the point estimate, and the quadratic loss $(d - p)^{2}$, which leads to the posterior mean `(mean(samples))` as the point estimate.
+**Learnings**:
 
-> When the posterior distribution is symmetrical and normal-looking, then the median and mean converge to the same point, which relaxes some anxiety we might have about choosing a loss function. For the original globe tossing data (6 waters in 9 tosses), for example, the mean and median are barely different.
+> In order to decide upon a point estimate, a single-value summary of
+> the posterior distribution, we need to pick a loss function. Different
+> loss functions nominate different point estimates. The two most common
+> examples are the absolute loss as above, which leads to the median as
+> the point estimate, and the quadratic loss $(d - p)^{2}$, which leads
+> to the posterior mean `(mean(samples))` as the point estimate.
 
-**Comparison of mean & median** with globe tossing data (6 waters in 9 tosses) versus (3 waters in 3 tosses):
+> When the posterior distribution is symmetrical and normal-looking,
+> then the median and mean converge to the same point, which relaxes
+> some anxiety we might have about choosing a loss function. For the
+> original globe tossing data (6 waters in 9 tosses), for example, the
+> mean and median are barely different.
 
-6/9: Mean = `r mean(samples_a)` Median = `r median(samples_a)`
-3/3: Mean = `r mean(samples_skewed_a)` Median = `r median(samples_skewed_a)`
+**Comparison of mean & median** with globe tossing data (6 waters in 9
+tosses) versus (3 waters in 3 tosses):
+
+6/9: Mean = `r mean(samples_a)` Median = `r median(samples_a)` 3/3: Mean
+= `r mean(samples_skewed_a)` Median = `r median(samples_skewed_a)`
 
 ::: callout-important
-Instead of deciding what parameter to report for summarizing the posterior distribution it is usually better to communicate as much as you can about the posterior distribution, as well as the data and the model itself, so that others can build upon your work. 
+Instead of deciding what parameter to report for summarizing the
+posterior distribution it is usually better to communicate as much as
+you can about the posterior distribution, as well as the data and the
+model itself, so that others can build upon your work.
 
-This advice is also valid if you just want to accept or not to accept an hypothesis. Because the challenge then is to say what the relevant costs and benefits would be, in terms of the knowledge gained or lost.
+This advice is also valid if you just want to accept or not to accept an
+hypothesis. Because the challenge then is to say what the relevant costs
+and benefits would be, in terms of the knowledge gained or lost.
 :::
-
 
 #### Tidyverse
 
 ##### Calculate MAP
 
-To get the MAP of the skewed version (three tosses with thre `W`) we have to `arrange()` our `d_b` tibble in descending order by posterior. Then we will see the corresponding p_grid_b value for its MAP estimate.
+To get the MAP of the skewed version (three tosses with thre `W`) we
+have to `arrange()` our `d_b` tibble in descending order by posterior.
+Then we will see the corresponding p_grid_b value for its MAP estimate.
 
 ```{r}
 #| label: calculate-skewed-MAP-grid-b
@@ -1560,8 +1652,9 @@ To get the MAP of the skewed version (three tosses with thre `W`) we have to `ar
 samples_skewed_b %>% 
   arrange(desc(posterior_skewed_b))
 ```
-To emphasize it, we can use slice() to select the top row. The MAP value is the column `posterior_skewed_b`.
 
+To emphasize it, we can use slice() to select the top row. The MAP value
+is the column `posterior_skewed_b`.
 
 ```{r}
 #| label: calculate-skewed-MAP-grid2-b
@@ -1582,13 +1675,15 @@ samples_skewed_b %>% tidybayes::mode_qi(p_skewed_b)
 samples_skewed_b %>% tidybayes::mode_hdci(p_skewed_b)
 ```
 
-Those returned a lot of output in addition to the mode. If all you want is the mode itself, you can just use `tidybayes::Mode()`.
+Those returned a lot of output in addition to the mode. If all you want
+is the mode itself, you can just use `tidybayes::Mode()`.
 
 ```{r}
 #| label: tidybayes-mode
 
 tidybayes::Mode(samples_skewed_b$p_skewed_b)
 ```
+
 Medians and means are typical measures of central tendency, too.
 
 ```{r}
@@ -1601,7 +1696,7 @@ samples_skewed_b %>%
 
 ##### Plot left panel of figure 3.4
 
-1. Bundle the three types of estimates into a tibble
+1.  Bundle the three types of estimates into a tibble
 
 ```{r}
 #| label: bundle-skewed-point-estimates
@@ -1617,6 +1712,7 @@ samples_skewed_b %>%
          y = c(.0005, .0012, .002))
 )
 ```
+
 Plotting the results:
 
 ```{r}
@@ -1635,7 +1731,9 @@ samples_skewed_b %>%
        y = "density") +
   theme(panel.grid = element_blank())
 ```
-In contrast the other distribution with 6 successes by 9 trials (tosses):
+
+In contrast the other distribution with 6 successes by 9 trials
+(tosses):
 
 ```{r}
 #| label: fig-sym-point-estimates_b
@@ -1664,9 +1762,14 @@ samples_b %>%
        y = "density") +
   theme(panel.grid = element_blank())
 ```
+
 ##### Loss function
 
-Let $p$ be the proportion of the Earth covered by water and $d$ be our guess. If McElreath pays us $100 if we guess exactly right but subtracts money from the prize proportional to how far off we are, then our loss is proportional to $d - p$. If we decide $d = .5$, we can compute our expected loss.
+Let $p$ be the proportion of the Earth covered by water and $d$ be our
+guess. If McElreath pays us \$100 if we guess exactly right but
+subtracts money from the prize proportional to how far off we are, then
+our loss is proportional to $d - p$. If we decide $d = .5$, we can
+compute our expected loss.
 
 ```{r}
 #| label: loss-epected-0.5-b
@@ -1675,11 +1778,19 @@ d_skewed_b |>
     summarise(`expected loss` = sum(posterior_skewed_b * abs(0.5 - p_grid_b)))
 ```
 
-The `map()` family of the [{**purrr**} package](https://purrr.tidyverse.org/) is the tidyverse alternative to the family of `apply()` functions from the base R framework. You can learn more about how to use the `map()` family on different places:
+The `map()` family of the [{**purrr**}
+package](https://purrr.tidyverse.org/) is the tidyverse alternative to
+the family of `apply()` functions from the base R framework. You can
+learn more about how to use the `map()` family on different places:
 
-- [Purrr reference](https://purrr.tidyverse.org/reference/map.html): Apply a function to each element of a vector
-- [Purrr tutorial](https://jennybc.github.io/purrr-tutorial/ls01_map-name-position-shortcuts.html): Introduction to map(): extract elements
-- [University of Virginia Library](https://data.library.virginia.edu/getting-started-with-the-purrr-package-in-r/): Getting Started with the purrr Package in R
+-   [Purrr reference](https://purrr.tidyverse.org/reference/map.html):
+    Apply a function to each element of a vector
+-   [Purrr
+    tutorial](https://jennybc.github.io/purrr-tutorial/ls01_map-name-position-shortcuts.html):
+    Introduction to map(): extract elements
+-   [University of Virginia
+    Library](https://data.library.virginia.edu/getting-started-with-the-purrr-package-in-r/):
+    Getting Started with the purrr Package in R
 
 Calculate loss function
 
@@ -1716,7 +1827,7 @@ Calculate the minimum loss
 )
 ```
 
-Now we’re ready for the right panel of Figure 3.4.
+Now we're ready for the right panel of Figure 3.4.
 
 ```{r}
 #| label: fig-minimum-loss-b
@@ -1731,7 +1842,9 @@ l_b %>%
   theme(panel.grid = element_blank())
 ```
 
-We saved the exact minimum value as `min_loss_b[1]`, which is `r min_loss_b[1]`. Within sampling error, this is the posterior median as depicted by our samples.
+We saved the exact minimum value as `min_loss_b[1]`, which is
+`r min_loss_b[1]`. Within sampling error, this is the posterior median
+as depicted by our samples.
 
 ```{r}
 #| label: posterior-skewed-median_b
@@ -1740,7 +1853,8 @@ samples_skewed_b %>%
   summarise(posterior_median_b = median(p_skewed_b))
 ```
 
-The quadratic loss $(d−p)^{2}$ suggests we should use the mean instead. Let’s investigate.
+The quadratic loss $(d−p)^{2}$ suggests we should use the mean instead.
+Let's investigate.
 
 ```{r}
 #| label: fig-minimum-loss2-b
@@ -1781,7 +1895,10 @@ l2_b %>%
   ylab("expected proportional loss") +
   theme(panel.grid = element_blank())
 ```
-Based on quadratic loss $(d−p)^{2}$, the exact minimum value is `r min_loss2_b[1]`. Within sampling error, this is the posterior mean of our samples.
+
+Based on quadratic loss $(d−p)^{2}$, the exact minimum value is
+`r min_loss2_b[1]`. Within sampling error, this is the posterior mean of
+our samples.
 
 ```{r}
 #| label: posterior-skewed-mean_b
@@ -1790,4 +1907,505 @@ samples_skewed_b %>%
   summarise(posterior_mean_b = mean(p_skewed_b))
 ```
 
+## Sampling to simulate prediction
+
+### Original
+
+To generate implied observations from a model is useful for at least
+five reasons:
+
+1.  **Model design**: We can sample not only from the posterior, but
+    also from the prior. Seeing what the model expects, before the data
+    arrive, is the best way to understand the implications of the prior.
+    We'll do a lot of this in later chapters, where there will be
+    multiple parameters and so their joint implications are not always
+    very clear.
+2.  **Model checking**: After a model is updated using data, it is worth
+    simulating implied observations, to check both whether the fit
+    worked correctly and to investigate model behavior.
+3.  **Software validation**: In order to be sure that our model fitting
+    software is working, it helps to simulate observations under a known
+    model and then attempt to recover the values of the parameters the
+    data were simulated under.
+4.  **Research design**: If you can simulate observations from your
+    hypothesis, then you can evaluate whether the research design can be
+    effective. In a narrow sense, this means doing power analysis, but
+    the possibilities are much broader.
+5.  **Forecasting**: Estimates can be used to simulate new predictions,
+    for new cases and future observations. These forecasts can be useful
+    as applied prediction, but also for model criticism and revision.
+
+#### Dummy data
+
+> Now note that these assumptions not only allow us to infer the
+> plausibility of each possible value of *p*, after observation. That's
+> what you did in the previous chapter. These assumptions also allow us
+> to simulate the observations that the model implies. They allow this,
+> because likelihood functions work in both directions. Given a realized
+> observation, the likelihood function says how plausible the
+> observation is. And given only the parameters, the likelihood defines
+> a distribution of possible observations that we can sample from, to
+> simulate observation. In this way, Bayesian models are always
+> *generative*, capable of simulating predictions. Many non-Bayesian
+> models are also generative, but many are not.
+>
+> We will call such simulated data **DUMMY DATA**, to indicate that it
+> is a stand-in for actual data.
+
+##### Probability of each globe toss
+
+> Suppose $N = 2$, two tosses of the globe. Then there are only three
+> possible observations: 0 water, 1 water, 2 water. You can quickly
+> compute the probability of each, for any given value of *p*. Let's use
+> $p = 0.7$, which is just about the true proportion of water on the
+> Earth:
+
+```{r}
+#| label: dummy-data-a
+
+## R code 3.20
+dbinom(0:2, size = 2, prob = 0.7)
+```
+
+##### Simulation of globe tosses
+
+> Now we're going to simulate observations, using these probabilities.
+> This is done by sampling from the distribution just described above.
+> You could use `sample()` to do this, but R provides convenient
+> sampling functions for all the ordinary probability distributions,
+> like the binomial.
+
+```{r}
+#| label: simulate-1-obs-a
+
+set.seed(3) # for reproducibility
+
+## R code 3.21
+rbinom(1, size = 2, prob = 0.7)
+```
+
+(As the outcome results from a random process the above value differs
+from the SR2 version. But with `set.seed(3)`\` you will get the same
+value of $2$.)
+
+> That $1$ means "2 water in 2 tosses." The "`r`" in `rbinom` stands for
+> "random." It can also generate more than one simulation at a time. A
+> set of 10 simulations can be made by:
+
+```{r}
+#| label: simulate-10-obs-a
+
+set.seed(3)
+## R code 3.22
+rbinom(10, size = 2, prob = 0.7)
+```
+
+> Let's generate 100,000 dummy observations, just to verify that each
+> value (0, 1, or 2) appears in proportion to its likelihood:
+
+```{r}
+#| label: simulate-1e5-obs-a
+
+set.seed(3)
+## R code 3.23
+dummy_w_a <- rbinom(1e5, size = 2, prob = 0.7)
+table(dummy_w_a) / 1e5
+```
+
+##### Plot simulation of globe tosses
+
+We could use either the base R `graphics::hist()` or --- as in the SR2
+book --- the `rethinking::simplehist()` function.
+
+```{r}
+#| label: fig-plot-hist-figure-3.5-a
+#| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. The plot uses the base R `hist()` function"
+
+set.seed(3)
+## R code 3.24
+dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
+hist(dummy_w_a, xlab = "dummy water count")
+```
+
+```{r}
+#| label: fig-plot-simplehist-figure-3.5-a
+#| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. the plot uses the rethinking::simplehist() function"
+
+set.seed(3)
+## R code 3.24
+dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
+rethinking::simplehist(dummy_w_a, xlab = "dummy water count")
+```
+
+> Notice that most of the time the expected observation does not contain
+> water in its true proportion, 0.7. That's the nature of observation:
+> There is a one-to-many relationship between data and data-generating
+> processes. You should experiment with sample size, the `size` input in
+> the code above, as well as the prob, to see how the distribution of
+> simulated samples changes shape and location.
+
+> Many readers will already have seen simulated observations. **SAMPLING
+> DISTRIBUTIONS** are the foundation of common non-Bayesian statistical
+> traditions. In those approaches, inference about parameters is made
+> through the sampling distribution. In this book, inference about
+> parameters is never done directly through a sampling distribution. The
+> posterior distribution is not sampled, but deduced logically. Then
+> samples can be drawn from the posterior, as earlier in this chapter,
+> to aid in inference. In neither case is "sampling" a physical act. In
+> both cases, it's just a mathematical device and produces only *small
+> world* (@sec-small-and-large-worlds) numbers.
+
+
+#### Model checking
+
+> MODEL CHECKING means (1) ensuring the model fitting worked correctly and (2) evaluating the adequacy of a model for some purpose. Since Bayesian models are always _generative_, able to simulate observations as well as estimate parameters from observations, once you condition a model on data, you can simulate to examine the model’s empirical expectations.
+
+> We’d like to _propagate_ the parameter uncertainty—carry it forward—as we evaluate the implied predictions. All that is required is averaging over the posterior density for `p`, while computing the predictions. For each possible value of the parameter `p`, there is an implied distribution of outcomes. So if you were to compute the sampling distribution of outcomes at each value of `p`, then you could average all of these prediction distributions together, using the posterior probabilities of each value of `p`, to get a POSTERIOR PREDICTIVE DISTRIBUTION.
+
+The reproduction of FIGURE 3.6 that illustrates this averaging is shown in ref###.
+
+> we need to learn how to combine sampling of simulated observations, as in the previous section, with sampling parameters from the posterior distribution. We expect to do better when we use the entire posterior distribution, not just some point estimate derived from it. 
+
+So how do you actually do the calculations? 
+
+```{r}
+#| label: sim-pred-values-a
+
+set.seed(3)
+## R code 3.25
+w_a <- rbinom(1e4, size = 9, prob = 0.6)
+rethinking::simplehist(w_a)
+```
+> This generates 10,000 (1e4) simulated predictions of 9 globe tosses (size=9), assuming $p = 6$. The predictions are stored as counts of water, so the theoretical minimum is zero and the theoretical maximum is nine. 
+
+We used `rethinking::`simplehist(w_a)` to get a clean histogram of the simulated outcomes.
+
+> All you need to propagate parameter uncertainty into these predictions is replace the value 0.6 with samples from the posterior:
+
+```{r}
+#| label: sim-pred-samples-a
+#| fig-cap: "Random binomial samples to simulate predicted observations for $p = 0.6$"
+#| attr-source: '#lst-sim-pred-samples-a lst-cap="Generate 1e4 random binomial samples to simulate predicted observations for $p = 0.6$"'
+
+set.seed(3)
+## R code 3.26
+w2_a <- rbinom(1e4, size = 9, prob = samples_a)
+rethinking::simplehist(w2_a)
+```
+
+The symbol `samples_a` above is the same list of random samples from the posterior distribution that we have calculated in @lst-draw-samples-a and used in previous sections. 
+
+
+
+> For each sampled value, a random binomial observation is generated. Since the sampled values appear in proportion to their posterior probabilities, the resulting simulated observations are averaged over the posterior. You can manipulate these simulated observations just like you manipulate samples from the posterior—you can compute intervals and point statistics using the same procedures. 
+
+> The simulated model predictions are quite consistent with the observed data in this case—the actual count of 6 lies right in the middle of the simulated distribution. … So far, we’ve only viewed the data just as the model views it: Each toss of the globe is completely independent of the others. This assumption is questionable.
+
+> So with the goal of seeking out aspects of prediction in which the model fails, let’s look at the data in two different ways. Recall that the sequence of nine tosses was `W L W W W L W L W`. First, consider the length of the longest run of either water or land. This will provide a crude measure of correlation between tosses. So in the observed data, the longest run is 3 W’s. Second, consider the number of times in the data that the sample switches from water to land or from land to water. This is another measure of correlation between samples. In the observed data, the number of switches is 6. There is nothing special about these two new ways of describing the data. They just serve to inspect the data in new ways. In your own modeling, you’ll have to imagine aspects of the data that are relevant in your context, for your purposes.
+
+
+
+
+FIGURE 3.7 showing the simulated predictions, viewed in these two new ways, is reproduced in ref###. I have also postponed the interpretation of Figure 3.7 to ref###, because it is more understandable viewing the plots.
+
+### Tidyverse
+
+
+
+#### Dummy data
+
+> Dummy data for the globe tossing model arise from the binomial likelihood. 
+
+##### Probability of each globe toss
+
+Suppose $N = 2$, two tosses of the globe.
+
+```{r}
+#| label: dummy-data-b
+
+tibble(n      = 2,
+       `p(w)` = .7,
+       w      = 0:n) %>% 
+  mutate(density = dbinom(w, size = n, prob = `p(w)`))
+```
+
+##### Simulation of globe tosses
+
+Simulate one globe toss:
+
+```{r}
+#| label: simulate-1-obs-b
+
+set.seed(3)
+rbinom(1, size = 2, prob = .7)
+```
+
+Simulate 10 globe tosses.
+
+```{r}
+#| label: simulate-10-obs-b
+
+set.seed(3)
+rbinom(10, size = 2, prob = .7)
+```
+Now generate 100,000 (i.e., 1e5) reproducible dummy observations.
+
+```{r}
+#| label: simulate-1e5-obs-b
+
+n_draws_b <- 1e5
+
+set.seed(3)
+dummy_w_b <- tibble(draws = rbinom(n_draws_b, size = 2, prob = .7)) 
+    
+    dummy_w_b |> 
+        count(draws) |> 
+        mutate(proportion = n / nrow(dummy_w_b))
+```
+##### Plot simulation of globe tosses
+
+The simulation updated to $n=9$ and plotting the tidyverse version of Figure 3.5.
+
+```{r}
+#| label: fig-plot-ggplot2-figure-3.5-b
+#| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. The plot uses the {**ggplot2**} functions. The left panel is Kurz's original, the right one is my version slightly changed."
+
+n_draws_b <- 1e5
+
+set.seed(3)
+dummy_w2_b <- tibble(draws = rbinom(n_draws_b, size = 9, prob = .7))
+
+p1 <- dummy_w2_b |> 
+    ggplot(aes(x = draws)) + 
+    geom_histogram(binwidth = 1, center = 0,
+                 fill = "deepskyblue", color = "black", 
+                 linewidth = 1/10) +
+    # breaks = 0:10 * 2 = equivalent in Kurz's versions:  breaks = 0:4 * 2
+    scale_x_continuous("dummy water count", breaks = 0:10 * 2) +
+    ylab("frequency") +
+    coord_cartesian(xlim = c(0, 9)) +
+    theme(panel.grid = element_blank())
+
+p2 <- dummy_w2_b |> 
+    ggplot(aes(x = draws)) + 
+    geom_histogram(binwidth = 1, center = 0,
+                 fill = "deepskyblue", color = "black", 
+                 linewidth = 1/10) +
+    ## breaks = 0:10 * 2 = equivalent in Kurz's versions:  breaks = 0:4 * 2
+    ## I decided to set a break at each of the draws: breaks = 0:9 * 1
+    scale_x_continuous("dummy water count", breaks = 0:9 * 1) +
+    ylab("frequency") +
+    ## I did not zoom into the graph because doesn't look so nice
+    ## for instance the last line is not visible
+    # coord_cartesian(xlim = c(0, 9)) +
+    theme(panel.grid = element_blank())
+
+library(patchwork)
+p1 + p2
+```
+##### Simulating and plotting 9 conditions
+
+McElreath suggested we play around with different values of `size` and `prob`. The next block of code simulates nine conditions.
+
+```{r}
+#| label: fig-simulate-9-conditions
+#| fig-cap: "Distribution of 9 simulated sample observations, using different size (number of tosses: 3, 6, 9) and different probabilities (prob: 0.3, 0.6, 0.9)."
+
+n_draws <- 1e5
+
+simulate_binom <- function(n, probability) {
+  set.seed(3)
+  rbinom(n_draws, size = n, prob = probability) 
+}
+
+d9_b <-
+  crossing(n9_b           = c(3, 6, 9),
+           probability9_b = c(.3, .6, .9)) %>% 
+  mutate(draws9_b = map2(n9_b, probability9_b, simulate_binom)) %>% 
+  ungroup() %>% 
+  mutate(n           = str_c("n = ", n9_b),
+         probability = str_c("p = ", probability9_b)) %>% 
+  unnest(draws9_b)
+
+d9_b |> 
+    slice_sample(n = 10) |> 
+    arrange(n9_b)
+
+```
+
+I am still not very experienced with `tidyr::crossing()` and `tidyr::unnest()`:
+
+- **`crossing()`** is a wrapper around `expand_grid()` and therefore creates a tibble from all combination of inputs. In addition to `expand_grid()` it de-duplicates and sorts its input.
+- **`unnest()`** expands a list-column containing data frames into row and columns. In the above case `map2()` returns a list and stores the data in `draws9_b`.
+
+Instead of `head()` I used `dplyr::slice_sample()` and ordered the result by the first column. I think this will get a better glimpse on the data as just the first 6 rows.
+
+```{r}
+#| label: fig-sim-plot-9-cond-b
+
+d9_b %>% 
+  ggplot(aes(x = draws9_b)) +
+  geom_histogram(binwidth = 1, center = 0,
+                 color = "deepskyblue", linewidth = 1/10) +
+  scale_x_continuous("dummy water count", breaks = 0:4 * 2) +
+  ylab("frequency") +
+  coord_cartesian(xlim = c(0, 9)) +
+  theme(panel.grid = element_blank()) +
+  facet_grid(n9_b ~ probability9_b)
+```
+#### Model checking
+
+On software checking Kurz refers to some material, that is too special for me. So I do not include it here. Maybe I will come later here again when I have more experiences with Bayesian statistics and the necessary tools.
+
+##### Reproduction of Figure 3.6
+
+At first I thought I do not need to refresh the original grid approximation from @lst-grid-approx-b as I have it stored it with the unique name `d_b`. But it turned out that the above code with `n_grid_b = 1000L` does not work, because it draws no vertical lines by the posterior density. Instead one has to sample 1001 times. 
+
+Actually I do not know why this (small) difference is necessary, but I noticed that with most sample numbers the plot does not work correctly. It worked with 1071. The sequence 1011, 1021, 1031, 1041, 1051, 1061 misses just one vertical line at .7 Ab exception is 1041, which misses .6.
+
+So I have to crate the data with 1001 samples again before I produce the plot.
+
+```{r}
+#| label: fig-repr-figure-3.6-top-b
+#| fig-cap: "Reproduction of the top part of Figure 3.6"
+
+n2_b <- 1001L
+n_success <- 6L
+n_trials  <- 9L
+
+(
+  d2_b <-
+  tibble(p_grid2_b = seq(from = 0, to = 1, length.out = n2_b),
+         # note we're still using a flat uniform prior
+         prior2_b  = 1) %>% 
+  mutate(likelihood2_b = dbinom(n_success, size = n_trials, prob = p_grid2_b)) %>% 
+  mutate(posterior2_b = (likelihood2_b * prior2_b) / sum(likelihood2_b * prior2_b))
+)
+
+d2_b %>% 
+  ggplot(aes(x = p_grid2_b, y = posterior2_b)) +
+  geom_area(color = "deepskyblue", fill = "deepskyblue") +
+  geom_segment(data = . %>% 
+                 filter(p_grid2_b %in% c(seq(from = .1, to = .9, by = .1), 3 / 10)),
+               aes(xend = p_grid2_b, yend = 0, linewidth = posterior2_b),
+               color = "black", show.legend = F) +
+  geom_point(data = . %>%
+               filter(p_grid2_b %in% c(seq(from = .1, to = .9, by = .1), 3 / 10))) +
+  annotate(geom = "text", 
+           x = .08, y = .0025,
+           label = "Posterior probability") +
+  scale_linewidth_continuous(range = c(0, 1)) +
+  scale_x_continuous("probability of water", breaks = 0:10 / 10) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(panel.grid = element_blank())
+```
+
+We’ll need to do a bit of wrangling before we’re ready to make the plot in the middle panel of Figure 3.6.
+
+I STOPPED HERE! (2023-07-31) THERE IS A GAP BECAUSE THE FOLLOWING CODE CHUNKS (MOSTLY DRAWINGS) ARE FOR MY PURPOSE (LEARNING BAYESIAN STATISTICS) NOT RELEVANT.
+
+
 ## I STOPPED HERE! (2023-07-29)
+
+## Practice with brms
+
+### Tidyverse (and {brms})
+
+With {**brms**}, we’ll fit the primary model of $w=6$ and $n=9$.
+
+#### Fit model with the {brms} package
+
+```{r}
+#| label: brms-model-fit-b
+ 
+
+b3.1 <-
+  brms::brm(data = list(w = 6), 
+      family = binomial(link = "identity"),
+      w | trials(9) ~ 0 + Intercept,
+      # this is a flat prior
+      brms::prior(beta(1, 1), class = b, lb = 0, ub = 1),
+      iter = 5000, warmup = 1000,
+      seed = 3,
+      file = "fits/b03.01")
+```
+
+We'll learn more about the beta distribution in Chapter 12. But for now,
+here's the posterior summary for `b_Intercept`, the probability of a
+"w".
+
+```{r}
+#| label: posterior-summary-b
+
+brms::posterior_summary(b3.1)["b_Intercept", ] %>% 
+  round(digits = 2)
+```
+
+#### Simulate probability values
+
+I had problems with the following code chunk. See [my postings at Kurz's repo](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse_2_ed/issues/49).
+
+```{r}
+#| label: sim-prob-values
+
+f <-
+  brms:::fitted.brmsfit(b3.1, 
+         summary = F,
+         scale = "linear") %>% 
+  data.frame() %>% 
+  rlang::set_names("p")
+
+glimpse(f)
+```
+
+
+
+```{r}
+#| label: fig-brms-model-density
+#| fig-cap: "Density plot of the fittet {brms} model"
+
+f %>% 
+  ggplot(aes(x = p)) +
+  geom_density(fill = "deepskyblue", color = "deepskyblue") +
+  annotate(geom = "text", x = .08, y = 2.5,
+           label = "Posterior probability") +
+  scale_x_continuous("probability of water",
+                     breaks = c(0, .5, 1),
+                     limits = 0:1) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(panel.grid = element_blank())
+```
+
+The graphic should look like the top part of Figure 3.6, reproduced as @fig-repr-figure-3.6-top-b. (I am not sure if the differences are important: I have a smaller apex and my curve is more irregular.)
+
+> Much like we did with samples, we can use this distribution of probabilities to predict histograms of $w$ counts. With those in hand, we can make an analogue to the histogram in the bottom panel of Figure 3.6.
+
+
+```{r}
+#| label: fig-sim-pred-values-b
+#| fig-cap: "Simulation to predict posterior distribution" 
+
+set.seed(3)
+f <-
+  f %>% 
+  mutate(w2 = rbinom(n(), size = 9,  prob = p))
+
+# the plot
+f %>% 
+  ggplot(aes(x = w2)) +
+  geom_histogram(binwidth = 1, center = 0, color = "black",
+                 fill = "deepskyblue", linewidth = 1/10) +
+  scale_x_continuous("number of water samples", breaks = 0:3 * 3) +
+  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 5000)) +
+  ggtitle("Posterior predictive distribution") +
+  coord_cartesian(xlim = c(0, 9)) +
+  theme(panel.grid = element_blank())
+```
+
+## Session info
+
+```{r}
+#| label: session-info
+
+sessionInfo()
+```
