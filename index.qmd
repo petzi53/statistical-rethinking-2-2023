@@ -218,17 +218,17 @@ using new code, prepared for the 3rd edition. With the book (2nd ed.) I
 do not have problems to copy the code snippets via calibre with the ePUB
 eBook version.
 
-## Setup Chunk
+## Setup Chunks
 
-In this text you will find very long chapters resulting in long files
-with many code chunks. To secure that I can run individual chunks for
-test purposes without rendering the whole file I will collect the
-`library()` commands of all necessary packages in the setup chunk for
-each file (See [Quarto equivalent to RMarkdown setup
-chunk](https://community.rstudio.com/t/quarto-equivalent-to-rmarkdown-setup-chunk/153018)).
+At first I tried to collect all necessary package to load with `library()` in the `setup` chunk (See [Quarto equivalent to RMarkdown setup
+chunk](https://community.rstudio.com/t/quarto-equivalent-to-rmarkdown-setup-chunk/153018)). The idea was to be able to run individual calling functions from different packages for test purposes and not to have to run all code chunks of the very long files. Additionally I tried to prevent conflicts of function names with the `conflicts_prefer()` function of the {**conflicted**} package in each setup file.
 
-I am also using the {**conflicted**} package and provide the preferable
-commands with `conflicts_prefer()` in each setup file.
+But it turned out that this was not a feasible approach: I noticed between packages with similar purpose (in my case between {**rethinking**} and {**brms*}) too many conflicts. Furthermore many of these conflicts are hidden because the came from imports from other packages.
+
+I will therefore just load the meta package {**tidverse**} in the setup chunks of every files. To prevent conflict with function names I will call functions of other packages with the syntax \<package name\>::\<function()\>. This has the additional advantage to learn from which package the function comes from. And my aim to be able to run code chunks separately is also possible.
+
+I will differentiate between "base R" referring to all packages loaded automatically after starting R and the package {**base**} itself, that is part of the collection of "base R" packages. 
+
 
 ## Course Schedule
 
@@ -251,7 +251,7 @@ HTML table, taken from the [README.md file for the 2023
 lectures](https://github.com/rmcelreath/stat_rethinking_2023/blob/main/README.md#calendar--topical-outline).
 
 | Week \## | Meeting date | Reading             | Lectures                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-|----------|--------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|-------|-------|-------|----------------------------------------------------|
 | Week 01  | 06 January   | Chapters 1, 2 and 3 | \[1\] \<[Golem of Prague](https://www.youtube.com/watch?v=FdnMWdICdRs&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=1)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-01)\> <br> \[2\] \<[Garden of Forking Data](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02)\>                                                        |
 | Week 02  | 13 January   | Chapter 4           | \[3\] \<[Geocentric Models](https://www.youtube.com/watch?v=tNOu-SEacNU&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=3)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-03)\> <br> \[4\] \<[Categories and Curves](https://www.youtube.com/watch?v=F0N4b7K_iYQ&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=4)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-04)\>                                                       |
 | Week 03  | 20 January   | Chapters 5 and 6    | \[5\] \<[Elemental Confounds](https://www.youtube.com/watch?v=mBEA7PKDmiY&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=5)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-05)\> <br> \[6\] \<[Good and Bad Controls](https://www.youtube.com/watch?v=uanZZLlzKHw&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=6)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-06)\>                                                     |

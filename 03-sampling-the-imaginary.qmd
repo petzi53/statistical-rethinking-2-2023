@@ -2301,10 +2301,148 @@ d2_b %>%
 
 We’ll need to do a bit of wrangling before we’re ready to make the plot in the middle panel of Figure 3.6.
 
-I STOPPED HERE! (2023-07-31) THERE IS A GAP BECAUSE THE FOLLOWING CODE CHUNKS (MOSTLY DRAWINGS) ARE FOR MY PURPOSE (LEARNING BAYESIAN STATISTICS) NOT RELEVANT.
+GAP HERE! (2023-07-31) THERE IS A GAP BECAUSE THE FOLLOWING CODE CHUNKS OF CHAP 3.3 (MOSTLY DRAWINGS) ARE FOR MY PURPOSE (LEARNING BAYESIAN STATISTICS) NOT RELEVANT.
+
+## Summary
+
+The third chapter teaches the basic skills for working with samples from the posterior distribution. The posterior distribution is a probability distribution. And like all probability distributions, we can imagine drawing samples from it.
+
+### Sampling from a grid-approximate posterior
+
+Before beginning to work with samples, we need to generate them with @lst-grid-approx-base-demo respectively with @lst-grid-approx-tidyverse-demo. Then we can draw - for instance - 10,000 samples from the posterior. To make the random draws reproducible we will use `base::set.seed()` with a see of 3.
+
+#### Sampling with base R functions
+
+```{r}
+#| label: draw-samples-base-demo
+#| attr-source: '#lst-draw-samples-base-demo lst-cap="Drawing 10,000 sample from the posterior using `base::sample()`"'
+#| eval: false
+
+set.seed(3)
+
+## R code 3.3 ###########################
+samples <- sample(p_grid, prob = posterior, size = 1e4, replace = TRUE)
+```
+
+#### Sampling with {tidyverse} functions
+
+```{r}
+#| label: draw-samples-tidyverse-demo
+#| attr-source: '#lst-draw-samples-tidyverse-demo lst-cap="Drawing 10,000 sample from the posterior using `dplyr::slice_sample()`"'
+#| eval: false
+
+set.seed(3)
+samples <-
+  df %>% 
+    slice_sample(n = 1e4, weight_by = posterior, replace = T)
+```
+
+### Sampling to summarize
+
+The next step after sampling is to summarize and interpret the posterior distribution.
+
+#### Intervals of defined boundaries
+
+For instance I will ask for the posterior probability that the proportion of water is less than 0.5. We could use the grid-approximate posterior to just add up all all of the probabilities, where the corresponding parameter value is less than 0.5
+
+But since grid approximation isn’t practical in general, it won’t always be so easy. Once there is more than one parameter in the posterior distribution, even this simple sum is no longer very simple. So wee need to perform the same calculation, using samples from the posterior.
+
+##### Base R: Define boundary
+
+Using the grid-approximate posterior:
+
+```{r}
+#| label: define-boundary-from-grid-base-demo
+#| attr-source: '#lst-define-boundary-from-grid-base-demo lst-cap="Define boundary by using the grid-approximate posterior with base R functions"'
+#| eval: false
 
 
-## I STOPPED HERE! (2023-07-29)
+## R code 3.6 #############################
+# add up posterior probability where p < 0.5
+sum(posterior[p_grid < 0.5])
+```
+
+Using the samples from the posterior:
+
+```{r}
+#| label: define-boundary-from-samples-base-demo
+#| attr-source: '#lst-define-boundary-from-samples-base-demo lst-cap="Define boundary by summing up the samples from the posterior with base R functions"'
+#| eval: false
+
+## R code 3.7 #############################
+## sum samples of posterior probability where p < 0.5
+sum(samples < 0.5) / 1e4
+
+
+## R code 3.8 #############################
+## find boundaries samples of posterior probability 
+## where p lies between 0.5 and 0.75
+sum(samples > 0.5 & samples < 0.75) / 1e4
+
+```
+
+
+
+##### Tidyverse: Define boundary
+
+```{r}
+#| label: define-boundary-from-grid-tidyverse-demo
+#| attr-source: '#lst-define-boundary-from-grid-tidyverse-demo lst-cap="Define boundary by using the grid-approximate posterior with {tidyverse} functions"'
+#| eval: false
+
+## add up posterior probability where p < 0.5
+df %>% 
+  filter(p_grid < .5) %>% 
+  summarise(sum = sum(posterior))
+```
+
+Using the samples from the posterior:
+
+```{r}
+#| label: define-boundary-from-samples-tidyverse-demo
+#| attr-source: '#lst-define-boundary-from-samples-tidyverse-demo lst-cap="Define boundary by summing up the samples from the posterior with {tidyverse} function `filter()` and `summarize()`"'
+#| eval: false
+
+## filter and summarize samples of posterior probability where p < 0.5
+samples %>%
+  filter(p_grid < .5) %>% 
+  summarise(sum = n() / 1e4)
+
+## filter and summarize samples of posterior probability 
+## where p lies between 0.5 and 0.75
+samples %>% 
+  filter(p_grid > .5 & p_grid < .75) %>% 
+  summarise(sum = n() / 1e4)
+```
+
+A more explicit approach for the same computation is to follow up `dplyr::count()` with `dplyr::mutate()`.
+
+```{r}
+#| label: define-boundary-from-samples-tidyverse2-demo
+#| attr-source: '#lst-define-boundary-from-samples-tidyverse2-demo lst-cap="Define boundary by summing up the samples from the posterior with {tidyverse} functions `count()` and `mutate()`"'
+#| eval: false
+
+## count and sum samples of posterior probability where p < 0.5
+samples %>% 
+  count(p_grid < .5) %>% 
+  mutate(probability = n / sum(n))
+
+## count and sum samples of posterior probability where p < 0.5
+samples %>% 
+  count(p_grid > .5 & p_grid < .75) %>% 
+  mutate(probability = n / sum(n))
+```
+
+#### Intervals of defined probability mass
+
+In scientific journals it is usual to report an interval of defined mass, usually known as a confidence interval. What the interval indicates is a range of parameter values compatible with the model and data. The model and data themselves may not inspire confidence, in which case the interval will not either. McElreath therefore call these areas compatibility intervals.
+
+These posterior intervals report two parameter values that contain between them a specified amount of posterior probability, a probability mass. For this type of interval, it is easier to find the answer by using samples from the posterior than by using a grid approximation. 
+
+
+## I STOPPED HERE! (2023-08-01) TO BE CONTINUED {.unnumbered}
+
+## Practice
 
 ## Practice with brms
 

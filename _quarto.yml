@@ -15,7 +15,8 @@ book:
     - 03-sampling-the-imaginary.qmd
     - 04a-geocentric-models.qmd
     - 04b-geocentric-models.qmd
-    - 95a-references.qmd
+    - 90-glossary.qmd
+    - 95-references.qmd
 
 bibliography: references.bib
 

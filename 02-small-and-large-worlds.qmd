@@ -4,19 +4,8 @@
 #| label: setup
 
 library(tidyverse)
-library(patchwork)
-
-
 ```
 
-::: callout-note
-###### Setup chunk results in several output chunks
-
-The single setup chunk produces in the output several separate chunks
-that are tied with the specifics of the loaded packages. This split-up
-helps to see the association of messages with their corresponding
-packages.
-:::
 
 ## Original {.unnumbered}
 
@@ -1800,6 +1789,8 @@ package](https://patchwork.data-imaginist.com/) to combine them."
 #| label: fig-plot-model
 #| fig-cap: "Figure 2.6 from book reproduced with tidyverse code shows the posterior distribution as a product of the prior distribution and likelihood. Top: A flat prior constructs a posterior that is simply proportional to the likelihood. Middle: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. Bottom: A peaked prior that shifts and skews the posterior, relative to the likelihood. Cormpare it with @fig-2-6-book."
 
+library(patchwork)
+
 p1 <-
   d %>%
   filter(row == "flat") %>% 
@@ -2819,5 +2810,207 @@ Non-Bayesian inference ("Frequentism"):
     arbitrary. (The 95% in Non-Bayesian inference is essentially a
     dogma, a superstition. Even in Non-Bayesian statistics it is
     conceptualized as an arbitrary interval.)
+    
+## Summary
+
+### Small worlds and the garden of forking data
+
+The chapter starts to build Bayesian models and is focused on the small world. It explains probability theory in its essential form: counting the ways things can happen. This is shown with **the garden of forking data**.
+
+Bayesian inference is really just counting and comparing of possibilities. … In order to make good inference about what actually happened, it helps to consider everything that could have happened. A Bayesian analysis is a garden of forking data, in which alternative sequences of events are cultivated. As we learn about what did happen, some of these alternative sequences are pruned. In the end, what remains is only what is logically consistent with our knowledge.
+
+#### Bayesian updating: Counting
+
+We may have additional information about the relative plausibility of each conjecture. This information could arise from knowledge of how the contents of the bag were generated. It could also arise from previous data. Whatever the source, it would help to have a way to combine different sources of information to update the plausibilities. Luckily there is a natural solution: Just multiply the counts. … Multiplication is just a shortcut to enumerating and counting up all of the paths through the garden that could produce all the observations.
+
+A Bayesian model begins with one set of plausibilities assigned to each of these possibilities. These are the prior plausibilities. Then it updates them in light of the data, to produce the posterior plausibilities. This updating process is a kind of learning, called Bayesian updating.
+
+How to start the updating process? 
+
+When there is no reason to say that one conjecture is more plausible than another, weigh all of the conjectures equally. 
+
+#### From counts to probability
+
+When we don’t know what caused the data, potential causes that may produce the data in more ways are more plausible.
+
+### Building a model
+
+#### Data story
+
+Bayesian data analysis usually means producing a story for how the data came to be. This story may be descriptive, specifying associations that can be used to predict outcomes, given observations. Or it may be causal, a theory of how some events produce other events.
+
+#### Bayesian updating again
+
+In contrast to non-Bayesian statistical inference with it widespread superstition that 30 observations are needed before one can use a Gaussian distribution (so-called _asymptotic_ behavior), Bayesian estimates are valid for any sample size. 
+
+This does not mean that more data isn’t helpful—it certainly is. Rather, the estimates have a clear and valid interpretation, no matter the sample size. But the price for this power is dependency upon the initial plausibilities, the prior. If the prior is a bad one, then the resulting inference will be misleading.
+
+#### Evaluation
+
+1. Model’s certainty (curves narrow and tall) is no guarantee that the model is a good one, because the inferences are conditional on the model. Under a different model, things might look differently.
+2. It is important to supervise and critique your model’s work and to check the model’s inferences in light of aspects of the data it does not know about. This usually means asking and answering additional questions, beyond those that originally constructed the model.
+
+### Components of the model
+
+- **List variables**, observed ones (data) and unobserved ones (parameter like proportions of observed variables).
+- **Define variables** by building a model that relates variables to one another. 
+    - **Observed variables**: We don’t have to literally count, we can use a mathematical function that tells us the right plausibility, the likelihood. For example in the case of the globe tossing model this is the _binomial distribution_.
+    - **Unobserved variables (parameters)**: In statistical modeling, many of the most common questions we ask about data are answered directly by parameters. For every parameter we intend our Bayesian machine to consider, we must provide a distribution of prior plausibility, its prior. Because the prior is an assumption, it should be interrogated like other assumptions: by altering it and checking how sensitive inference is to the assumption.
+    
+### Making the model go
+
+As mathematical rules often cannot be conditioned formally or you have to constrain your choice of prior to special forms that are easy to do mathematics with, we need numerical techniques to approximate the mathematics.
+
+#### Grid approximation
+
+We can achieve an excellent approximation of the continuous posterior distribution by considering only a finite grid of parameter values. At any particular value of a parameter, `p`, it’s a simple matter to compute the posterior probability: just multiply the prior probability of `p` by the likelihood at `p`. Repeating this procedure for each value in the grid generates an approximate picture of the exact posterior distribution. 
+
+##### Grid Approcimation with {base} R functions
+
+```{r}
+#| label: grid-approx-base-demo
+#| attr-source: '#lst-grid-approx-base-demo lst-cap="Five steps of the grid approximation technique using only functions of base R"'
+#| eval: false
+
+## R code 2.3 ###########################################
+p_grid <- seq(from = 0, to = 1, length.out = 20)    # <1>
+prior <- rep(1, 20)                                 # <2>
+likelihood <- dbinom(6, size = 9, prob = p_grid)    # <3>
+unstd.posterior <- likelihood * prior               # <4>
+posterior <- unstd.posterior / sum(unstd.posterior) # <5>
+```
+
+1. Define the grid. This means you decide how many points to use in estimating the posterior, and then you make a list of the parameter values on the grid.
+2. Compute the value of the prior at each parameter value on the grid.
+3. Compute the likelihood at each parameter value.
+4. Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood.
+5. Finally, standardize the posterior, by dividing each value by the sum of all values.
+
+##### Grid Approximation with {tidyverse} functions
+
+```{r}
+#| label: grid-approx-tidyverse-demo
+#| attr-source: '#lst-grid-approx-tidyverse-demo lst-cap="Five steps of the grid approximation technique using tidyverse functions"'
+#| eval: false
+
+(
+    df <-
+        tibble(p_grid = seq(from = 0, to = 1, length.out = 20),      # <1>
+               prior  = 1) %>%                                       # <2>
+        mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>%  # <3>
+        mutate(unstd_posterior = likelihood * prior) %>%             # <4>
+        mutate(posterior = unstd_posterior / sum(unstd_posterior))   # <5>
+)
+```
+
+1. Define grid.
+2. Define prior.
+3. Compute likelihood at each value in grid.
+4. Compute product of likelihood and prior.
+5. Standardize the posterior.
+
+#### Quadratic approximation
+
+Grid approximation has the disadvantage that the number of unique values to consider in the grid grows rapidly as the number of parameters in the model increases. In this case quadratic approximation may be an alternative.
+
+Under quite general conditions, the region near the peak of the posterior distribution will be nearly Gaussian—or “normal”—in shape. This means the posterior distribution can be usefully approximated by a Gaussian distribution. A Gaussian distribution is convenient, because it can be completely described by only two numbers: the location of its center (mean) and its spread (variance).
+
+A Gaussian approximation is called “quadratic approximation” because the logarithm of a Gaussian distribution forms a parabola. And a parabola is a quadratic function.
+
+Two steps of the quadratic approximation technique:
+
+1. Find the posterior mode. This is usually accomplished by some optimization algorithm, a procedure that virtually “climbs” the posterior distribution, as if it were a mountain. The golem doesn’t know where the peak is, but it does know the slope under its feet. There are many well-developed optimization procedures, most of them more clever than simple hill climbing. But all of them try to find peaks.
+2. Once you find the peak of the posterior, you must estimate the curvature near the peak. This curvature is sufficient to compute a quadratic approximation of the entire posterior distribution. In some cases, these calculations can be done analytically, but usually your computer uses some numerical technique instead.
+
+
+```{r}
+#| label: quadratic-approx-demo
+#| attr-source: '#lst-quadratic-approx-demo lst-cap="Two steps of the quadratic approximation technique"'
+#| eval: false
+
+
+globe_qa <- rethinking::quap( # <1>
+  alist(                      # <2>
+    W ~ dbinom(W + L, p),     # <3> 
+    p ~ dunif(0, 1)           # <4> 
+  ), 
+  data = list(W = 6, L = 3)   # <5>
+)
+
+rethinking::precis(globe_qa)  # <6>
+```
+
+1. To compute the quadratic approximation, the book will use as tool the `rethinking::quap()` function in the rethinking package. With `quap()` you will find the mode of posterior distribution and produce an approximation of the full posterior using the quadratic curvature at the mode.
+2. To use `quap()`, you provide a formula, a list of data. The formula defines the probability of the data and the prior. `base::alist()` handles its arguments as if they described function arguments. So the values are not evaluated, and tagged arguments with no value are allowed whereas list simply ignores them. `alist()` is most often used in conjunction with formulae.
+3. Provide formula for the calculation of the binomial likelihood.
+4. Provide the formula for the prior probability. In this example we choose the uniform distribution between 0 and 1.
+5. Provide the data for the calculation as a list of values. The chosen names (symbols) correspond to the formula.
+6. The function `rethinking::precis()` presents a brief summary of the quadratic approximation.
+
+McElreath is using the quadratic approximation for much of the first half of this book. For many of the most common procedures in applied statistics—linear regression, for example—the approximation works very well. Often, it is even exactly correct, not actually an approximation at all. Computationally, quadratic approximation is very inexpensive, at least compared to grid approximation and MCMC.
+
+Additionally of using `rethinking::quap()`, I will also provide the `brms::brm()` alternative as suggested by the {**tidyverse**} version of Kurz.
+
+#### Markov chain Monte Carlo (MCMC)
+
+There are lots of important model types, like multilevel (mixed-effects) models, for which neither grid approximation nor quadratic approximation is always satisfactory. … As a result, various counterintuitive model fitting techniques have arisen. The most popular of these is MCMC, which is a family of conditioning engines capable of handling highly complex models.
+
+The conceptual challenge with MCMC lies in its highly non-obvious strategy. Instead of attempting to compute or approximate the posterior distribution directly, MCMC techniques merely draw samples from the posterior. You end up with a collection of parameter values, and the frequencies of these values correspond to the posterior plausibilities. You can then build a picture of the posterior from the histogram of these samples.
+
+##### Using only code from base R
+
+I will add here without comments a demonstration of this important technique. In later chapters we will learn more about it.
+
+```{r}
+#| label: demo-MCMC
+#| attr-source: '#lst-demo-MCMC lst-cap="Demonstration how to estimate the posterior with MCMC"'
+#| eval: false
+
+## R code 2.8 ####################################
+n_samples <- 1000
+p <- rep(NA, n_samples)
+p[1] <- 0.5
+W <- 6
+L <- 3
+for (i in 2:n_samples) {
+  p_new <- rnorm(1, p[i - 1], 0.1)
+  if (p_new < 0) p_new <- abs(p_new)
+  if (p_new > 1) p_new <- 2 - p_new
+  q0 <- dbinom(W, W + L, p[i - 1])
+  q1 <- dbinom(W, W + L, p_new)
+  p[i] <- ifelse(runif(1) < q1 / q0, p_new, p[i - 1])
+}
+
+## R code 2.9 ####################################
+rethinking::dens(p, xlim = c(0, 1))
+curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
+```
+
+##### Using {brms}
+
+Again: The following demo comes without comments. It just will give a feeling of the structure of the used function. Later I will dive with Kurz into the details how to apply the functions of the {**brms**} package.
+
+```{r}
+#| label: demo-using-brms
+#| attr-source: '#lst-demo-using-brms lst-cap="Demonstration of using {brms}"'
+#| eval: false
+
+b2.1 <-
+  brms::brm(data = list(w = 24), 
+      family = binomial(link = "identity"),
+      w | trials(36) ~ 0 + Intercept,
+      brms::prior(beta(1, 1), class = b, lb = 0, ub = 1),
+      seed = 2,
+      file = "fits/b02.01")
+
+print(b2.1)
+
+brms::posterior_summary(b2.1) %>% 
+  round(digits = 2)
+
+```
+
 
 ## Practice
+
+## I STOPPED HERE! (2023-08-01) TO BE CONTINUED {.unnumbered}
