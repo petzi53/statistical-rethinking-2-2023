@@ -200,7 +200,7 @@ step_exp <- function() {
 }
 
 plot_exp <- 1:7 |> 
-    map(step_exp)
+    purrr::map(step_exp)
 plot_exp[[7]]
 
 ```

@@ -1,20 +1,14 @@
-# 4a: Geocentric Models
+# Geocentric Models
 
 ```{r}
 #| label: setup
 
-library(conflicted)
-library(rethinking)
 library(tidyverse)
-library(brms)
-library(skimr)
-
-conflicts_prefer(dplyr::filter)
 ```
 
-## 4.1a Normal Distributions
+## Normal Distributions
 
-### 4.1.1a Normal by addition
+### Normal by addition
 
 > Suppose you and a thousand of your closest friends line up on the
 > halfway line of a soccer field (football pitch). Each of you has a
@@ -26,6 +20,17 @@ conflicts_prefer(dplyr::filter)
 > Now we measure the distance of each person from the halfway line. Can
 > you predict what proportion of the thousand people who are standing on
 > the halfway line? How about the proportion 5 yards left of the line?
+>
+> It's hard to say where any individual person will end up, but you can
+> say with great confidence what the collection of positions will be.
+> The distances will be distributed in approximately normal, or
+> Gaussian, fashion. This is true even though the underlying
+> distribution is binomial. It does this because there are so many more
+> possible ways to realize a sequence of left-right steps that sums to
+> zero. There are slightly fewer ways to realize a sequence that ends up
+> one step left or right of zero, and so on, with the number of possible
+> sequences declining in the characteristic bell curve of the normal
+> distribution.
 
 Showing that there's nothing special about the underlying coin flip:
 
@@ -38,12 +43,13 @@ Showing that there's nothing special about the underlying coin flip:
 > Then we need to replicate this procedure 1000 times.
 
 ```{r}
-#| label: sim-step-experiment-a
+#| label: fig-sim-step-experiment-a
+#| fig-cap: "Random walks on the soccer field converge to a normal distribution. The more steps are taken, the closer the match between the real empirical distribution of positions and the ideal normal distribution, superimposed in the last plot in the bottom panel."
 
-# to replicate with the b-model
+# to provide reproducibility and to conform with tidyverse version
 set.seed(4)
 
-## R code 4.1
+## R code 4.1 #################################
 pos_a1 <- replicate(1000, sum(runif(16, -1, 1)))
 pos_a2 <- replicate(1000, sum(runif(32, -1, 1)))
 
@@ -62,21 +68,21 @@ plot(density(pos_a2))
 > upon the underlying distribution, the convergence might be slow, but
 > it will be inevitable.
 
-### 4.1.2a Normal by multiplication
+### Normal by multiplication
 
 ```{r}
 #| label: random-sample-growth
 
-## R code 4.2
+## R code 4.2 #########################
 prod(1 + runif(12, 0, 0.1))
 ```
 
 ```{r}
 #| label: normal-by-multiplaction
 
-## R code 4.3
+## R code 4.3 #########################
 growth <- replicate(10000, prod(1 + runif(12, 0, 0.1)))
-dens(growth, norm.comp = TRUE)
+rethinking::dens(growth, norm.comp = TRUE)
 ```
 
 > ... small effects that multiply together are approximately additive,
@@ -85,13 +91,13 @@ dens(growth, norm.comp = TRUE)
 ```{r}
 #| label: compare-small-big-growth
 
-## R code 4.4
+## R code 4.4 #########################
 big <- replicate(10000, prod(1 + runif(12, 0, 0.5)))
 small <- replicate(10000, prod(1 + runif(12, 0, 0.01)))
 
 par(mfrow = c(2, 2)) # 2-by-2 grid of plots
-dens(big, norm.comp = TRUE)
-dens(small, norm.comp = TRUE)
+rethinking::dens(big, norm.comp = TRUE)
+rethinking::dens(small, norm.comp = TRUE)
 
 ```
 
@@ -100,7 +106,7 @@ dens(small, norm.comp = TRUE)
 > causal forces that tend towards Gaussian distributions extends well
 > beyond purely additive interactions.
 
-### 4.1.3a Normal by log-multiplication
+### Normal by log-multiplication
 
 > Large deviates that are multiplied together do not produce Gaussian
 > distributions, but they do tend to produce Gaussian distributions on
@@ -109,12 +115,12 @@ dens(small, norm.comp = TRUE)
 ```{r}
 #| label: normal-by-log-multi
 
-## R code 4.5
+## R code 4.5 #########################
 log.big <- replicate(10000, log(prod(1 + runif(12, 0, 0.5))))
 
 par(mfrow = c(2, 2)) # 2-by-2 grid of plots
-dens(big, norm.comp = TRUE)
-dens(log.big, norm.comp = TRUE)
+rethinking::dens(big, norm.comp = TRUE)
+rethinking::dens(log.big, norm.comp = TRUE)
 
 ```
 
@@ -125,7 +131,7 @@ dens(log.big, norm.comp = TRUE)
 > scales are arbitrary, there's nothing suspicious about this
 > transformation.
 
-### 4.1.4a Using Gaussian Distribution
+### Using Gaussian Distributions
 
 **Ontological Reasons**: the world is full of Gaussian distributions,
 approximately. We're never going to experience a perfect Gaussian
@@ -181,7 +187,7 @@ also called *probability mass*.
 #| label: load-howell-data-a
 
 ## R code 4.7
-data(Howell1)
+data(package = "rethinking", list = "Howell1")
 d_a <- Howell1
 ```
 
@@ -194,7 +200,7 @@ d_a <- Howell1
 str(d_a)
 
 ## R code 4.9
-precis(d_a)
+rethinking::precis(d_a)
 ```
 
 #### 4.3.1.2a Select the height data of adults
@@ -219,7 +225,7 @@ d2_a <- d_a[d_a$age >= 18, ]
 ```{r}
 #| label: print-height-dist
 
-dens(d2_a$height, norm.comp = TRUE)
+rethinking::dens(d2_a$height, norm.comp = TRUE)
 
 ```
 
@@ -257,7 +263,7 @@ curve(dunif(x, 0, 50), from = -10, to = 60)
 sample_mu_a <- rnorm(1e4, 178, 20)
 sample_sigma_a <- runif(1e4, 0, 50)
 prior_h_a <- rnorm(1e4, sample_mu_a, sample_sigma_a)
-dens(prior_h_a)
+rethinking::dens(prior_h_a)
 ```
 
 Playing around with different priors coming from scientific background
@@ -270,7 +276,7 @@ knowledge about heights of adults:
 sample_mu2_a <- rnorm(1e4, 170, 20)
 sample_sigma2_a <- runif(1e4, 0, 35)
 prior2_h_a <- rnorm(1e4, sample_mu2_a, sample_sigma2_a)
-dens(prior2_h_a)
+rethinking::dens(prior2_h_a)
 ```
 
 **Simulate heights from priors with large sd**
@@ -283,7 +289,7 @@ dens(prior2_h_a)
 
 sample_mu3_a <- rnorm(1e4, 178, 100)
 prior_h3_a <- rnorm(1e4, sample_mu3_a, sample_sigma_a)
-dens(prior_h3_a)
+rethinking::dens(prior_h3_a)
 ```
 
 #### 4.3.2.3a Personal comment
@@ -391,7 +397,7 @@ sample.mu4_a <- post$mu[sample.rows]
 sample.sigma4_a <- post$sigma[sample.rows]
 
 ## R code 4.20
-plot(sample.mu4_a, sample.sigma4_a, cex = 0.8, pch = 21, col = col.alpha(rangi2, 0.1))
+plot(sample.mu4_a, sample.sigma4_a, cex = 0.8, pch = 21, col = rethinking::col.alpha(rethinking:::rangi2, 0.1))
 
 ```
 
@@ -401,8 +407,8 @@ plot(sample.mu4_a, sample.sigma4_a, cex = 0.8, pch = 21, col = col.alpha(rangi2,
 #| label: marg-post-density-a
 
 ## R code 4.21
-dens(sample.mu4_a)
-dens(sample.sigma4_a)
+rethinking::dens(sample.mu4_a)
+rethinking::dens(sample.sigma4_a)
 
 ```
 
@@ -412,8 +418,8 @@ dens(sample.sigma4_a)
 #| label: post-comp-intervals-a
 
 ## R code 4.22
-PI(sample.mu4_a)
-PI(sample.sigma4_a)
+rethinking::PI(sample.mu4_a)
+rethinking::PI(sample.sigma4_a)
 ```
 
 #### 4.3.4.1a Sample Size & Sigma Posterior
@@ -445,7 +451,7 @@ sample2.mu <- post2$mu[sample2.rows]
 sample2.sigma <- post2$sigma[sample2.rows]
 plot(sample2.mu, sample2.sigma,
   cex = 0.5,
-  col = col.alpha(rangi2, 0.1),
+  col = rethinking::col.alpha(rethinking:::rangi2, 0.1),
   xlab = "mu", ylab = "sigma", pch = 16
 )
 
@@ -457,7 +463,7 @@ plot(sample2.mu, sample2.sigma,
 #| label: marg-post-density-a2
 
 ## R code 4.25
-dens(sample2.sigma, norm.comp = TRUE)
+rethinking::dens(sample2.sigma, norm.comp = TRUE)
 
 ```
 
@@ -491,10 +497,10 @@ flist <- alist(
 )
 
 ## R code 4.28
-m4.1 <- quap(flist, data = d2_a)
+m4.1 <- rethinking::quap(flist, data = d2_a)
 
 ## R code 4.29
-precis(m4.1)
+rethinking::precis(m4.1)
 
 ```
 
@@ -527,8 +533,8 @@ start <- list(
   mu = mean(d2_a$height),
   sigma = sd(d2_a$height)
 )
-m4.1_2 <- quap(flist, data = d2_a, start = start)
-precis(m4.1_2)
+m4.1_2 <- rethinking::quap(flist, data = d2_a, start = start)
+rethinking::precis(m4.1_2)
 
 ```
 
@@ -559,7 +565,7 @@ value.
 #| label: smaller-prior
 
 ## R code 4.31
-m4.2 <- quap(
+m4.2 <- rethinking::quap(
   alist(
     height ~ dnorm(mu, sigma),
     mu ~ dnorm(178, 0.1),
@@ -567,7 +573,7 @@ m4.2 <- quap(
   ),
   data = d2_a
 )
-precis(m4.2)
+rethinking::precis(m4.2)
 
 ```
 

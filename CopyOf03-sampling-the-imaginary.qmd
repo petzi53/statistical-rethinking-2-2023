@@ -2578,10 +2578,10 @@ quantile(samples_r, c(0.1, 0.9))
 ```
 
 Intervals of this sort, which assign equal probability mass to each
-tail, are very common in the scientific literature. We'll call them
+tail, are very common in the scientific literature. We\'ll call them
 **percentile intervals (PI)**. These intervals do a good job of
 communicating the shape of a distribution, as long as the distribution
-isn't too asymmetrical.
+isn\'t too asymmetrical.
 
 But in highly skewed distribution they are --- in terms of supporting
 inferences about which parameters are consistent with the data --- not
@@ -2602,7 +2602,7 @@ rethinking::HPDI(samples_r, prob = 0.5)
 
 As in the base R version the tidyverse variant is also using the
 `quantile()`\` function. The only difference is the call of the correct
-vector. Since `p_grid` samples are saved in the `samples` tibble, we'll
+vector. Since `p_grid` samples are saved in the `samples` tibble, we\'ll
 have to index with `$` within `quantile()`.
 
 ```{r}
@@ -2634,7 +2634,7 @@ Point estimates are of limited value: The Bayesian parameter estimate is
 precisely the entire posterior distribution, which is not a single
 number, but instead a function that maps each unique parameter value
 onto a plausibility value. So really the most important thing to note is
-that you don't have to choose a point estimate. It's hardly ever
+that you don\'t have to choose a point estimate. It\'s hardly ever
 necessary and often harmful. It discards information.
 
 ##### Base R
@@ -2764,102 +2764,6 @@ min_loss_t <-
   loss_t %>% 
     filter(weighted_average_loss_t == min(weighted_average_loss_t)) %>%
     as.numeric()
-```
-
-### Sampling to simulate prediction
-
-Another common job for samples is to ease simulation of the model's
-implied observations. This is useful for 1. Model design 2. Model
-checking 3. Software validation 4. Research design 5. Forecasting
-
-#### Dummy data
-
-Instead of using `dbinom()` to compute the probability of events, we
-will use `rbinom()` to generate dummy data to simulate observations.
-
-We will generate 100,000 dummy observations to verify that each value of
-the globe tossing model (6 Waters with 9 tosses) appears in proportion
-to its likelihood:
-
-##### Base R
-
-```{r}
-#| label: fig-generate-dummy-obs-base-demo
-#| fig-cap: "Dsitribution of 100,000 dummy observations of the globe tossing model resulting in 6 Water with 9 tosses: base R version" 
-#| attr-source: '#lst-generate-dummy-obs-base-demo lst-cap="Generating dummy observation to simulate the probability of each value of the globe tossing model: base R version"'
-
-set.seed(3)
-## R code 3.24 ###############################
-dummy_data_r <- rbinom(1e5, size = 9, prob = 0.7)
-## replace `rethinking::simplehist()` with base R `graphics::hist()`
-hist(dummy_data_r, xlab = "dummy water count") 
-
-```
-
-##### Tidyverse
-
-```{r}
-#| label: generate-dummy-obs-tidyverse-demo
-#| fig-cap: "Dsitribution of 100,000 dummy observations of the globe tossing model resulting in 6 Water with 9 tosses: tidyverse version" 
-#| attr-source: '#lst-generate-dummy-obs-tidyverse-demo lst-cap="Generating dummy observation to simulate the probability of each value of the globe tossing model: tidyverse version"'
-
-set.seed(3)
-d2_t <- tibble(draws_t = rbinom(1e5, size = 9, prob = .7))
-
-# the histogram
-d2_t %>% 
-  ggplot(aes(x = draws_t)) +
-  geom_histogram(binwidth = 1, center = 0,
-                 fill = "deepskyblue", color = "black", linewidth = 1/10) +
-  scale_x_continuous("dummy water count", breaks = 0:4 * 2) +
-  ylab("frequency") +
-  theme(panel.grid = element_blank())
-```
-
-#### Model checking
-
-Since Bayesian models are always generative, able to simulate
-observations as well as estimate parameters from observations, once you
-condition a model on data, you can simulate to examine the model's
-empirical expectations.
-
-All that is required is averaging over the posterior density for `p`,
-while computing the predictions. For each possible value of the
-parameter `p`, there is an implied distribution of outcomes. So if you
-were to compute the sampling distribution of outcomes at each value of
-`p`, then you could average all of these prediction distributions
-together, using the posterior probabilities of each value of `p`, to get
-a **posterior predictive distribution**.
-
-```{r}
-
-## R code 3.26 #############################
-w_predicted_r <- rbinom(1e4, size = 9, prob = samples_r)
-hist(w_predicted_r)
-```
-
-##### Tidyverse
-
-```{r}
-
-set.seed(3)
-
-samples2_t <-
-  d_t %>% 
-  slice_sample(n = 1e4, weight_by = posterior_t, replace = T) %>% 
-  mutate(w_predicted_t = purrr::map_dbl(p_grid_t, rbinom, n = 1, size = 9))
-
-## plot histogram
-samples2_t %>% 
-  ggplot(aes(x = w_predicted_t)) +
-  geom_histogram(binwidth = 1, center = 0, color = "black",
-                 fill = "deepskyblue", linewidth = 1/10) +
-  scale_x_continuous("number of water samples",
-                     breaks = 0:3 * 3) +
-  scale_y_continuous("frequency") +
-  ggtitle("Posterior predictive distribution") +
-  coord_cartesian(ylim = c(0, 2000)) +
-  theme(panel.grid = element_blank())
 ```
 
 ## I STOPPED HERE! (2023-08-01) TO BE CONTINUED {.unnumbered}

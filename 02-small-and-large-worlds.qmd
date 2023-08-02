@@ -2811,7 +2811,7 @@ Non-Bayesian inference ("Frequentism"):
     dogma, a superstition. Even in Non-Bayesian statistics it is
     conceptualized as an arbitrary interval.)
     
-## Summary
+## Synopsis
 
 ### Small worlds and the garden of forking data
 
@@ -2865,7 +2865,7 @@ As mathematical rules often cannot be conditioned formally or you have to constr
 
 We can achieve an excellent approximation of the continuous posterior distribution by considering only a finite grid of parameter values. At any particular value of a parameter, `p`, it’s a simple matter to compute the posterior probability: just multiply the prior probability of `p` by the likelihood at `p`. Repeating this procedure for each value in the grid generates an approximate picture of the exact posterior distribution. 
 
-##### Grid Approcimation with {base} R functions
+##### Base R
 
 ```{r}
 #| label: grid-approx-base-demo
@@ -2886,7 +2886,7 @@ posterior <- unstd.posterior / sum(unstd.posterior) # <5>
 4. Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood.
 5. Finally, standardize the posterior, by dividing each value by the sum of all values.
 
-##### Grid Approximation with {tidyverse} functions
+##### Tidyverse
 
 ```{r}
 #| label: grid-approx-tidyverse-demo
@@ -2922,6 +2922,7 @@ Two steps of the quadratic approximation technique:
 1. Find the posterior mode. This is usually accomplished by some optimization algorithm, a procedure that virtually “climbs” the posterior distribution, as if it were a mountain. The golem doesn’t know where the peak is, but it does know the slope under its feet. There are many well-developed optimization procedures, most of them more clever than simple hill climbing. But all of them try to find peaks.
 2. Once you find the peak of the posterior, you must estimate the curvature near the peak. This curvature is sufficient to compute a quadratic approximation of the entire posterior distribution. In some cases, these calculations can be done analytically, but usually your computer uses some numerical technique instead.
 
+##### Rethinking
 
 ```{r}
 #| label: quadratic-approx-demo
@@ -2957,7 +2958,7 @@ There are lots of important model types, like multilevel (mixed-effects) models,
 
 The conceptual challenge with MCMC lies in its highly non-obvious strategy. Instead of attempting to compute or approximate the posterior distribution directly, MCMC techniques merely draw samples from the posterior. You end up with a collection of parameter values, and the frequencies of these values correspond to the posterior plausibilities. You can then build a picture of the posterior from the histogram of these samples.
 
-##### Using only code from base R
+##### Base R and Rethinking
 
 I will add here without comments a demonstration of this important technique. In later chapters we will learn more about it.
 
@@ -2986,7 +2987,7 @@ rethinking::dens(p, xlim = c(0, 1))
 curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
 ```
 
-##### Using {brms}
+##### brms
 
 Again: The following demo comes without comments. It just will give a feeling of the structure of the used function. Later I will dive with Kurz into the details how to apply the functions of the {**brms**} package.
 

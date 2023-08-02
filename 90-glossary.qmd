@@ -30,9 +30,11 @@ specified amount of posterior probability, a probability mass. (Chap.3)
 
 Cross Validation (1)
 
+**Data**: Observed variables. See parameter. (Chap.2, 4)
+
 Directed Acyclic Graph (DAG) (2)
 
-Exponential Family (1)
+Exponential Family (1, **4**)
 
 **Frequentist Approach**: The frequentist approach requires that all
 probabilities be defined by connection to the frequencies of events in
@@ -42,6 +44,8 @@ to repeat the measurement many many times, we would end up collecting a
 list of values that will have some pattern to it. It means also that
 parameters and models cannot have probability distributions, only
 measurements can. (Chap.1)
+
+Generalized Linear Models (GLMs): (4)
 
 Graphical Causal Model (2)
 
@@ -67,6 +71,13 @@ Information Criteria (1)
 
 Information Entropy (2)
 
+**Joint Generative Model**: It is defined by a combination of variables
+and their probability distributions. It can be used both to simulate
+hypothetical observations as well as to analyze real ones. (Chap.4)
+
+Large World: References the broader context in which one deploys a
+model, the 'real' worlds. See [Small World]{.smallcaps}. (Chap.2)
+
 **Likelihood**: The relative number of ways that a value *p* can produce
 the data. It is derived by enumerating all the possible data sequences
 that could have happened and then eliminating those sequences
@@ -75,7 +86,9 @@ in a *distribution of variables*, in contrast to conventional
 statistics, where a *distribution function assigned to an observed
 variable* is usually called a likelihood. (Chap.2)
 
-Loss Function (3)
+**Loss Function**: A loss function is a rule that tells you the cost
+associated with using any particular point estimate. *Different loss
+functions imply different point estimates*. (Chap.3)
 
 **Markov Chain Monte Carlo (MCMC)**: There are lots of important model
 types, like multilevel (mixed-effects) models, for which neither grid
@@ -84,7 +97,8 @@ a result, various counterintuitive model fitting techniques have arisen.
 The most popular of these is MCMC, which is a family of conditioning
 engines capable of handling highly complex models. (Chap.1, **2**)
 
-Maximum A Posteriori (MAP) (3)
+**Maximum A Posteriori (MAP)**: The estimate where the posterior's peak
+will lie at the posterior distribution. (Chap.3, **4**)
 
 Maximum Entropy (1,2)
 
@@ -92,7 +106,12 @@ Maximum Likehood Estimate (MLE) (2)
 
 Metropolis Algorithm (2)
 
-Model Checking (3)
+**Model Checking**: It means (1) ensuring the model fitting worked
+correctly and (2) evaluating the adequacy of a model for some purpose.
+Since Bayesian models are always *generative*, able to simulate
+observations as well as estimate parameters from observations, once you
+condition a model on data, you can simulate to examine the model\'s
+empirical expectations. (Chap.3)
 
 Multilevel Model (1)
 
@@ -110,14 +129,18 @@ model is overly complex.
 See also [Wikipedia](https://en.wikipedia.org/wiki/Overfitting) and
 [IBM](https://www.ibm.com/topics/overfitting). (Chap. 1)
 
-**Parameter**: A conjectured proportion, *p*. It\'s just a way of
-indexing possible explanations of the data. Unobserved variables are
-also usually called parameters. Data are measured and known; parameters
-are unknown and must be estimated from data. (Chap.2)
+**Parameter**: Variables that cannot be observed. A conjectured
+proportion, *p*. It's just a way of indexing possible explanations of
+the data. Data are measured and known; parameters are unknown and must
+be estimated from data. Example for parameters are rates, proportions,
+and averages. See Data. (Chap.2, 4)
 
 Partial Pooling (1)
 
-Percentil Interval (PI) (3)
+**Percentile Interval (PI)**: Intervals that assign equal probability
+mass to each tail. are very common in the scientific literature. These
+intervals do a good job of communicating the shape of a distribution, as
+long as the distribution isn't too asymmetrical. (Chap.3)
 
 **Posterior Distribution**: Once you have named all the variables and
 chosen definitions for each, a Bayesian model can update all of the
@@ -130,7 +153,11 @@ takes the form of the probability of the parameters, conditional on the
 data. The mathematical definition of the posterior distribution arises
 from Bayes' Theorem. (Chap. 2)
 
-Posterior Predictive Distribution (3)
+**Posterior Predictive Distribution**: After we compute the sampling
+distribution of outcomes at each value of *p*, we can average all of
+these prediction distributions together, using the posterior
+probabilities of each value of *p* to get a posterior predictive
+distribution. (Chap.3)
 
 **Posterior Probability**: The new, updated plausibility of any specific
 *p*. (Chap.2)
@@ -142,19 +169,46 @@ equally. (Chap.2)
 **Prior Probability**: The prior plausibility of any specific *p*.
 (Chap.2)
 
+**Probability Density**: Continuous ones like the Gaussian are called
+*probability density* functions, denoted with *`p`* or just plain old
+*`f`*, depending upon author and tradition. For mathematical reasons,
+probability densities can be greater than 1. Probability *density* is
+the rate of change in cumulative probability. So where cumulative
+probability is increasing rapidly, density can easily exceed 1. But if
+we calculate the area under the density function, it will never
+exceed 1. Such areas are also called *probability mass*. See also
+Probability Mass. (Chap.4)
+
+**Probability Mass**: Probability distributions with only discrete
+outcomes, like the binomial, are called *probability mass* functions and
+denoted `Pr`\`. If we calculate the area under the density function, it
+will never exceed 1. Such areas are also called *probability mass*. See
+also Probability Density. (Chap.4)
+
 Process Models (1)
+
+[**Small World**]{.smallcaps}: Reference to the self-contained logical
+world of the model. (Chap.2) See [Large World.]{.smallcaps}
 
 Standard Error: (2)
 
 **Quadratic Approximation**: Under quite general conditions, the region
 near the peak of the posterior distribution will be nearly Gaussian---or
-\"normal\"---in shape. This means the posterior distribution can be
+"normal"---in shape. This means the posterior distribution can be
 usefully approximated by a Gaussian distribution. A Gaussian
 distribution is convenient, because it can be completely described by
 only two numbers: the location of its center (mean) and its spread
 (variance). (Chap.2)
 
-Sampling Distribution (1,**3**)
+**Sampling Distribution**: They are the foundation of common
+non-Bayesian statistical traditions. In those approaches, inference
+about parameters is made through the sampling distribution. In Bayesian
+statistics, inference about parameters is never done directly through a
+sampling distribution. The posterior distribution is not sampled, but
+deduced logically. Then samples can be drawn from the posterior to aid
+in inference. In neither case is \"sampling\" a physical act. In both
+cases, it\'s just a mathematical device and produces only *small world*
+numbers. (1,**3**)
 
 Subjective Bayesian (2)
 

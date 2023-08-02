@@ -7,6 +7,7 @@ If you want to exclude this file, remove it from the mentioned chapters
 in `_quarto.yml`.
 :::
 
+
 ```{r}
 #| context: setup
 ```
@@ -16,7 +17,9 @@ in `_quarto.yml`.
 tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w"))
 ```
 
+
 ## Code Annotation with echo: fenced
+
 
 ```{r}
 #| label: test-code-annotation
@@ -24,6 +27,7 @@ tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w"))
 1 + 1 # <1>
 2 + 2 # <2>
 ```
+
 
 1.  Simple
 2.  Very simple
@@ -36,6 +40,7 @@ Maybe there are option you can set up with {**pillar**}?
 To cross reference the output of a tibble you need to convert it to a
 table.
 
+
 ```{r}
 #| label: tbl-mytable
 #| tbl-cap: "This is a test"
@@ -45,9 +50,11 @@ myTable <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w"))
 kable(myTable)
 ```
 
+
 See @tbl-mytable
 
 ## Table Width with kableExtra
+
 
 ```{r}
 #| label: table-width
@@ -61,7 +68,9 @@ dt %>%
   kable_classic(full_width = F, html_font = "Cambria")
 ```
 
+
 ## Cross Reference to Code Listing (not working)
+
 
 ```{r}
 #| lst-label: lst-code1
@@ -70,6 +79,7 @@ dt %>%
 a <- 1
 a + 1
 ```
+
 
 I'd like to be able to reference the code chunk @lst-code1.
 
@@ -82,6 +92,7 @@ a + 1
 
 I'd like to be able to reference the code chunk @lst-code2.
 
+
 ```{r}
 #| echo: true
 #| eval: true
@@ -90,9 +101,11 @@ I'd like to be able to reference the code chunk @lst-code2.
 5 + 5
 ```
 
+
 You refer to the listing of this code chunk with @list-summarize.
 
 ## tbl captions with (some) mathematical operators
+
 
 ```{r}
 #| label: tbl-test
@@ -101,4 +114,24 @@ You refer to the listing of this code chunk with @list-summarize.
 tibble::tibble(x = runif(10), y = x * 2)
 ```
 
-## 
+
+## Using brms
+
+
+```{r}
+library(brms)
+
+fit1 <- brm(count ~ zAge + zBase * Trt + (1|patient),
+            data = epilepsy, family = poisson())
+summary(fit1)
+```
+
+```{r}
+newdata <- data.frame(Trt = c(0, 1), zAge = 0, zBase = 0)
+predict(fit1, newdata = newdata, re_formula = NA)
+```
+
+```{r}
+fitted(fit1, newdata = newdata, re_formula = NA)
+```
+
