@@ -8,6 +8,40 @@ library(tidyverse)
 
 ## Vampire Example {.unnumbered}
 
+### Probability notation {.unnumbered}
+
+To understand the interpretation of the following formulae in this
+section I need some [primer of probability
+notation](https://www.mathsisfun.com/data/probability-events-conditional.html):
+
+-   $P(A)$ means "**Probability Of Event A**".
+
+    *Example*: What is the probability of $2$ after throwing a dice?
+    $P(A) = \frac{1}{6}$
+
+-   $P(B \mid A)$ means "**Probability of Event B given A**". This is a
+    conditional probability. After event $A$ has happened, what is the
+    probability of $B$. If the events are independent from each other
+    than the changes do not influence each other. *Example*: The
+    probability to throw $2$ in a second dice throw are still
+    $P(B \mid A) = \frac{1}{6}$. If the events are dependent of each
+    other then "Probability of event A and event B equals the
+    probability of event A times the probability of event B given event
+    A."
+
+$$
+P(A \space and\space B) = P(A) \times P(B \mid A)
+$$
+
+*Example*: Taking a red marble from a urn of $5$ red and $5$ blue
+marbles without replacement. Here the probability of a red marble (in
+the second draw) given the probability of a red marble (in the first
+draw) is
+
+$$
+\frac{5}{10} \times \frac{4}{9} = \frac{2}{9}
+$$
+
 ### Original {.unnumbered}
 
 #### a) Medical Test Scenario with Bayes theorem {.unnumbered}
@@ -177,11 +211,11 @@ tibble(pr_vampire_b2          = 100 / 100000,
 
 ```
 
-## Sampling from a grid-approximate posterior
+## Sampling from a grid-approximate posterior {#sec-sampling-from-a-grid-approximate-posterior}
 
 ### Original
 
-#### Grid approximation
+#### Grid approximation {#sec-grid-approximation-a}
 
 Before we are going to draw samples from the posterior distribution we
 need to compute the distribution. Again we are using grid approximation.
@@ -296,11 +330,11 @@ similar to the ideal. This is shown in the tidyverse version
 
 ### Tidyverse
 
-#### Grid approximation
+#### Grid approximation {#sec-grid-approximation-b}
 
 ```{r}
 #| label: grid-approx-b
-#| attr-source: '#lst-grid-approx-b lst-cap="Grid aproximation"'
+#| attr-source: '#lst-grid-approx-b lst-cap="Grid aproximation: tidyverse"'
 
 # how many grid points would you like?
 n_grid_b <- 1000L
@@ -443,7 +477,7 @@ d_b %>%
 
 ```
 
-## Sampling to Summarize
+## Sampling to Summarize {#sec-sampling-to-summarize}
 
 ### Three questions asked {.unnumbered}
 

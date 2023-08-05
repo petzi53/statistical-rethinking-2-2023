@@ -34,6 +34,12 @@ Cross Validation (1)
 
 Directed Acyclic Graph (DAG) (2)
 
+**Exchangeable**: There is a mathematical result known as *de Finetti's
+theorem* that says values which are exchangeable can be approximated by
+mixtures of *independent and identically distributed* (i.i.d.),
+distributions. Colloquially, exchangeable values can be reordered.
+(Chap.4)
+
 Exponential Family (1, **4**)
 
 **Frequentist Approach**: The frequentist approach requires that all
@@ -86,9 +92,17 @@ in a *distribution of variables*, in contrast to conventional
 statistics, where a *distribution function assigned to an observed
 variable* is usually called a likelihood. (Chap.2)
 
+**Linear Regression**: In linear regression, the relationships are
+modeled using linear predictor functions whose unknown model parameters
+are estimated from the data. Such models are called linear models.
+(Wikipedia, Chap.4)
+
 **Loss Function**: A loss function is a rule that tells you the cost
 associated with using any particular point estimate. *Different loss
 functions imply different point estimates*. (Chap.3)
+
+**Marginal Distribution**: The jargon "marginal" here means "averaging
+over the other parameters." (Chap.4)
 
 **Markov Chain Monte Carlo (MCMC)**: There are lots of important model
 types, like multilevel (mixed-effects) models, for which neither grid
@@ -110,7 +124,7 @@ Metropolis Algorithm (2)
 correctly and (2) evaluating the adequacy of a model for some purpose.
 Since Bayesian models are always *generative*, able to simulate
 observations as well as estimate parameters from observations, once you
-condition a model on data, you can simulate to examine the model\'s
+condition a model on data, you can simulate to examine the model's
 empirical expectations. (Chap.3)
 
 Multilevel Model (1)
@@ -154,19 +168,27 @@ data. The mathematical definition of the posterior distribution arises
 from Bayes' Theorem. (Chap. 2)
 
 **Posterior Predictive Distribution**: After we compute the sampling
-distribution of outcomes at each value of *p*, we can average all of
+distribution of outcomes at each value of *`p`*, we can average all of
 these prediction distributions together, using the posterior
-probabilities of each value of *p* to get a posterior predictive
+probabilities of each value of *`p`* to get a posterior predictive
 distribution. (Chap.3)
 
 **Posterior Probability**: The new, updated plausibility of any specific
-*p*. (Chap.2)
+*`p`*. (Chap.2)
 
 **Principle of Indifference**: When there is no reason to say that one
 conjecture is more plausible than another, weigh all of the conjectures
 equally. (Chap.2)
 
-**Prior Probability**: The prior plausibility of any specific *p*.
+**Prior Predictive Simulation**: It is an essential part of your
+modeling. Once you've chosen priors for *`h`, `μ`*, and *`σ`*, these
+imply a joint prior distribution of individual heights. By simulating
+from this distribution, you can see what your choices imply about
+observable height. This helps you diagnose bad choices. Lots of
+conventional choices are indeed bad ones, and we'll be able to see this
+through prior predictive simulations.
+
+**Prior Probability**: The prior plausibility of any specific *`p`*.
 (Chap.2)
 
 **Probability Density**: Continuous ones like the Gaussian are called
@@ -192,13 +214,20 @@ world of the model. (Chap.2) See [Large World.]{.smallcaps}
 
 Standard Error: (2)
 
+**Stochastic**: A stochastic relationship is just a mapping of a
+variable or parameter onto a distribution. It is *stochastic* because no
+single instance of the variable on the left is known with certainty.
+Instead, the mapping is probabilistic: Some values are more plausible
+than others, but very many different values are plausible under any
+model. (Chap.4)
+
 **Quadratic Approximation**: Under quite general conditions, the region
 near the peak of the posterior distribution will be nearly Gaussian---or
 "normal"---in shape. This means the posterior distribution can be
 usefully approximated by a Gaussian distribution. A Gaussian
 distribution is convenient, because it can be completely described by
 only two numbers: the location of its center (mean) and its spread
-(variance). (Chap.2)
+(variance). (Chap.2, 4)
 
 **Sampling Distribution**: They are the foundation of common
 non-Bayesian statistical traditions. In those approaches, inference
@@ -206,8 +235,8 @@ about parameters is made through the sampling distribution. In Bayesian
 statistics, inference about parameters is never done directly through a
 sampling distribution. The posterior distribution is not sampled, but
 deduced logically. Then samples can be drawn from the posterior to aid
-in inference. In neither case is \"sampling\" a physical act. In both
-cases, it\'s just a mathematical device and produces only *small world*
+in inference. In neither case is "sampling" a physical act. In both
+cases, it's just a mathematical device and produces only *small world*
 numbers. (1,**3**)
 
 Subjective Bayesian (2)

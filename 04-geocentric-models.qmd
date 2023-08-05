@@ -6,149 +6,91 @@
 library(tidyverse)
 ```
 
-## Normal Distributions
+## Why normal distributions are normal?
+
+Why are there so many distribution approximately normal, resulting in a
+Gaussian curve? Because there will be more combinations of outcomes that
+sum up to a "central" value, rather than to some extreme value.
+
+::: callout-tip
+Any process that adds together random values from the same distribution
+converges to a normal.
+:::
 
 ### Normal by addition
 
-> Suppose you and a thousand of your closest friends line up on the
-> halfway line of a soccer field (football pitch). Each of you has a
-> coin in your hand. At the sound of the whistle, you begin flipping the
-> coins. Each time a coin comes up heads, that person moves one step
-> towards the left-hand goal. Each time a coin comes up tails, that
-> person moves one step towards the right-hand goal. Each person flips
-> the coin 16 times, follows the implied moves, and then stands still.
-> Now we measure the distance of each person from the halfway line. Can
-> you predict what proportion of the thousand people who are standing on
-> the halfway line? How about the proportion 5 yards left of the line?
->
-> It's hard to say where any individual person will end up, but you can
-> say with great confidence what the collection of positions will be.
-> The distances will be distributed in approximately normal, or
-> Gaussian, fashion. This is true even though the underlying
-> distribution is binomial. It does this because there are so many more
-> possible ways to realize a sequence of left-right steps that sums to
-> zero. There are slightly fewer ways to realize a sequence that ends up
-> one step left or right of zero, and so on, with the number of possible
-> sequences declining in the characteristic bell curve of the normal
-> distribution.
+Whatever the average value of the source distribution, each sample from
+it can be thought of as a fluctuation from that average value. When we
+begin to add these fluctuations together, they also begin to cancel one
+another out. A large positive fluctuation will cancel a large negative
+one. The more terms in the sum, the more chances for each fluctuation to
+be canceled by another, or by a series of smaller ones in the opposite
+direction. So eventually the most likely sum, in the sense that there
+are the most ways to realize it, will be a sum in which every
+fluctuation is canceled by another, a sum of zero (relative to the
+mean).
 
-Showing that there's nothing special about the underlying coin flip:
+It doesn't matter what shape the underlying distribution possesses. It
+could be uniform, like in our example above, or it could be (nearly)
+anything else. Depending upon the underlying distribution, the
+convergence might be slow, but it will be inevitable.
 
-> Assume ... that each step is different from all the others, a random
-> distance between zero and one yard. Thus a coin is flipped, a distance
-> between zero and one yard is taken in the indicated direction, and the
-> process repeats. To simulate this, we generate for each person a list
-> of 16 random numbers between −1 and 1. These are the individual steps.
-> Then we add these steps together to get the position after 16 steps.
-> Then we need to replicate this procedure 1000 times.
-
-```{r}
-#| label: fig-sim-step-experiment-a
-#| fig-cap: "Random walks on the soccer field converge to a normal distribution. The more steps are taken, the closer the match between the real empirical distribution of positions and the ideal normal distribution, superimposed in the last plot in the bottom panel."
-
-# to provide reproducibility and to conform with tidyverse version
-set.seed(4)
-
-## R code 4.1 #################################
-pos_a1 <- replicate(1000, sum(runif(16, -1, 1)))
-pos_a2 <- replicate(1000, sum(runif(32, -1, 1)))
-
-par(mfrow = c(2, 2)) # 2-by-2 grid of plots
-hist(pos_a1)
-hist(pos_a2)
-
-plot(density(pos_a1))
-plot(density(pos_a2))
-```
-
-> Any process that adds together random values from the same
-> distribution converges to a normal. ... It doesn't matter what shape
-> the underlying distribution possesses. It could be uniform, like in
-> our example above, or it could be (nearly) anything else. Depending
-> upon the underlying distribution, the convergence might be slow, but
-> it will be inevitable.
+See the excellent article [Why is normal distribution so
+ubiquitous?](https://ekamperi.github.io/mathematics/2021/01/29/why-is-normal-distribution-so-ubiquitous.html)
+which also explains the example of random walks from SR2. See also the
+scientific paper [Why are normal distribution
+normal?](https://www.journals.uchicago.edu/doi/pdf/10.1093/bjps/axs046)
+of the The British Journal for the Philosophy of Science.
 
 ### Normal by multiplication
 
-```{r}
-#| label: random-sample-growth
+This is not only valid for addition but also for multiplication of small
+values: Multiplying small numbers is approximately the same as addition.
 
-## R code 4.2 #########################
-prod(1 + runif(12, 0, 0.1))
-```
+### Normal by log-multipliation
 
-```{r}
-#| label: normal-by-multiplaction
+But even the multiplication of large values tend to produce Gaussian
+distributions on the log scale.
 
-## R code 4.3 #########################
-growth <- replicate(10000, prod(1 + runif(12, 0, 0.1)))
-rethinking::dens(growth, norm.comp = TRUE)
-```
+### Using Gaussian distribution
 
-> ... small effects that multiply together are approximately additive,
-> and so they also tend to stabilize on Gaussian distributions.
+The justifications for using the Gaussian distribution fall into two
+broad categories:
 
-```{r}
-#| label: compare-small-big-growth
+1.  **Ontological justification**: The world is full of Gaussian
+    distributions, approximately. We're never going to experience a
+    perfect Gaussian distribution. But it is a widespread pattern,
+    appearing again and again at different scales and in different
+    domains. Measurement errors, variations in growth, and the
+    velocities of molecules all tend towards Gaussian distributions.
 
-## R code 4.4 #########################
-big <- replicate(10000, prod(1 + runif(12, 0, 0.5)))
-small <- replicate(10000, prod(1 + runif(12, 0, 0.01)))
+There are many other patterns in nature, so make no mistake in assuming
+that the Gaussian pattern is universal. In later chapters, we'll see how
+other useful and common patterns, like the exponential and gamma and
+Poisson, also arise from natural processes. The Gaussian is a member of
+a family of fundamental natural distributions known as the **Exponential
+family**. All of the members of this family are important for working
+science, because they populate our world.
 
-par(mfrow = c(2, 2)) # 2-by-2 grid of plots
-rethinking::dens(big, norm.comp = TRUE)
-rethinking::dens(small, norm.comp = TRUE)
+2.  **Epistemological justification**: The Gaussian represents a
+    particular state of ignorance. When all we know or are willing to
+    say about a distribution of measures (measures are continuous values
+    on the real number line) is their mean and variance, then the
+    Gaussian distribution arises as the most consistent with our
+    assumptions. It is the least surprising and least informative
+    assumption to make. --- If you don't think the distribution should
+    be Gaussian, then that implies that you know something else that you
+    should tell your golem about, something that would improve
+    inference.
 
-```
-
-> The interacting growth deviations, as long as they are sufficiently
-> small, converge to a Gaussian distribution. In this way, the range of
-> causal forces that tend towards Gaussian distributions extends well
-> beyond purely additive interactions.
-
-### Normal by log-multiplication
-
-> Large deviates that are multiplied together do not produce Gaussian
-> distributions, but they do tend to produce Gaussian distributions on
-> the log scale.
-
-```{r}
-#| label: normal-by-log-multi
-
-## R code 4.5 #########################
-log.big <- replicate(10000, log(prod(1 + runif(12, 0, 0.5))))
-
-par(mfrow = c(2, 2)) # 2-by-2 grid of plots
-rethinking::dens(big, norm.comp = TRUE)
-rethinking::dens(log.big, norm.comp = TRUE)
-
-```
-
-> We get the Gaussian distribution back, because adding logs is
-> equivalent to multiplying the original numbers. So even multiplicative
-> interactions of large deviations can produce Gaussian distributions,
-> once we measure the outcomes on the log scale. Since measurement
-> scales are arbitrary, there's nothing suspicious about this
-> transformation.
-
-### Using Gaussian Distributions
-
-**Ontological Reasons**: the world is full of Gaussian distributions,
-approximately. We're never going to experience a perfect Gaussian
-distribution. But it is a widespread pattern, appearing again and again
-at different scales and in different domains. ... The Gaussian is a
-member of a family of fundamental natural distributions known as the
-**EXPONENTIAL FAMILY**. All of the members of this family are important
-for working science, because they populate our world.
-
-**Epistemological Reasons**: the Gaussian represents a particular state
-of ignorance. When all we know or are willing to say about a
-distribution of measures (measures are continuous values on the real
-number line) is their mean and variance, then the Gaussian distribution
-arises as the most consistent with our assumptions.
-
-::: callout-tip
-## Gaussian distribution
+::: callout-caution
+Although the Gaussian distribution is common in nature and has some nice
+properties, there are some risks in using it as a default data model.
+The Gaussian distribution has some very thin tails---there is very
+little probability in them. Instead most of the mass in the Gaussian
+lies within one standard deviation of the mean. Many natural (and
+unnatural) processes have much heavier tails.
+:::
 
 The Gaussian is a continuous distribution, unlike the discrete
 distributions of earlier chapters. Probability distributions with only
@@ -156,198 +98,653 @@ discrete outcomes, like the binomial, are called *probability mass*
 functions and denoted `Pr`. Continuous ones like the Gaussian are called
 *probability density* functions, denoted with *`p`* or just plain old
 *`f`*, depending upon author and tradition. For mathematical reasons,
-probability densities can be greater than 1. Try dnorm(0,0,0.1), for
+probability densities can be greater than 1. Try `dnorm(0,0,0.1)`", for
 example, which is the way to make R calculate *`p`*`(0|0, 0.1)`. The
 answer, about 4, is no mistake. Probability *density* is the rate of
 change in cumulative probability. So where cumulative probability is
 increasing rapidly, density can easily exceed 1. But if we calculate the
 area under the density function, it will never exceed 1. Such areas are
 also called *probability mass*.
+
+## A language describing models
+
+1.  First, we recognize a set of variables to work with. Some of these
+    variables are observable. We call these data. Others are
+    unobservable things like rates and averages. We call these
+    parameters.
+2.  We define each variable either in terms of the other variables or in
+    terms of a probability distribution.
+3.  The combination of variables and their probability distributions
+    defines a joint generative model that can be used both to simulate
+    hypothetical observations as well as analyze real ones.
+
+Models are mappings of one set of variables through a probability
+distribution onto another set of variables. Fundamentally, these models
+define the ways values of some variables can arise, given values of
+other variables.
+
+### Re-describing the globe tossing model
+
+::: {#def-glob-tossing-model}
+Recall the proportion of water problem from previous chapters. The model
+in that case was always:
+
+$$
+\begin{align*}
+W \sim Binomial(N, p) \\
+p \sim Uniform(0, 1)
+\end{align*}
+$$
+
+-   `W`: observed count of water
+-   `N`: total number of tosses
+-   `p`: proportion of water on the globe
+
+Read the above statement as:
+
+1.  **First line**: The count W is distributed binomially with sample
+    size `N` and probability `p`.
+2.  **Second line**: The prior for `p` is assumed to be uniform between
+    zero and one.
+
+The first line defines the likelihood function used in Bayes' theorem.
+The other lines define priors. Both of the lines in this model are
+**stochastic**, as indicated by the `~` symbol. A stochastic
+relationship is just a mapping of a variable or parameter onto a
+distribution. It is stochastic because no single instance of the
+variable on the left is known with certainty. Instead, the mapping is
+probabilistic: Some values are more plausible than others, but very many
+different values are plausible under any model. Later, we'll have models
+with deterministic definitions in them.
 :::
 
-## 4.2a Language describing models
+## Gaussian model of height
 
-> (1)  First, we recognize a set of variables to work with. Some of
-> these variables are observable. We call these *data*. Others are
-> unobservable things like rates and averages. We call these
-> *parameters*.
->
-> (2)  We define each variable either in terms of the other variables or
-> in terms of a probability distribution.
->
-> (3)  The combination of variables and their probability distributions
-> defines a *joint generative model* that can be used both to simulate
-> hypothetical observations as well as analyze real ones.
+There are an infinite number of possible Gaussian distributions. Some
+have small means. Others have large means. Some are wide, with a large
+`σ`. Others are narrow. We want our Bayesian machine to consider every
+possible distribution, each defined by a combination of `μ` and `σ`, and
+rank them by posterior plausibility. Posterior plausibility provides a
+measure of the logical compatibility of each possible distribution with
+the data and model.
 
-## 4.3a Gaussian model of height
+### The data
 
-### 4.3.1a The data
+#### Original
+
+The data contained in `data(Howell1)` are partial census data for the
+Dobe area !Kung San, compiled from interviews conducted by Nancy Howell
+in the late 1960s. Much more raw data is available for download from
+https://tspace.library.utoronto.ca/handle/1807/10395.
+
+For the non-anthropologists reading along, the !Kung San are the most
+famous foraging population of the twentieth century, largely because of
+detailed quantitative studies by people like Howell.
+
+::: callout-caution
+Loading data from a package with `data()` is only possible if you have
+already loaded the package. In our example:
 
 ```{r}
-#| label: load-howell-data-a
+#| label: loading-data-from-package1_a
+#| attr-source: '#lst-loading-data-from-package1_a lst-cap="Load data `Howell1` from the loaded {**rethinking**} package and assign the data to an object."'
+#| eval: false
 
-## R code 4.7
+## R code 4.7 #######################
+library(rethinking)
+data(Howell1)
+d_a <- Howell1
+```
+
+Because of many function name conflicts with {**brms**} I do not want to
+load {**rethinking**} and will call the function of these conflicted
+packages with `<package name>::<function name>()` Therefore I have to
+use another, not so usual loading strategy of the data set:
+
+```{r}
+#| label: loading-data-from-package2_a
+#| attr-source: '#lst-loading-data-from-package2_a lst-cap="Load data `Howell1` from the {**rethinking**} package without loading the package and assign the data to an object. Rethinking"'
+
 data(package = "rethinking", list = "Howell1")
 d_a <- Howell1
 ```
 
-#### 4.3.1.1a Show the data
+The advantage of this strategy is that I have not always to detach the
+{**rethinking**} package and to make sure {**rethinking**} is detached
+before using {**brms**} as it is necessary in the Kurz's {**tidyverse**}
+/ {**brms**} version.
+:::
+
+##### Show the data
 
 ```{r}
 #| label: show-howell-data-a
+#| attr-source: '#lst-show-howell-data-a lst-cap="Show and inspect the data: rethinking"'
 
-## R code 4.8
+## R code 4.8 ####################
 str(d_a)
 
-## R code 4.9
+## R code 4.9 ###################
 rethinking::precis(d_a)
 ```
 
-#### 4.3.1.2a Select the height data of adults
+This data frame contains four columns. Each column has 544 entries, so
+there are 544 individuals in these data. Each individual has a recorded
+height (centimeters), weight (kilograms), age (years), and "maleness" (0
+indicating female and 1 indicating male).
+
+##### Select the height data of adults
+
+We're going to work with just the height column, for the moment. All we
+want for now are heights of adults in the sample. The reason to filter
+out non-adults for now is that height is strongly correlated with age,
+before adulthood.
 
 ```{r}
 #| label: select-height-adults-a
+#| attr-source: '#lst-select-height-adults-a lst-cap="Select the height data of adults (individuals older or equal than 18 years): base R version"'
 
-## R code 4.10
+## R code 4.10 ###################
 head(d_a$height)
  
-## R code 4.11
+## R code 4.11 ###################
 d2_a <- d_a[d_a$age >= 18, ]
 
 ```
 
-### 4.3.2a The model
+We'll be working with the data frame d2 now. It should have 352 rows
+(individuals) in it. We will check this with `nrow(d2_a)` =
+`r nrow(d2_a)`.
 
-> Our goal is to model these values using a Gaussian distribution.
+#### Tidyverse
 
-#### 4.3.2.1a Plot the priors
+##### Show the data
 
 ```{r}
-#| label: print-height-dist
+#| label: loading-data-from-package_b
+#| attr-source: '#lst-loading-data-from-package_b lst-cap="Load data `Howell1` from the {**rethinking**} package without loading the package and assign the data to an object. Tidyverse"'
 
-rethinking::dens(d2_a$height, norm.comp = TRUE)
+data(package = "rethinking", list = "Howell1")
+d_b <- Howell1
+```
+
+```{r}
+#| label: show-howell-data1-b
+
+d_b |>
+    glimpse()
 
 ```
+
+`glimpse()` is the tidyverse analogue for `str()`.
+
+```{r}
+#| label: show-howell-data2-b
+d_b |> 
+    summary()
+```
+
+Kurz tells us that the {**brms**} package does not have a function that
+works like `rethinking::precis()` for providing numeric and graphical
+summaries of variables, as in the second part of
+@lst-show-howell-data-a. Kurz suggests `base::summary()` to get some of
+the information from `rethinking::precis()`.
+
+```{r}
+#| label: show-howell-data3-b
+d_b |>            
+    skimr::skim() 
+
+```
+
+I think `skimr::skim()` is a better option as an alternative to
+`rethinking::precis()` as `base::summary()` because it also has a
+graphical summary of the variables. {**skimr**} has many other useful
+functions and is very adaptable. I propose to install and to try it out.
+
+##### Select the height data of adults
+
+With {**tidyverse**} we can isolate height values with the
+`dplyr::select()` function and we are using the `dplyr::filter()`
+function to make an adults-only data frame.
+
+```{r}
+#| label: select-height-adults-b
+#| attr-source: '#lst-select-height-adults-b lst-cap="Select the height data of adults (individuals older or equal than 18 years): tidyverse version"'
+
+d_b %>%
+  select(height) %>% 
+  glimpse()
+
+d2_b <- 
+  d_b %>%
+  filter(age >= 18) 
+ 
+glimpse(d2_b)
+```
+
+The two functions of @lst-select-height-adults-b are much more readable
+and understandable as the weird base R syntax in
+@lst-select-height-adults-a.
+
+### The model
+
+#### Original
+
+Our goal is to model the data in `d2_a` using a Gaussian distribution.
+
+Plot the distribution of heights
+
+```{r}
+#| label: fig-dist-heights-a
+#| fig-cap: "The distribution of the heights data,overlaid by an ideal Gaussian distribution: rethinking version"
+#| attr-source: '#lst-fig-dist-heights-a lst-cap="Plot the distribution of the heights of adults: rethinking version"'
+
+rethinking::dens(d2_a$height, norm.comp = TRUE)
+```
+
+With the option `norm.comp = TRUE` I have overlaid a Gaussian
+distribution to see the differences to the actual data. There are some
+differences locally, especially on the peak of the distribution. But the
+tails looks nice and we can say that the overall impression of the curve
+is Gaussian.
+
+::: callout-caution
+###### Decisions how to model the data
+
+Gawking at the raw data, to try to decide how to model them, is usually
+not a good idea. The data could be, for example, a mixture of different
+Gaussian distributions. Furthermore, the empirical distribution need not
+be actually Gaussian in order to justify using a Gaussian probability
+distribution.
+:::
+
+::: {#def-heights-normal}
+Define the heights as normally distributed with a mean `μ` and standard
+deviation `σ`
+
+$$
+h_{i} \sim Normal(σ, μ) 
+$$
+:::
+
+The symbol `h` refers to the list of heights, and the subscript `i`
+means each individual element of this list. It is conventional to use
+`i` because it stands for index. The index `i` takes on row numbers, and
+so in this example can take any value from 1 to 352 (the number of
+heights in `d2_a$height`). As such, the model above is saying that all
+the golem knows about each height measurement is defined by the same
+normal distribution, with mean `μ` and standard deviation `σ`.
+
+The short model in @def-heights-normal assumes that the values $h_{i}$
+are *independent and identically distributed*, abbreviated `i.i.d.`,
+`iid`, or `IID`.
+
+To complete the model, we're going to need some priors. The parameters
+to be estimated are both `μ` and `σ`, so we need a prior `Pr(μ, σ)`, the
+joint prior probability for all parameters. In most cases, priors are
+specified independently for each parameter, which amounts to assuming
+$Pr(μ,σ) = Pr(μ)Pr(σ)$.
+
+::: {#def-height-priors}
+Priors for heights model
+
+$$
+\begin{align*}
+h_{i} \sim Normal(μ, σ)  \\ 
+μ \sim Normal(178, 20)   \\ 
+μ \sim Uniform(0, 50)       
+\end{align*}
+$$
+
+1.  First line represents the likelihood.
+2.  Second line is the chosen `μ` prior.
+3.  Third line is the chosen `σ` prior.
+:::
+
+Let's think about the chosen value for the priors more in detail:
+
+The prior for `μ` is a broad Gaussian prior, centered on 178 cm, with
+95% of probability between 178 ± 40 cm.
+
+Why 178 cm? Your author is 178 cm tall. And the range from 138 cm to 218
+cm encompasses a huge range of plausible mean heights for human
+populations. So domain-specific information has gone into this prior.
+Everyone knows something about human height and can set a reasonable and
+vague prior of this kind. But in many regression problems, as you'll see
+later, using prior information is more subtle, because parameters don't
+always have such clear physical meaning.
+
+Whatever the prior, it's a very good idea to plot your priors, so you
+have a sense of the assumption they build into the model.
 
 **Plot the mu prior (mean)**
 
 ```{r}
-#| label: plot-mean-prior-a
+#| label: fig-mean-prior-a
+#| fig-cap: "Plot of the chosen mean prior: base R version"
 
-## R code 4.12
+## R code 4.12 ###############################
 curve(dnorm(x, 178, 20), from = 100, to = 250)
 ```
 
+You can see that the golem is assuming that the average height (not each
+individual height) is almost certainly between 140 cm and 220 cm. So
+this prior carries a little information, but not a lot.
+
 **Plot the sigma prior (standard deviation)**
 
-```{r}
-#| label: plot-sd-prior-a
+A standard deviation like `σ` must be positive, so bounding it at zero
+makes sense. How should we pick the upper bound? In this case, a
+standard deviation of 50 cm would imply that 95% of individual heights
+lie within 100 cm of the average height. That's a very large range.
 
-## R code 4.13
+```{r}
+#| label: fig-sd-prior-a
+#| fig-cap: "Plot the chosen prior for the standard deviation: base R version"
+
+## R code 4.13 ###########################
 curve(dunif(x, 0, 50), from = -10, to = 60)
 ```
 
-#### 4.3.2.2a Prior predictive simulation
+**Prior predictive simulation**
 
 > Once you've chosen priors for *h, μ*, and *σ*, these imply a joint
 > prior distribution of individual heights. By simulating from this
 > distribution, you can see what your choices imply about observable
 > height. This helps you diagnose bad choices.
 
-**Simulate heights by sampling from the prior**
+Okay, so how to do this? You can quickly simulate heights by sampling
+from the prior, like you sampled from the posterior back in
+@sec-sampling-the-imaginary. Remember, every posterior is also
+potentially a prior for a subsequent analysis, so you can process priors
+just like posteriors.
 
 ```{r}
-#| label: prior-predictive-sim-a
+#| label: fig-prior-predictive-sim-a
+#| fig-cap: "Simulate heights by sampling from the prior: rethinking version"
 
-## R code 4.14
+set.seed(4) # to make example reproducible
+## R code 4.14 #######################################
 sample_mu_a <- rnorm(1e4, 178, 20)
 sample_sigma_a <- runif(1e4, 0, 50)
 prior_h_a <- rnorm(1e4, sample_mu_a, sample_sigma_a)
-rethinking::dens(prior_h_a)
+rethinking::dens(prior_h_a, norm.comp = TRUE)
 ```
 
-Playing around with different priors coming from scientific background
-knowledge about heights of adults:
+> It displays a vaguely bell-shaped density with thick tails. It is the
+> expected distribution of heights, averaged over the prior. Notice that
+> the prior probability distribution of height is not itself Gaussian.
+> This is okay. The distribution you see is not an empirical
+> expectation, but rather the distribution of relative plausibilities of
+> different heights, before seeing the data.
 
-```{r}
-#| label: prior2-predictive-sim-a
-
-## R code 4.14
-sample_mu2_a <- rnorm(1e4, 170, 20)
-sample_sigma2_a <- runif(1e4, 0, 35)
-prior2_h_a <- rnorm(1e4, sample_mu2_a, sample_sigma2_a)
-rethinking::dens(prior2_h_a)
-```
+This comment is strange for me as in my point of view the distribution
+*is* Gaussian. It is true that the tails are (a little bit?) thicker
+than in the standard Gaussian distribution. But in my view
+@fig-prior-predictive-sim-a is more Gaussian than @fig-dist-heights-a.
+OK, in @fig-dist-heights-a we have just `r nrow(d2_a)` data and in
+@fig-prior-predictive-sim-a we sampled 10,000 times. But this is not a
+counter argument for @fig-prior-predictive-sim-a not being a a bell
+shaped distribution.
 
 **Simulate heights from priors with large sd**
 
-> Priors with ... large standard deviations are quite common in Bayesian
-> models, but they are hardly ever sensible.
+Prior predictive simulation is very useful for assigning sensible
+priors, because it can be quite hard to anticipate how priors influence
+the observable variables. As an example, consider a much flatter and
+less informative prior for `μ`, like $μ \sim Normal(178, 100)$. Priors
+with such large standard deviations are quite common in Bayesian models,
+but they are hardly ever sensible.
 
 ```{r}
-#| label: plot-predictive-sim2-a
+#| label: fig-prior-predictive-sim2-a
+#| fig-cap: "Simulate heights from priors with a large standard deviation: rethinking version"
 
-sample_mu3_a <- rnorm(1e4, 178, 100)
-prior_h3_a <- rnorm(1e4, sample_mu3_a, sample_sigma_a)
-rethinking::dens(prior_h3_a)
+set.seed(4) # to make example reproducible
+## R code 4.15 ############################
+sample_mu2_a <- rnorm(1e4, 178, 100)
+prior_h2_a <- rnorm(1e4, sample_mu2_a, sample_sigma_a)
+rethinking::dens(prior_h2_a)
 ```
 
-#### 4.3.2.3a Personal comment
+The results of @fig-prior-predictive-sim2-a contradicts our scientific
+knowledge --- but also our common sense --- about possible height values
+of humans. Now the model, before seeing the data, expects people to have
+negative height. It also expects some giants. One of the tallest people
+in recorded history, [Robert Pershing
+Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) (1918--1940) stood
+272 cm tall. In our prior predictive simulation many people are taller
+than this.
 
-Both simulation show unsensitive data with negative height to the left
-and gigantic humans in comparison to the tallest person --- [Robert
-Pershing Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow)
-(1918--1940) --- ever measured (272cm).
+Does this matter? In this case, we have so much data that the silly
+prior is harmless. But that won't always be the case. There are plenty
+of inference problems for which the data alone are not sufficient, no
+matter how numerous. Bayes lets us proceed in these cases. But only if
+we use our scientific knowledge to construct sensible priors. Using
+scientific knowledge to build priors is not cheating. The important
+thing is that your prior not be based on the values in the data, but
+only on what you know about the data before you see it.
 
-So what? Are the priors chosen wrongly? Or does these impossibilities
-not matter?
+#### Tidyverse
 
-> Does this matter? In this case, we have so much data that the silly
-> prior is harmless. But that won't always be the case. There are plenty
-> of inference problems for which the data alone are not sufficient, no
-> matter how numerous. Bayes lets us proceed in these cases. But only if
-> **we use our scientific knowledge to construct sensible priors**.
-> Using scientific knowledge to build priors is not cheating. The
-> important thing is that your prior not be based on the values in the
-> data, but only on what you know about the data before you see it.
-> (emphasis is mine)
+The plot of the heights distribution compared with the standard Gaussian
+distribution is missing in Kurz's version. I added this plot by using
+the last example of [How to Plot a Normal Distribution in
+R](https://www.statology.org/plot-normal-distribution-r/).
 
-### 4.3.3a Grid approximation of the posterior distribution
+```{r}
+#| label: fig-dist-heights-b
+#| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution: tidyverse version"
+#| attr-source: '#lst-fig-dist-heights-b lst-cap="Plot the distribution of the heights of adults: tidyverse version"'
 
-> mapping out the posterior distribution through brute force
-> calculations.
+p0 <- 
+    d2_b |> 
+    ggplot(aes(height)) +
+    geom_density() +
+
+    stat_function(
+        fun = dnorm,
+        args = with(d2_b, c(mean = mean(height), sd = sd(height)))
+        ) +
+    scale_x_continuous("Height in cm")
+
+p0
+```
+
+Here is the shape for the prior $μ \sim Normal(178, 20)$.
+
+```{r}
+#| label: fig-mean-prior-b
+#| fig-cap: "Plot of the chosen mean prior: tidyverse version"
+#| attr-source: '#lst-fig-mean-prior-b lst-cap="Plot of the chosen mean prior: tidyverse version"'
+
+p1 <-
+  tibble(x = seq(from = 100, to = 250, by = .1)) %>% 
+    
+  ggplot(aes(x = x, y = dnorm(x, mean = 178, sd = 20))) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(from = 100, to = 250, by = 75)) +
+  labs(title = "mu ~ dnorm(178, 20)",
+       y = "density")
+
+p1
+```
+
+And here's the ggplot2 code for our prior for `σ`, a uniform
+distribution with a minimum value of 0 and a maximum value of 50. We
+don't really need the `y`-axis when looking at the shapes of a density,
+so we'll just remove it with `scale_y_continuous()`.
+
+```{r}
+#| label: fig-sd-prior-b
+#| fig-cap: "Plot the chosen prior for the standard deviation: tidyverse version"
+
+p2 <-
+  tibble(x = seq(from = -10, to = 60, by = .1)) %>%
+  
+  ggplot(aes(x = x, y = dunif(x, min = 0, max = 50))) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0, 50)) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  ggtitle("sigma ~ dunif(0, 50)")
+
+p2
+```
+
+We can simulate from both priors at once to get a prior probability
+distribution of `height`.
+
+```{r}
+#| label: fig-prior-predictive-sim-b
+#| fig-cap: "Simulate heights by sampling from the prior: tidyverse version"
+
+n <- 1e4
+set.seed(4)
+
+sim <-
+  tibble(sample_mu_b    = rnorm(n, mean = 178, sd  = 20),
+         sample_sigma_b = runif(n, min = 0, max = 50)) %>% 
+  mutate(height = rnorm(n, mean = sample_mu_b, sd = sample_sigma_b))
+  
+p3 <- sim %>% 
+  ggplot(aes(x = height)) +
+  geom_density(fill = "deepskyblue") +
+  scale_x_continuous(breaks = c(0, 73, 178, 283)) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  ggtitle("height ~ dnorm(mu, sigma)") +
+  theme(panel.grid = element_blank())
+
+p3
+```
+
+If you look at the `x`-axis breaks on the plot in McElreath's lower left
+panel in Figure 4.3, you'll notice they're intentional. To compute the
+mean and 3 standard deviations above and below, you might do this.
+
+```{r}
+#| label: compute-mean-3sd-b
+sim %>% 
+  summarise(ll   = mean(height) - sd(height) * 3,
+            mean = mean(height),
+            ul   = mean(height) + sd(height) * 3) %>% 
+  mutate_all(round, digits = 1)
+```
+
+Here's the work to make the lower right panel of Figure 4.3.
+
+```{r}
+#| label: fig-reproduce-4.3-low-right
+#| fig-cap: "Reproduce lower right panels of Figure 4.3"
+
+
+# simulate
+set.seed(4)
+
+sim <-
+  tibble(sample_mu_b    = rnorm(n, mean = 178, sd = 100),
+         sample_sigma_b = runif(n, min = 0, max = 50)) %>% 
+  mutate(height = rnorm(n, mean = sample_mu_b, sd = sample_sigma_b))
+
+# compute the values we'll use to break on our x axis
+breaks <-
+  c(mean(sim$height) - 3 * sd(sim$height), 0, mean(sim$height), mean(sim$height) + 3 * sd(sim$height)) %>% 
+  round(digits = 0)
+
+# this is just for aesthetics
+text <-
+  tibble(height = 272 - 25,
+         y      = .0013,
+         label  = "tallest man",
+         angle  = 90)
+
+# plot
+p4 <-
+  sim %>% 
+  ggplot(aes(x = height)) +
+  geom_density(fill = "deepskyblue", color = "black") +
+  geom_vline(xintercept = 0, color = "black") +
+  geom_vline(xintercept = 272, color = "black", linetype = 3) +
+  geom_text(data = text,
+            aes(y = y, label = label, angle = angle),
+            color = "black") +
+  scale_x_continuous(breaks = breaks) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  ggtitle("height ~ dnorm(mu, sigma)\nmu ~ dnorm(178, 100)") +
+  theme(panel.grid = element_blank())
+
+p4
+```
+
+Let's combine the four to make our version of McElreath's Figure 4.3.
+
+```{r}
+#| label: fig-reproduce-3.4
+#| fig-cap: "Reproduction of Figure 3.4"
+
+library(patchwork)
+(p1 + xlab("mu") | p2 + xlab("sigma")) / (p3 | p4)
+```
+
+On page 84, McElreath said his prior simulation indicated 4% of the
+heights would be below zero. He also drew the break down compared to the
+tallest man on record, [Robert Pershing
+Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) (1918--1940).
+
+```{r}
+#| label: calc-breaks-b
+
+sim %>% 
+  count(height < 0) %>% 
+  mutate(percent = 100 * n / sum(n))
+
+sim %>% 
+  count(height < 272) %>% 
+  mutate(percent = 100 * n / sum(n))
+```
+
+### Grid approximation of the posterior distribution
+
+#### Original
+
+We are going to map out the posterior distribution through brute force
+calculations.
 
 This is not recommended because it is
 
 -   laborious and computationally expensive
 -   usually so impractical as to be essentially impossible.
 
+Therefor the grid approximation technique has limited relevance. Later
+on we will use the quadratic approximation with `rethinking::quap()`.
+
 ```{r}
 #| label: grid-approx-posterior-a
 
-## R code 4.16
+## R code 4.16 ##################################
 
-# establish range of μ and σ values, respectively, to calculate over # as well as how many points to calculate in-between. 
-mu.list <- seq(from = 150, to = 160, length.out = 100)
-sigma.list <- seq(from = 7, to = 9, length.out = 100)
+# establish range of μ and σ values, respectively, to calculate over 
+# as well as how many points to calculate in-between. 
+mu.list_a <- seq(from = 150, to = 160, length.out = 100)
+sigma.list_a <- seq(from = 7, to = 9, length.out = 100)
 
 # expands μ & σ values into a matrix of all of the combinations
-post <- expand.grid(mu = mu.list, sigma = sigma.list)
+post_a <- expand.grid(mu_a = mu.list_a, sigma_a = sigma.list_a)
 
 # compute the log-likelihood at each combination of μ and σ
-post$LL <- sapply(1:nrow(post), function(i) {
+post_a$LL <- sapply(1:nrow(post_a), function(i) {
   sum(
-    dnorm(d2_a$height, post$mu[i], post$sigma[i], log = TRUE)
+    dnorm(d2_a$height, post_a$mu[i], post_a$sigma[i], log = TRUE)
   )
 })
 
 # multiply the prior by the likelihood
 # as the priors are on the log scale adding = multiplying
-post$prod <- post$LL + dnorm(post$mu, 178, 20, TRUE) +
-  dunif(post$sigma, 0, 50, TRUE)
+post_a$prod <- post_a$LL + dnorm(post_a$mu_a, 178, 20, TRUE) +
+  dunif(post_a$sigma_a, 0, 50, TRUE)
 
 # getting back on the probability scale without rounding error 
-post$prob <- exp(post$prod - max(post$prod))
+post_a$prob <- exp(post_a$prod - max(post_a$prod))
 
 ```
 
@@ -361,95 +758,255 @@ post$prob <- exp(post$prod - max(post$prod))
 **Plot contour lines**
 
 ```{r}
-#| label: contour-plot-a
+#| label: fig-contour-plot-a
+#| fig-cap: "Draw a contour plot: rethinking version"
 
-## R code 4.17
-rethinking::contour_xyz(post$mu, post$sigma, post$prob)
+## R code 4.17 ##################################
+rethinking::contour_xyz(post_a$mu_a, post_a$sigma_a, post_a$prob)
 
 ```
+
+You can inspect this posterior distribution, now residing in
+`post_a$prob`, using a variety of plotting commands.
 
 **Plot heat map**
 
 ```{r}
-#| label: plot-heat-map-a
+#| label: fig-heat-map-a
+#| fig-cap: "Draw a heat map: rethinking version"
 
-## R code 4.18
-rethinking::image_xyz(post$mu, post$sigma, post$prob)
+## R code 4.18 ##################################
+rethinking::image_xyz(post_a$mu_a, post_a$sigma_a, post_a$prob)
 
 ```
 
-### 4.3.4a Sampling from the posterior
+#### Tidyverse
+
+With grid approximation we are going to use the brute force method for
+the calculation of the posterior distribution. This technique has
+limited relevance. Later on we will use the quadratic approximation with
+`brms::brm()`.
+
+It is the same technique we have use in
+@sec-sampling-from-a-grid-approximate-posterior respectively in the
+tidyverse version in @sec-grid-approximation-b. As there is no
+conceptually new information to learn, I am not going into the details
+of the following code. (It combines several code chunk from Kurz's
+version.) But I am going to foreshadow the most important differences in
+the tidyverse approach of the grid approximation technique:
+
+Instead of `base::grid_expand()` we will use `tidyr::crossing()` Instead
+of `base::sapply()` we will use `purr::map2()`
+
+The produced tibble contains data frames in its cells, so that we have
+to use the `tidyr::unnest()` function to expand the list-column
+containing data frames into rows and columns.
+
+Referring to the plots:
+
+-   Instead of `rethinking::contour_xyz()` we will use
+    `ggplot2::geom_contour()`
+-   Instead of `rethinking::image_xyz()` we will use
+    `ggplot2::geom_raster()`
 
 ```{r}
-#| label: posterior-sample-a
+#| label: grid-approx-posterior-b
+#| attr-source: '#lst-grid-approx-posterior-b lst-cap="Grid Approximation of the posterior distribution: tidyverse version"'
 
-## R code 4.19
+n <- 200
 
-# randomly sample row numbers in post 
-# in proportion to the values in post$prob. 
-sample.rows <- sample(1:nrow(post),
+d_grid_b <-
+  # we'll accomplish with `tidyr::crossing()` what McElreath did with base R `expand.grid()`
+  crossing(mu_b    = seq(from = 140, to = 160, length.out = n),
+           sigma_b = seq(from = 4, to = 9, length.out = n))
+
+glimpse(d_grid_b)
+
+grid_function <- function(mu, sigma) {
+  
+  dnorm(d2_b$height, mean = mu, sd = sigma, log = TRUE) %>% 
+    sum()
+  
+}
+
+d_grid2_b <-
+  d_grid_b %>% 
+  mutate(log_likelihood_b = map2(mu_b, sigma_b, grid_function)) %>%
+  unnest(log_likelihood_b) %>% 
+  mutate(prior_mu_b    = dnorm(mu_b, mean = 178, sd = 20, log = T),
+         prior_sigma_b = dunif(sigma_b, min = 0, max = 50, log = T)) %>% 
+  mutate(product_b = log_likelihood_b + prior_mu_b + prior_sigma_b) %>% 
+  mutate(probability_b = exp(product_b - max(product_b)))
+  
+head(d_grid2_b)
+```
+
+```{r}
+#| label: fig-contour-b
+#| fig-cap: "Draw 2D contours of a 3D surface"
+
+d_grid2_b %>% 
+  ggplot(aes(x = mu_b, y = sigma_b, z = probability_b)) + 
+  geom_contour() +
+  labs(x = expression(mu),
+       y = expression(sigma)) +
+  coord_cartesian(xlim = range(d_grid2_b$mu_b),
+                  ylim = range(d_grid2_b$sigma_b)) +
+  theme(panel.grid = element_blank())
+
+```
+
+```{r}
+#| label: fig-heatmap-b
+#| fig-cap: "Draw heat map"
+
+d_grid2_b %>% 
+  ggplot(aes(x = mu_b, y = sigma_b, fill = probability_b)) + 
+  geom_raster(interpolate = TRUE) +
+  scale_fill_viridis_c(option = "B") +
+  labs(x = expression(mu),
+       y = expression(sigma)) +
+  theme(panel.grid = element_blank())
+```
+
+### Sampling from the posterior
+
+#### Original
+
+To study this posterior distribution in more detail, again I'll push the
+flexible approach of sampling parameter values from it. This works just
+like it did in @sec-sampling-to-summarize, when you sampled values of
+`p` from the posterior distribution for the globe tossing example. The
+only new trick is that since there are two parameters, and we want to
+sample combinations of them, we first randomly sample row numbers in
+post in proportion to the values in \`post_a\$prob´. Then we pull out
+the parameter values on those randomly sampled rows.
+
+```{r}
+#| label: fig-posterior-sample-a
+#| fig-cap: "Samples from the posterior distribution for the heights data. The density of points is highest in the center, reflecting the most plausible combinations of μ and σ. There are many more ways for these parameter values to produce the data, conditional on the model. (rethinking version)"
+
+## R code 4.19 ###########################
+
+# randomly sample row numbers in post_a 
+# in proportion to the values in post_a$prob. 
+sample.rows <- sample(1:nrow(post_a),
   size = 1e4, replace = TRUE,
-  prob = post$prob
+  prob = post_a$prob
 )
 
 # pull out the parameter values
-sample.mu4_a <- post$mu[sample.rows]
-sample.sigma4_a <- post$sigma[sample.rows]
+sample.mu_a <- post_a$mu[sample.rows]
+sample.sigma_a <- post_a$sigma[sample.rows]
 
-## R code 4.20
-plot(sample.mu4_a, sample.sigma4_a, cex = 0.8, pch = 21, col = rethinking::col.alpha(rethinking:::rangi2, 0.1))
+## R code 4.20 ###########################
+plot(sample.mu_a, sample.sigma_a, cex = 0.8, pch = 21, col = rethinking::col.alpha(rethinking:::rangi2, 0.1))
 
 ```
+
+The function `col.alpha()` is part of the {**rethinking**} R package.
+All it does is make colors transparent, which helps the plot in FIGURE
+4.4 (here: @fig-posterior-sample-a) more easily show density, where
+samples overlap. Adjust the plot to your tastes by playing around with
+`cex` (character expansion, the size of the points), `pch` (plot
+character), and the 0.1 transparency value.
 
 **Marginal Posterior Density**
 
-```{r}
-#| label: marg-post-density-a
+Now that you have these samples, you can describe the distribution of
+confidence in each combination of `μ` and `σ` by summarizing the
+samples. Think of them like data and describe them, just like in
+@sec-sampling-to-summarize. For example, to characterize the shapes of
+the marginal posterior densities of `μ` and `σ`, all we need to do is:
 
-## R code 4.21
-rethinking::dens(sample.mu4_a)
-rethinking::dens(sample.sigma4_a)
+```{r}
+#| label: fig-marg-post-density-a
+#| fig-cap: "Shapes of the marginal posterior densities of μ and σ: rethinking version"
+
+## R code 4.21 #########################
+rethinking::dens(sample.mu_a)
+rethinking::dens(sample.sigma_a)
 
 ```
+
+The jargon "marginal" here means "averaging over the other parameters."
+Execute the above code and inspect the plots. These densities are very
+close to being normal distributions. And this is quite typical. As
+sample size increases, posterior densities approach the normal
+distribution. If you look closely, though, you'll notice that the
+density for σ has a longer right-hand tail. I'll exaggerate this
+tendency a bit later, to show you that this condition is very common for
+standard deviation parameters.
 
 **Posterior Compatibility Intervals (PIs)**
 
+To summarize the widths of these densities with posterior compatibility
+intervals we use:
+
 ```{r}
 #| label: post-comp-intervals-a
+#| attr-source: '#lst-post-comp-intervals-a lst-cap="Posterior Compatibility Intervals (PIs): rethinking version"'
 
-## R code 4.22
-rethinking::PI(sample.mu4_a)
-rethinking::PI(sample.sigma4_a)
+## R code 4.22 ####################
+rethinking::PI(sample.mu_a)
+rethinking::PI(sample.sigma_a)
 ```
 
-#### 4.3.4.1a Sample Size & Sigma Posterior
+Since these samples are just vectors of numbers, you can compute any
+statistic from them that you could from ordinary data: `mean`, `median`,
+or `quantile`, for example.
+
+**Sample size and the normality of sigmas posterior**
+
+Before moving on to using quadratic approximation `rethinking::quap()`
+as shortcut to all of this inference, it is worth repeating the analysis
+of the height data above, but now with only a fraction of the original
+data. The reason to do this is to demonstrate that, in principle, the
+posterior is not always so Gaussian in shape. There's no trouble with
+the mean, `μ`. For a Gaussian likelihood and a Gaussian prior on `μ`,
+the posterior distribution is always Gaussian as well, regardless of
+sample size. It is the standard deviation `σ` that causes problems. So
+if you care about `σ`---often people do not---you do need to be careful
+of abusing the quadratic approximation.
+
+The deep reasons for the posterior of `σ` tending to have a long
+right-hand tail are complex. But a useful way to conceive of the problem
+is that variances must be positive. As a result, there must be more
+uncertainty about how big the variance (or standard deviation) is than
+about how small it is. For example, if the variance is estimated to be
+near zero, then you know for sure that it can't be much smaller. But it
+could be a lot bigger.
+
+Let's quickly analyze only 20 of the heights from the height data to
+reveal this issue. To sample 20 random heights from the original list:
 
 ```{r}
-#| label: sample-only-20
+#| label: fig-sample-only-20-a
+#| fig-cap: "Sample 20 heights: rethinking version"
 
-## R code 4.23
+## R code 4.23 ######################################
 d3_a <- sample(d2_a$height, size = 20)
 
-## R code 4.24
-mu.list <- seq(from = 150, to = 170, length.out = 200)
-sigma.list <- seq(from = 4, to = 20, length.out = 200)
-post2 <- expand.grid(mu = mu.list, sigma = sigma.list)
-post2$LL <- sapply(1:nrow(post2), function(i) {
+## R code 4.24 ######################################
+mu2_a.list <- seq(from = 150, to = 170, length.out = 200)
+sigma2_a.list <- seq(from = 4, to = 20, length.out = 200)
+post2_a <- expand.grid(mu = mu2_a.list, sigma = sigma2_a.list)
+post2_a$LL <- sapply(1:nrow(post2_a), function(i) {
   sum(dnorm(d3_a,
-    mean = post2$mu[i], sd = post2$sigma[i],
+    mean = post2_a$mu[i], sd = post2_a$sigma[i],
     log = TRUE
   ))
 })
-post2$prod <- post2$LL + dnorm(post2$mu, 178, 20, TRUE) +
-  dunif(post2$sigma, 0, 50, TRUE)
-post2$prob <- exp(post2$prod - max(post2$prod))
-sample2.rows <- sample(1:nrow(post2),
+post2_a$prod <- post2_a$LL + dnorm(post2_a$mu, 178, 20, TRUE) +
+  dunif(post2_a$sigma, 0, 50, TRUE)
+post2_a$prob <- exp(post2_a$prod - max(post2_a$prod))
+sample2_a.rows <- sample(1:nrow(post2_a),
   size = 1e4, replace = TRUE,
-  prob = post2$prob
+  prob = post2_a$prob
 )
-sample2.mu <- post2$mu[sample2.rows]
-sample2.sigma <- post2$sigma[sample2.rows]
-plot(sample2.mu, sample2.sigma,
+sample2_a.mu <- post2_a$mu[sample2_a.rows]
+sample2_a.sigma <- post2_a$sigma[sample2_a.rows]
+plot(sample2_a.mu, sample2_a.sigma,
   cex = 0.5,
   col = rethinking::col.alpha(rethinking:::rangi2, 0.1),
   xlab = "mu", ylab = "sigma", pch = 16
@@ -457,17 +1014,100 @@ plot(sample2.mu, sample2.sigma,
 
 ```
 
+you'll see another scatter plot of the samples from the posterior
+density, but this time you'll notice a distinctly longer tail at the top
+of the cloud of points.
+
 **Marginal Posterior Density with only 20 rows**
 
+You should also inspect the marginal posterior density for σ, averaging
+over μ, produced with:
+
 ```{r}
-#| label: marg-post-density-a2
+#| label: fig-marg-post-density-a2
+#| fig-cap: "Marginal posterior density for σ, averaging over μ: rethinking version"
 
 ## R code 4.25
-rethinking::dens(sample2.sigma, norm.comp = TRUE)
+rethinking::dens(sample2_a.sigma, norm.comp = TRUE)
 
 ```
 
-### 4.3.5a Using `quap()`
+#### Tidyverse
+
+We can use `dplyr::sample_n()` to sample rows, with replacement, from
+`d_grid2_b`.
+
+```{r}
+#| label: fig-posterior-sample-b
+#| fig-cap: "Samples from the posterior distribution for the heights data. The density of points is highest in the center, reflecting the most plausible combinations of μ and σ. There are many more ways for these parameter values to produce the data, conditional on the model. (tidyverse version)"
+
+
+set.seed(4)
+
+d_grid_samples_b <- 
+  d_grid2_b %>% 
+  sample_n(size = 1e4, replace = T, weight = probability_b)
+
+d_grid_samples_b %>% 
+  ggplot(aes(x = mu_b, y = sigma_b)) + 
+  geom_point(size = .9, alpha = 1/15) +
+  scale_fill_viridis_c() +
+  labs(x = expression(mu[samples]),
+       y = expression(sigma[samples])) +
+  theme(panel.grid = element_blank())
+```
+
+We can use `tidyr::pivot_longer()` and then `ggplot2::facet_wrap()` to
+plot the densities for both `mu` and `sigma` at once.
+
+```{r}
+#| label: fig-densities-mu-sigma
+#| fig-cap: "Shapes of the marginal posterior densities of μ and σ: tidyverse version"
+
+d_grid_samples_b %>% 
+  pivot_longer(mu_b:sigma_b) %>% 
+
+  ggplot(aes(x = value)) + 
+  geom_density(fill = "deepskyblue", color = "black") +
+  scale_y_continuous(NULL, breaks = NULL) +
+  xlab(NULL) +
+  theme(panel.grid = element_blank()) +
+  facet_wrap(~ name, scales = "free", labeller = label_parsed)
+```
+
+We'll use the {**tidybayes**} package to compute their posterior modes
+and 95% HDIs.
+
+```{r}
+#| label: post-mode-hdi95-b
+
+d_grid_samples_b %>% 
+  pivot_longer(mu_b:sigma_b) %>% 
+  group_by(name) %>% 
+  tidybayes::mode_hdi(value) 
+```
+
+Let's say you wanted their posterior medians and 50% quantile-based
+intervals, instead. Just switch out the last line for
+`tidybayes::median_qi(value, .width = .5)`.
+
+```{r}
+#| label: post-median-qi90-b
+
+d_grid_samples_b %>% 
+  pivot_longer(mu_b:sigma_b) %>% 
+  group_by(name) %>% 
+  tidybayes::median_qi(value, .width = .5)
+```
+
+**Sample size and the normality of σ's posterior**
+
+I will skip this part as there is nothing conceptually new in this
+section.
+
+### Finding the posterior distribution with `quap()` resp. `brms()`
+
+#### Original
 
 > To build the **quadratic approximation**, we'll use quap, a command in
 > the `rethinking` package. The `quap` function works by using the model
@@ -480,34 +1120,42 @@ rethinking::dens(sample2.sigma, norm.comp = TRUE)
 > quadratic curvature at the MAP to produce an approximation of the
 > posterior distribution. (parenthesis and emphasis are mine)
 
-1.  We start with the Howell data frame for adults `d2_a` (age \>= 18).
-    We will place the R code equivalents into an `alist` (4.27).
-2.  Then we fit the model to the data in the data frame `d2_a` (4.28) to
-    `m4.1`.
-3.  Now we can have a look at the posterior distribution (4.29).
+::: callout-note
+The procedure used by `rethinking:quap()` is very similar to what many
+non-Bayesian procedures do, just without any priors.
+:::
+
+1.  We start with the Howell1 data frame for adults `d2_a` (age \>= 18).
+    We will place the R code equivalents into an `alist()` We are going
+    to use the @def-height-priors. (Code 4.27).
+2.  Then we fit the model with `rethinking::quap()` to the data in the
+    data frame `d2_a` (Code 4.28) to `m4.1`.
+3.  Now we can have a look with `rethinking::precis()` at the posterior
+    distribution (Code 4.29).
 
 ```{r}
-#| label: using-quap
+#| label: post-dist-quap-m4.1
+#| att-source: '#lst-post-dist-quap-m4.1 lst-cap="Finding the posterior distribution with rethinking::quap()"'
 
-## R code 4.27
+## R code 4.27 ######################
 flist <- alist(
   height ~ dnorm(mu, sigma),
   mu ~ dnorm(178, 20),
   sigma ~ dunif(0, 50)
 )
 
-## R code 4.28
+## R code 4.28 ######################
 m4.1 <- rethinking::quap(flist, data = d2_a)
 
-## R code 4.29
+## R code 4.29 ######################
 rethinking::precis(m4.1)
 
 ```
 
 > These numbers provide Gaussian approximations for each parameter's
 > *marginal* distribution. This means the plausibility of each value of
-> μ, after averaging over the plausibilities of each value of *σ*, is
-> given by a Gaussian distribution with mean 154.6 and standard
+> `_μ_`, after averaging over the plausibilities of each value of `_σ_`,
+> is given by a Gaussian distribution with mean 154.6 and standard
 > deviation 0.4.
 >
 > The 5.5% and 94.5% quantiles are percentile interval boundaries,
@@ -515,20 +1163,29 @@ rethinking::precis(m4.1)
 > default. It displays a quite wide interval, so it shows a
 > high-probability range of parameter values. If you want another
 > interval, such as the conventional and mindless 95%, you can use
-> `precis(m4.1,prob=0.95)`. But I don't recommend 95% intervals, because
-> readers will have a hard time not viewing them as significance tests.
-> 89 is also a prime number, so if someone asks you to justify it, you
-> can stare at them meaningfully and incant, "Because it is prime."
-> That's no worse justification than the conventional justification for
-> 95%.
+> `precis(m4.1, prob=0.95)`. But I don't recommend 95% intervals,
+> because readers will have a hard time not viewing them as significance
+> tests. 89 is also a prime number, so if someone asks you to justify
+> it, you can stare at them meaningfully and incant, "Because it is
+> prime." That's no worse justification than the conventional
+> justification for 95%.
+
+I encourage you to compare these 89% boundaries to the compatibility
+intervals from the grid approximation in @lst-post-comp-intervals-a
+earlier. You'll find that they are almost identical. When the posterior
+is approximately Gaussian, then this is what you should expect.
+
+**Start values for `rethinking::quap()`**
 
 Mean and standard deviation are good values to start values for hill
-climbing. If you don't specify `quap()` will use a random value.
+climbing. If you don't specify `rethinking::quap()` will use a random
+value.
 
 ```{r}
-#| label: start-values-for-quap
+#| label: start-values-quap
+#| attr-source: '#start-values-quap lst-cap="Define start values for rethinking::quap()"'
 
-## R code 4.30
+## R code 4.30 ######################
 start <- list(
   mu = mean(d2_a$height),
   sigma = sd(d2_a$height)
@@ -539,7 +1196,7 @@ rethinking::precis(m4.1_2)
 ```
 
 ::: callout-note
-## list() and alist()
+###### list() and alist()
 
 Note that the list of start values is a regular `list`, not an `alist`
 like the formula list is. The two functions `alist` and `list` do the
@@ -548,7 +1205,7 @@ They differ in one important respect: `list` evaluates the code you
 embed inside it, while `alist` does not. So when you define a list of
 formulas, you should use `alist`, so the code isn't executed. But when
 you define a list of start values for parameters, you should use `list`,
-so that code like `mean(d2$height)` will be evaluated to a numeric
+so that code like `mean(d2_a$height)` will be evaluated to a numeric
 value.
 :::
 
@@ -556,15 +1213,16 @@ value.
 
 > The priors we used before are very weak, both because they are nearly
 > flat and because there is so much data. So I'll splice in a more
-> informative prior for *μ*, so you can see the effect. All I'm going to
-> do is change the standard deviation of the prior to 0.1, so it's a
+> informative prior for `*μ*`, so you can see the effect. All I'm going
+> to do is change the standard deviation of the prior to 0.1, so it's a
 > very narrow prior. I'll also build the formula right into the call to
 > `quap` this time.
 
 ```{r}
-#| label: smaller-prior
+#| label: post-dist-quap-m4.2
+#| attr-source: '#lst-post-dist-quap-m4.2 lst-cap="Finding the posterior distribution with a narrower prior rethinking::quap()"'
 
-## R code 4.31
+## R code 4.31 ###########################
 m4.2 <- rethinking::quap(
   alist(
     height ~ dnorm(mu, sigma),
@@ -577,18 +1235,143 @@ rethinking::precis(m4.2)
 
 ```
 
-> Notice that the estimate for *μ* has hardly moved off the prior. The
+> Notice that the estimate for `*μ*` has hardly moved off the prior. The
 > prior was very concentrated around 178. So this is not surprising. But
-> also notice that the estimate for *σ* has changed quite a lot, even
+> also notice that the estimate for `*σ*` has changed quite a lot, even
 > though we didn't change its prior at all. Once the golem is certain
 > that the mean is near 178---as the prior insists---then the golem has
-> to estimate *σ* conditional on that fact. This results in a different
-> posterior for σ, even though all we changed is prior information about
-> the other parameter.
+> to estimate `*σ*` conditional on that fact. This results in a
+> different posterior for `*σ*`, even though all we changed is prior
+> information about the other parameter.
 
 ::: callout-caution
-## Change of μ?
+###### `μ` has hardly moved off the prior
 
-I do not understand the hint, that "*μ* has hardly moved off the prior",
-because for me *μ* has changed considerably from 154 to 177.
+At first I did not understand "that the estimate for `*μ*` has hardly
+moved off the prior". I thought this assertion refers to the value of
+`*μ*` in both calculation. *μ* has changed considerably from 154.61 to
+177.86 and under that assumption the above quote does not make sense.
+
+But in contrast to my wrong assumption the assertion refers to the
+difference between the chosen prior (178) and the resulting value of
+`*μ*` (177.86).
 :::
+
+#### Tidyverse
+
+> In the text, McElreath indexed his models with names like `m4.1`. I
+> will largely follow that convention, but will replace the *m* with a
+> *b* to stand for the **`brms`** package.
+
+Here's how to fit the first model for this chapter.
+
+```{r}
+#| label: post-dist-brms-b4.1
+#| att-source: '#lst-post-dist-brms-b4.1 lst-cap="Finding the posterior distribution with brms::brm()"'
+
+b4.1 <- 
+  brms::brm(data = d2_b, 
+      family = gaussian,
+      height ~ 1,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.01")
+
+brms:::plot.brmsfit(b4.1)
+```
+
+If you want detailed diagnostics for the HMC chains, call
+`brms::launch_shinystan(b4.1)`. That\'ll keep you busy for a while. See the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan) for more information.
+
+::: callout-caution
+###### Launch of shinystan turned off
+
+I turned off the evaluation of the following chunk. It took some time
+and the it referred to a local page `http://127.0.0.1:6367/`\`where I
+could inspect many details of the model. But this is at the moment too
+complex to me: I do not understand all the parameters and the many
+configurable options programmed with a {**shiny**) interface.
+:::
+
+```{r}
+#| label: detailled-diganostic-chains-brms-b4.1
+#| eval: false
+
+brms::launch_shinystan(b4.1)
+
+```
+
+```{r}
+#| label: print-summary-brms-b4.1
+
+brms:::print.brmsfit(b4.1)
+
+```
+
+```{r}
+#| label: print-stan-like-summary-brms-b4.1
+
+b4.1$fit
+```
+Whereas rethinking defaults to 89% intervals, using `print()` or `summary()` with {**brms**} models defaults to 95% intervals.
+
+::: callout-note
+As I have learned shortly: `print()` or `summary()` are generic functions where one can add new printing methods with new classes. In this case `class(b4.1)` = `r class(b4.1)`. This means I do not need to add `brms::` to secure that I will get the {**brms**} printing or summary method as I didn't load the {**brms**} package. Quite the contrary: Adding `brms::` would result into the message: "Error: 'summary' is not an exported object from 'namespace:brms'".
+
+As I really want to specify explicitly the method these generic functions should use, I need to use the syntax `brms:::print.brmsfit()` or `brms:::summary.brmsfit()` respectively.
+
+In this respect I have to learn more about S3 classes. There are many important web resources about this subject that I have found with the search string "r what is s3 class". Maybe I should start with the [S3 chapter in Advanced R](https://adv-r.hadley.nz/s3.html).
+:::
+
+Unless otherwise specified, Kurz will stick with 95% intervals throughout. To get those 89% intervals or McElreath approach, one could use the `prob` argument within `summary()` or `print()`.
+
+
+```{r}
+#| label: summary-interval-.89-brms-b4.1
+
+brms:::summary.brmsfit(b4.1, prob = .89)
+
+```
+
+Here’s the `brms::brm()` code for the model with the very narrow `_μ_` prior corresponding to the `rethinking::quap()` code in @lst-post-dist-quap-m4.2. 
+
+```{r}
+#| label: fig-post-dist-brms-b4.2
+#| fig-cap: "Finding the posterior distribution with a narrower prior using brms::brm()"
+#| att-source: '#lst-post-dist-brms-b4.2 lst-cap="Finding the posterior distribution with a narrower prior using brms::brm()"'
+
+b4.2 <- 
+  brms::brm(data = d2_b, 
+      family = gaussian,
+      height ~ 1,
+      prior = c(brms::prior(normal(178, 0.1), class = Intercept),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.02")
+
+brms:::plot.brmsfit(b4.2, widths = c(1, 2))
+
+```
+
+
+And here’s the model `summary()`.
+
+```{r}
+#| label: summary-narrow-prior
+
+brms:::summary.brmsfit(b4.2)
+
+```
+
+Subsetting the `summary()` output with `$fixed` provides a convenient way to compare the Intercept summaries between `b4.1` and `b4.2`.
+
+```{r}
+#| label: compare-summaries-b4.1-b4.2
+
+rbind(brms:::summary.brmsfit(b4.1)$fixed,
+      brms:::summary.brmsfit(b4.2)$fixed)
+
+```
