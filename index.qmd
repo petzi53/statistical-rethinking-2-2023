@@ -1,7 +1,7 @@
 # Preface {.unnumbered}
 
 ::: {.callout-note style="color: blue;"}
-## This is work in progress: Included 70 of 555 code chunks $\approx$ 12,7% of the book content.
+## This is work in progress: Included 77 of 555 code chunks $\approx$ 13,5% of the book content.
 :::
 
 ## Content and Goals of this Book {.unnumbered}
@@ -379,9 +379,9 @@ I have also found two GitHub repos with solutions:
     Wolf](https://github.com/cavaunpeu/statistical-rethinking)
     *(cavaunpeu)*
 
-::: {.callout-caution style="color: orange;"}
-## Caution
+::: callout-caution
+###### Caution
 
 These solutions are written by members of the #RStats community and are
-not authorized by the author.
+not authorized by Richard McElreath, the author of Statistical Rethinking.
 :::

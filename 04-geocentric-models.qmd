@@ -187,8 +187,8 @@ already loaded the package. In our example:
 
 ```{r}
 #| label: loading-data-from-package1_a
-#| attr-source: '#lst-loading-data-from-package1_a lst-cap="Load data `Howell1` from the loaded {**rethinking**} package and assign the data to an object."'
 #| eval: false
+
 
 ## R code 4.7 #######################
 library(rethinking)
@@ -1134,8 +1134,8 @@ non-Bayesian procedures do, just without any priors.
     distribution (Code 4.29).
 
 ```{r}
-#| label: post-dist-quap-m4.1
-#| att-source: '#lst-post-dist-quap-m4.1 lst-cap="Finding the posterior distribution with rethinking::quap()"'
+#| label: post-dist-quap-m4-1-a
+#| attr-source: '#lst-post-dist-quap-m4-1-a lst-cap="Finding the posterior distribution with rethinking::quap()"'
 
 ## R code 4.27 ######################
 flist <- alist(
@@ -1175,7 +1175,7 @@ intervals from the grid approximation in @lst-post-comp-intervals-a
 earlier. You'll find that they are almost identical. When the posterior
 is approximately Gaussian, then this is what you should expect.
 
-**Start values for `rethinking::quap()`**
+##### Start values for `rethinking::quap()` {#sec-start-values-rethinking}
 
 Mean and standard deviation are good values to start values for hill
 climbing. If you don't specify `rethinking::quap()` will use a random
@@ -1283,7 +1283,9 @@ brms:::plot.brmsfit(b4.1)
 ```
 
 If you want detailed diagnostics for the HMC chains, call
-`brms::launch_shinystan(b4.1)`. That\'ll keep you busy for a while. See the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan) for more information.
+`brms::launch_shinystan(b4.1)`. That'll keep you busy for a while. See
+the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan)
+for more information.
 
 ::: callout-caution
 ###### Launch of shinystan turned off
@@ -1315,18 +1317,32 @@ brms:::print.brmsfit(b4.1)
 
 b4.1$fit
 ```
-Whereas rethinking defaults to 89% intervals, using `print()` or `summary()` with {**brms**} models defaults to 95% intervals.
+
+Whereas rethinking defaults to 89% intervals, using `print()` or
+`summary()` with {**brms**} models defaults to 95% intervals.
 
 ::: callout-note
-As I have learned shortly: `print()` or `summary()` are generic functions where one can add new printing methods with new classes. In this case `class(b4.1)` = `r class(b4.1)`. This means I do not need to add `brms::` to secure that I will get the {**brms**} printing or summary method as I didn't load the {**brms**} package. Quite the contrary: Adding `brms::` would result into the message: "Error: 'summary' is not an exported object from 'namespace:brms'".
+As I have learned shortly: `print()` or `summary()` are generic
+functions where one can add new printing methods with new classes. In
+this case `class(b4.1)` = `r class(b4.1)`. This means I do not need to
+add `brms::` to secure that I will get the {**brms**} printing or
+summary method as I didn't load the {**brms**} package. Quite the
+contrary: Adding `brms::` would result into the message: "Error:
+'summary' is not an exported object from 'namespace:brms'".
 
-As I really want to specify explicitly the method these generic functions should use, I need to use the syntax `brms:::print.brmsfit()` or `brms:::summary.brmsfit()` respectively.
+As I really want to specify explicitly the method these generic
+functions should use, I need to use the syntax `brms:::print.brmsfit()`
+or `brms:::summary.brmsfit()` respectively.
 
-In this respect I have to learn more about S3 classes. There are many important web resources about this subject that I have found with the search string "r what is s3 class". Maybe I should start with the [S3 chapter in Advanced R](https://adv-r.hadley.nz/s3.html).
+In this respect I have to learn more about S3 classes. There are many
+important web resources about this subject that I have found with the
+search string "r what is s3 class". Maybe I should start with the [S3
+chapter in Advanced R](https://adv-r.hadley.nz/s3.html).
 :::
 
-Unless otherwise specified, Kurz will stick with 95% intervals throughout. To get those 89% intervals or McElreath approach, one could use the `prob` argument within `summary()` or `print()`.
-
+Unless otherwise specified, Kurz will stick with 95% intervals
+throughout. To get those 89% intervals or McElreath approach, one could
+use the `prob` argument within `summary()` or `print()`.
 
 ```{r}
 #| label: summary-interval-.89-brms-b4.1
@@ -1335,7 +1351,9 @@ brms:::summary.brmsfit(b4.1, prob = .89)
 
 ```
 
-Here’s the `brms::brm()` code for the model with the very narrow `_μ_` prior corresponding to the `rethinking::quap()` code in @lst-post-dist-quap-m4.2. 
+Here's the `brms::brm()` code for the model with the very narrow `_μ_`
+prior corresponding to the `rethinking::quap()` code in
+@lst-post-dist-quap-m4.2.
 
 ```{r}
 #| label: fig-post-dist-brms-b4.2
@@ -1356,8 +1374,7 @@ brms:::plot.brmsfit(b4.2, widths = c(1, 2))
 
 ```
 
-
-And here’s the model `summary()`.
+And here's the model `summary()`.
 
 ```{r}
 #| label: summary-narrow-prior
@@ -1366,7 +1383,8 @@ brms:::summary.brmsfit(b4.2)
 
 ```
 
-Subsetting the `summary()` output with `$fixed` provides a convenient way to compare the Intercept summaries between `b4.1` and `b4.2`.
+Subsetting the `summary()` output with `$fixed` provides a convenient
+way to compare the Intercept summaries between `b4.1` and `b4.2`.
 
 ```{r}
 #| label: compare-summaries-b4.1-b4.2
@@ -1375,3 +1393,343 @@ rbind(brms:::summary.brmsfit(b4.1)$fixed,
       brms:::summary.brmsfit(b4.2)$fixed)
 
 ```
+
+### Sampling from a quap
+
+#### Original
+
+The above explains how to get a quadratic approximation of the
+posterior, using `rethinking::quap()`. But how do we then get samples
+from the quadratic approximate posterior distribution? --- When R
+constructs a quadratic approximation, it calculates not only standard
+deviations for all parameters, but also the covariances among all pairs
+of parameters. Just like a mean and standard deviation (or its square, a
+variance) are sufficient to describe a one-dimensional Gaussian
+distribution, a list of means and a matrix of variances and covariances
+are sufficient to describe a multi-dimensional Gaussian distribution.
+
+```{r}
+#| label: calc-var-cov-m4.1-a
+#| attr-source: '#lst-calc-var-cov-m4.1-a lst-cap="Calculation of the variance-covariance matrix: rethinking version"'
+
+## R code 4.32 ###################
+rethinking::vcov(m4.1)
+```
+
+`vcov()` returns the variance-covariance matrix of the main parameters
+of a fitted model object. In the above {**rethinking**} version is uses
+the class `map2stan` for a fitted Stan model as `m4.1` is of class
+`map`.
+
+::: callout-caution
+###### rethinking::vcov
+
+In @lst-calc-var-cov-m4.1-a I am explicitly using the package
+{**rethinking**} for the `vcov()` function. The same function is also
+available as a base R function with `stats::vcov()`. But this generates
+an error because there is no method known for an object of class `map`
+from the rethinking package. The help file for `stats::vcov()` only says
+that the `vcov` object is an S3 method for classes `lm`, `glm`, `mlm`
+and `aov` but not for `map`.
+
+> Error in UseMethod("vcov") : no applicable method for 'vcov' applied
+> to an object of class "map"
+
+I could have used only `vcov()`. But this only works when the
+{**rethinking**} package is already loaded. In that case R knows because
+of the class of the object which `vcov()` version to use. In this case:
+class of object = `class(m4.1)` `r class(m4.1)`.
+:::
+
+@lst-calc-var-cov-m4.1-a results in a variance-covariance matrix. It is
+the multi-dimensional glue of a quadratic approximation, because it
+tells us how each parameter relates to every other parameter in the
+posterior distribution. A variance-covariance matrix can be factored
+into two elements: (1) a vector of variances for the parameters and (2)
+a correlation matrix that tells us how changes in any parameter lead to
+correlated changes in the others.
+
+```{r}
+#| label: vcov-decomp-m4.1-a
+
+## R code 4.33 #######################
+base::diag(rethinking::vcov(m4.1))      # <1>
+stats::cov2cor(rethinking::vcov(m4.1))  # <2>
+```
+
+1.  `base::diag()` extracts the diagonal of the (variance-covariance)
+    matrix. The two-element vector in the output is the list of
+    variances. If you take the square root of this vector, you get the
+    standard deviations that are shown in `rethinking::precis()` output.
+2.  `stats::cov2cor()` scales a covariance matrix into the corresponding
+    correlation matrix. The two-by-two matrix in the output is this
+    correlation matrix. Each entry shows the correlation, bounded
+    between −1 and +1, for each pair of parameters. The 1's indicate a
+    parameter's correlation with itself. If these values were anything
+    except 1, we would be worried. The other entries are typically
+    closer to zero, and they are very close to zero in this example.
+    This indicates that learning μ tells us nothing about σ and likewise
+    that learning σ tells us nothing about μ. This is typical of simple
+    Gaussian models of this kind. But it is quite rare more generally,
+    as you'll see in later chapters.
+
+Okay, so how do we get samples from this multi-dimensional posterior?
+Now instead of sampling single values from a simple Gaussian
+distribution, we sample vectors of values from a multi-dimensional
+Gaussian distribution.
+
+```{r}
+#| label: extract-samples-m4.1-a
+#| attr-source: '#lst-extract-samples-m4.1-a lst-cap="Extract sample vectors of values from the multi-dimensional Gaussian distribution of m4.1: rethinking version"'
+
+
+## R code 4.34 #######################
+post3_a <- rethinking::extract.samples(m4.1, n = 1e4)
+head(post3_a)
+```
+
+You end up with a data frame, post, with 10,000 (1e4) rows and two
+columns, one column for `_μ_` and one for `_σ_`. Each value is a sample
+from the posterior, so the mean and standard deviation of each column
+will be very close to the MAP values from before. You can confirm this
+by summarizing the samples:
+
+```{r}
+#| label: summary-samples-m4.1-a
+#| attr-source: '#lst-summary-samples-m4.1-a lst-cap="Summary the extracted samples: rethinking version"'
+
+## R code 4.35 ##################
+rethinking::precis(post3_a)
+```
+
+Compare these values to the output from @lst-post-dist-quap-m4-1-a. And
+you can use `plot(post)` to see how much they resemble the samples from
+the grid approximation in FIGURE 4.4 (here @fig-posterior-sample-a).
+These samples also preserve the covariance between `_μ_` and `_σ_`. This
+hardly matters right now, because `_μ_` and `_σ_` don't co-vary at all
+in this model. But once you add a predictor variable to your model,
+covariance will matter a lot.
+
+```{r}
+#| label: fig-posterior-sample-vectors-a
+#| fig-cap: "Samples from the vectors of values from a multi-dimensional Gaussian distribution. The density of points is highest in the center, reflecting the most plausible combinations of μ and σ. It is very similar to @fig-posterior-sample-a (rethinking version)"
+
+base::plot(post3_a)
+```
+
+##### Under the hood with multivariate sampling {#sec-under-the-hood-multivariate-sampling}
+
+The function `rethinking::extract.samples()` is for convenience. It is
+just running a simple simulation of the sort you conducted near the end
+of @sec-sampling-the-imaginary with @lst-sim-pred-samples-a. Here's a
+peak at the motor. The work is done by a multi-dimensional version of
+`stats::rnorm()`, `MASS::mvrnorm()`. The function `stats::rnorm()`
+simulates random Gaussian values, while `MASS::mvrnorm()` simulates
+random vectors of multivariate Gaussian values. Here's how to use it the
+{**MASS**} function to do what `rethinking::extract.samples()` does:
+
+```{r}
+#| label: fig-posterior-sample-vectors-MASS-a
+#| fig-cap: "Extract samples from the vectors of values from a multi-dimensional Gaussian distribution using the {**MASS**} package. It is same calculation as in @fig-posterior-sample-a (rethinking version)"
+
+
+## R code 4.36 ######################
+post4_a <- MASS::mvrnorm(n = 1e4, mu = rethinking::coef(m4.1), 
+                      Sigma = rethinking::vcov(m4.1))
+plot(post4_a)
+```
+
+#### Tidyverse
+
+{**brms**} doesn't seem to have a convenience function that works the
+way `vcov()` does for {**rethinking**}.
+
+```{r}
+#|label: calc-var-cov-m4.1-b
+#|attr-source: '#lst-calc-var-cov-m4.1-b lst-cap="Calculation of vcov(): tidyverse version."'
+
+brms:::vcov.brmsfit(b4.1)
+```
+
+This only returns the first element in the matrix it did for
+{**rethinking**}. That is, it appears `brms::vcov()` only returns the
+variance/covariance matrix for the single-level `_β_` parameters.
+
+::: callout-caution
+###### brms::vcov()
+
+Referring to a similar situation with `rethinking::vcov()` in
+@lst-calc-var-cov-m4.1-a I cannot write `brms::vcov()`, but have to use
+either `brms:::vcov.brmsfit(b4.1)` or just `vcov(b4.1)`. The weird thing
+is that the first time it also works with `brms::vcov()` but only the
+first time!
+:::
+
+However, if you really wanted this information, you could get it after
+putting the Hamilton Monte Carlo (HMC) chains in a data frame. We do
+that with the `brms::as_draws_df()` function:
+
+```{r}
+#| label: put-hmc-into-df-b
+#| attr-source: '#lst-put-hmc-into-df-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
+
+post_b <- brms::as_draws_df(b4.1)
+
+head(post_b)
+```
+
+::: callout-tip
+###### draws object
+
+The functions of the family `as_draws()` transform `brmsfit` objects to
+`draws` objects, a format supported by the {**posterior**} package.
+{brms} currently imports the family of `as_draws()`functions from the
+{**posterior**} package, a tool for working with posterior
+distributions.
+
+@lst-put-hmc-into-df-b produced the {**brms**} version of what McElreath
+achieved with `extract.samples()` in @lst-extract-samples-m4.1-a.
+However, what happened under the hood was different. Whereas rethinking
+used the `mvnorm()` function from the {**MASS**} package, with
+{**brms**} we just extracted the iterations of the HMC chains and put
+them in a data frame.
+:::
+
+Now `select()` the columns containing the draws from the desired
+parameters `b_Intercept` and `sigma` and feed them into `cov()`.
+
+```{r}
+#| label: calc-cov-post-b
+#| attr-source: '#lst-calc-cov-post-b lst-cap="Calculate the vector of variances and correlation matrix for b_Intercept and sigma"'
+
+select(post_b, b_Intercept:sigma) %>% 
+  stats::cov()
+```
+
+@lst-calc-cov-post-b displays "(1) a vector of variances for the
+parameters and (2) a correlation matrix" for them (p. 90). Here are just
+the variances (i.e., the diagonal elements) and the correlation matrix.
+
+```{r}
+#| label: calc-var-post-b
+#| attr-source: '#lst-calc-var-post-b lst-cap="Calculate only variances (the diagonal values)"'
+
+select(post_b, b_Intercept:sigma) %>%
+  stats::cov() %>%
+  base::diag()
+
+```
+
+```{r}
+#| label: calc-corr-matrix-post-b
+#| attr-source: '#lst-calc-corr-matrix-post-b lst-cap="Calculate only crrelation"'
+
+# correlation
+post_b %>%
+  select(b_Intercept, sigma) %>%
+  stats::cor()
+```
+
+```{r}
+#| label: show-data-structure
+
+str(post_b)
+```
+
+The `post_b` object is not just a data frame, but also of class
+`draws_df`, which means it contains three metadata variables ----
+`.chain`, `.iteration`, and `.draw` --- which are often hidden from
+view, but are there in the background when needed. As you'll see, we'll
+make good use of the `.draw` variable in the future. Notice how our post
+data frame also includes a vector named `lp__`. That's the log
+posterior.
+
+For details, see: - The [Log-Posterior (function and
+gradient)](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html#the-log-posterior-function-and-gradient)
+section of the Stan Development Team's (2023) vignette [RStan: the R
+interface to
+Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html)
+and - Stephen Martin's [explanation of the log
+posterior](https://discourse.mc-stan.org/t/basic-question-what-is-lp-in-posterior-samples-of-a-brms-regression/17567/2)
+on the Stan Forums.
+
+::: callout-caution
+###### Summaries of {brms} and {posterior} packages
+
+Kurz claims that `summary()` function doesn't work for {**brms**}
+posterior data frames quite the way `rethinking::precis()` does for
+posterior data frames from the {\*\*rethinking\*} package. But I this
+observation is somewhat misleading.
+
+The posterior data frame `post_b` is not of class `brms`. Let's check
+this:
+
+```{r}
+#| label: class-post_b-b
+
+class(post_b)
+```
+
+The class `draws_df`and `draws` refers to the {**posterior**} and not to
+the {**brms**} package. Remember: In @lst-put-hmc-into-df-b we
+transformed with the function `as_draws_df` the `brms` object into a
+`draws_df` and `draws` object.
+
+Therefore Kurz's claim should be read: The `summary()` function doesn't
+work for {**posterior**} posterior data frames quite the way
+`rethinking::precis()` does for posterior data frames from the
+{**rethinking**} package. Instead of calling `brms:::summary.brmsfit()`
+I will use `posterior:::summary.draws()`.
+
+I wouldn't have noticed this difference if I hadn't mentioned explicitly
+the name of the packages in front of the function, because in that case
+R would have used `base::summary()` as in Kurz's text.
+:::
+
+```{r}
+#| label: base-summary-samples-b4.1-b
+#| attr-source: '#lst-base-summary-samples-b4.1-b lst-cap="Summary the extracted iterations of the HMC chains: base version"' 
+
+base::summary(post_b[, 1:2])
+
+```
+
+```{r}
+#| label: posterior-summary-samples-b4.1-b
+#| attr-source: '#lst-posterior-summary-samples-b4.1-b lst-cap="Summary the extracted iterations of the HMC chains: posterior version"' 
+
+posterior:::summary.draws(post_b[, 1:2])
+
+
+```
+
+To get a similar summary with tiny histograms Kurz offers different
+solutions:
+
+-   A base R approach by using the transpose of a `stats::quantile()`
+    call nested within `base::apply()`
+-   A {**tidyverse**} approach
+-   A {**brms**} approach by just putting the `brm()` fit object into
+    `posterior_summary()`
+-   A {**tidybayes**} approach using `tidybayes::mean_hdi()` if you're
+    willing to drop the posterior `sd` and
+-   Using additionally the [function
+    `histospark()`](https://github.com/hadley/precis/blob/master/R/histospark.R)
+    (from the unfinished {**precis**} package by Hadley Wickham supposed
+    to replace `base::summary()`) to get the tiny histograms and to add
+    them into the tidyverse approach.
+
+Additionally I will propose using the {**skimr**} packages:
+
+```{r}
+#| label: skim-summary-samples-b4.1-b
+#| attr-source: '#lst-skim-summary-samples-b4.1-b lst-cap="Summary the extracted iterations of the HMC chains: skimr version"' 
+
+skimr::skim(post_b[, 1:2])
+```
+
+Kurz refers only shortly to both `overthinking` blocks of this section:
+
+- Start values for `rethinking::quap()` resp. `brms::brm()` (See
+@sec-start-values-rethinking): Within the `brm()` function, you use the `init` argument fpr the start values.
+- Under the hood with multivariate sampling (See @sec-under-the-hood-multivariate-sampling): Again Kurz remarked that `brms::as_draws_df()` is not the same as `rethinking::extract.samples()`. What this exactly means will (hopefully) explained later in @sec-markov-chain-monte-carlo.

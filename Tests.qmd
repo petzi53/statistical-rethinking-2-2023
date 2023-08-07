@@ -101,4 +101,14 @@ You refer to the listing of this code chunk with @list-summarize.
 tibble::tibble(x = runif(10), y = x * 2)
 ```
 
-## 
+## Misc
+
+### Warning message
+
+> ```         
+> Warning message:
+> In postprocess(params$input, params$format, params$output, params$preserve) :
+>   Since code annotations are present, code-linking has been disabled
+> ```
+
+### Callout cross references?

@@ -2138,7 +2138,7 @@ simulated outcomes.
 > is replace the value 0.6 with samples from the posterior:
 
 ```{r}
-#| label: sim-pred-samples-a
+#| label: fig-sim-pred-samples-a
 #| fig-cap: "Random binomial samples to simulate predicted observations for $p = 0.6$"
 #| attr-source: '#lst-sim-pred-samples-a lst-cap="Generate 1e4 random binomial samples to simulate predicted observations for $p = 0.6$"'
 
@@ -2866,7 +2866,10 @@ together, using the posterior probabilities of each value of `p`, to get
 a **posterior predictive distribution**.
 
 ```{r}
+#| label: post-pred-dist-r
+#| attr-source: '#lst-post-pred-dist-r lst-cap="Using the posterior probabilities of each value of p, to get a posterior predictive distribution: rethinking version"'
 
+set.seed(3)
 ## R code 3.26 #############################
 w_predicted_r <- rbinom(1e4, size = 9, prob = samples_r)
 hist(w_predicted_r)
@@ -2875,6 +2878,8 @@ hist(w_predicted_r)
 ##### Tidyverse
 
 ```{r}
+#| label: post-pred-dist-t
+#| attr-source: '#lst-post-pred-dist-t lst-cap="Using the posterior probabilities of each value of p, to get a posterior predictive distribution: tidyverse version"'
 
 set.seed(3)
 

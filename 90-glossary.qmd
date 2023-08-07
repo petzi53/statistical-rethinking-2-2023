@@ -245,3 +245,11 @@ Subjective Bayesian (2)
 values. In a scientific context, variables include things we wish to
 infer, such as proportions and rates, as well as things we might
 observe, the data. (Chap.2)
+
+**Variance-Covariance Matrix**: It is the multi-dimensional glue of a
+quadratic approximation, because it tells us how each parameter relates
+to every other parameter in the posterior distribution. A
+variance-covariance matrix can be factored into two elements: (1) a
+vector of variances for the parameters and (2) a correlation matrix that
+tells us how changes in any parameter lead to correlated changes in the
+others. (Chap.4)
