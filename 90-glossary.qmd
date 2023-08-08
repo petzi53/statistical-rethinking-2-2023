@@ -92,6 +92,14 @@ in a *distribution of variables*, in contrast to conventional
 statistics, where a *distribution function assigned to an observed
 variable* is usually called a likelihood. (Chap.2)
 
+**Linear Model**: It is strategy to make the parameter for the mean of a
+Gaussian distribution, *`µ`*, into a linear function of the predictor
+variable and other, new parameters that we invent. The linear model
+strategy instructs the golem to assume that the predictor variable has a
+constant and additive relationship to the mean of the outcome. The golem
+then computes the posterior distribution of this constant relationship.
+(Chap.4)
+
 **Linear Regression**: In linear regression, the relationships are
 modeled using linear predictor functions whose unknown model parameters
 are estimated from the data. Such models are called linear models.
@@ -143,6 +151,19 @@ model is overly complex.
 See also [Wikipedia](https://en.wikipedia.org/wiki/Overfitting) and
 [IBM](https://www.ibm.com/topics/overfitting). (Chap. 1)
 
+**p-hacking**: It is the practice of adjusting the model and the data to
+achieve a desired result. The desired result is usually a *p*-value less
+then 5%. The problem is that when the model is adjusted in light of the
+observed data, then *p*-values no longer retain their original meaning.
+False results are to be expected. This is valid for Bayesian and
+Non-Bayesian statistics. Even if Bayesian statistics don't pay any
+attention to p-values, the danger remains. We could choose our priors
+conditional on the observed sample, just to get some desired (wrong)
+result. It is therefore important to choose priors conditional on
+pre-data knowledge of the variables---their constraints, ranges, and
+theoretical relationships. We should always judge our priors against
+general facts, not the sample.
+
 **Parameter**: Variables that cannot be observed. A conjectured
 proportion, *p*. It's just a way of indexing possible explanations of
 the data. Data are measured and known; parameters are unknown and must
@@ -176,6 +197,13 @@ distribution. (Chap.3)
 **Posterior Probability**: The new, updated plausibility of any specific
 *`p`*. (Chap.2)
 
+**Predictor Variable**: Predictor variable, also known sometimes as the
+independent variable, is used to make a prediction for dependent
+variables. The predictor variable is the counterpart to the dependent
+variable, often directly informed or affected by the predictor variable.
+([DeepAI](https://deepai.org/machine-learning-glossary-and-terms/predictor-variable))
+(Chap.4)
+
 **Principle of Indifference**: When there is no reason to say that one
 conjecture is more plausible than another, weigh all of the conjectures
 equally. (Chap.2)
@@ -208,6 +236,13 @@ will never exceed 1. Such areas are also called *probability mass*. See
 also Probability Density. (Chap.4)
 
 Process Models (1)
+
+**Regression**: The term has come to mean using one or more predictor
+variables to model the distribution of one or more outcome variables.
+The original use of term, however, arose from anthropologist Francis
+Galton's (1822--1911) observation that the sons of tall and short men
+tended to be more similar to the population mean, hence *regression to
+the mean*. (Chap.4)
 
 [**Small World**]{.smallcaps}: Reference to the self-contained logical
 world of the model. (Chap.2) See [Large World.]{.smallcaps}

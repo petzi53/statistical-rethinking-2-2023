@@ -1,7 +1,7 @@
 # Preface {.unnumbered}
 
 ::: {.callout-note style="color: blue;"}
-## This is work in progress: Included 77 of 555 code chunks $\approx$ 13,5% of the book content.
+## This is work in progress: Included 80 of 555 of the {**rethinking**} code chunks $\approx$ 14,5% of the book content.
 :::
 
 ## Content and Goals of this Book {.unnumbered}
