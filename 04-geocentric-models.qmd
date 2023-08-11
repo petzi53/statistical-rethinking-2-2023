@@ -135,8 +135,8 @@ Describe the globe tossing model from previous chapter
 
 $$
 \begin{align*}
-W \sim Binomial(N, p) \space \space (1)\\
-p \sim Uniform(0, 1)  \space \space (2)
+W \sim \operatorname{Binomial}(N, p) \space \space (1)\\
+p \sim \operatorname{Uniform}(0, 1)  \space \space (2)
 \end{align*}
 $$ {#eq-globe-tossing-model}
 
@@ -376,7 +376,7 @@ deviation `σ`
 Heights normally distributed
 
 $$
-h_{i} \sim Normal(σ, μ) 
+h_{i} \sim \operatorname{Normal}(σ, μ) 
 $$ {#eq-height-normal-dist}
 :::
 
@@ -407,9 +407,9 @@ Priors for heights model
 
 $$
 \begin{align*}
-h_{i} \sim Normal(μ, σ) \space \space (1) \\ 
-μ \sim Normal(178, 20)  \space \space (2) \\ 
-μ \sim Uniform(0, 50)   \space \space (3)      
+h_{i} \sim \operatorname{Normal}(μ, σ) \space \space (1) \\ 
+μ \sim \operatorname{Normal}(178, 20)  \space \space (2) \\ 
+μ \sim \operatorname{Uniform}(0, 50)   \space \space (3)      
 \end{align*}
 $$ {#eq-prior-height-model}
 
@@ -1095,6 +1095,16 @@ d_grid_samples_b %>%
 
 We'll use the {**tidybayes**} package to compute their posterior modes
 and 95% HDIs.
+
+::: {.callout-important}
+There is a companion package {**ggdist**} which is imported by {**tidybayes**}. Whenever you cannot find the function in {**tidybayes**} then look at the documentation of {**ggdist**}. This is also the case for the `tidybayes::mode_hdi()` function. In the help files of {**tidybayes**} you will just find notes about a deprecated `tidybayes::mode_hdih()` function but not the arguments of its new version without the last `h` (for horizontal) `tidybayes::mode_hdi()`. But you can look up these details in the {**ggdist**} documentation. This observation is valid for many families of deprecated functions.
+
+There is a division of functionality between {**tidybayes**} and {**ggdist**}:
+
+- {**tidybayes**}: Tidy Data and 'Geoms' for Bayesian Models: Compose data for and extract, manipulate, and visualize posterior draws from Bayesian models in a tidy data format. Functions are provided to help extract tidy data frames of draws from Bayesian models and that generate point summaries and intervals in a tidy format.
+- {**ggdist**}: Visualizations of Distributions and Uncertainty: Provides primitives for visualizing distributions using {**ggplot2**} that are particularly tuned for visualizing uncertainty in either a frequentist or Bayesian mode. Both analytical distributions (such as frequentist confidence distributions or Bayesian priors) and distributions represented as samples (such as bootstrap distributions or Bayesian posterior samples) are easily visualized.
+:::
+
 
 ```{r}
 #| label: post-mode-hdi95-b
@@ -1822,11 +1832,11 @@ Linear model height against weight
 
 $$
 \begin{align*}
-h_{i} \sim Normal(μ_{i}, σ) \space \space (1) \\ 
+h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\ 
 μ_{i} = \alpha + \beta(x_{i}-\overline{x}) \space \space (2) \\
-\alpha \sim Normal(178, 20) \space \space (3)  \\ 
-\beta \sim Normal(0,10) \space \space (4) \\
-\sigma \sim Uniform(0, 50) \space \space (5)      
+\alpha \sim \operatorname{Normal}(178, 20) \space \space (3)  \\ 
+\beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
+\sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
 \end{align*}
 $$ {#eq-height-weight-linear-model}
 
@@ -1917,9 +1927,9 @@ Here's how to do it, setting a seed so you can reproduce it exactly:
 
 ## R code 4.38 #####################
 set.seed(2971)
-N <- 100 # 100 lines
-a <- rnorm(N, 178, 20)
-b <- rnorm(N, 0, 10)
+N_100_a <- 100 # 100 lines
+a <- rnorm(N_100_a, 178, 20)
+b <- rnorm(N_100_a, 0, 10)
 
 
 ## R code 4.39 #####################
@@ -1931,7 +1941,7 @@ abline(h = 0, lty = 2)
 abline(h = 272, lty = 1, lwd = 0.5)
 mtext("b ~ dnorm(0,10)")
 xbar <- mean(d2_a$weight)
-for (i in 1:N) {
+for (i in 1:N_100_a) {
   curve(a[i] + b[i] * (x - xbar),
     from = min(d2_a$weight), to = max(d2_a$weight), add = TRUE,
     col = rethinking::col.alpha("black", 0.2)
@@ -1959,7 +1969,7 @@ that the logarithm of $\beta$ has a Normal(0,1) distribution.
 Defining the prior as Log-Normal distribution
 
 $$
-\beta \sim LogNormal(0,1)
+\beta \sim \operatorname{Log-Normal}(0,1)
 $$ {#eq-prior-log-normal-dist}
 :::
 
@@ -1996,9 +2006,9 @@ with the Log-Normal prior:
 
 ## R code 4.41 ###################
 set.seed(2971)
-N <- 100 # 100 lines
-a <- rnorm(N, 178, 20)
-b <- rlnorm(N, 0, 1)
+N_100_a <- 100 # 100 lines
+a <- rnorm(N_100_a, 178, 20)
+b <- rlnorm(N_100_a, 0, 1)
 
 ## R code 4.39 ###################
 plot(NULL,
@@ -2009,7 +2019,7 @@ abline(h = 0, lty = 2)
 abline(h = 272, lty = 1, lwd = 0.5)
 mtext("b ~ dnorm(0,10)")
 xbar <- mean(d2_a$weight)
-for (i in 1:N) {
+for (i in 1:N_100_a) {
   curve(a[i] + b[i] * (x - xbar),
     from = min(d2_a$weight), to = max(d2_a$weight), add = TRUE,
     col = rethinking::col.alpha("black", 0.2)
@@ -2255,13 +2265,13 @@ Finding the posterior distribution
 
 $$
 \begin{align*}
-h_{i} \sim Normal(μ_{i}, σ) \space \space (1) \\ 
+h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\ 
 μ_{i} = \alpha + \beta(x_{i}-\overline{x}) \space \space (2) \\
-\alpha \sim Normal(178, 20) \space \space (3)  \\ 
-\beta \sim Normal(0,10) \space \space (4) \\
-\sigma \sim Uniform(0, 50) \space \space (5) \\    
+\alpha \sim \operatorname{Normal}(178, 20) \space \space (3)  \\ 
+\beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
+\sigma \sim \operatorname{Uniform}(0, 50)  \space \space (5) \\    
 \end{align*} 
-$$ {#eq-find-post-dist}
+$$ {#eq-find-post-dist-a}
 
 ```         
 height ~ dnorm(mu, sigma)     # <1>
@@ -2299,6 +2309,7 @@ m4.3 <- rethinking::quap(
 )
 
 # summary result
+## R code 4.44 ############################
 rethinking::precis(m4.3)
 ```
 
@@ -2340,9 +2351,12 @@ between the two, because $\beta = exp(log(\beta))$. In code form:
 
 #### Tidyverse
 
-Unlike with McElreath's `rethinking::quap()` formula syntax, I'm not
-aware that you can just specify something like `weight – xbar` in the
-`formula` argument in `brms::brm()`. However, the alternative is easy:
+Unlike with McElreath's `rethinking::quap()` formula syntax, Kurz is not
+aware that we can just specify something like `weight – xbar` in the
+`formula` argument in `brms::brm()`. 
+
+
+However, the alternative is easy:
 Just make a new variable in the data that is equivalent to
 `weight – mean(weight)`. We'll call it `weight_c`.
 
@@ -2355,6 +2369,17 @@ d2_b <-
   d2_b %>% 
   mutate(weight_c = weight - mean(weight))
 ```
+Unlike with McElreath’s {**rethinking**} package, the conventional `brms::brm()` syntax doesn’t mirror the statistical notation. But here are the analogues to the exposition at the bottom of page 97:
+
+$$
+* $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$: `family = gaussian`,
+* $\mu_i = \alpha + \beta \text{weight}_i$: `height ~ 1 + weight_c`,
+* $\alpha \sim \operatorname{Normal}(178, 20)$: `prior(normal(178, 20), class = Intercept`,
+* $\beta \sim \operatorname{Log-Normal}(0, 1)$: `prior(lognormal(0, 1), class = b)`, and
+* $\sigma \sim \operatorname{Uniform}(0, 50)$: `prior(uniform(0, 50), class = sigma)`.
+$$ {#eq-find-post-dist-b}
+
+
 
 ```{r}
 #| label: find-and summarize-post-dist-b
@@ -2439,4 +2464,747 @@ brms::fixef(b4.3b)["lb_Intercept", "Estimate"] %>% exp()
 
 They\'re the same within simulation variance.
 
-## I STOPPED THIS CHAPTER HERE! (2023-08-09)
+### Interpretating the posterior distribution
+
+#### Original
+
+Statistical models are hard to interpret. There are two broad categories of interpretation:
+- reading tables
+- plotting simulation
+
+Plotting posterior distributions and posterior predictions is better than attempting to understand a table. 
+
+##### Table of marginal distributions
+
+I have already included the summary (`precis()`) for the `m4.3` model in @lst-find-post-dist-a. But I will repeat it to inspect the marginal posterior distributions of the parameters in detail:
+
+```{r}
+#| label: display-precis-m4.3
+#| attr-source: '#lst-display-precis-m4.3 lst-cap="Display the marginal posterior distributions of the parameters: rethinking version"'
+
+
+## R code 4.44 ################
+rethinking::precis(m4.3)
+```
+1. First row: quadratic approximation for $\alpha$
+2. Second row: quadratic approximation for $\beta$
+3. Third row: quadratic approximation for $\sigma$
+
+
+Let’s focus on b ($\beta$), because it’s the new parameter. Since ($\beta$) is a slope, the value 0.90 can be read as *a person 1 kg heavier is expected to be 0.90 cm taller*. 89% of the posterior probability ($94.5-5.5$) lies between 0.84 and 0.97. That suggests that ($\beta$) values close to zero or greatly above one are highly incompatible with these data and this model. It is most certainly not evidence that the relationship between weight and height is linear, because the model only considered lines. It just says that, if you are committed to a line, then lines with a slope around 0.9 are plausible ones.
+
+Remember, the numbers in the default precis output aren’t sufficient to describe the quadratic posterior completely. For that, we also require the variance-covariance matrix. 
+
+```{r}
+#| label: var-cov-matrix-m4.3
+#| attr-source: '#lst-var-cov-matrix-m4.3 lst-cap="Calculate the variance-covariance matrix for model m4.3"'
+
+## R code 4.45 ######################
+round(rethinking::vcov(m4.3), 3)
+```
+
+```{r}
+#| label: marg-post-cov-m4.3
+#| attr-source: '#lst-var-cov-matrix-m4.3 lst-cap="Calculate the marginal posteriors and covariance matrix for model m4.3"'
+
+rethinking::pairs(m4.3)
+```
+
+##### Plotting posterior inference against the data
+
+It’s almost always much more useful to plot the posterior inference against the data. Not only does plotting help in interpreting the posterior, but it also provides an informal check on model assumptions. 
+
+We’re going to start with a simple version of that task, superimposing just the posterior mean values over the height and weight data. Then we’ll slowly add more and more information to the prediction plots, until we’ve used the entire posterior distribution.
+
+We’ll start with just the raw data and a single line. The code below plots the raw data, computes the posterior mean values for `a` and `b`, then draws the implied line:
+
+```{r}
+#| label: fig-raw-data-line-m4.3
+#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black."
+
+## R code 4.46 ############################################
+plot(height ~ weight, data = d2_a, col = rethinking::rangi2)
+post_m4.3 <- rethinking::extract.samples(m4.3)
+a_map <- mean(post_m4.3$a)
+b_map <- mean(post_m4.3$b)
+curve(a_map + b_map * (x - xbar), add = TRUE)
+```
+Each point in this plot is a single individual. The black line is defined by the mean slope `β` and mean intercept `α`. This is not a bad line. It certainly looks highly plausible. But there are an infinite number of other highly plausible lines near it. Let’s draw those too.
+
+##### Adding uncertainty around the mean
+
+Plots of the average line, like in @fig-raw-data-line-m4.3, are useful for getting an impression of the magnitude of the estimated influence of a variable. But they do a poor job of communicating uncertainty. Remember, the posterior distribution considers every possible regression line connecting height to weight. It assigns a relative plausibility to each. This means that each combination of `α` and `β` has a posterior probability. It could be that there are many lines with nearly the same posterior probability as the average line. Or it could be instead that the posterior distribution is rather narrow near the average line.
+
+So how can we get that uncertainty onto the plot? Together, a combination of `α` and `β` define a line. And so we could sample a bunch of lines from the posterior distribution. Then we could display those lines on the plot, to visualize the uncertainty in the regression relationship.
+
+To better appreciate how the posterior distribution contains lines, we work with all of the samples from the model. 
+
+```{r}
+#| label: collect-post-samples-a
+
+## R code 4.47 ################
+# post_m4.3 <- rethinking::extract.samples(m4.3) # already in previous listing
+post_m4.3[1:5, ]
+```
+
+Each row is a correlated random sample from the joint posterior of all three parameters, using the covariances provided by `rethinking::vcov(m4.3)` (@lst-var-cov-matrix-m4.3). The paired values of `a` and `b` on each row define a line. The average of very many of these lines is the posterior mean line. But the scatter around that average is meaningful, because it alters our confidence in the relationship between the predictor and the outcome.
+
+So now let’s display a bunch of these lines, so you can see the scatter. This lesson will be easier to appreciate, if we use only some of the data to begin. Then you can see how adding in more data changes the scatter of the lines. So we’ll begin with just the first 10 cases in `d2_a`. The following code extracts the first 10 cases and re-estimates the model:
+
+```{r}
+#| label: extract-10-re-est-mod-a
+
+## R code 4.48 ##########################
+N10_a <- 10
+dN10_a <- d2_a[1:N10_a, ]
+mN10_a <- rethinking::quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * (weight - mean(weight)),
+    a ~ dnorm(178, 20),
+    b ~ dlnorm(0, 1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = dN10_a
+)
+
+```
+
+Now let’s plot 20 of these lines for the 10 data points, to see what the uncertainty looks like.
+
+```{r}
+#| label: fig-plot-lines-10-points-a
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3. 20 lines sampled from 10 data points of the posterior distribution, showing the uncertainty in the regression relationship: rethinking version"
+
+
+## R code 4.49 ##############################
+# extract 20 samples from the posterior
+post_20_m4.3 <- rethinking::extract.samples(mN10_a, n = 20)
+
+# display raw data and sample size
+plot(dN10_a$weight, dN10_a$height,
+  xlim = range(d2_a$weight), ylim = range(d2_a$height),
+  col = rethinking::rangi2, xlab = "weight", ylab = "height"
+)
+mtext(rethinking:::concat("N = ", N10_a))
+
+# plot the lines, with transparency
+for (i in 1:20) {
+  curve(post_20_m4.3$a[i] + post_20_m4.3$b[i] * (x - mean(dN10_a$weight)),
+    col = rethinking::col.alpha("black", 0.3), add = TRUE
+  )
+}
+
+```
+The result is shown in the upper-left plot in FIGURE 4.7. By plotting multiple regression lines, sampled from the posterior, it is easy to see both the highly confident aspects of the relationship and the less confident aspects. The cloud of regression lines displays greater uncertainty at extreme values for weight.
+
+The other plots in FIGURE 4.7 show the same relationships, but for increasing amounts of data. Just re-use the code from before, but change N <- 10 to some other value. Notice that the cloud of regression lines grows more compact as the sample size increases. This is a result of the model growing more confident about the location of the mean.
+
+Plot 20 lines sampled from 50 data points of the posterior distribution
+
+```{r}
+#| label: fig-plot-lines-50-points-a
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3. 20 lines sampled from 50 data points of the posterior distribution, showing the uncertainty in the regression relationship: rethinking version"
+
+## R code 4.48, 4.49 ######################
+N50_a <- 50
+dN50_a <- d2_a[1:N50_a, ]
+mN50_a <- rethinking::quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * (weight - mean(weight)),
+    a ~ dnorm(178, 20),
+    b ~ dlnorm(0, 1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = dN50_a
+)
+
+# extract 20 samples from the posterior
+post_50_m4.3 <- rethinking::extract.samples(mN50_a, n = 20)
+
+# display raw data and sample size
+plot(dN50_a$weight, dN50_a$height,
+  xlim = range(d2_a$weight), ylim = range(d2_a$height),
+  col = rethinking::rangi2, xlab = "weight", ylab = "height"
+)
+mtext(rethinking:::concat("N = ", N50_a))
+
+# plot the lines, with transparency
+for (i in 1:20) {
+  curve(post_50_m4.3$a[i] + post_50_m4.3$b[i] * (x - mean(dN50_a$weight)),
+    col = rethinking::col.alpha("black", 0.3), add = TRUE
+  )
+}
+
+```
+
+Plot 20 lines sampled from 352 data points of the posterior distribution
+
+```{r}
+#| label: fig-plot-lines-all-352-points-a
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3. 20 lines sampled from all 352 data points of the posterior distribution, showing the uncertainty in the regression relationship."
+
+## R code 4.48, 4.49 ###########################
+N352_a <- 352
+dN352_a <- d2_a[1:N352_a, ]
+mN352_a <- rethinking::quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * (weight - mean(weight)),
+    a ~ dnorm(178, 20),
+    b ~ dlnorm(0, 1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = dN352_a
+)
+
+# extract 20 samples from the posterior
+post_352_m4.3 <- rethinking::extract.samples(mN352_a, n = 20)
+
+# display raw data and sample size
+plot(dN352_a$weight, dN352_a$height,
+  xlim = range(d2_a$weight), ylim = range(d2_a$height),
+  col = rethinking::rangi2, xlab = "weight", ylab = "height"
+)
+mtext(rethinking:::concat("N = ", N352_a))
+
+# plot the lines, with transparency
+for (i in 1:20) {
+  curve(post_352_m4.3$a[i] + post_352_m4.3$b[i] * (x - mean(dN352_a$weight)),
+    col = rethinking::col.alpha("black", 0.3), add = TRUE
+  )
+}
+
+```
+
+
+#### Tidyverse
+
+Instead of `rethinking::extract.samples()` the {**brms**} packages extract all the posterior draws with `brms::as_draws_df()`. We have already done this with @lst-put-hmc-into-df-b. We just repeat this code here using `dplyr::slice(1:6)` instead of `utils::head()`
+
+
+```{r}
+#| label: put-hmc-into-df2-b
+#| attr-source: '#lst-put-hmc-into-df2-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
+
+post_b <- brms::as_draws_df(b4.3)
+post_b %>%
+  slice(1:6)
+```
+
+Here are the four models:
+
+```{r}
+#| label: calc-all-four-models-b
+#| attr-source: '#lst-calc-all-four-models-b lst-cap="Calculate all four models"'
+
+dN10_b <- 10
+
+b4.3_010 <- 
+  brms::brm(data = d2_b %>%
+        slice(1:dN10_b),  # note our tricky use of `N` and `slice()`
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_010")
+
+dN50_b <- 50
+
+b4.3_050 <- 
+  brms::brm(data = d2_b %>%
+        slice(1:dN50_b), 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_050")
+
+dN150_b <- 150
+
+b4.3_150 <- 
+  brms::brm(data = d2_b %>%
+        slice(1:dN150_b), 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_150")
+
+dN352_b <- 352
+
+b4.3_352 <- 
+  brms::brm(data = d2_b %>%
+        slice(1:dN352_b), 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_352")
+```
+
+
+Here are the trace plots and coefficient summaries from these four models.
+
+```{r}
+#| label: trace-plots-cov-sum-b
+#| attr-source: '#lst-trace-plots-cov-sum-b lst-cap="Trace plots and coefficient summaries from all four models"'
+
+
+plot(b4.3_010)
+print(b4.3_010)
+
+plot(b4.3_050)
+print(b4.3_050)
+
+plot(b4.3_150)
+print(b4.3_150)
+
+plot(b4.3_352)
+print(b4.3_352)
+```
+
+
+We’ll need to put the chains of each model into data frames.
+
+```{r}
+#| label: put-chain-into-model-b
+#| #| attr-source: #lst-put-chain-into-model-b lst-cap="Put the chains of each model into data frames"'
+
+post010_b4.3 <- brms::as_draws_df(b4.3_010)
+post050_b4.3 <- brms::as_draws_df(b4.3_050)
+post150_b4.3 <- brms::as_draws_df(b4.3_150)
+post352_b4.3 <- brms::as_draws_df(b4.3_352)
+```
+
+
+Here is the code for the four individual plots:
+
+```{r}
+#| label: calc-code-for plots-b
+#| attr-source: '#lst-calc-code-for plots-b lst-cap="Prepare data for four individual plots"'
+
+p1 <- 
+  ggplot(data =  d2_b[1:10, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post010_b4.3 %>% slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 10")
+
+p2 <-
+  ggplot(data =  d2_b[1:50, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post050_b4.3 %>% slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 50")
+
+p3 <-
+  ggplot(data =  d2_b[1:150, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post150_b4.3 %>% slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 150")
+
+p4 <- 
+  ggplot(data =  d2_b[1:352, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post352_b4.3 %>% slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 352")
+```
+
+
+Now we can combine the ggplots with patchwork syntax to make the full version of Figure 4.7.
+
+```{r}
+#| label: fig-draw-plots-figure-4.7-b
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, b4.3, with increasing amounts of data. In each plot, 20 lines sampled from the posterior distribution, showing the uncertainty in the regression relationship. Tidyverse version."
+
+
+
+library(patchwork)
+
+(p1 + p2 + p3 + p4) &
+  scale_x_continuous("weight",
+                     breaks = c(-10, 0, 10),
+                     labels = labels) &
+  theme_classic()
+```
+
+
+
+##### Plotting regression intervals and contours
+
+The cloud of regression lines in @fig-plot-lines-10-points-a, @fig-plot-lines-50-points-a and @fig-plot-lines-all-352-points-a is an appealing display, because it communicates uncertainty about the relationship in a way that many people find intuitive. But it’s more common, and often much clearer, to see the uncertainty displayed by plotting an interval or contour around the average regression line.
+
+```{r}
+#| label: calc-PI-around-regr-line-a
+#| attr-source: '#lst-calc-PI-around-regr-line-a lst-cap="Calculate uncertainty around the average regression line"'
+
+## R code 4.50 ##########################
+
+post_m4.3 <- rethinking::extract.samples(m4.3)      # <1>
+mu_at_50_a <- post_m4.3$a + post_m4.3$b * (50 - xbar) # <2>
+head(mu_at_50_a)                                      # <3>
+```
+
+1. Repeating the code for drawing (extracting and collecting) from the fitted model m4.3 (already done in @fig-raw-data-line-m4.3)
+2. The code to the right of the `<-` takes its form from the equation for $\mu_{i} = \alpha + \beta(x_{i} - \overline{x})$. The value of $x_{i}$ in this case is 50.
+3. The result is a vector of predicted means, one for each random sample from the posterior. Since joint `a` and `b` went into computing each, the variation across those means incorporates the uncertainty in and correlation between both parameters.
+
+It might be helpful at this point to actually plot the density for this vector of means:
+
+```{r}
+#| label: fig-density-vector-mean-50-a
+#| fig-cap: "The quadratic approximate posterior distribution of the mean height, μ, when weight is 50 kg. This distribution represents the relative plausibility of different values of the mean. Rehtinking version"
+
+## R code 4.51 ##################
+rethinking::dens(mu_at_50_a, col = rethinking::rangi2, lwd = 2, xlab = "mu|weight=50")
+```
+
+Since the components of `μ` have distributions, so too does `μ`. And since the distributions of `α` and `β` are Gaussian, so too is the distribution of `μ` (adding Gaussian distributions always produces a Gaussian distribution).
+
+Since the posterior for `μ` is a distribution, you can find intervals for it, just like for any posterior distribution. To find the 89% compatibility interval of `μ` at 50 kg, just use the `PI()` command as usual:
+
+```{r}
+#| label: PI-mu-at-50-a
+#| attr-source: '#lst-PI-mu-at-50-a lst-cap="89% compatibility interval of μ at 50 kg"'
+
+## R code 4.52 ##############
+rethinking::PI(mu_at_50_a, prob = 0.89)
+
+```
+
+What these numbers mean is that the central 89% of the ways for the model to produce the data place the average height between about 159 cm and 160 cm (conditional on the model and data), assuming the weight is 50 kg.
+
+That’s good so far, but we need to repeat the above calculation for every weight value on the horizontal axis, not just when it is 50 kg. We want to draw 89% intervals around the average slope in @fig-raw-data-line-m4.3.
+
+This is made simple by strategic use of the `rethinking::`link()` function, a part of the {**rethinking**} package. What `rethinking::link()` will do is take your `rethinking::quap()` approximation, sample from the posterior distribution, and then compute `μ` for each case in the data and sample from the posterior distribution. Here’s what it looks like for the data you used to fit the model:
+
+```{r}
+#| label: calc-mu-with-link-a
+#| attr-source: '#lst-calc-mu-with-link-a lst-cap="Calculate μ for each case in the data and sample from the posterior distribution: Rethinking version"'
+
+## R code 4.53 ##############
+mu_a <- rethinking::link(m4.3)
+str(mu_a)
+```
+
+
+You end up with a big matrix of values of `μ`. Each row is a sample from the posterior distribution. The default is 1000 samples, but you can use as many or as few as you like. Each column is a case (row) in the data. There are 352 rows in `d2_a`, corresponding to 352 individuals. So there are 352 columns in the matrix mu above.
+
+The function `rethinking::link()` provides a posterior distribution of `μ` for each case we feed it. So above we have a distribution of `μ` for each individual in the original data. We actually want something slightly different: a distribution of `μ` for each unique weight value on the horizontal axis. It’s only slightly harder to compute that, by just passing `rethinking::link()` some new data:
+
+```{r}
+#| label: calc-dist-mu-unique-with-link-a
+#| attr-source: '#lst-calc-dist-mu-unique-with-link-a lst-cap="Calculate a distribution of μ for each unique weight value on the horizontal axis: rethinking version"'
+
+## R code 4.54 ###############################
+# define sequence of weights to compute predictions for
+# these values will be on the horizontal axis
+weight.seq <- seq(from = 25, to = 70, by = 1)
+
+# use link to compute mu
+# for each sample from posterior
+# and for each weight in weight.seq
+mu2_a <- rethinking::link(m4.3, data = data.frame(weight = weight.seq))
+str(mu2_a)
+```
+
+And now there are only 46 columns in mu, because we fed it 46 different values for weight. To visualize what you’ve got here, let’s plot the distribution of `μ` values at each height.
+
+```{r}
+#| label: fig-dist-mu-height-100-a
+#| fig-cap: "The first 100 values in the distribution of μ at each weight value. Rethinking version"
+
+## R code 4.55
+# use type="n" to hide raw data
+base::plot(height ~ weight, d2_a, type = "n")
+
+# loop over samples and plot each mu value
+for (i in 1:100) {
+  graphics::points(weight.seq, mu2_a[i, ], pch = 16, col = rethinking::col.alpha(rethinking::rangi2, 0.1))
+}
+
+```
+At each weight value in `weight.seq`, a pile of computed `μ` values are shown. Each of these piles is a Gaussian distribution, like that in @fig-density-vector-mean-50-a. You can see now that the amount of uncertainty in `μ` depends upon the value of weight. And this is the same fact you saw in @fig-plot-lines-10-points-a, @fig-plot-lines-50-points-a and @fig-plot-lines-all-352-points-a.
+
+The final step is to summarize the distribution for each weight value. We’ll use `base::apply()`, which applies a function of your choice to a matrix.
+
+```{r}
+#| label: sum-dist-weight-a
+#| attr-source: '#lst-sum-dist-weight-a lst-cap="Summary of the distribution for each weight value. Rethinking version"'
+
+## R code 4.56 #####################
+# summarize the distribution of mu
+mu2.mean <- apply(mu2_a, 2, mean)                      # <1>
+mu2.PI <- apply(mu2_a, 2, rethinking::PI, prob = 0.89) # <2>
+mu2.mean                                               # <3>
+mu2.PI                                                 # <4>
+```
+
+1. Read `apply(mu2,2,mean)` as "compute the mean of each column (dimension '2') of the matrix mu". Now `mu2.mean` contains the average `μ` at each weight value.
+2. `mu2.PI` contains 89% lower and upper bounds for each weight value.
+3. `mu2.mean` and `mu2.PI` are just different kinds of summaries of the distributions in `mu2_a`, with each column being for a different weight value. These summaries are only summaries. The "estimate" is the entire distribution.
+
+
+```{r}
+#| label: fig-summaries-on-data-top-a
+#| fig-cap: "Plot of the summaries on top of the !Kung height data again, now with 89% compatibility interval of the mean indicated by the shaded region. Compare this region to the distributions of blue points in @fig-dist-mu-height-100-a."
+
+## R code 4.57 ###########################
+# plot raw data
+# fading out points to make line and interval more visible
+plot(height ~ weight, data = d2_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5))
+
+# plot the MAP line, aka the mean mu for each weight
+graphics::lines(weight.seq, mu2.mean)
+
+# plot a shaded region for 89% PI
+rethinking::shade(mu2.PI, weight.seq)
+
+```
+::: callout-caution
+There is very little uncertainty about the average height as a function of average weight. But keep in mind that these inferences are always conditional on the model. Think of the regression line in @fig-summaries-on-data-top-a as saying: *Conditional on the assumption that height and weight are related by a straight line, then this is the most plausible line, and these are its plausible bounds.*
+
+:::
+
+
+Using this approach, you can derive and plot posterior prediction means and intervals for quite complicated models, for any data you choose. As long as you know the structure of the model —-- how parameters relate to the data —-- you can use samples from the posterior to describe any aspect of the model’s behavior.
+
+Summarizing the three steps for generating predictions and intervals from the posterior of a fit model:
+
+1. Use `rethinking::link()` to generate distributions of posterior values for `μ`. The default behavior of `rethinking::link()` is to use the original data, so you have to pass it a list of new horizontal axis values you want to plot posterior predictions across.
+2. Use summary functions like `mean` or `PI` to find averages and lower and upper bounds of `μ` for each value of the predictor variable.
+3. Finally, use plotting functions like `graphics::lines()` and `rethinking::shade()` to draw the lines and intervals. Or you might plot the distributions of the predictions, or do further numerical calculations with them. It’s really up to you.
+
+::: callout-note
+You could write a function that accomplish the same thing as `rethinking::link()`:
+
+```{r}
+#| label: writing-link-function-a
+#| attr-source: '#lst-writing-link-function-a lst-cap="Code to perform the same steps as the rethinking::link() function"'
+#| 
+## R code 4.58 ################################
+post_m4.3 <- rethinking::extract.samples(m4.3)
+mu.link <- function(weight) post_m4.3$a + post_m4.3$b * (weight - xbar)
+weight.seq <- seq(from = 25, to = 70, by = 1)
+mu3_a <- sapply(weight.seq, mu.link)
+mu3.mean <- apply(mu3_a, 2, mean)
+mu3.CI <- apply(mu3_a, 2, rethinking::PI, prob = 0.89)
+mu3.mean
+mu3.CI
+```
+
+And the values in `mu3.mean` and `mu3.CI` should be very similar (allowing for simulation variance) to what you got the automated way, using `rethinking::link()` in @lst-sum-dist-weight-a.
+
+Knowing this manual method is useful both for (1) understanding and (2) sheer power. Whatever the model you find yourself with, this approach can be used to generate posterior predictions for any component of it. Automated tools like link save effort, but they are never as flexible as the code you can write yourself.
+:::
+
+#### Tidyverse
+
+Since we used `weight_c` to fit our model, we might first want to understand what exactly the mean value is for weight.
+
+```{r}
+#| label: calc-mean-weight-b
+#| attr-source: '#lst-calc-mean-weight-b lst-cap="Calculate mean of weight"'
+
+mean(d2_b$weight)
+```
+
+Just a hair under 45. If we're interested in $\mu$ at `weight` = 50, that implies we're also interested in $\mu$ at `weight_c` + 5.01. Within the context of our model, we compute this with $\alpha + \beta \cdot 5.01$. Here's what that looks like with `post_b`.
+
+```{r}
+#| label: calc-mean-weight-at-50-b
+#| attr-source: '#lst-calc-mean-weight-at-50-b lst-cap="Calculate the mean at weight 50 kg"'
+
+mu_at_50_b <- 
+  post_b %>% 
+  transmute(mu_at_50_b = b_Intercept + b_weight_c * 5.01)
+ 
+head(mu_at_50_b)
+```
+
+And here is a version McElreath’s Figure 4.8 density plot.
+
+```{r}
+#| label: fig-density-vector-mean-50-b
+#| fig-cap: "The quadratic approximate posterior distribution of the mean height, μ, when weight is 50 kg. This distribution represents the relative plausibility of different values of the mean. Tidyverse version"
+
+mu_at_50_b %>%
+  ggplot(aes(x = mu_at_50_b)) +
+  geom_density(linewidth = 0, fill = "deepskyblue") +
+  scale_y_continuous(NULL, breaks = NULL) +
+  xlab(expression(mu["height | weight = 50"])) +
+  theme_classic()
+```
+
+We’ll use `tidybayes::mean_hdi()` to get both 89% and 95% HPDIs along with the mean.
+
+```{r}
+#| label: calc-mean-and-HPDI-b
+#| attr-source: '#lst-calc-mean-and-HPDI-b lst-cap="Calculate both 89% and 95% Highest Priority Intensity Intervals (HPDIs) along with the mean."'
+
+tidybayes::mean_hdi(mu_at_50_b[, 1], .width = c(.89, .95))
+```
+If you wanted to express those sweet 95% HPDIs on your density plot, you might use `tidybayes::stat_halfeye()`. Since `tidybayes::stat_halfeye()` also returns a point estimate, we’ll throw in the mode.
+
+```{r}
+#| label: fig-half-eye-b
+#| fig-cap: "Plot of half-eye (density + interval) geometry"
+mu_at_50_b %>%
+  ggplot(aes(x = mu_at_50_b, y = 0)) +
+  tidybayes::stat_halfeye(point_interval = tidybayes::mode_hdi, .width = .95,
+               fill = "deepskyblue") +
+  scale_y_continuous(NULL, breaks = NULL) +
+  xlab(expression(mu["height | weight = 50"])) +
+  theme_classic()
+```
+With {**brms**}, you would use fitted() to do what McElreath accomplished with `rethinking::link()`.
+
+::: {.callout-caution}
+Kurz applies the function `fitted()` in the code, but in the text he uses twice `brms::fitted()` which doesn't exist. I used both `brms:::fitted.brmsfit()` and `stats::fitted()` to get the same results. 
+
+The object `b4.3` is of class `brmsfit` but in the help file of `stats::fitted()` you can read: "`fitted` is a generic function which extracts fitted values from objects returned by modeling functions.  **All object classes which are returned by model fitting functions should provide a `fitted` method.** (emphasis is mine)
+
+My interpretation therefore is that `stats::fitted()` is using `brms:::fitted.brmsfit()`. Thts why the results are identical.
+
+:::
+
+```{r}
+#| label: calc-mu-with-fitted-b
+#| attr-source: '#lst-calc-mu-with-fitted-b lst-cap="Calculate μ for each case in the data and sample from the posterior distribution: Tidyverse version"'
+
+mu2_b <- brms:::fitted.brmsfit(b4.3, summary = F)
+mu2.1_b <- stats::fitted(b4.3, summary = F)
+str(mu2_b)
+str(mu2.1_b)
+```
+
+When you specify `summary = F`, `brms:::fitted.brmsfit()` returns a matrix of values with as many rows as there were post-warmup draws across your Hamilton Monte Carlo (HMC) chains and as many columns as there were cases in your analysis. Because we had 4,000 post-warmup draws and $n=352$, `brms:::fitted.brmsfit()` returned a matrix of 4,000 rows and 352 vectors. If you omitted the `summary = F` argument, the default is TRUE and `brms:::fitted.brmsfit()` will return summary information instead.
+
+Much like `rethinking::link()`, `brms:::fitted.brmsfit()` can accommodate custom predictor values with its `newdata` argument.
+
+```{r}
+#| label: calc-dist-mu-unique-with-fitted.brmsfit-b
+#| attr-source: '#lst-calc-dist-mu-unique-with-fitted.brmsfit-b lst-cap="Calculate a distribution of μ for each unique weight value on the horizontal axis: tidyverse version"'
+
+weight_seq <- 
+  tibble(weight = 25:70) %>% 
+  mutate(weight_c = weight - mean(d2_b$weight))
+
+mu3_b <-
+  brms:::fitted.brmsfit(b4.3,
+         summary = F,
+         newdata = weight_seq) %>%
+  data.frame() %>%
+  # here we name the columns after the `weight` values from which they were computed
+  set_names(25:70) %>% 
+  mutate(iter = 1:n())
+
+head(mu3_b)
+```
+
+Anticipating {**ggplot2**}, we went ahead and converted the output to a data frame. But we might do a little more data processing with the aid of `tidyr::pivot_longer()`, which will convert the data from the wide format to the long format. 
+
+::: callout-tip
+###### Literature references
+
+If you are new to the distinction between wide and long data, you can learn more from the [Pivot data from wide to long](https://tidyr.tidyverse.org/reference/pivot_longer.html) vignette from the tidyverse team (2020); Simon Ejdemyr’s blog post, [Wide & long data](https://sejdemyr.github.io/r-tutorials/basics/wide-and-long/); or Karen Grace-Martin’s blog post, [The wide and long data format for repeated measures data](https://www.theanalysisfactor.com/wide-and-long-data/).
+:::
+
+```{r}
+#| label: convert-wide-to-long-b
+#| attr-source: '#lst-convert-wide-to-long-b lst-cap="Data processing: Convert data from wide to long format: tidyverse version"'
+
+mu4_b <- 
+  mu3_b %>%
+  pivot_longer(-iter,
+               names_to = "weight",
+               values_to = "height") %>% 
+  # we might reformat `weight` to numerals
+  mutate(weight = as.numeric(weight))
+
+head(mu4_b)
+```
+
+Now our data processing is done, here we reproduce McElreath’s Figure 4.9.a.
+
+```{r}
+#| label: fig-dist-mu-height-100-b
+#| fig-cap: "The first 100 values in the distribution of μ at each weight value. Tidyverse version"
+d2_b %>%
+  ggplot(aes(x = weight, y = height)) +
+  geom_point(data = mu4_b %>% filter(iter < 101), 
+             color = "navyblue", alpha = .05) +
+  coord_cartesian(xlim = c(30, 65)) +
+  theme(panel.grid = element_blank())
+```
+With `brms:::fitted.brmsfit()`, it’s quite easy to plot a regression line and its intervals. Just omit the `summary = T` argument.
+
+```{r}
+#| label: sum-dist-weight-b
+#| attr-source: '#lst-sum-dist-weight-b lst-cap="Summary of the distribution for each weight value. Tidyverse version"'
+
+mu_summary <-
+  brms:::fitted.brmsfit(b4.3, 
+         newdata = weight_seq) %>%
+  data.frame() %>%
+  bind_cols(weight_seq)
+
+head(mu_summary)
+```
+
+Here it is, our analogue to Figure 4.9.b.
+
+```{r}
+#| label: fig-summaries-on-data-top-b
+#| fig-cap: "Plot of the summaries on top of the !Kung height data again, now with 89% compatibility interval of the mean indicated by the shaded region. Compare this region to the distributions of blue points in @fig-dist-mu-height-100-b."
+
+
+d2_b %>%
+  ggplot(aes(x = weight, y = height)) +
+  geom_smooth(data = mu_summary,
+              aes(y = Estimate, ymin = Q2.5, ymax = Q97.5),
+              stat = "identity",
+              fill = "grey70", color = "black", alpha = 1, linewidth = 1/2) +
+  geom_point(color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
+  coord_cartesian(xlim = range(d2_b$weight)) +
+  theme(text = element_text(family = "Times"),
+        panel.grid = element_blank())
+```
+
+If you wanted to use intervals other than the default 95% ones, you’d include the probs argument like this: `stats::fitted(b4.3, newdata = weight.seq, probs = c(.25, .75))`. The resulting third and fourth vectors from the `fitted()` object would be named `Q25` and `Q75` instead of the default `Q2.5` and `Q97.5`. The [Q prefix](https://github.com/paul-buerkner/brms/issues/425) stands for quantile.
+
+Similar to `rethinking::link()`, `stats::fitted()` uses the formula from your model to compute the model expectations for a given set of predictor values. I use it a lot in this project. If you follow along, you’ll get a good handle on it. But to dive deeper, you can [go here for the documentation](https://rdrr.io/cran/brms/man/fitted.brmsfit.html). Though we won’t be using it in this project, {**brms**} users might want to know that fitted() is also an alias for the `brms::posterior_epred()` function, about which you might [learn more here](https://rdrr.io/cran/brms/man/posterior_epred.brmsfit.html). Users can always learn more about them and other functions in the [{**brms**} reference manual](https://cran.r-project.org/web/packages/brms/brms.pdf).
+
+## I STOPPED THIS CHAPTER HERE! (2023-08-11)
