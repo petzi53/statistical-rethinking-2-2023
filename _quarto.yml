@@ -24,16 +24,15 @@ format:
     theme: cosmo
     number-sections: true
     toc-depth: 5
-    toc-expand: true
-    code-fold: show
+    toc-expand: 2
+    code-fold: false
     code-tools: true
-    code-overflow: scroll
     code-link: true
+    code-overflow: scroll
     df-print: default
 
 knitr:
   opts_chunk:
-    collapse: true
     comment: "#>"
     R.options:
       knitr.graphics.auto_pdf: true
@@ -41,7 +40,6 @@ knitr:
 editor: visual
 
 execute:
-    echo: fenced
     freeze: auto
 
 language:

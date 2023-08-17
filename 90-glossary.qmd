@@ -15,7 +15,8 @@ from Bayes' Theorem. The key lesson is that the posterior is
 proportional to the product of the prior and the probability of the
 data. (Chap.2)
 
-Centering: (Chap.4)
+**Centering**: results in a lack of covariance among the parameters
+(Chap.4)
 
 **Compatibility Interval**: In scientific journals it is usual to report
 an interval of defined mass, usually known as a confidence interval.

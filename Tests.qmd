@@ -1,32 +1,137 @@
 # Tests
 
-::: {.callout-warning style="color: orange;"}
-###### Warning
-
+::: {.callout-caution style="color: orange;"}
 If you want to exclude this file, remove it from the mentioned chapters
 in `_quarto.yml`.
 :::
 
-```{r}
-#| context: setup
+```{r setup}
+
+
+library(glossary)
+
 ```
+
+```{r}
+glossary_path("glossary.yml")
+```
+
+```{r, results='asis'}
+glossary_style(color = "#0066cc", 
+               text_decoration = "underline double 1px",
+               def_bg = "#333",
+               def_color = "white")
+```
+
+## Popup Type
+
+Set the popup type with `glossary_popup()`; options are "click"
+(default), "hover", and "none".
+
+```{r}
+glossary_popup("none")
+```
+
+`r glossary("alpha")`
+
+```{r}
+glossary_popup("hover")
+```
+
+`r glossary("alpha")`
+
+```{r}
+glossary_popup("click")
+```
+
+`r glossary("alpha")`
+
+------------------------------------------------------------------------
+
+What is a `r glossary("p-value")`.
+
+Display a different value for the term with `r glossary("p-value", "p")`
+
+Just show the term `r glossary("p-value", show="term")`.
+
+Just show the definition `r glossary("p-value", show = "def")`
+
+## In-Text Terms
+
+There are a few ways to customise the glossary term display.
+
+-   Look up a term from the glossary file with `glossary("alpha")`:
+    `r glossary("alpha")`
+
+-   Display a different value for the term with
+    `glossary("alpha", "$\\alpha$")`: `r glossary("alpha", "$\\alpha$")`
+
+-   Use an inline definition instead of the glossary file with
+    `glossary("beta", def = "The second letter of the Greek alphabet")`:
+    `r glossary("beta", def = "The second letter of the Greek alphabet")`
+
+-   Just show the term (no hover) with
+    `glossary("effect size", show = "term")`:
+    `r glossary("effect size", show = "term")`
+
+-   Just show the definition with `glossary("p-value", show = "def")`:
+    `r glossary("p-value", show = "def")`
 
 ```{r}
 #| error: true
 tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w"))
 ```
 
-## Code Annotation with echo: fenced
+## Code Annotation and `echo: fenced`
+
+::: callout-important
+Code Annotation does not work together with `echo: fenced` (Version:
+'1.3.433')
+:::
+
+### Code Annotation without `echo: fenced`: It works!
 
 ```{r}
-#| label: test-code-annotation
-#| echo: fenced
+#| label: test-code-annotation1
+
 1 + 1 # <1>
 2 + 2 # <2>
 ```
 
-1.  Simple
-2.  Very simple
+1.  My first line of code
+2.  My second line of code
+
+### Code Annotation with `echo: fenced` (Doesn't work!)
+
+```{r}
+#| label: test-code-annotation2
+#| echo: fenced
+
+1 + 1 # <1>
+2 + 2 # <2>
+```
+
+1.  First line of code
+2.  Second line of code
+
+::: callout-tip
+If you declare the option `echo: fenced` in the YAML (file) under
+`execute:` then it is is valid for all chunks (and files). But you can
+tweak this rule for individual chunks whenever you add the option
+`echo: true` in the chunk header.
+:::
+
+## Reference Code Listings
+
+```{r}
+#| label: a-test
+#| code-summary: "This is a test"
+#| attr-source: '#lst-my-test lst-cap="This is a test"'
+
+2 + 2
+```
+
+See: @lst-my-test
 
 ## Cross Reference to a Tibble
 
@@ -41,19 +146,24 @@ table.
 #| tbl-cap: "This is a test"
 #| echo: fenced
 
-library(knitr)
-myTable <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w"))
-kable(myTable)
+library(knitr) 
+myTable <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) 
+kable(myTable) 
 ```
+
+1.  First line
+2.  Second line
+3.  third line
 
 See @tbl-mytable
 
 ## Table Width with kableExtra & Cross Reference
 
+This text uses a function name with `kableExtra::kbl()` in this line.
+
 ```{r}
 #| label: tbl-width
 #| tbl-cap: "Table wdth with kableExtra and quarto cross reference"
-#| echo: fenced
 
 library(kableExtra)
 
@@ -118,13 +228,30 @@ See @tbl-test
 >   Since code annotations are present, code-linking has been disabled
 > ```
 
-
 ### Error b4.3
 
-***
-> Warning: It appears as if you have specified a lower bounded prior on a parameter that has no natural lower bound.
+------------------------------------------------------------------------
+
+> Warning: It appears as if you have specified a lower bounded prior on
+> a parameter that has no natural lower bound.
 >
-> If this is really what you want, please specify argument 'lb' of 'set_prior' appropriately.
-> Warning occurred for prior 
-> b ~ lognormal(0, 1)
-***
+> If this is really what you want, please specify argument 'lb' of
+> 'set_prior' appropriately. Warning occurred for prior b \~
+> lognormal(0, 1) \*\*\*
+
+
+::: {#def-spines-blossom-model}
+
+$$
+\begin{align*}
+\text{day\_in\_year}_i \sim \operatorname{Normal}(\mu_i, \sigma) \\
+\mu_i  = \alpha + {\sum_{k=1}^K w_k B_{k, i}} \\
+\alpha \sim \operatorname{Normal}(100, 10) \\
+w_j \sim \operatorname{Normal}(0, 10) \\
+\sigma \sim \operatorname{Exponential}(1)
+
+
+\end{align*}
+$$ {#eq-spines-blossom-model-b}
+
+:::

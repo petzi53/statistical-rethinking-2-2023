@@ -257,6 +257,7 @@ posterior_a <- posterior_a / sum(posterior_a)
 ```{r}
 #| label: draw-samples-a
 #| attr-source: '#lst-draw-samples-a lst-cap="Draw 1000 Samples from the posterior distribution, using `base::set.seed(3)`"'
+#| echo: fenced
 
 n_samples_a <- 1e4
 
