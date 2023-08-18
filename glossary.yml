@@ -15,6 +15,12 @@ Exponential Distribution: |
   The exponential distribution is often concerned with the amount of time until some specific event occurs. For example, the amount of time (beginning now) until an earthquake occurs has an exponential distribution.
 
   Values for an exponential random variable occur in the following way: There are fewer large values and more small values. For example, the amount of money customers spend in one trip to the supermarket follows an exponential distribution. There are more people who spend small amounts of money and fewer people who spend large amounts of money. ([LibreTexts Statistics](https://stats.libretexts.org/Bookshelves/Introductory_Statistics/Introductory_Statistics_(OpenStax)/05%3A_Continuous_Random_Variables/5.04%3A_The_Exponential_Distribution))
+Generalized Additive Models (GAMs): |
+  GAMs are generalized linear model in which the linear response variable depends linearly on unknown smooth functions of some predictor variables, and interest focuses on inference about these smooth functions. They can be interpreted as the discriminative generalization of the naive Bayes generative model. ([Wikipedia](https://en.wikipedia.org/wiki/Generalized_additive_model)).
+
+  GAMs relax the restriction that the relationship must be a simple weighted sum, and instead assume that the outcome can be modelled by a sum of arbitrary functions of each feature. ([Medium member story](https://towardsdatascience.com/generalised-additive-models-6dfbedf1350a#c407)) (Chap.4)
+
+
 Knots: |
   B-splines is that they divide the full range of some predictor variable into parts called Knots. Knots are cutpoints that defines different regions (or partitions) for a variable. In each regions, a fitting must occurs. The definition of different regions is a way to stay local in the fitting process. ([DataCademia | Statistics Knots (Cut Points)](https://datacadamia.com/data_mining/knot)) (Chap.4)
 Polynomial Regression: |

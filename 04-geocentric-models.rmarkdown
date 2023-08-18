@@ -2,6 +2,7 @@
 
 ## File setup {.unnumbered}
 
+
 ```{r}
 #| label: setup
 
@@ -26,6 +27,7 @@ glossary_style(color = "#0066cc",
                def_bg = "#333",
                def_color = "white")
 ```
+
 
 ## `ORIGINAL`
 
@@ -253,6 +255,7 @@ using all along.
 We will write it in a form that is compatible and therefore better
 recognizable with the expression in @eq-from-model-to-bayes-theorem:
 
+
 ```{r}
 #| label: model-bayes-theorem-a
 #| attr-source: '#lst-model-bayes-theorem-a lst-cap="Calculate the posterior distribution in a way that is regognizable with the Bayes theorem"'
@@ -265,6 +268,7 @@ posterior_num <- dbinom(w, n, p_grid_a) * dunif(p_grid_a, 0, 1)
 posterior_a <- posterior_num / sum(posterior_num)
 
 ```
+
 
 Compare to the calculations in earlier chapters, for example with
 @lst-grid-approx-a.
@@ -294,6 +298,7 @@ detailed quantitative studies by people like Howell.
 Loading data from a package with `data()` is only possible if you have
 already loaded the package. In our example:
 
+
 ```{r}
 #| label: loading-data-from-package1_a
 #| eval: false
@@ -305,10 +310,12 @@ data(Howell1)
 d_a <- Howell1
 ```
 
+
 Because of many function name conflicts with {**brms**} I do not want to
 load {**rethinking**} and will call the function of these conflicted
 packages with `<package name>::<function name>()` Therefore I have to
 use another, not so usual loading strategy of the data set:
+
 
 ```{r}
 #| label: loading-data-from-package2_a
@@ -318,6 +325,7 @@ data(package = "rethinking", list = "Howell1")
 d_a <- Howell1
 ```
 
+
 The advantage of this strategy is that I have not always to detach the
 {**rethinking**} package and to make sure {**rethinking**} is detached
 before using {**brms**} as it is necessary in the Kurz's {**tidyverse**}
@@ -325,6 +333,7 @@ before using {**brms**} as it is necessary in the Kurz's {**tidyverse**}
 :::
 
 ##### Show the data
+
 
 ```{r}
 #| label: show-howell-data-a
@@ -336,6 +345,7 @@ str(d_a)
 ## R code 4.9 ###################
 rethinking::precis(d_a)
 ```
+
 
 This data frame contains four columns. Each column has 544 entries, so
 there are 544 individuals in these data. Each individual has a recorded
@@ -349,6 +359,7 @@ want for now are heights of adults in the sample. The reason to filter
 out non-adults for now is that height is strongly correlated with age,
 before adulthood.
 
+
 ```{r}
 #| label: select-height-adults-a
 #| attr-source: '#lst-select-height-adults-a lst-cap="Select the height data of adults (individuals older or equal than 18 years): base R version"'
@@ -361,6 +372,7 @@ d2_a <- d_a[d_a$age >= 18, ]
 
 ```
 
+
 We'll be working with the data frame d2 now. It should have 352 rows
 (individuals) in it. We will check this with `nrow(d2_a)` =
 `r nrow(d2_a)`.
@@ -371,6 +383,7 @@ Our goal is to model the data in `d2_a` using a Gaussian distribution.
 
 ##### Plot the distribution of heights
 
+
 ```{r}
 #| label: fig-dist-heights-a
 #| fig-cap: "The distribution of the heights data,overlaid by an ideal Gaussian distribution: rethinking version"
@@ -378,6 +391,7 @@ Our goal is to model the data in `d2_a` using a Gaussian distribution.
 
 rethinking::dens(d2_a$height, norm.comp = TRUE)
 ```
+
 
 With the option `norm.comp = TRUE` I have overlaid a Gaussian
 distribution to see the differences to the actual data. There are some
@@ -466,6 +480,7 @@ have a sense of the assumption they build into the model.
 
 ##### Plot the mean prior (mu)
 
+
 ```{r}
 #| label: fig-mean-prior-a
 #| fig-cap: "Plot of the chosen mean prior: base R version"
@@ -473,6 +488,7 @@ have a sense of the assumption they build into the model.
 ## R code 4.12 ###############################
 curve(dnorm(x, 178, 20), from = 100, to = 250)
 ```
+
 
 You can see that the golem is assuming that the average height (not each
 individual height) is almost certainly between 140 cm and 220 cm. So
@@ -485,6 +501,7 @@ makes sense. How should we pick the upper bound? In this case, a
 standard deviation of 50 cm would imply that 95% of individual heights
 lie within 100 cm of the average height. That's a very large range.
 
+
 ```{r}
 #| label: fig-sd-prior-a
 #| fig-cap: "Plot the chosen prior for the standard deviation: base R version"
@@ -492,6 +509,7 @@ lie within 100 cm of the average height. That's a very large range.
 ## R code 4.13 ###########################
 curve(dunif(x, 0, 50), from = -10, to = 60)
 ```
+
 
 ##### Prior predictive simulation
 
@@ -506,6 +524,7 @@ from the prior, like you sampled from the posterior back in
 potentially a prior for a subsequent analysis, so you can process priors
 just like posteriors.
 
+
 ```{r}
 #| label: fig-prior-predictive-sim-a
 #| fig-cap: "Simulate heights by sampling from the prior: rethinking version"
@@ -517,6 +536,7 @@ sample_sigma_a <- runif(1e4, 0, 50)
 prior_h_a <- rnorm(1e4, sample_mu_a, sample_sigma_a)
 rethinking::dens(prior_h_a, norm.comp = TRUE)
 ```
+
 
 > It displays a vaguely bell-shaped density with thick tails. It is the
 > expected distribution of heights, averaged over the prior. Notice that
@@ -543,6 +563,7 @@ less informative prior for `μ`, like $μ \sim Normal(178, 100)$. Priors
 with such large standard deviations are quite common in Bayesian models,
 but they are hardly ever sensible.
 
+
 ```{r}
 #| label: fig-prior-predictive-sim2-a
 #| fig-cap: "Simulate heights from priors with a large standard deviation: rethinking version"
@@ -553,6 +574,7 @@ sample_mu2_a <- rnorm(1e4, 178, 100)
 prior_h2_a <- rnorm(1e4, sample_mu2_a, sample_sigma_a)
 rethinking::dens(prior_h2_a)
 ```
+
 
 The results of @fig-prior-predictive-sim2-a contradicts our scientific
 knowledge --- but also our common sense --- about possible height values
@@ -585,6 +607,7 @@ This is not recommended because it is
 Therefor the grid approximation technique has limited relevance. Later
 on we will use the quadratic approximation with `rethinking::quap()`.
 
+
 ```{r}
 #| label: grid-approx-posterior-a
 
@@ -615,6 +638,7 @@ post_a$prob <- exp(post_a$prod - max(post_a$prod))
 
 ```
 
+
 > **Comment to the last line**: the obstacle for getting back on the
 > probability scale is that rounding error is always a threat when
 > moving from log-probability to probability. If you use the obvious
@@ -623,6 +647,7 @@ post_a$prob <- exp(post_a$prod - max(post_a$prod))
 > probabilities to zero.
 
 **Plot contour lines**
+
 
 ```{r}
 #| label: fig-contour-plot-a
@@ -633,10 +658,12 @@ rethinking::contour_xyz(post_a$mu_a, post_a$sigma_a, post_a$prob)
 
 ```
 
+
 You can inspect this posterior distribution, now residing in
 `post_a$prob`, using a variety of plotting commands.
 
 **Plot heat map**
+
 
 ```{r}
 #| label: fig-heat-map-a
@@ -646,6 +673,7 @@ You can inspect this posterior distribution, now residing in
 rethinking::image_xyz(post_a$mu_a, post_a$sigma_a, post_a$prob)
 
 ```
+
 
 #### Sampling from the posterior
 
@@ -657,6 +685,7 @@ only new trick is that since there are two parameters, and we want to
 sample combinations of them, we first randomly sample row numbers in
 post in proportion to the values in \`post_a\$prob´. Then we pull out
 the parameter values on those randomly sampled rows.
+
 
 ```{r}
 #| label: fig-posterior-sample-a
@@ -680,6 +709,7 @@ plot(sample.mu_a, sample.sigma_a, cex = 0.8, pch = 21, col = rethinking::col.alp
 
 ```
 
+
 The function `col.alpha()` is part of the {**rethinking**} R package.
 All it does is make colors transparent, which helps the plot in FIGURE
 4.4 (here: @fig-posterior-sample-a) more easily show density, where
@@ -699,6 +729,7 @@ samples. Think of them like data and describe them, just like in
 @sec-sampling-to-summarize. For example, to characterize the shapes of
 the marginal posterior densities of `μ` and `σ`, all we need to do is:
 
+
 ```{r}
 #| label: fig-marg-post-density-a
 #| fig-cap: "Shapes of the marginal posterior densities of μ and σ: rethinking version"
@@ -708,6 +739,7 @@ rethinking::dens(sample.mu_a)
 rethinking::dens(sample.sigma_a)
 
 ```
+
 
 The jargon "marginal" here means "averaging over the other parameters."
 Execute the above code and inspect the plots. These densities are very
@@ -723,6 +755,7 @@ standard deviation parameters.
 To summarize the widths of these densities with posterior compatibility
 intervals we use:
 
+
 ```{r}
 #| label: post-comp-intervals-a
 #| attr-source: '#lst-post-comp-intervals-a lst-cap="Posterior Compatibility Intervals (PIs): rethinking version"'
@@ -731,6 +764,7 @@ intervals we use:
 rethinking::PI(sample.mu_a)
 rethinking::PI(sample.sigma_a)
 ```
+
 
 Since these samples are just vectors of numbers, you can compute any
 statistic from them that you could from ordinary data: `mean`, `median`,
@@ -759,6 +793,7 @@ could be a lot bigger.
 
 Let's quickly analyze only 20 of the heights from the height data to
 reveal this issue. To sample 20 random heights from the original list:
+
 
 ```{r}
 #| label: fig-sample-only-20-a
@@ -794,6 +829,7 @@ plot(sample2_a.mu, sample2_a.sigma,
 
 ```
 
+
 you'll see another scatter plot of the samples from the posterior
 density, but this time you'll notice a distinctly longer tail at the top
 of the cloud of points.
@@ -803,6 +839,7 @@ of the cloud of points.
 You should also inspect the marginal posterior density for σ, averaging
 over μ, produced with:
 
+
 ```{r}
 #| label: fig-marg-post-density-a2
 #| fig-cap: "Marginal posterior density for σ, averaging over μ: rethinking version"
@@ -811,6 +848,7 @@ over μ, produced with:
 rethinking::dens(sample2_a.sigma, norm.comp = TRUE)
 
 ```
+
 
 #### Finding the posterior distribution with quap()
 
@@ -838,6 +876,7 @@ non-Bayesian procedures do, just without any priors.
 3.  Now we can have a look with `rethinking::precis()` at the posterior
     distribution (Code 4.29).
 
+
 ```{r}
 #| label: post-dist-quap-m4-1-a
 #| attr-source: '#lst-post-dist-quap-m4-1-a lst-cap="Finding the posterior distribution with rethinking::quap()"'
@@ -856,6 +895,7 @@ m4.1 <- rethinking::quap(flist, data = d2_a)
 rethinking::precis(m4.1)
 
 ```
+
 
 > These numbers provide Gaussian approximations for each parameter's
 > *marginal* distribution. This means the plausibility of each value of
@@ -886,6 +926,7 @@ Mean and standard deviation are good values to start values for hill
 climbing. If you don't specify `rethinking::quap()` will use a random
 value.
 
+
 ```{r}
 #| label: start-values-quap
 #| attr-source: '#start-values-quap lst-cap="Define start values for rethinking::quap()"'
@@ -899,6 +940,7 @@ m4.1_2 <- rethinking::quap(flist, data = d2_a, start = start)
 rethinking::precis(m4.1_2)
 
 ```
+
 
 ::: callout-note
 ###### list() and alist()
@@ -923,6 +965,7 @@ value.
 > very narrow prior. I'll also build the formula right into the call to
 > `quap` this time.
 
+
 ```{r}
 #| label: post-dist-quap-m4.2
 #| attr-source: '#lst-post-dist-quap-m4.2 lst-cap="Finding the posterior distribution with a narrower prior rethinking::quap()"'
@@ -939,6 +982,7 @@ m4.2 <- rethinking::quap(
 rethinking::precis(m4.2)
 
 ```
+
 
 > Notice that the estimate for `*μ*` has hardly moved off the prior. The
 > prior was very concentrated around 178. So this is not surprising. But
@@ -974,6 +1018,7 @@ variance) are sufficient to describe a one-dimensional Gaussian
 distribution, a list of means and a matrix of variances and covariances
 are sufficient to describe a multi-dimensional Gaussian distribution.
 
+
 ```{r}
 #| label: calc-var-cov-m4.1-a
 #| attr-source: '#lst-calc-var-cov-m4.1-a lst-cap="Calculation of the variance-covariance matrix: rethinking version"'
@@ -981,6 +1026,7 @@ are sufficient to describe a multi-dimensional Gaussian distribution.
 ## R code 4.32 ###################
 rethinking::vcov(m4.1)
 ```
+
 
 `vcov()` returns the variance-covariance matrix of the main parameters
 of a fitted model object. In the above {**rethinking**} version is uses
@@ -1015,6 +1061,7 @@ into two elements: (1) a vector of variances for the parameters and (2)
 a correlation matrix that tells us how changes in any parameter lead to
 correlated changes in the others.
 
+
 ```{r}
 #| label: vcov-decomp-m4.1-a
 
@@ -1022,6 +1069,7 @@ correlated changes in the others.
 base::diag(rethinking::vcov(m4.1))      # <1>
 stats::cov2cor(rethinking::vcov(m4.1))  # <2>
 ```
+
 
 1.  `base::diag()` extracts the diagonal of the (variance-covariance)
     matrix. The two-element vector in the output is the list of
@@ -1044,6 +1092,7 @@ Now instead of sampling single values from a simple Gaussian
 distribution, we sample vectors of values from a multi-dimensional
 Gaussian distribution.
 
+
 ```{r}
 #| label: extract-samples-m4.1-a
 #| attr-source: '#lst-extract-samples-m4.1-a lst-cap="Extract sample vectors of values from the multi-dimensional Gaussian distribution of m4.1: rethinking version"'
@@ -1054,11 +1103,13 @@ post3_a <- rethinking::extract.samples(m4.1, n = 1e4)
 head(post3_a)
 ```
 
+
 You end up with a data frame, post, with 10,000 (1e4) rows and two
 columns, one column for `_μ_` and one for `_σ_`. Each value is a sample
 from the posterior, so the mean and standard deviation of each column
 will be very close to the MAP values from before. You can confirm this
 by summarizing the samples:
+
 
 ```{r}
 #| label: summary-samples-m4.1-a
@@ -1068,6 +1119,7 @@ by summarizing the samples:
 rethinking::precis(post3_a)
 ```
 
+
 Compare these values to the output from @lst-post-dist-quap-m4-1-a. And
 you can use `plot(post)` to see how much they resemble the samples from
 the grid approximation in FIGURE 4.4 (here @fig-posterior-sample-a).
@@ -1076,12 +1128,14 @@ hardly matters right now, because `_μ_` and `_σ_` don't co-vary at all
 in this model. But once you add a predictor variable to your model,
 covariance will matter a lot.
 
+
 ```{r}
 #| label: fig-posterior-sample-vectors-a
 #| fig-cap: "Samples from the vectors of values from a multi-dimensional Gaussian distribution. The density of points is highest in the center, reflecting the most plausible combinations of μ and σ. It is very similar to @fig-posterior-sample-a (rethinking version)"
 
 base::plot(post3_a)
 ```
+
 
 ##### Under the hood with multivariate sampling {#sec-under-the-hood-multivariate-sampling-a}
 
@@ -1094,6 +1148,7 @@ simulates random Gaussian values, while `MASS::mvrnorm()` simulates
 random vectors of multivariate Gaussian values. Here's how to use it the
 {**MASS**} function to do what `rethinking::extract.samples()` does:
 
+
 ```{r}
 #| label: fig-posterior-sample-vectors-MASS-a
 #| fig-cap: "Extract samples from the vectors of values from a multi-dimensional Gaussian distribution using the {**MASS**} package. It is same calculation as in @fig-posterior-sample-a (rethinking version)"
@@ -1104,6 +1159,7 @@ post4_a <- MASS::mvrnorm(n = 1e4, mu = rethinking::coef(m4.1),
                       Sigma = rethinking::vcov(m4.1))
 plot(post4_a)
 ```
+
 
 ### Linear prediction
 
@@ -1118,6 +1174,7 @@ linear regression.
 Let's look at how height in these Kalahari foragers (the outcome
 variable) co-varies with weight (the predictor variable).
 
+
 ```{r}
 #| label: fig-height-against-weight-a
 #| fig-cap: "Adult height and weight against one another"
@@ -1125,6 +1182,7 @@ variable) co-varies with weight (the predictor variable).
 ## R code 4.37 #####################
 plot(d2_a$height ~ d2_a$weight)
 ```
+
 
 There's obviously a relationship: Knowing a person's weight helps you
 predict height. To make this vague observation into a more precise
@@ -1241,6 +1299,7 @@ range of observed weights will do fine. Then we need to simulate a bunch
 of lines, the lines implied by the priors for $\alpha$ and $\beta$.
 Here's how to do it, setting a seed so you can reproduce it exactly:
 
+
 ```{r}
 #| label: fig-sim-heights-only-with-priors-a
 #| fig-cap: "Simulating heights from the model, using only the priors: rethinking version"
@@ -1269,6 +1328,7 @@ for (i in 1:N_100_a) {
 }
 
 ```
+
 
 For reference, I've added a dashed line at zero---no one is shorter than
 zero---and the "Wadlow" line at 272 cm for the world's tallest person.
@@ -1299,6 +1359,7 @@ Base R provides the `dlnorm()` and `rlnorm()` densities for working with
 log-normal distributions. You can simulate this relationship to see what
 this means for $\beta$:
 
+
 ```{r}
 #| label: fig-log-normal-a
 #| fig-cap: "Log-Normal distribution: rethinking version"
@@ -1311,6 +1372,7 @@ b <- rlnorm(1e4, 0, 1)
 rethinking::dens(b, xlim = c(0, 5), adj = 0.1)
 ```
 
+
 If the logarithm of $\beta$ is normal, then $\beta$ itself is strictly
 positive. The reason is that `exp(x)` is greater than zero for any real
 number `x`. This is the reason that Log-Normal priors are commonplace.
@@ -1318,6 +1380,7 @@ They are an easy way to enforce positive relationships.
 
 So what does this earn us? Do the prior predictive simulation again, now
 with the Log-Normal prior:
+
 
 ```{r}
 #| label: fig-prior-pred-sim-a
@@ -1348,6 +1411,7 @@ for (i in 1:N_100_a) {
 
 
 ```
+
 
 This is much more sensible. There is still a rare impossible
 relationship. But nearly all lines in the joint prior for $\alpha$ and
@@ -1427,6 +1491,7 @@ sigma ~ dunif(0, 50)          # <5>
 Notice that the linear model, in the R code on the right-hand side, uses
 the R assignment operator, `<-` instead of the symbol `=`.
 
+
 ```{r}
 #| label: find-post-dist-a
 #| attr-source: '#lst-find-post-dist-a lst-cap="Find the posterior distribution of the linear height-weight model: rethinking version"'
@@ -1453,6 +1518,7 @@ m4.3 <- rethinking::quap(
 rethinking::precis(m4.3)
 ```
 
+
 You can usefully think of as assigning to $y = log(x)$ the order of
 magnitude of $x = exp(y)$. The function is the reverse, turning a
 magnitude into a value. These definitions will make a mathematician
@@ -1463,6 +1529,7 @@ These definitions allow the Log-Normal prior for `β` to be coded another
 way. Instead of defining a parameter `β`, we define a parameter that is
 the logarithm of `β` and then assign it a normal distribution. Then we
 can reverse the logarithm inside the linear model. It looks like this:
+
 
 ```{r}
 #| label: find-post-dist2-a
@@ -1482,6 +1549,7 @@ m4.3b <- rethinking::quap(
 
 rethinking::precis(m4.3b)
 ```
+
 
 Note the `exp(log_b)` in the definition of `mu`. This is the same model
 as `m4.3`. It will make the same predictions. But instead of `β` in the
@@ -1503,6 +1571,7 @@ I have already included the summary (`precis()`) for the `m4.3` model in
 @lst-find-post-dist-a. But I will repeat it to inspect the marginal
 posterior distributions of the parameters in detail:
 
+
 ```{r}
 #| label: table-summary-m4.3
 #| attr-source: '#lst-table-summary-m4.3 lst-cap="Display the marginal posterior distributions of the parameters: rethinking version"'
@@ -1512,6 +1581,7 @@ posterior distributions of the parameters in detail:
 rethinking::precis(m4.3)
 
 ```
+
 
 **Interpreting the result of `rethinking::precis(m4.3)`**
 
@@ -1534,6 +1604,7 @@ Remember, the numbers in the default precis output aren't sufficient to
 describe the quadratic posterior completely. For that, we also require
 the variance-covariance matrix.
 
+
 ```{r}
 #| label: var-cov-matrix-m4.3
 #| attr-source: '#lst-var-cov-matrix-m4.3 lst-cap="Calculate the variance-covariance matrix for model m4.3"'
@@ -1542,9 +1613,11 @@ the variance-covariance matrix.
 round(rethinking::vcov(m4.3), 3)
 ```
 
+
 There is very little covariation among the parameters in this case. The
 lack of covariance among the parameters results from
 `r glossary("centering")`.
+
 
 ```{r}
 #| label: fig-marg-post-cov-m4.3
@@ -1554,6 +1627,7 @@ lack of covariance among the parameters results from
 
 rethinking::pairs(m4.3)
 ```
+
 
 ##### Plotting posterior inference against the data
 
@@ -1570,6 +1644,7 @@ We'll start with just the raw data and a single line. The code below
 plots the raw data, computes the posterior mean values for `a` and `b`,
 then draws the implied line:
 
+
 ```{r}
 #| label: fig-raw-data-line-m4.3
 #| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: rethinking version"
@@ -1582,6 +1657,7 @@ a_map <- mean(post_m4.3$a)
 b_map <- mean(post_m4.3$b)
 curve(a_map + b_map * (x - xbar), add = TRUE)
 ```
+
 
 Each point in this plot is a single individual. The black line is
 defined by the mean slope `β` and mean intercept `α`. This is not a bad
@@ -1609,6 +1685,7 @@ relationship.
 To better appreciate how the posterior distribution contains lines, we
 work with all of the samples from the model.
 
+
 ```{r}
 #| label: collect-post-samples-a
 
@@ -1616,6 +1693,7 @@ work with all of the samples from the model.
 # post_m4.3 <- rethinking::extract.samples(m4.3) # already in previous listing
 post_m4.3[1:5, ]
 ```
+
 
 Each row is a correlated random sample from the joint posterior of all
 three parameters, using the covariances provided by
@@ -1631,6 +1709,7 @@ data to begin. Then you can see how adding in more data changes the
 scatter of the lines. So we'll begin with just the first 10 cases in
 `d2_a`. The following code extracts the first 10 cases and re-estimates
 the model:
+
 
 ```{r}
 #| label: extract-10-re-est-mod-a
@@ -1651,8 +1730,10 @@ mN10_a <- rethinking::quap(
 
 ```
 
+
 Now let's plot 20 of these lines for the 10 data points, to see what the
 uncertainty looks like.
+
 
 ```{r}
 #| label: fig-plot-lines-10-points-a
@@ -1679,6 +1760,7 @@ for (i in 1:20) {
 
 ```
 
+
 The result is shown in the upper-left plot in FIGURE 4.7. By plotting
 multiple regression lines, sampled from the posterior, it is easy to see
 both the highly confident aspects of the relationship and the less
@@ -1692,6 +1774,7 @@ grows more compact as the sample size increases. This is a result of the
 model growing more confident about the location of the mean.
 
 Plot 20 lines sampled from 50 data points of the posterior distribution
+
 
 ```{r}
 #| label: fig-plot-lines-50-points-a
@@ -1730,7 +1813,9 @@ for (i in 1:20) {
 
 ```
 
+
 Plot 20 lines sampled from 352 data points of the posterior distribution
+
 
 ```{r}
 #| label: fig-plot-lines-all-352-points-a
@@ -1769,6 +1854,7 @@ for (i in 1:20) {
 
 ```
 
+
 ##### Plotting regression intervals and contours
 
 The cloud of regression lines in @fig-plot-lines-10-points-a,
@@ -1777,6 +1863,7 @@ appealing display, because it communicates uncertainty about the
 relationship in a way that many people find intuitive. But it's more
 common, and often much clearer, to see the uncertainty displayed by
 plotting an interval or contour around the average regression line.
+
 
 ```{r}
 #| label: calc-PI-around-regr-line-a
@@ -1788,6 +1875,7 @@ post_m4.3 <- rethinking::extract.samples(m4.3)      # <1>
 mu_at_50_a <- post_m4.3$a + post_m4.3$b * (50 - xbar) # <2>
 head(mu_at_50_a)                                      # <3>
 ```
+
 
 1.  Repeating the code for drawing (extracting and collecting) from the
     fitted model m4.3 (already done in @fig-raw-data-line-m4.3)
@@ -1802,6 +1890,7 @@ head(mu_at_50_a)                                      # <3>
 It might be helpful at this point to actually plot the density for this
 vector of means:
 
+
 ```{r}
 #| label: fig-density-vector-mean-50-a
 #| fig-cap: "The quadratic approximate posterior distribution of the mean height, μ, when weight is 50 kg. This distribution represents the relative plausibility of different values of the mean. Rehtinking version"
@@ -1809,6 +1898,7 @@ vector of means:
 ## R code 4.51 ##################
 rethinking::dens(mu_at_50_a, col = rethinking::rangi2, lwd = 2, xlab = "mu|weight=50")
 ```
+
 
 Since the components of `μ` have distributions, so too does `μ`. And
 since the distributions of `α` and `β` are Gaussian, so too is the
@@ -1820,6 +1910,7 @@ for it, just like for any posterior distribution. To find the 89%
 compatibility interval of `μ` at 50 kg, just use the `PI()` command as
 usual:
 
+
 ```{r}
 #| label: PI-mu-at-50-a
 #| attr-source: '#lst-PI-mu-at-50-a lst-cap="89% compatibility interval of μ at 50 kg"'
@@ -1828,6 +1919,7 @@ usual:
 rethinking::PI(mu_at_50_a, prob = 0.89)
 
 ```
+
 
 What these numbers mean is that the central 89% of the ways for the
 model to produce the data place the average height between about 159 cm
@@ -1844,6 +1936,7 @@ This is made simple by strategic use of the
 for each case in the data and sample from the posterior distribution.
 Here's what it looks like for the data you used to fit the model:
 
+
 ```{r}
 #| label: calc-mu-with-link-a
 #| attr-source: '#lst-calc-mu-with-link-a lst-cap="Calculate μ for each case in the data and sample from the posterior distribution: Rethinking version"'
@@ -1852,6 +1945,7 @@ Here's what it looks like for the data you used to fit the model:
 mu_a <- rethinking::link(m4.3)
 str(mu_a)
 ```
+
 
 You end up with a big matrix of values of `μ`. Each row is a sample from
 the posterior distribution. The default is 1000 samples, but you can use
@@ -1865,6 +1959,7 @@ each individual in the original data. We actually want something
 slightly different: a distribution of `μ` for each unique weight value
 on the horizontal axis. It's only slightly harder to compute that, by
 just passing `rethinking::link()` some new data:
+
 
 ```{r}
 #| label: calc-dist-mu-unique-with-link-a
@@ -1882,9 +1977,11 @@ mu2_a <- rethinking::link(m4.3, data = data.frame(weight = weight.seq))
 str(mu2_a)
 ```
 
+
 And now there are only 46 columns in mu, because we fed it 46 different
 values for weight. To visualize what you've got here, let's plot the
 distribution of `μ` values at each height.
+
 
 ```{r}
 #| label: fig-dist-mu-height-100-a
@@ -1901,6 +1998,7 @@ for (i in 1:100) {
 
 ```
 
+
 At each weight value in `weight.seq`, a pile of computed `μ` values are
 shown. Each of these piles is a Gaussian distribution, like that in
 @fig-density-vector-mean-50-a. You can see now that the amount of
@@ -1911,6 +2009,7 @@ same fact you saw in @fig-plot-lines-10-points-a,
 The final step is to summarize the distribution for each weight value.
 We'll use `base::apply()`, which applies a function of your choice to a
 matrix.
+
 
 ```{r}
 #| label: sum-dist-weight-a
@@ -1924,6 +2023,7 @@ mu2.mean                                               # <3>
 mu2.PI                                                 # <4>
 ```
 
+
 1.  Read `apply(mu2,2,mean)` as "compute the mean of each column
     (dimension '2') of the matrix mu". Now `mu2.mean` contains the
     average `μ` at each weight value.
@@ -1932,6 +2032,7 @@ mu2.PI                                                 # <4>
     distributions in `mu2_a`, with each column being for a different
     weight value. These summaries are only summaries. The "estimate" is
     the entire distribution.
+
 
 ```{r}
 #| label: fig-summaries-on-data-top-a
@@ -1949,6 +2050,7 @@ graphics::lines(weight.seq, mu2.mean)
 rethinking::shade(mu2.PI, weight.seq)
 
 ```
+
 
 ::: callout-caution
 There is very little uncertainty about the average height as a function
@@ -1984,6 +2086,7 @@ from the posterior of a fit model:
 You could write a function that accomplish the same thing as
 `rethinking::link()`:
 
+
 ```{r}
 #| label: writing-link-function-a
 #| attr-source: '#lst-writing-link-function-a lst-cap="Code to perform the same steps as the rethinking::link() function"'
@@ -1998,6 +2101,7 @@ mu3.CI <- apply(mu3_a, 2, rethinking::PI, prob = 0.89)
 mu3.mean
 mu3.CI
 ```
+
 
 And the values in `mu3.mean` and `mu3.CI` should be very similar
 (allowing for simulation variance) to what you got the automated way,
@@ -2048,6 +2152,7 @@ the Gaussian distribution of heights.
 There is a tool called `rethinking::sim()` which does this simulation of
 the posterior observations:
 
+
 ```{r}
 #| label: simulate-post-dist-a
 #| attr-source: '#lst-simulate-post-dist-a lst-cap="Simulation of the posterior observations"'
@@ -2057,11 +2162,13 @@ sim.height <- rethinking::sim(m4.3, data = list(weight = weight.seq))
 str(sim.height)
 ```
 
+
 This matrix is much like the earlier one, `mu`, but it contains
 simulated heights, not distributions of plausible average height, `μ`.
 
 We can summarize these simulated heights in the same way we summarized
 the distributions of `μ`, by using apply:
+
 
 ```{r}
 #| label: sum-sim-heights-a
@@ -2071,6 +2178,7 @@ the distributions of `μ`, by using apply:
 height.PI <- apply(sim.height, 2, rethinking::PI, prob = 0.89)
 ```
 
+
 Now `height.PI` contains the 89% posterior prediction interval of
 observable (according to the model) heights, across the values of weight
 in `weight.seq`.
@@ -2078,6 +2186,7 @@ in `weight.seq`.
 Let's plot everything we've built up: (1) the average line, (2) the
 shaded region of 89% plausible `μ`, and (3) the boundaries of the
 simulated heights the model expects.
+
 
 ```{r}
 #| label: fig-pred-interval-height-a
@@ -2099,6 +2208,7 @@ rethinking::shade(height.PI, weight.seq)
 
 ```
 
+
 Notice that the outline for the wide shaded interval is a little rough.
 This is the simulation variance in the tails of the sampled Gaussian
 values. If it really bothers you, increase the number of samples you
@@ -2113,6 +2223,7 @@ it serves to remind us that all statistical inference is approximate.
 The fact that we can compute an expected value to the 10th decimal place
 does not imply that our inferences are precise to the 10th decimal
 place.
+
 
 ```{r}
 #| label: fig-pred-interval-height2-a
@@ -2138,6 +2249,7 @@ rethinking::shade(mu3.CI, weight.seq)
 rethinking::shade(height2.PI, weight.seq)
 ```
 
+
 Just like with `rethinking::link()`, it's useful to know a little about
 how `rethinking::sim()` operates. For every distribution like `dnorm`,
 there is a companion simulation function. For the Gaussian distribution,
@@ -2145,6 +2257,7 @@ the companion is `rnorm`, and it simulates sampling from a Gaussian
 distribution. What we want R to do is simulate a height for each set of
 samples, and to do this for each value of weight. The following will do
 it:
+
 
 ```{r}
 #| label: writing-sim-function-a
@@ -2165,8 +2278,10 @@ sim3.height <- sapply(weight.seq, function(weight) {
 height3.PI <- apply(sim3.height, 2, rethinking::PI, prob = 0.89)
 ```
 
+
 The values in `height.PI` will be practically identical to the ones
 computed in the main text and displayed in FIGURE 4.10.
+
 
 ```{r}
 #| label: compare-height-PIs-str--a
@@ -2177,7 +2292,9 @@ str(height3.PI)
 
 ```
 
+
 Small differences are the result of the randomized sampling process:
+
 
 ```{r}
 #| label: compare-height-PIs-head-a
@@ -2186,6 +2303,7 @@ Small differences are the result of the randomized sampling process:
 head(height.PI)[ , 1:6]
 head(height3.PI)[ , 1:6]
 ```
+
 
 ### Curves from lines
 
@@ -2202,6 +2320,7 @@ as extra predictors. This is an easy way to build curved associations.
 Polynomial regressions are very common, and understanding how they work
 will help scaffold later models.
 
+
 ```{r}
 #| label: fig-scatterplot-height-weight-a
 #| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal). This time with the full data, e.g., the non-adults data."
@@ -2209,6 +2328,7 @@ will help scaffold later models.
 
 plot(height ~ weight, data = d_a, col = rethinking::rangi2)
 ```
+
 
 The relationship is visibly curved, now that we've included the
 non-adult individuals. (Compare with adult data in
@@ -2306,6 +2426,7 @@ transformations -- you don't need the computer to recalculate the
 transformations on every iteration of the fitting procedure. So I'll
 also build the square of `weight_s` as a separate variable:
 
+
 ```{r}
 #| label: quap-parabolic
 #| attr-source: '#lst-quap-parabolic lst-cap="Finding the posterior distribution of a parabolic model of height on weight with rethinking::quap()"'
@@ -2326,9 +2447,11 @@ m4.5 <- rethinking::quap(
 )
 ```
 
+
 Now, since the relationship between the outcome height and the predictor
 weight depends upon two slopes, b1 and b2, it isn't so easy to read the
 relationship off a table of coefficients:
+
 
 ```{r}
 #| label: show-result-m4.5
@@ -2337,6 +2460,7 @@ relationship off a table of coefficients:
 ## R code 4.66 ################
 rethinking::precis(m4.5)
 ```
+
 
 The parameter $\alpha$ (a) is still the intercept, so it tells us the
 expected value of height when weight is at its mean value. But it is no
@@ -2349,6 +2473,7 @@ You have to plot these model fits to understand what they are saying. So
 let's do that. We'll calculate the mean relationship and the 89%
 intervals of the mean and the predictions, like in the previous section.
 Here's the working code:
+
 
 ```{r}
 #| label: fig-polynomial-regression-a
@@ -2373,8 +2498,10 @@ rethinking::shade(height5.PI, weight5.seq)
 
 ```
 
+
 The quadratic regression does a pretty good job. It is much better than
 a linear regression for the full Howell1 data set.
+
 
 ```{r}
 #| label: fig-find-post-full-data-a
@@ -2437,6 +2564,7 @@ rethinking::shade(height.PI_full, weight.seq_full)
 
 ```
 
+
 I had `xbar` to recalculate with the new data set. All the other code is
 the same as in @lst-find-post-dist-a and @lst-fig-raw-data-line-m4.3.
 
@@ -2484,6 +2612,7 @@ sigma ~ dunif(0, 50)                    # <7>
 Fit the model accordingly. It is only a slight modification of the
 parabolic model's code:
 
+
 ```{r}
 #| label: fig-cubic-regression-a
 #| fig-cap: "Cubic regressions of height on weight (standardized), for the full !Kung data."
@@ -2524,6 +2653,7 @@ rethinking::shade(height6.PI, weight6.seq)
 
 ```
 
+
 This cubic curve is even more flexible than the parabola, so it fits the
 data even better.
 
@@ -2544,6 +2674,7 @@ model using standardized variables, but want to plot the estimates on
 the original scale. All that's really needed is first to turn off the
 horizontal axis when you plot the raw data:
 
+
 ```{r}
 #| label: fig-x-axis-turned-off-a
 #| attr-source: '#lst-fig-x-axis-turned-off-a lst-cap="Cubic regression with x-axis turned off: Rehtinking version"'
@@ -2552,8 +2683,10 @@ horizontal axis when you plot the raw data:
 plot(height ~ weight_s, d_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5), xaxt = "n")
 ```
 
+
 The `xaxt` at the end there turns off the horizontal axis. Then you
 explicitly construct the axis, using the `graphics::axis()` function.
+
 
 ```{r}
 #| label: fig-cubic-regression-natural-scale-a
@@ -2567,6 +2700,7 @@ at_a <- c(-2, -1, 0, 1, 2)                           # <1>
 labels <- at_a * sd(d_a$weight) + mean(d_a$weight)   # <2>
 axis(side = 1, at = at_a, labels = round(labels, 1)) # <3>
 ```
+
 
 1.  Defines the location of the labels, in standardized units.
 2.  Takes standardized units and converts them back to the original
@@ -2597,6 +2731,7 @@ Cherry trees blossom all over Japan in the spring each year, and the
 tradition of flower viewing follows. The timing of the blossoms can vary
 a lot by year and century. Let's load a thousand years of blossom dates:
 
+
 ```{r}
 #| label: load-cherry-blossoms-data-a
 #| attr-source: '#lst-load-cherry-blossoms-data-a lst-cap="Load Cherry Blossoms data and display summary (rethinking version)"'
@@ -2607,6 +2742,7 @@ d4_a <- cherry_blossoms
 rethinking::precis(d4_a)
 ```
 
+
 See `?cherry_blossoms` for details and sources. We're going to work with
 the historical record of the **d**ay **o**f **y**ear of first bloom,
 `doy`, for now. It ranges from 86 (late March) to 124 (early May). The
@@ -2616,12 +2752,14 @@ trend in that cloud. It's hard to tell. (For the abbreviation CE see:
 [Common Era (CE) and Before Common Era
 (BCE)](https://www.timeanddate.com/calendar/ce-bce-what-do-they-mean.html))
 
+
 ```{r}
 #| label: fig-scatterplot-cbl-a
 #| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year: base R version"
 
 plot(doy ~ year, data = d4_a)
 ```
+
 
 There might be some wiggly trend in that cloud. It's hard to tell.
 
@@ -2651,6 +2789,7 @@ different evenly-spaced quantiles of the predictor variable. This gives
 you more knots where there are more observations. We used only 5 knots
 in the first example. Now let's go for 15:
 
+
 ```{r}
 #| label: choose-knots-a
 #| attr-source: '#lst-choose-knots-a lst-cap="Choose the knots that serve as pivots for the spline: rethinking version"'
@@ -2661,6 +2800,7 @@ num_knots15_a <- 15
 (knot_list15_a <- quantile(d5_a$year, 
                            probs = seq(0, 1, length.out = num_knots15_a)))
 ```
+
 
 ##### Choice of polynomial degree
 
@@ -2673,6 +2813,7 @@ will build basis functions for any list of knots and degree. This code
 will construct the necessary basis functions for a degree 3 (cubic)
 spline:
 
+
 ```{r}
 #| label: compute-b-spline-matrix-a
 #| attr-source: '#lst-compute-b-spline-matrix-a lst-cap="Compute the B-spline basis matrix for a cubic spline (degree 3): rethinking version"'
@@ -2683,6 +2824,7 @@ B_a <- splines::bs(d5_a$year,
   degree = 3, intercept = TRUE
 )
 ```
+
 
 The B-spline basis matrix B_a should have 827 rows and 17 columns. Lets
 check it:
@@ -2697,6 +2839,7 @@ prediction.
 
 To display the basis functions, just plot each column against year:
 
+
 ```{r}
 #| label: fig-b-spline-matrix-a
 #| attr-source: '#lst-fig-b-spline-matrix-a lst-cap="B-spline basis matrix for a cubic spline (degree 3): rethinking version"'
@@ -2706,6 +2849,7 @@ plot(NULL, xlim = range(d5_a$year), ylim = c(0, 1), xlab = "year", ylab = "basis
 for (i in 1:ncol(B_a)) lines(d5_a$year, B_a[, i])
 
 ```
+
 
 The plot shows, just like the top in FIGURE 4.12., the basis functions.
 However now more of these functions overlap.
@@ -2737,6 +2881,7 @@ that sum. The easiest way is to use matrix multiplication.
 only other trick is to use a start list for the weights to tell
 `rethinking::quap()` how many there are.
 
+
 ```{r}
 #| label: fit-model-m4.7
 #| attr-source: '#lst-fit-model-m4.7 lst-cap="Fit the model of B-spline basis matrix m4.7"'
@@ -2755,7 +2900,9 @@ m4.7 <- rethinking::quap(
 )
 ```
 
+
 A summary with `rethinking::precis` won't reveal much.
+
 
 ```{r}
 #| label: summarize-model-m4.7
@@ -2764,9 +2911,11 @@ A summary with `rethinking::precis` won't reveal much.
 rethinking::precis(m4.7,depth = 2)
 ```
 
+
 You should see 17 `w` parameters. But you can't tell what the model
 thinks from the parameter summaries. Instead we need to plot the
 posterior predictions. First, here are the weighted basis functions:
+
 
 ```{r}
 #| label: fig-weighted-basis-function
@@ -2783,8 +2932,10 @@ for (i in 1:ncol(B_a)) lines(d5_a$year, w[i] * B_a[, i])
 
 ```
 
+
 And finally we will plot the 97% posterior interval for `μ`, at each
 year:
+
 
 ```{r}
 #| label: fig-PI-cbl-a
@@ -2800,6 +2951,7 @@ rethinking::shade(mu_PI_cbl_a, d5_a$year,
                   col = rethinking::col.alpha("black", 0.5))
 
 ```
+
 
 The spline is much wigglier now. Something happened around 1500, for
 example. If you add more knots, you can make this even wigglier. You
@@ -2820,6 +2972,7 @@ parameters w: `B %*% w`. This notation is just linear algebra shorthand
 for (1) multiplying each element of the vector `w` by each value in the
 corresponding row of `B_a` and then (2) summing up each result. You
 could also fit the same model with the following less-elegant code:
+
 
 ```{r}
 #| label: fit-model-m4.7alt-a
@@ -2855,6 +3008,7 @@ rethinking::shade(mu_PI_cbl2_a, d5_a$year,
                   col = rethinking::col.alpha("black", 0.5))
 
 ```
+
 
 #### Smooth functions for a rough world
 
@@ -2909,6 +3063,7 @@ symmetry in the table of content.
 
 We can use grid approximation to work through our globe tossing model.
 
+
 ```{r}
 #| label: model-bayes-b
 #| attr-source: '#lst-model-bayes-b lst-cap="Calculate globe tossing model with syntax from Bayes theorem"'
@@ -2928,7 +3083,9 @@ d_bayes_b <-
 head(d_bayes_b)
 ```
 
+
 In case you were curious, here's what they look like.
+
 
 ```{r}
 #| label: fig-prior-likelihood-posterior-b
@@ -2948,6 +3105,7 @@ d_bayes_b %>%
   facet_wrap(~ name, scales = "free")
 ```
 
+
 The posterior is a combination of the prior and the likelihood. When the
 prior is flat across the parameter space, the posterior is just the
 likelihood re-expressed as a probability. As we go along, you'll see we
@@ -2961,6 +3119,7 @@ priors.
 #### The data
 
 ##### Show the data
+
 
 ```{r}
 #| label: loading-data-from-package_b
@@ -2978,7 +3137,9 @@ d_b |>
 
 ```
 
+
 `glimpse()` is the tidyverse analogue for `str()`.
+
 
 ```{r}
 #| label: show-howell-data2-b
@@ -2986,11 +3147,13 @@ d_b |>
     summary()
 ```
 
+
 Kurz tells us that the {**brms**} package does not have a function that
 works like `rethinking::precis()` for providing numeric and graphical
 summaries of variables, as in the second part of
 @lst-show-howell-data-a. Kurz suggests `base::summary()` to get some of
 the information from `rethinking::precis()`.
+
 
 ```{r}
 #| label: show-howell-data3-b
@@ -2998,6 +3161,7 @@ d_b |>
     skimr::skim() 
 
 ```
+
 
 I think `skimr::skim()` is a better option as an alternative to
 `rethinking::precis()` as `base::summary()` because it also has a
@@ -3009,6 +3173,7 @@ functions and is very adaptable. I propose to install and to try it out.
 With {**tidyverse**} we can isolate height values with the
 `dplyr::select()` function and we are using the `dplyr::filter()`
 function to make an adults-only data frame.
+
 
 ```{r}
 #| label: select-height-adults-b
@@ -3025,6 +3190,7 @@ d2_b <-
 glimpse(d2_b)
 ```
 
+
 The two functions of @lst-select-height-adults-b are much more readable
 and understandable as the weird base R syntax in
 @lst-select-height-adults-a.
@@ -3037,6 +3203,7 @@ The plot of the heights distribution compared with the standard Gaussian
 distribution is missing in Kurz's version. I added this plot by using
 the last example of [How to Plot a Normal Distribution in
 R](https://www.statology.org/plot-normal-distribution-r/).
+
 
 ```{r}
 #| label: fig-dist-heights-b
@@ -3057,9 +3224,11 @@ p0 <-
 p0
 ```
 
+
 ##### Plot the mean prior
 
 Here is the shape for the prior $μ \sim Normal(178, 20)$.
+
 
 ```{r}
 #| label: fig-mean-prior-b
@@ -3078,12 +3247,14 @@ p1 <-
 p1
 ```
 
+
 ##### Plot the prior of the standard deviation (sigma)
 
 And here's the ggplot2 code for our prior for `σ`, a uniform
 distribution with a minimum value of 0 and a maximum value of 50. We
 don't really need the `y`-axis when looking at the shapes of a density,
 so we'll just remove it with `scale_y_continuous()`.
+
 
 ```{r}
 #| label: fig-sd-prior-b
@@ -3101,10 +3272,12 @@ p2 <-
 p2
 ```
 
+
 ##### Prior predictive simulation
 
 We can simulate from both priors at once to get a prior probability
 distribution of `height`.
+
 
 ```{r}
 #| label: fig-prior-predictive-sim-b
@@ -3129,9 +3302,11 @@ p3 <- sim %>%
 p3
 ```
 
+
 If you look at the `x`-axis breaks on the plot in McElreath's lower left
 panel in Figure 4.3, you'll notice they're intentional. To compute the
 mean and 3 standard deviations above and below, you might do this.
+
 
 ```{r}
 #| label: compute-mean-3sd-b
@@ -3142,7 +3317,9 @@ sim %>%
   mutate_all(round, digits = 1)
 ```
 
+
 Here's the work to make the lower right panel of Figure 4.3.
+
 
 ```{r}
 #| label: fig-reproduce-4.3-low-right
@@ -3187,7 +3364,9 @@ p4 <-
 p4
 ```
 
+
 Let's combine the four to make our version of McElreath's Figure 4.3.
+
 
 ```{r}
 #| label: fig-reproduce-3.4
@@ -3197,10 +3376,12 @@ Let's combine the four to make our version of McElreath's Figure 4.3.
 (p1 + xlab("mu") | p2 + xlab("sigma")) / (p3 | p4)
 ```
 
+
 On page 84, McElreath said his prior simulation indicated 4% of the
 heights would be below zero. He also drew the break down compared to the
 tallest man on record, [Robert Pershing
 Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) (1918--1940).
+
 
 ```{r}
 #| label: calc-breaks-b
@@ -3213,6 +3394,7 @@ sim %>%
   count(height < 272) %>% 
   mutate(percent = 100 * n / sum(n))
 ```
+
 
 #### Grid approximation of the posterior distribution
 
@@ -3242,6 +3424,7 @@ Referring to the plots:
     `ggplot2::geom_contour()`
 -   Instead of `rethinking::image_xyz()` we will use
     `ggplot2::geom_raster()`
+
 
 ```{r}
 #| label: grid-approx-posterior-b
@@ -3303,10 +3486,12 @@ d_grid2_b %>%
   theme(panel.grid = element_blank())
 ```
 
+
 #### Sampling from the posterior
 
 We can use `dplyr::sample_n()` to sample rows, with replacement, from
 `d_grid2_b`.
+
 
 ```{r}
 #| label: fig-posterior-sample-b
@@ -3328,8 +3513,10 @@ d_grid_samples_b %>%
   theme(panel.grid = element_blank())
 ```
 
+
 We can use `tidyr::pivot_longer()` and then `ggplot2::facet_wrap()` to
 plot the densities for both `mu` and `sigma` at once.
+
 
 ```{r}
 #| label: fig-densities-mu-sigma
@@ -3345,6 +3532,7 @@ d_grid_samples_b %>%
   theme(panel.grid = element_blank()) +
   facet_wrap(~ name, scales = "free", labeller = label_parsed)
 ```
+
 
 We'll use the {**tidybayes**} package to compute their posterior modes
 and 95% HDIs.
@@ -3385,6 +3573,7 @@ Replace `tidyverse::` with `ggdist::` where appropriate. This is
 important when you want to find the related help file.
 :::
 
+
 ```{r}
 #| label: post-mode-hdi95-b
 
@@ -3394,9 +3583,11 @@ d_grid_samples_b %>%
   tidybayes::mode_hdi(value) 
 ```
 
+
 Let's say you wanted their posterior medians and 50% quantile-based
 intervals, instead. Just switch out the last line for
 `tidybayes::median_qi(value, .width = .5)`.
+
 
 ```{r}
 #| label: post-median-qi90-b
@@ -3406,6 +3597,7 @@ d_grid_samples_b %>%
   group_by(name) %>% 
   tidybayes::median_qi(value, .width = .5)
 ```
+
 
 **Sample size and the normality of σ's posterior**
 
@@ -3419,6 +3611,7 @@ section.
 > *b* to stand for the **`brms`** package.
 
 Here's how to fit the first model for this chapter.
+
 
 ```{r}
 #| label: post-dist-brms-b4.1
@@ -3437,6 +3630,7 @@ b4.1 <-
 brms:::plot.brmsfit(b4.1)
 ```
 
+
 If you want detailed diagnostics for the HMC chains, call
 `brms::launch_shinystan(b4.1)`. That'll keep you busy for a while. See
 the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan)
@@ -3451,6 +3645,7 @@ could inspect many details of the model. But this is at the moment too
 complex to me: I do not understand all the parameters and the many
 configurable options programmed with a {**shiny**) interface.
 :::
+
 
 ```{r}
 #| label: detailled-diganostic-chains-brms-b4.1
@@ -3472,6 +3667,7 @@ brms:::print.brmsfit(b4.1)
 
 b4.1$fit
 ```
+
 
 Whereas rethinking defaults to 89% intervals, using `print()` or
 `summary()` with {**brms**} models defaults to 95% intervals.
@@ -3499,6 +3695,7 @@ Unless otherwise specified, Kurz will stick with 95% intervals
 throughout. To get those 89% intervals or McElreath approach, one could
 use the `prob` argument within `summary()` or `print()`.
 
+
 ```{r}
 #| label: summary-interval-.89-brms-b4.1
 
@@ -3506,9 +3703,11 @@ brms:::summary.brmsfit(b4.1, prob = .89)
 
 ```
 
+
 Here's the `brms::brm()` code for the model with the very narrow `_μ_`
 prior corresponding to the `rethinking::quap()` code in
 @lst-post-dist-quap-m4.2.
+
 
 ```{r}
 #| label: fig-post-dist-brms-b4.2
@@ -3529,7 +3728,9 @@ brms:::plot.brmsfit(b4.2, widths = c(1, 2))
 
 ```
 
+
 And here's the model `summary()`.
+
 
 ```{r}
 #| label: summary-narrow-prior
@@ -3538,8 +3739,10 @@ brms:::summary.brmsfit(b4.2)
 
 ```
 
+
 Subsetting the `summary()` output with `$fixed` provides a convenient
 way to compare the Intercept summaries between `b4.1` and `b4.2`.
+
 
 ```{r}
 #| label: compare-summaries-b4.1-b4.2
@@ -3549,10 +3752,12 @@ rbind(brms:::summary.brmsfit(b4.1)$fixed,
 
 ```
 
+
 #### Sampling from a ~~quap()~~ `brm()` fit
 
 {**brms**} doesn't seem to have a convenience function that works the
 way `vcov()` does for {**rethinking**}.
+
 
 ```{r}
 #| label: calc-var-cov-m4.1-b
@@ -3560,6 +3765,7 @@ way `vcov()` does for {**rethinking**}.
 
 brms:::vcov.brmsfit(b4.1)
 ```
+
 
 This only returns the first element in the matrix it did for
 {**rethinking**}. That is, it appears `brms::vcov()` only returns the
@@ -3579,6 +3785,7 @@ However, if you really wanted this information, you could get it after
 putting the Hamilton Monte Carlo (HMC) chains in a data frame. We do
 that with the `brms::as_draws_df()` function:
 
+
 ```{r}
 #| label: put-hmc-into-df-b
 #| attr-source: '#lst-put-hmc-into-df-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
@@ -3587,6 +3794,7 @@ post_b <- brms::as_draws_df(b4.1)
 
 head(post_b)
 ```
+
 
 ::: callout-tip
 ###### draws object
@@ -3608,6 +3816,7 @@ them in a data frame.
 Now `select()` the columns containing the draws from the desired
 parameters `b_Intercept` and `sigma` and feed them into `cov()`.
 
+
 ```{r}
 #| label: calc-cov-post-b
 #| attr-source: '#lst-calc-cov-post-b lst-cap="Calculate the vector of variances and correlation matrix for b_Intercept and sigma"'
@@ -3616,9 +3825,11 @@ select(post_b, b_Intercept:sigma) %>%
   stats::cov()
 ```
 
+
 @lst-calc-cov-post-b displays "(1) a vector of variances for the
 parameters and (2) a correlation matrix" for them (p. 90). Here are just
 the variances (i.e., the diagonal elements) and the correlation matrix.
+
 
 ```{r}
 #| label: calc-var-post-b
@@ -3645,6 +3856,7 @@ post_b %>%
 
 str(post_b)
 ```
+
 
 The `post_b` object is not just a data frame, but also of class
 `draws_df`, which means it contains three metadata variables ----
@@ -3674,11 +3886,13 @@ observation is somewhat misleading.
 The posterior data frame `post_b` is not of class `brms`. Let's check
 this:
 
+
 ```{r}
 #| label: class-post_b-b
 
 class(post_b)
 ```
+
 
 The class `draws_df`and `draws` refers to the {**posterior**} and not to
 the {**brms**} package. Remember: In @lst-put-hmc-into-df-b we
@@ -3696,6 +3910,7 @@ the name of the packages in front of the function, because in that case
 R would have used `base::summary()` as in Kurz's text.
 :::
 
+
 ```{r}
 #| label: base-summary-samples-b4.1-b
 #| attr-source: '#lst-base-summary-samples-b4.1-b lst-cap="Summary the extracted iterations of the HMC chains: base version"' 
@@ -3712,6 +3927,7 @@ posterior:::summary.draws(post_b[, 1:2])
 
 
 ```
+
 
 To get a similar summary with tiny histograms Kurz offers different
 solutions:
@@ -3731,12 +3947,14 @@ solutions:
 
 Additionally I will propose using the {**skimr**} packages:
 
+
 ```{r}
 #| label: skim-summary-samples-b4.1-b
 #| attr-source: '#lst-skim-summary-samples-b4.1-b lst-cap="Summary the extracted iterations of the HMC chains: skimr version"' 
 
 skimr::skim(post_b[, 1:2])
 ```
+
 
 Kurz refers only shortly to both `overthinking` blocks of this section:
 
@@ -3751,6 +3969,7 @@ Kurz refers only shortly to both `overthinking` blocks of this section:
 
 ### Linear prediction
 
+
 ```{r}
 #| label: fig-height-against-weight-b
 #| fig-cap: "Adult height and weight against one another"
@@ -3761,6 +3980,7 @@ d2_b |>
     geom_point()
 ```
 
+
 #### The linear model strategy
 
 ##### Empty: Model definition
@@ -3768,6 +3988,7 @@ d2_b |>
 ##### Empty: Linear model
 
 ##### Priors {#sec-priors-b}
+
 
 ```{r}
 #| label: fig-sim-heights-only-with-priors-b
@@ -3795,9 +4016,11 @@ lines %>%
 
 ```
 
+
 Using the Log-Normal distribution prohibits negative values. This is an
 important constraint for height and weight as these variables cannot be
 under 0.
+
 
 ```{r}
 #| label: fig-log-normal-b
@@ -3813,6 +4036,7 @@ tibble(b = rlnorm(1e4, meanlog = 0, sdlog = 1)) %>%
 
 ```
 
+
 ::: callout-note
 Kurz used with `mean`and `sd`an abbreviated version of the argument
 names `meanlog` and `sdlog`.
@@ -3825,6 +4049,7 @@ happy that Kurz added some explanations:
 > distribution whose logarithm is normally distributed. For example,
 > here's what happens when we compare Normal(0,1) with
 > log(Log-Normal(0,1)).
+
 
 ```{r}
 #| label: fig-normal-log-normal
@@ -3842,6 +4067,7 @@ tibble(rnorm           = rnorm(1e5, mean = 0, sd = 1),
   theme_classic() +
   facet_wrap(~ name, nrow = 2)
 ```
+
 
 > Those values are ~~what~~ the mean and standard deviation of the
 > output from the `rlnorm()` function **after** they are log
@@ -3867,6 +4093,7 @@ $$ {#eq-formula-mean-sd}
 Let's try our hand at those formulas and compute the mean and standard
 deviation for Log-Normal(0,1):
 
+
 ```{r}
 #| label: compute-mu-sigma-for-log-normal-manually-b
 
@@ -3880,7 +4107,9 @@ exp(mu + (sigma^2) / 2)
 sqrt((exp(sigma^2) - 1) * exp(2 * mu + sigma^2))
 ```
 
+
 Let's confirm with simulated draws from `rlnorm()`.
+
 
 ```{r}
 #| label: compute-log-normal-b
@@ -3925,6 +4154,7 @@ tibble(n = 1:n_lines,
   theme_classic()
 ```
 
+
 ::: callout-tip
 ###### Literature reference
 
@@ -3944,6 +4174,7 @@ aware that we can just specify something like `weight – xbar` in the
 However, the alternative is easy: Just make a new variable in the data
 that is equivalent to `weight – mean(weight)`. We'll call it `weight_c`.
 
+
 ```{r}
 #| label: create-weight-diff-var-b
 #| attr-source: '#lst-create-weight-diff-var-b lst-cap="Create a new variable in the data equivalent to weight - mean(height): tidyverse version"'
@@ -3953,6 +4184,7 @@ d2_b <-
   d2_b %>% 
   mutate(weight_c = weight - mean(weight))
 ```
+
 
 Unlike with McElreath's {**rethinking**} package, the conventional
 `brms::brm()` syntax doesn't mirror the statistical notation. But here
@@ -3969,6 +4201,7 @@ are the analogues to the exposition at the bottom of page 97:
 : Mirror the statistical notation of the rethinking package with the
 tidyverse approach using the brms package
 {#tbl-mirror-rethinking-tidyverse}
+
 
 ```{r}
 #| label: find-and-summarize-post-dist-b
@@ -3988,7 +4221,9 @@ b4.3 <-
 brms:::summary.brmsfit(b4.3)
 ```
 
+
 Here are the trace plots.
+
 
 ```{r}
 #| label: fig-find-post-dist-b
@@ -3996,6 +4231,7 @@ Here are the trace plots.
 
 plot(b4.3, widths = c(1, 2))
 ```
+
 
 {**brms**} does not allow users to insert coefficients into functions
 like exp() within the conventional `formula` syntax. We can fit a
@@ -4008,6 +4244,7 @@ variable names in the `formula`. Since this is so early in the book, I
 won't go into a full-blown explanation, here. There will be many more
 opportunities to practice with the non-linear syntax in the chapters to
 come.
+
 
 ```{r}
 #| label: find-post-dist2-b
@@ -4028,8 +4265,10 @@ b4.3b <-
       file = "fits/b04.03b")
 ```
 
+
 If you execute `summary(b4.3b)`, you'll see the intercept and `σ`
 summaries for this model are about the same as those for `b4.3`, above.
+
 
 ```{r}
 #| label: summarize-post-dist2-b
@@ -4038,10 +4277,12 @@ summaries for this model are about the same as those for `b4.3`, above.
 brms:::summary.brmsfit(b4.3b)
 ```
 
+
 The difference is for the β parameter, which we called `lb` in the
 `b4.3b` model. If we term that parameter from `b4.3` as $\beta^{b4.3}$
 and the one from our new model $\beta^{b4.3b}$, it turns out that
 $\beta^{b4.3} = exp(\beta^{b4.3b})$.
+
 
 ```{r}
 #| label: extract-fixed-effects-b
@@ -4050,6 +4291,7 @@ $\beta^{b4.3} = exp(\beta^{b4.3b})$.
 brms::fixef(b4.3)["weight_c", "Estimate"]
 brms::fixef(b4.3b)["lb_Intercept", "Estimate"] %>% exp()
 ```
+
 
 They're the same within simulation variance.
 
@@ -4060,6 +4302,7 @@ They're the same within simulation variance.
 With a little `[]` subsetting we can exclude the log posterior from our
 summary for `b4.3`.
 
+
 ```{r}
 #| label: table-summary-b4.3
 #| attr-source: '#lst-table-summary-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: brms version"'
@@ -4068,7 +4311,9 @@ brms::posterior_summary(b4.3)[1:3, ] %>%
   round(digits = 2)
 ```
 
+
 Without the subsetting we will get 2 more lines:
+
 
 ```{r}
 #| label: table-summary2-b4.3
@@ -4077,6 +4322,7 @@ Without the subsetting we will get 2 more lines:
 brms::posterior_summary(b4.3) %>% 
   round(digits = 2)
 ```
+
 
 ::: callout-note
 ###### TODO: Interpret printout
@@ -4099,6 +4345,7 @@ But reading the help file of `posterior::summarise_draws()` it turned
 out that it "will convert an object to a draws object if it isn't
 already".
 
+
 ```{r}
 #| label: table-summary3-b4.3
 #| attr-source: '#lst-table-summary3-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: posterior version"'
@@ -4109,10 +4356,12 @@ posterior::summarize_draws(b4.3, posterior::default_summary_measures(),
 
 ```
 
+
 @lst-table-summary3-b4.3 is the default call using
 `posterior::default_summary_measures()`. This returns the default
 measures. But we can adapt this standard summary to get a very similar
 result a in @lst-table-summary-m4.3.
+
 
 ```{r}
 #| label: table-summary4-b4.3
@@ -4123,9 +4372,11 @@ posterior::summarize_draws(b4.3, "mean", "median", "sd",
                            .num_args = list(sigfig = 2))[1:3, ]
 ```
 
+
 But don't forget that there exists also `summary()` as an alias either
 for `brmsfit` or `draws` objects which can be used for a standardized
 output:
+
 
 ```{r}
 #| label: table-summary5-b4.3
@@ -4139,9 +4390,11 @@ summary(brms::as_draws_array(b4.3))[1:3, ]
 
 ```
 
+
 If we put our {**brms**} fit into the `brms:::vcov.brmsfit()` function,
 we'll get the variance/covariance matrix of the `intercept` and
 `weight_c` coefficient.
+
 
 ```{r}
 #| label: var-cov-matrix-b4.3
@@ -4151,8 +4404,10 @@ brms:::vcov.brmsfit(b4.3) %>%
   round(3)
 ```
 
+
 No `σ`, however. To get that, we'll have to extract the posterior draws
 and use the `cov()` function, instead.
+
 
 ```{r}
 #| label: var-cov-matrix2-b4.3
@@ -4164,9 +4419,11 @@ brms::as_draws_df(b4.3) %>%
   round(digits = 3)
 ```
 
+
 The `pairs()` function will work for a brms fit much like it would one
 from rethinking. It will show "both the marginal posteriors and the
 covariance".
+
 
 ```{r}
 #| label: fig-marg-post-cov-b4.3
@@ -4176,9 +4433,11 @@ covariance".
 brms:::pairs.brmsfit(b4.3)
 ```
 
+
 ##### Plotting posterior inference around the mean
 
 Here is the code for Figure 4.6.
+
 
 ```{r}
 #| label: fig-raw-data-line-b4.3
@@ -4193,11 +4452,13 @@ d2_b %>%
   theme_classic()
 ```
 
+
 Note how the breaks on our `x`-axis look off. That's because we fit the
 model with `weight_c` and we plotted the points in that metric, too.
 Since we computed `weight_c` by subtracting the mean of weight from the
 data, we can adjust the `x`-axis break point labels by simply adding
 that value back.
+
 
 ```{r}
 #| label: fig-raw-data-line2-b4.3
@@ -4220,10 +4481,12 @@ d2_b %>%
   theme(panel.grid = element_blank())
 ```
 
+
 Furthermore note the use of the `brms:::fixef.brmsfit()` function within
 `ggplot2::geom_abline()`. The function extracts the population-level
 ('fixed') effects from a `brmsfit` object. Let's try and see what
 `brms::fixef()` produces:
+
 
 ```{r}
 #| label: using-fixef-b
@@ -4232,6 +4495,7 @@ Furthermore note the use of the `brms:::fixef.brmsfit()` function within
 
 brms::fixef(b4.3)
 ```
+
 
 So the function `ggplot2::geom_abline()` has used the intercept (`a`)
 and the slope (`b`) of the estimate column.
@@ -4258,6 +4522,7 @@ extract all the posterior draws with `brms::as_draws_df()`. We have
 already done this with @lst-put-hmc-into-df-b. We just repeat this code
 here using `dplyr::slice(1:6)` instead of `utils::head()`
 
+
 ```{r}
 #| label: put-hmc-into-df2-b
 #| attr-source: '#lst-put-hmc-into-df2-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
@@ -4267,7 +4532,9 @@ post_b %>%
   slice(1:6)
 ```
 
+
 Here are the four models leading up to Figure 4.7:
+
 
 ```{r}
 #| label: calc-all-four-models-b
@@ -4330,8 +4597,10 @@ b4.3_352 <-
       file = "fits/b04.03_352")
 ```
 
+
 Here are the trace plots and coefficient summaries from these four
 models.
+
 
 ```{r}
 #| label: trace-plots-cov-sum-b
@@ -4351,7 +4620,9 @@ plot(b4.3_352)
 print(b4.3_352)
 ```
 
+
 We'll need to put the chains of each model into data frames.
+
 
 ```{r}
 #| label: put-chain-into-model-b
@@ -4363,7 +4634,9 @@ post150_b4.3 <- brms::as_draws_df(b4.3_150)
 post352_b4.3 <- brms::as_draws_df(b4.3_352)
 ```
 
+
 Here is the code for the four individual plots:
+
 
 ```{r}
 #| label: calc-code-for-plots-b
@@ -4414,8 +4687,10 @@ p8 <-
   labs(subtitle = "N = 352")
 ```
 
+
 Now we can combine the ggplots with patchwork syntax to make the full
 version of Figure 4.7.
+
 
 ```{r}
 #| label: fig-draw-plots-figure-4.7-b
@@ -4432,10 +4707,12 @@ version of Figure 4.7.
   theme_classic()
 ```
 
+
 ##### Plotting regression intervals and contours
 
 Since we used `weight_c` to fit our model, we might first want to
 understand what exactly the mean value is for weight.
+
 
 ```{r}
 #| label: calc-mean-weight-b
@@ -4444,10 +4721,12 @@ understand what exactly the mean value is for weight.
 mean(d2_b$weight)
 ```
 
+
 Just a hair under 45. If we're interested in $\mu$ at `weight` = 50,
 that implies we're also interested in $\mu$ at `weight_c` + 5.01. Within
 the context of our model, we compute this with
 $\alpha + \beta \cdot 5.01$. Here's what that looks like with `post_b`.
+
 
 ```{r}
 #| label: calc-mean-weight-at-50-b
@@ -4460,7 +4739,9 @@ mu_at_50_b <-
 head(mu_at_50_b)
 ```
 
+
 And here is a version McElreath's Figure 4.8 density plot.
+
 
 ```{r}
 #| label: fig-density-vector-mean-50-b
@@ -4474,8 +4755,10 @@ mu_at_50_b %>%
   theme_classic()
 ```
 
+
 We'll use `tidybayes::mean_hdi()` to get both 89% and 95% HPDIs along
 with the mean.
+
 
 ```{r}
 #| label: calc-mean-and-HPDI-b
@@ -4484,9 +4767,11 @@ with the mean.
 tidybayes::mean_hdi(mu_at_50_b[, 1], .width = c(.89, .95))
 ```
 
+
 If you wanted to express those sweet 95% HPDIs on your density plot, you
 might use `tidybayes::stat_halfeye()`. Since `tidybayes::stat_halfeye()`
 also returns a point estimate, we'll throw in the mode.
+
 
 ```{r}
 #| label: fig-half-eye-b
@@ -4499,6 +4784,7 @@ mu_at_50_b %>%
   xlab(expression(mu["height | weight = 50"])) +
   theme_classic()
 ```
+
 
 With {**brms**}, you would use fitted() to do what McElreath
 accomplished with `rethinking::link()`.
@@ -4518,6 +4804,7 @@ My interpretation therefore is that `stats::fitted()` is using
 `brms:::fitted.brmsfit()`. Thts why the results are identical.
 :::
 
+
 ```{r}
 #| label: calc-mu-with-fitted-b
 #| attr-source: '#lst-calc-mu-with-fitted-b lst-cap="Calculate μ for each case in the data and sample from the posterior distribution: Tidyverse version"'
@@ -4527,6 +4814,7 @@ mu2.1_b <- stats::fitted(b4.3, summary = F)
 str(mu2_b)
 str(mu2.1_b)
 ```
+
 
 When you specify `summary = F`, `brms:::fitted.brmsfit()` returns a
 matrix of values with as many rows as there were post-warmup draws
@@ -4539,6 +4827,7 @@ information instead.
 
 Much like `rethinking::link()`, `brms:::fitted.brmsfit()` can
 accommodate custom predictor values with its `newdata` argument.
+
 
 ```{r}
 #| label: calc-dist-mu-unique-with-fitted.brmsfit-b
@@ -4559,6 +4848,7 @@ mu3_b <-
 
 head(mu3_b)
 ```
+
 
 ::: callout-caution
 The {rethinking} version uses the variable `weight.seq` whereas the
@@ -4585,6 +4875,7 @@ data](https://www.theanalysisfactor.com/wide-and-long-data/).
 :::
 ***
 
+
 ```{r}
 #| label: convert-wide-to-long-b
 #| attr-source: '#lst-convert-wide-to-long-b lst-cap="Data processing: Convert data from wide to long format: tidyverse version"'
@@ -4600,8 +4891,10 @@ mu4_b <-
 head(mu4_b)
 ```
 
+
 Now our data processing is done, here we reproduce McElreath's Figure
 4.9.a.
+
 
 ```{r}
 #| label: fig-dist-mu-height-100-b
@@ -4614,8 +4907,10 @@ d2_b %>%
   theme(panel.grid = element_blank())
 ```
 
+
 With `brms:::fitted.brmsfit()`, it's quite easy to plot a regression
 line and its intervals. Just omit the `summary = T` argument.
+
 
 ```{r}
 #| label: sum-dist-weight-b
@@ -4630,7 +4925,9 @@ mu_summary <-
 head(mu_summary)
 ```
 
+
 Here it is, our analogue to Figure 4.9.b.
+
 
 ```{r}
 #| label: fig-summaries-on-data-top-b
@@ -4648,6 +4945,7 @@ d2_b %>%
   theme(text = element_text(family = "Times"),
         panel.grid = element_blank())
 ```
+
 
 If you wanted to use intervals other than the default 95% ones, you'd
 include the probs argument like this:
@@ -4684,6 +4982,7 @@ looks a lot like what we used for `fitted()`. Compare
 @lst-calc-dist-mu-unique-with-fitted.brmsfit-b with
 @lst-calc-pred-height-with-predict.brmsfit-b.
 
+
 ```{r}
 #| label: calc-pred-height-with-predict.brmsfit-b
 #| attr-source: '#lst-calc-pred-height-with-predict.brmsfit-b lst-cap="Calculate the prediction of heights: tidyverse version"'
@@ -4698,6 +4997,7 @@ pred_height %>%
   slice(1:6)
 ```
 
+
 This time the summary information in our data frame is for, as McElreath
 put it, "simulated heights, not distributions of plausible average
 height, `μ`" (p. 108). Another way of saying that is that these
@@ -4705,6 +5005,7 @@ simulations are the joint consequence of both `μ` and `σ`, unlike the
 results of `fitted()`, which only reflect `μ`.
 
 Figure 4.10 shows how you might visualize them:
+
 
 ```{r}
 #| label: fig-reproduce-figure-4.10
@@ -4726,6 +5027,7 @@ d2_b %>%
   theme(text = element_text(family = "Times"),
         panel.grid = element_blank())
 ```
+
 
 To smooth out the rough shaded interval we would have in the {**brms**}
 model fitting approach to refit `b4.3` after specifying a larger number
@@ -4756,6 +5058,7 @@ Next we follow McElreath's example and do our model-based predictions by
 hand. Instead of relying on base R `apply()` and `sapply()`, the main
 action in the tidyverse approach is in `expand_grid()`, the second
 `mutate()` line and the `group_by()` + `summarise()` combination.
+
 
 ```{r}
 #| label: fig-predict-manually-b
@@ -4788,6 +5091,7 @@ post_b %>%
         panel.grid = element_blank())
 ```
 
+
 We specifically left out the `fitted()` intervals to make it more
 apparent what we were simulating. You might also note that we could have
 easily replaced that three-line summarize() code with a single line of
@@ -4796,6 +5100,7 @@ tendency and interval type you wanted (e.g.,
 `tidybayes::mode_hdi(sim_height, .width = .89)`)
 
 Let's try this out:
+
 
 ```{r}
 #| label: fig-predict-manually2-b
@@ -4855,6 +5160,7 @@ post_b %>%
         panel.grid = element_blank())
 ```
 
+
 ::: \###### TODO: .width vs. ll/ul
 
 Revise @sec-sampling-to-summarize to understand better the difference
@@ -4874,6 +5180,7 @@ to use the `Howell1` data, but this time the full data set. The reason
 is that in the non-adult years there is a steeper slope than in the
 adult years.
 
+
 ```{r}
 #| label: fig-scatterplot-height-weight-b
 #| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal). This time with the full data, e.g., the non-adults data."
@@ -4890,8 +5197,10 @@ d_b %>%
         panel.grid = element_blank())
 ```
 
+
 Standardizing will help `brms::brm()` fit the model. We might
 standardize our weight variable like so:
+
 
 ```{r}
 #| label: standardize-weight-b
@@ -4903,7 +5212,9 @@ d3_b <-
   mutate(weight_s2 = weight_s^2)
 ```
 
+
 We fit the quadratic model (se @eq-parabolic-model) with {**brms**}:
+
 
 ```{r}
 #| label: brm-parabolic
@@ -4922,9 +5233,11 @@ b4.5 <-
       file = "fits/b04.05")
 ```
 
+
 Note our use of the coef argument within our prior statements. Since β1
 and β2 are both parameters of `class = b` within the {**brms**} set-up,
 we need to use the `coef` argument when we want their priors to differ.
+
 
 ```{r}
 #| label: fig-brm-parabolic
@@ -4933,9 +5246,11 @@ we need to use the `coef` argument when we want their priors to differ.
 plot(b4.5, widths = c(1, 2))
 ```
 
+
 ::: callout-note
 ###### TODO: Interpret graphic
 :::
+
 
 ```{r}
 #| label: print-brm-parabolic
@@ -4944,12 +5259,14 @@ plot(b4.5, widths = c(1, 2))
 print(b4.5)
 ```
 
+
 ::: callout-note
 ###### TODO: Interpret printout
 :::
 
 Our quadratic plot requires new `fitted()`- and `predict()`-oriented
 data wrangling.
+
 
 ```{r}
 #| label: wrangling-for-parabolic-model-b
@@ -4972,7 +5289,9 @@ pred_quad <-
   bind_cols(weight_seq_full)  
 ```
 
+
 Replicating Figure 4.11.b:
+
 
 ```{r}
 #| label: fig-replicate-4.11.b
@@ -5000,9 +5319,11 @@ p10 <-
 p10
 ```
 
+
 From a formula perspective, the cubic model is a simple extension of the
 quadratic (compare @eq-parabolic-model with @eq-cubic-regression). --
 Before we fit the model, we need to wrangle the data again.
+
 
 ```{r}
 #| label: wrangling-for-cubic-model-b
@@ -5013,7 +5334,9 @@ d3_b <-
   mutate(weight_s3 = weight_s^3)
 ```
 
+
 Now fit the model:
+
 
 ```{r}
 #| label: fit-cubic-regression-model-b
@@ -5033,8 +5356,10 @@ b4.6 <-
       file = "fits/b04.06")
 ```
 
+
 Here's the `fitted()`, `predict()`, and {**ggplot2**} code for Figure
 4.11.c, the cubic model.
+
 
 ```{r}
 #| label: fig-cubic-regression-model-b
@@ -5079,7 +5404,9 @@ p11 <-
 p11
 ```
 
+
 And now we'll fit the good old linear model.
+
 
 ```{r}
 #| label: fit-linear-regression-model-b
@@ -5097,8 +5424,10 @@ b4.7 <-
       file = "fits/b04.07")
 ```
 
+
 And here's the `fitted()`, `predict()`, and {**ggplot2**} code for
 Figure 4.11.a, the linear model.
+
 
 ```{r}
 #| label: fig-linear-regression-model-b
@@ -5139,9 +5468,11 @@ p9 <-
 p9
 ```
 
+
 Did you notice how we labeled each of the past three plots as `p1`,
 `p2`, and `p3`? Here we use those names to plot them all together with
 {**patchwork**} syntax.
+
 
 ```{r}
 #| label: fig-plot-all-together-b
@@ -5152,9 +5483,11 @@ Did you notice how we labeled each of the past three plots as `p1`,
 p9 | p10 | p11
 ```
 
+
 **Converting back to natural scale** You can apply McElreath's
 conversion trick within the {**ggplot2**} environment, too. Here it is
 with the cubic model.
+
 
 ```{r}
 #| label: fig-cubic-regression-natural-scale-b
@@ -5179,7 +5512,9 @@ ggplot(data = d3_b,
                      labels = round(at_b*sd(d3_b$weight) + mean(d3_b$weight), 1))
 ```
 
+
 #### Splines
+
 
 ```{r}
 #| label: load-cherry-blossoms-data-b
@@ -5210,8 +5545,10 @@ d4.2_b |>
 
 ```
 
+
 Kurz's version does not have the mini histograms. I added another
 summary with `skimr::skim()` to add tiny graphics.
+
 
 ```{r}
 #| label: fig-scatterplot-cbl-b
@@ -5229,8 +5566,10 @@ d4_b %>%
 
 ```
 
+
 By default {**ggplots**} removes missing data records with a warning. It
 turns out there are cases with missing data for the `doy` variable.
+
 
 ```{r}
 #| label: doy-missing-data
@@ -5241,11 +5580,13 @@ d4_b %>%
   mutate(percent = 100 * n / sum(n))
 ```
 
+
 Let's follow McElreath and make a subset of the data that excludes cases
 with missing data in `doy.` Within the tidyverse, we might do so with
 the `tidyr::drop_na()` function. -- This is a much easier way than my
 approach using `dplyr::filter()` (See
 [StackOverflow](https://stackoverflow.com/a/70848085/7322615):
+
 
 ```{r}
 #| label: remove-missing-data-records
@@ -5257,6 +5598,7 @@ d5_b <-
 d5_b
 ```
 
+
 But it worked and resulted in the same 827 records.
 
 ##### Choice of knots
@@ -5264,6 +5606,7 @@ But it worked and resulted in the same 827 records.
 Now we start with the spline procedure as mentioned in
 @sec-procedure-for-generating-b-splines with choosing number and
 location of knots:
+
 
 ```{r}
 #| label: choose-knots-b
@@ -5290,7 +5633,9 @@ d5_b %>%
         panel.grid = element_blank())
 ```
 
+
 ##### Choice of polynomial degree
+
 
 ```{r}
 #| label: compute-b-spline-matrix-b
@@ -5302,6 +5647,7 @@ B_b <- splines::bs(d5_b$year,
         intercept = TRUE)
 ```
 
+
 Look closely at McElreath's tricky `knot_list[-c(1, num_knots)]` code.
 Whereas `knot_list` contains 15 ordered `year` values, McElreath shaved
 off the first and last `year` values with `knot_list[-c(1, num_knots)]`,
@@ -5310,6 +5656,7 @@ knots at the boundaries. Since the first and 15^th^ values in
 `knot_list15_b` were boundary values for `year`, we removed them to
 avoid redundancies. We can confirm this with the code, below.
 
+
 ```{r}
 #| label: show-data-structure-b
 #| attr-source: '#lst-show-data-structure-b lst-cap="Show data structure to verify that `splines::bs()` adds the boundary knots"'
@@ -5317,16 +5664,19 @@ avoid redundancies. We can confirm this with the code, below.
 B_b %>% str()
 ```
 
+
 Look at the second to last line,
 `- attr(*, "Boundary.knots")= int [1:2] 812 2015`. Those default
 `"Boundary.knots"` are the same as `knot_list15_b[c(1, num_knots)]`.
 Let's confirm.
+
 
 ```{r}
 #| label: boundary-knots
 #| attr-source: '#lst-boundary-knots lst-cap="Boundary knots"'
 knot_list15_b[c(1, num_knots15_b)]
 ```
+
 
 By the `degree = 3` argument, we indicated we wanted a cubic spline.
 McElreath used `degree = 1` for Figure 4.12. For reasons I'm not
@@ -5336,6 +5686,7 @@ McElreath's code indicated he wanted to fit a B-spline that included an
 intercept. Thus: `intercept = TRUE`.
 
 Here's how we might make our version of the top panel of Figure 4.13.
+
 
 ```{r}
 #| label: fig-basis-functions-b
@@ -5363,8 +5714,10 @@ b_b %>%
         panel.grid = element_blank())
 ```
 
+
 To elucidate what's going on in that plot, we might break it up with
 `ggplot2::facet_wrap()`.
+
 
 ```{r}
 #| label: fig-facet-basis-functions-b
@@ -5387,6 +5740,7 @@ b_b %>%
         strip.text = element_text(size = 8, margin = margin(0.1, 0, 0.1, 0, "cm"))) +
   facet_wrap(~ bias_function, ncol = 1)
 ```
+
 
 ##### Parameter weights for each basis function
 
@@ -5429,6 +5783,7 @@ inverse of the rate, $1 / \lambda$.
 We are going to use the `dexp()` function to get a sense of what that
 prior looks like.
 
+
 ```{r}
 #| label: fig-exponential-prior-b
 #| fig-cap: "Using the density of the exponential distribution `dexp()` to show the prior"
@@ -5447,6 +5802,7 @@ tibble(x = seq(from = 0, to = 10, by = 0.1)) %>%
         panel.grid = element_blank())
 ```
 
+
 > We'll use exponential priors for the rest of the book, in place of
 > uniform priors. It is much more common to have a sense of the average
 > deviation than of the maximum. (McElreath)
@@ -5456,6 +5812,7 @@ the data structure. In his R code 4.76 (@lst-fit-model-m4.7), McElreath
 defined his data in a list, `list( D=d5_a$doy , B = B_a)`. Our approach
 will be a little different. Here, we'll add the `B_b` matrix to our
 `d5_b` data frame and name the results as `d6_b`.
+
 
 ```{r}
 #| label: add-matrix-to-df-b
@@ -5469,6 +5826,7 @@ d6_b <-
 d6_b %>% glimpse()
 ```
 
+
 In the `d6_b` data, columns `year` through `temp_lower` are all standard
 data columns. The `B` column is a *matrix column*, which contains the
 same number of rows as the others, but also smuggled in 17 columns
@@ -5478,6 +5836,7 @@ we can simply define our `formula` argument as $doy \sim 1 + B$, where
 `B` is a stand-in for `B.1 + B.2 + ... + B.17`.
 
 Here's how we fit the model:
+
 
 ```{r}
 #| label: fit-model-b4.8
@@ -5495,7 +5854,9 @@ b4.8 <-
       file = "fits/b04.08")
 ```
 
+
 Here is the model summary:
+
 
 ```{r}
 #| label: summarize-model-b4.8
@@ -5503,6 +5864,7 @@ Here is the model summary:
 
 brms:::print.brmsfit(b4.8)
 ```
+
 
 In @lst-summarize-model-b4.8 I have used this time the full call for the
 generic function of `print()`. Just using `print()` would have been
@@ -5527,6 +5889,7 @@ First we'll use `brms::as_draws_df()` to transform `d6_b` to a `draw`
 object so that it can processed easier by the {**posterior**} package.
 (??)
 
+
 ```{r}
 #| label: transform-to-draw-objects
 #| attr-source: '#lst-transform-to-draw-objects lst-cap="Transform data of model b4.8 to draw objects"'
@@ -5536,8 +5899,10 @@ post6_b <- brms::as_draws_df(b4.8)
 glimpse(post6_b)
 ```
 
+
 With a little wrangling, we can use summary information from `post6_b`
 to make our version of the middle panel of Figure 4.13.
+
 
 ```{r}
 #| label: fig-basis-fun-weighted-b
@@ -5561,6 +5926,7 @@ post6_b %>%
         panel.grid = element_blank()) 
 ```
 
+
 In case you missed it, the main action in the {**ggplot2**} code was
 `y = bias * weight`, where we defined the $y$-axis as the product of
 `bias` and `weight`. This is fulfillment of the $w_k B_{k, i}$ parts of
@@ -5569,6 +5935,7 @@ the model.
 Now here's how we might use `brms:::fitted.brmsfit()` to get the
 *expected values of the posterior predictive distribution* to make the
 lower plot of Figure 4.13.
+
 
 ```{r}
 #| label: fig-post-pred-dist-b
@@ -5593,6 +5960,7 @@ f %>%
         panel.grid = element_blank())
 ```
 
+
 If it wasn't clear, the dashed horizontal line intersecting a little
 above 100 on the $y$-axis is the posterior mean for the intercept.
 
@@ -5600,6 +5968,7 @@ above 100 on the $y$-axis is the posterior mean for the intercept.
 
 Now let's use our skills to remake the simpler model expressed in Figure
 4.12. This model, recall, is based on 5 knots.
+
 
 ```{r}
 #| label: fit-5-knot-model-b
@@ -5633,7 +6002,9 @@ b4.9 <-
       file = "fits/b04.09")
 ```
 
+
 Review the new model summary.
+
 
 ```{r}
 #| label: print-5-knot-model-b
@@ -5642,8 +6013,10 @@ Review the new model summary.
 print(b4.9)
 ```
 
+
 Here we do all the work in bulk to make and save the three subplots for
 Figure 4.12.
+
 
 ```{r}
 #| label: prepare-3-subplots-figure-4.12-b
@@ -5703,8 +6076,10 @@ p12 <-
        y = "day in year")
 ```
 
+
 Now combine the subplots with {**patchwork**} syntax and behold their
 glory.
+
 
 ```{r}
 #| label: fig-subplots-figure-4.12-b
@@ -5717,6 +6092,7 @@ glory.
   theme(panel.background = element_rect(fill = "#4f455c"),
         panel.grid = element_blank())
 ```
+
 
 #### Smooth functions for a rough world
 
@@ -5736,6 +6112,7 @@ But there is already one important learning I have gotten from the bonus section
 
 We might use the `brms::get_prior()` function to get a sense of how to set up the priors when using `brms::s()`
 
+
 ```{r}
 #| label: get-priors-bonus
 #| attr-source: '#lst-get-prior-bonus lst-cap="Get priors when using `brms::s()`"'
@@ -5745,7 +6122,9 @@ brms::get_prior(data = d5_b,
           doy ~ 1 + s(year))
 ```
 
+
 We have an overall intercept (`class = Intercept`), a single $\beta$ parameter for year (`class = b`), a $\sigma$ parameter (`class = sigma`), and an unfamiliar parameter of `class = sds`. I’m not going to go into that last parameter in any detail, here. We’ll need to work our way up through @sec-models-with-memory and the multilevel model to get a full picture of what it means. The important thing to note here is that the priors for our `s()`-based alternative to the B-spline models, above, are going to look a little different. Here’s how we might fit a model `b4.10` as an alternative to `b4.8`.
+
 
 ```{r}
 #| label: fit-bosus-model-b4.10
@@ -5773,7 +6152,9 @@ b4.10 <-
 print(b4.10)
 ```
 
+
 Our intercept and σ summaries are similar to those we got from `b4.8`. The rest looks different and maybe a little disorienting. Here’s what happens when we use `brms:::fitted.brmsfit()` to plot the implications of the model.
+
 
 ```{r}
 #| label: plot-implications-model-b4.10
@@ -5794,7 +6175,9 @@ fitted(b4.10) %>%
         panel.grid = element_blank())
 ```
 
+
 That smooth doesn’t look quite the same. Hopefully this isn’t terribly surprising. We used a function from a different package and ended up with a different underlying statistical model. In fact, we didn’t even use a B-spline. The default for `s()` is to use what’s called a *thin plate* regression spline. If we’d like to fit a B-spline, we have to set `bs = "bs"`. Here’s an example:
+
 
 ```{r}
 #| label: fit-model-b4.11
@@ -5821,7 +6204,9 @@ b4.11 <-
 print(b4.11)
 ```
 
+
 Now here’s the depiction of our `s()`-based B-spline model:
+
 
 ```{r}
 #| label: plot-bonus-model-b4.11
@@ -5841,6 +6226,7 @@ fitted(b4.11) %>%
   theme(panel.background = element_rect(fill = "#4f455c"), 
         panel.grid = element_blank())
 ```
+
 
 There are still important differences between the underlying statistical model for `b4.11` and the earlier `b4.8`. Kurz says that he doesn't want to go into the details why this is the case. For me this missing explication is both confusing and frustrating! I hope that with more knowledge and experience in fitting models I will be able to fill the gaps.
 
@@ -5887,6 +6273,7 @@ where $y_i$ was some continuous variable collected across participants, $i$. The
 
 Riffing off of Gelman and colleagues, here's how you might simulate data of this kind.
 
+
 ```{r}
 #| label: simulate-data-multiple-regression-b
 #| attr-source: '#lst-simulate-data-multiple-regression-b lst-cap="Simulate data for multiple regression analysis"'
@@ -5921,7 +6308,9 @@ d9_b %>%
   glimpse()
 ```
 
+
 Although our `d9_b` tibble has only three columns, the `X` column is a matrix column into which we've smuggled ten columns more. Here's how we might access them more directly.
+
 
 ```{r}
 #| label: access-nested-df
@@ -5932,9 +6321,11 @@ d9_b %>%
   glimpse()
 ```
 
+
 See? There's an $100 \times 10$ data matrix in there. 
 
 Here's how to fit the full model with {**brms**} where we use the compact matrix-column syntax in the `formula` argument.
+
 
 ```{r}
 #| label: fit-model-b4.12-b
@@ -5952,7 +6343,9 @@ b4.12 <-
       file = "fits/b04.12")
 ```
 
+
 Check the parameter summary.
+
 
 ```{r}
 #| label: print-summary-model-b4.12-b
@@ -5960,6 +6353,7 @@ Check the parameter summary.
 
 print(b4.12)
 ```
+
 
 **brms** automatically numbered our $K = 10$ `X` variables as `X1` through `X10`. As far as applications go, I'm not sure where I'd use this way of storing and modeling data in real life. But maybe some of y'all work in domains where this is just the right way to approach your data needs. If so, good luck and happy modeling.
 
@@ -5970,13 +6364,11 @@ print(b4.12)
 
 
 
+
 ```{r}
 #| label: session-info
 #| attr-source: '#lst-session-info lst-cap="Session info"'
 
 sessionInfo()
 ```
-
-
-
 
