@@ -44,3 +44,11 @@ execute:
 
 language:
    crossref-fig-title: "Picture"
+   crossref-prp-title: "Callout"
+
+# https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/language/_language.yml
+   callout-tip-title: "Resource"         # green
+   callout-note-title: "Note"            # blue
+   callout-warning-title: "Wach out!"    # orange
+   callout-important-title: "Procedure"  # red
+   callout-caution-title: "TODO"         # yellow

@@ -36,10 +36,18 @@ resulting in a Gaussian curve? Because there will be more combinations
 of outcomes that sum up to a "central" value, rather than to some
 extreme value.
 
-::: callout-tip
+****
+:::: {#prp-why-normal}
+Why are normal distribution normal?
+
+::: callout-important
 Any process that adds together random values from the same distribution
 converges to a normal.
 :::
+
+::::
+***
+
 
 #### Normal by addition
 
@@ -830,7 +838,7 @@ rethinking::dens(sample2_a.sigma, norm.comp = TRUE)
 > in the definition has a corresponding definition in the form of R
 > code. The engine inside quap then uses these definitions to define the
 > posterior probability at each combination of parameter values. Then it
-> can climb the posterior distribution and find the peak, its MAP
+> can climb the posterior distribution and find the peak, its `r glossary("MAP")`
 > (**Maximum A Posteriori** estimate). Finally, it estimates the
 > quadratic curvature at the MAP to produce an approximation of the
 > posterior distribution. (parenthesis and emphasis are mine)
@@ -849,8 +857,8 @@ non-Bayesian procedures do, just without any priors.
     distribution (Code 4.29).
 
 ```{r}
-#| label: post-dist-quap-m4-1-a
-#| attr-source: '#lst-post-dist-quap-m4-1-a lst-cap="Finding the posterior distribution with rethinking::quap()"'
+#| label: post-dist-quap-m4-1
+#| attr-source: '#lst-post-dist-quap-m4-1 lst-cap="Finding the posterior distribution with rethinking::quap(): Model m4.1"'
 
 ## R code 4.27 ######################
 flist <- alist(
@@ -885,7 +893,7 @@ rethinking::precis(m4.1)
 > prime." That's no worse justification than the conventional
 > justification for 95%.
 
-I encourage you to compare these 89% boundaries to the compatibility
+> I encourage you to compare these 89% boundaries to the compatibility
 intervals from the grid approximation in @lst-post-comp-intervals-a
 earlier. You'll find that they are almost identical. When the posterior
 is approximately Gaussian, then this is what you should expect.
@@ -935,7 +943,7 @@ value.
 
 ```{r}
 #| label: post-dist-quap-m4.2
-#| attr-source: '#lst-post-dist-quap-m4.2 lst-cap="Finding the posterior distribution with a narrower prior rethinking::quap()"'
+#| attr-source: '#lst-post-dist-quap-m4.2 lst-cap="Finding the posterior distribution with a narrower prior rethinking::quap(): Model m4.2"'
 
 ## R code 4.31 ###########################
 m4.2 <- rethinking::quap(
@@ -984,9 +992,11 @@ variance) are sufficient to describe a one-dimensional Gaussian
 distribution, a list of means and a matrix of variances and covariances
 are sufficient to describe a multi-dimensional Gaussian distribution.
 
+
+
 ```{r}
-#| label: calc-var-cov-m4.1-a
-#| attr-source: '#lst-calc-var-cov-m4.1-a lst-cap="Calculation of the variance-covariance matrix: rethinking version"'
+#| label: vcov-matrix-m4.1
+#| attr-source: '#lst-vcov-matrix-m4.1 lst-cap="Calculation of the variance-covariance matrix: rethinking version"'
 
 ## R code 4.32 ###################
 rethinking::vcov(m4.1)
@@ -997,10 +1007,12 @@ of a fitted model object. In the above {**rethinking**} version is uses
 the class `map2stan` for a fitted Stan model as `m4.1` is of class
 `map`.
 
-::: callout-caution
-###### rethinking::vcov
+***
+:::: {#prp-vcov-function)
+Two different `vcov()` functions
 
-In @lst-calc-var-cov-m4.1-a I am explicitly using the package
+::: callout-warning
+In @lst-vcov-matrix-m4.1 I am explicitly using the package
 {**rethinking**} for the `vcov()` function. The same function is also
 available as a base R function with `stats::vcov()`. But this generates
 an error because there is no method known for an object of class `map`
@@ -1017,7 +1029,10 @@ of the class of the object which `vcov()` version to use. In this case:
 class of object = `class(m4.1)` `r class(m4.1)`.
 :::
 
-@lst-calc-var-cov-m4.1-a results in a variance-covariance matrix. It is
+::::
+***
+
+@lst-vcov-matrix-m4.1 results in a variance-covariance matrix. It is
 the multi-dimensional glue of a quadratic approximation, because it
 tells us how each parameter relates to every other parameter in the
 posterior distribution. A variance-covariance matrix can be factored
@@ -1025,8 +1040,11 @@ into two elements: (1) a vector of variances for the parameters and (2)
 a correlation matrix that tells us how changes in any parameter lead to
 correlated changes in the others.
 
+
+
 ```{r}
-#| label: vcov-decomp-m4.1-a
+#| label: vcov-decomp-m4.1
+#| attr-source: '#lst-vcov-decomp-m4.1 lst-cap="Variance-Covariance Matrix of model m4.1 decomposed"'
 
 ## R code 4.33 #######################
 base::diag(rethinking::vcov(m4.1))      # <1>
@@ -1036,7 +1054,8 @@ stats::cov2cor(rethinking::vcov(m4.1))  # <2>
 1.  `base::diag()` extracts the diagonal of the (variance-covariance)
     matrix. The two-element vector in the output is the list of
     variances. If you take the square root of this vector, you get the
-    standard deviations that are shown in `rethinking::precis()` output.
+    standard deviations that are shown in the `rethinking::precis()` output of
+    @lst-post-dist-quap-m4-1.
 2.  `stats::cov2cor()` scales a covariance matrix into the corresponding
     correlation matrix. The two-by-two matrix in the output is this
     correlation matrix. Each entry shows the correlation, bounded
@@ -1044,10 +1063,76 @@ stats::cov2cor(rethinking::vcov(m4.1))  # <2>
     parameter's correlation with itself. If these values were anything
     except 1, we would be worried. The other entries are typically
     closer to zero, and they are very close to zero in this example.
-    This indicates that learning μ tells us nothing about σ and likewise
-    that learning σ tells us nothing about μ. This is typical of simple
+    This indicates that learning `μ` tells us nothing about `σ` and likewise
+    that learning `σ` tells us nothing about `μ`. This is typical of simple
     Gaussian models of this kind. But it is quite rare more generally,
     as you'll see in later chapters.
+
+***
+:::: {#prp-why-cor-almost-0}
+
+Confusing m4.1 (Gaussian distribution) with m4.3 (height-weight against each other)
+
+::: callout-warning
+
+Frankly speaking I had troubles to understand why the correlation is almost 0. It turned out that I had unconsciously in mind a correlation between height and weight, an issue that is raised later in this chapter with m4.3. 
+
+But here there is only a Gaussian distribution of height under discussion, and not the correlation between height and weight.
+:::
+::::
+
+***
+
+But wait, there is another problem in my understanding:
+
+***
+:::: {#prp-from-vcov-to-cor}
+
+How to compute correlation from variance-covariance matrix?
+
+::: {.callout-warning}
+
+I wonder how to compute the correlation matrix by hand form the covariance-variance matrix. I thought that I have to use `sqrt()`, but it didn't work. After I inspected the  code of the `cov2cor()` function I noticed that it uses the expression `sqrt(1/diag(V))`. I don't understand why it is using the inverse value and not just `sqrt()`. Maybe it has to do with matrix calculation, where I am not firm about it?
+:::
+::::
+
+***
+
+Let's check the assertion that the square root of the variance vector, will get us the standard deviations that are shown in the `rethinking::precis()` output of @lst-post-dist-quap-m4-1 (0.41 for $\mu$ and 0.29 for $\sigma$):
+
+```{r}
+#| label: sqrt-var-m4.1
+#| attr-source: '#lst-sqrt-var-m41 lst-cap="Square root of variance vector of model m4.1"'
+sqrt(base::diag(rethinking::vcov(m4.1)))
+```
+
+In fact: The square roots of the variance vector results in the standard deviation and therefore in the same output as in @lst-post-dist-quap-m4-1.
+
+> Scaling a covariance matrix into a correlation one can be achieved in many ways, mathematically most appealing by multiplication with a diagonal matrix from left and right, or more efficiently by using `base::sweep(.., FUN = "/")` twice. The `stats::cov2cor()` function is even a bit more efficient, and provided mostly for didactical reasons.
+
+I have taken how to compute the covariance matrix with `base::sweep()` from a [StackOverflow](https://stats.stackexchange.com/a/407954/207389) answer
+
+```{r}
+R <- stats::cov2cor(rethinking::vcov(m4.1))
+S <- sqrt(base::diag(rethinking::vcov(m4.1)))
+
+sweep(sweep(R, 1, S, "*"), 2, S, "*")
+```
+
+
+
+:::: {#prp-vcov-interpretation}
+How to interpret covariances?
+
+::: callout-caution
+A large covariance can mean a strong relationship between variables. However, you can’t compare variances over data sets with different scales (like pounds and inches).
+
+The main problem with interpretation is that the wide range of results that it takes on makes it hard to interpret. For example, your data set could return a value of 3, or 3,000. This wide range of values is cause by a simple fact: *The larger the X and Y values, the larger the covariance*. A value of 300 tells us that the variables are correlated, but unlike the correlation coefficient, that number doesn’t tell us exactly how strong that relationship is. The problem can be fixed by dividing the covariance by the standard deviation to get the correlation coefficient. ([Statistics How To](https://www.statisticshowto.com/probability-and-statistics/statistics-definitions/covariance/))
+
+:::
+
+::::
+***
 
 Okay, so how do we get samples from this multi-dimensional posterior?
 Now instead of sampling single values from a simple Gaussian
@@ -1067,8 +1152,7 @@ head(post3_a)
 You end up with a data frame, post, with 10,000 (1e4) rows and two
 columns, one column for `_μ_` and one for `_σ_`. Each value is a sample
 from the posterior, so the mean and standard deviation of each column
-will be very close to the MAP values from before. You can confirm this
-by summarizing the samples:
+will be very close to the `r glossary("MAP")` values from before. You can confirm this by summarizing the samples:
 
 ```{r}
 #| label: summary-samples-m4.1-a
@@ -1078,7 +1162,7 @@ by summarizing the samples:
 rethinking::precis(post3_a)
 ```
 
-Compare these values to the output from @lst-post-dist-quap-m4-1-a. And
+Compare these values to the output from @lst-post-dist-quap-m4-1. And
 you can use `plot(post)` to see how much they resemble the samples from
 the grid approximation in FIGURE 4.4 (here @fig-posterior-sample-a).
 These samples also preserve the covariance between `_μ_` and `_σ_`. This
@@ -1427,7 +1511,7 @@ h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\
 \beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50)  \space \space (5) \\    
 \end{align*} 
-$$ {#eq-find-post-dist-a}
+$$ {#eq-find-post-dist-m4.3}
 
 ```         
 height ~ dnorm(mu, sigma)     # <1>
@@ -1444,8 +1528,8 @@ Notice that the linear model, in the R code on the right-hand side, uses
 the R assignment operator, `<-` instead of the symbol `=`.
 
 ```{r}
-#| label: find-post-dist-a
-#| attr-source: '#lst-find-post-dist-a lst-cap="Find the posterior distribution of the linear height-weight model: rethinking version"'
+#| label: find-post-dist-m4.3
+#| attr-source: '#lst-find-post-dist-m4.3 lst-cap="Find the posterior distribution of the linear height-weight model: rethinking version"'
 
 ## R code 4.42 #############################
 
@@ -1516,7 +1600,7 @@ than attempting to understand a table.
 ##### Table of marginal distributions
 
 I have already included the summary (`precis()`) for the `m4.3` model in
-@lst-find-post-dist-a. But I will repeat it to inspect the marginal
+@lst-find-post-dist-m4.3. But I will repeat it to inspect the marginal
 posterior distributions of the parameters in detail:
 
 ```{r}
@@ -2041,12 +2125,12 @@ the code you can write yourself.
 Now let's walk through generating an 89% prediction interval for actual
 heights, not just the average height, `μ`. This means we'll incorporate
 the standard deviation `σ` and its uncertainty as well. Remember, the
-first line of the statistical model in @eq-find-post-dist-a is:
+first line of the statistical model in @eq-find-post-dist-m4.3 is:
 
 ------------------------------------------------------------------------
 
 ::: {#def-mod-line-1-a}
-Remember the first line of @eq-find-post-dist-a
+Remember the first line of @eq-find-post-dist-m4.3
 
 $$
 h_{i} \sim \operatorname{Normal}(μ_{i}, σ)
@@ -2465,7 +2549,7 @@ rethinking::shade(height.PI_full, weight.seq_full)
 ```
 
 I had `xbar` to recalculate with the new data set. All the other code is
-the same as in @lst-find-post-dist-a and @lst-fig-raw-data-line-m4.3.
+the same as in @lst-find-post-dist-m4.3 and @lst-fig-raw-data-line-m4.3.
 
 @fig-find-post-full-data-a shows the familiar linear regression from
 earlier in the chapter, but now with the standardized predictor and full
@@ -2557,10 +2641,10 @@ data even better.
 But it's not clear that any of these models make a lot of sense. They
 are good geocentric descriptions of the sample, yes. But there are two
 problems. First, a better fit to the sample might not actually be a
-better model. That's the subject of @sec-ulisses-compass. Second, the
+better model. That's the subject of @sec-chap07-ulisses-compass. Second, the
 model contains no biological information. We aren't learning any causal
 relationship between height and weight. We'll deal with this second
-problem much later, in @sec-genealized-linear-madness.
+problem much later, in @sec-chap16-genealized-linear-madness.
 
 **Converting back to natural scale**
 
@@ -2661,14 +2745,20 @@ parts. Then they assign a parameter to each part. These parameters are
 gradually turned on and off in a way that makes their sum into a fancy,
 wiggly curve.
 
-::: {#generating-b-splines .callout-important}
-###### Procedure for generating B-splines {#sec-procedure-for-generating-b-splines}
+***
+:::: {#prp-procedure-for-generating-b-splines}
+Procedure for generating B-splines
+
+::: callout-important
+
 
 1.  Choose the number and distribution of knots
 2.  Choose the polynomial degree
 3.  Get the parameter weights for each basis function (define the model
     and make it run)
 :::
+::::
+***
 
 ##### Choice of knots
 
@@ -2872,6 +2962,7 @@ m4.7alt <- rethinking::quap(
 rethinking::precis(m4.7alt, depth = 2)
 
 ```
+Besides that @lst-fit-model-m4.7alt-a is not elegant you will notice that it need also more time to compile. Although all models are cached it seems that @lst-fit-model-m4.7alt-a needs more time to check that it is the same code.
 
 ```{r}
 #| label: fig-PI-cbl2-a
@@ -2895,8 +2986,11 @@ class of models, `r glossary("generalized additive model")`, focuses on
 predicting an outcome variable using smooth functions of some predictor
 variables.
 
+***
+:::: {#prp-resources-for-gams}
+Resources for GAMs
+
 ::: callout-tip
-###### Resources for GAMs {#sec-resources-for-gams}
 
 -   Wood, S. N. (2017). Generalized Additive Models: An Introduction
     with R, Second Edition (2nd ed.). Taylor & Francis Inc.
@@ -2919,6 +3013,9 @@ variables.
 -   Eugenio Anello: Generalized Additive Models with R ([Medium member
     story](https://pub.towardsai.net/generalized-additive-models-with-r-5f01c8e52089))
 :::
+
+::::
+***
 
 ## `TIDYVERSE`
 
@@ -3139,6 +3236,8 @@ p2
 
 ##### Prior predictive simulation
 
+`r glossary("Prior predictive simulation")` is very useful for assigning sensible priors, because it can be quite hard to anticipate how priors influence the observable variables. 
+
 We can simulate from both priors at once to get a prior probability
 distribution of `height`.
 
@@ -3165,6 +3264,9 @@ p3 <- sim %>%
 
 p3
 ```
+
+`ggplot2::geom_density()` computes and draws kernel density estimates,  which is a smoothed version of the histogram. Note that there is no data mentioned explicitly in the call of `ggplot2::geom_density()`. When this is the case (data = `NULL`) then the data will be inherited from the plot data as specified in the call to `ggplot2::ggplot()`. Otherwise the function needs a data frame to override the plot data or a function with a single argument, the plot data. ([geom_density() help file](https://ggplot2.tidyverse.org/reference/geom_density.html)).
+
 
 If you look at the `x`-axis breaks on the plot in McElreath's lower left
 panel in Figure 4.3, you'll notice they're intentional. To compute the
@@ -3283,8 +3385,10 @@ Referring to the plots:
     `ggplot2::geom_raster()`
 
 ```{r}
-#| label: grid-approx-posterior-b
-#| attr-source: '#lst-grid-approx-posterior-b lst-cap="Grid Approximation of the posterior distribution: tidyverse version"'
+#| label: fig-grid-approx-posterior-b
+#| attr-source: '#lst-fig-grid-approx-posterior-b lst-cap="Grid Approximation of the posterior distribution: tidyverse version"'
+#| fig-cap: "Grid Approximation of the posterior distribution"
+#| results: hold
 
 n <- 200
 
@@ -3470,7 +3574,7 @@ I have worked my way through the `brms::brm()` help file. From its more than 40 
 
 But to understand the syntax I had made some minor changes:
 
-1. Instead of `height ~1` I wrote the argument with it argument name `formula = height ~ 1" and changed put it as first argument.
+1. Instead of `height ~ 1` I wrote the argument with it argument name `formula = height ~ 1" and changed put it as first argument.
 2. Instead of `family = gaussian` I wrote `family = gaussian()`as in the help file mentioned.
 
 To understand the syntax it is also quite revealing to look at @tbl-mirror-rethinking-tidyverse.
@@ -3478,9 +3582,26 @@ To understand the syntax it is also quite revealing to look at @tbl-mirror-rethi
 To learn more read [Defining statistical models; formulae](https://cran.r-project.org/doc/manuals/R-intro.html#Formulae-for-statistical-models) and Chapter 11 of [Introduction to R](https://cran.r-project.org/doc/manuals/R-intro.pdf).
 :::
 
+The following table I have inserted here from Kurz's explanation of model `b4.3`. It is the first time that I used brms::brm() and therefore I need slow down here and go into the gritty details.
+
+> Unlike with McElreath's {**rethinking**} package, the conventional
+`brms::brm()` syntax doesn't mirror the statistical notation. But here
+are the analogues to the exposition at the bottom of page 97:
+
+| {**rethinking**} package                                    | {**brms**} package: `brms::brm()`          |
+|------------------------------------|------------------------------------|
+| $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$ | `family = gaussian`                        |
+| $\mu_i = \alpha + \beta \text{weight}_i$                    | `height ~ 1 + weight_c`                 |
+| $\alpha \sim \operatorname{Normal}(178, 20)$                | `prior(normal(178, 20), class = Intercept` |
+| $\beta \sim \operatorname{Log-Normal}(0, 1)$                | `prior(lognormal(0, 1), class = b)`        |
+| $\sigma \sim \operatorname{Uniform}(0, 50)$                 | `prior(uniform(0, 50), class = sigma)`     |
+
+: Mirror the statistical notation of the rethinking package with the
+tidyverse approach using the brms package {#tbl-mirror-rethinking-tidyverse}
+
 ```{r}
 #| label: post-dist-brms-b4.1
-#| att-source: '#lst-post-dist-brms-b4.1 lst-cap="Finding the posterior distribution with brms::brm()"'
+#| attr-source: '#lst-post-dist-brms-b4.1 lst-cap="Finding the posterior distribution with brms::brm()"'
 
 b4.1 <- 
   brms::brm(
@@ -3500,7 +3621,7 @@ b4.1 <-
 1. **formula** describes the relation between dependent and independent variables in the form of a linear model. The left hand side are the dependent variables, the right hand side the independent. The independent variables are used to calculate the trend component of the linear model, the residuals are then assumed to have some kind of distribution. When the independent are equal to one `~ 1`, the trend component is a single value, e.g. the mean value of the data, i.e. the linear model only has an intercept. ([StackOverflow](https://stackoverflow.com/a/13366973/7322615)) In other words, it is the value the dependent variable is expected to have when the independent variables are zero or have no influence.  ([StackOverflow](https://stackoverflow.com/a/13367260/7322615)). The formula `y ~ 1` is just a model with a constant (intercept) and no regressor ([StackOverflow](https://stackoverflow.com/questions/53812741/tilde-operator-in-r)).
 2. **data**: A data frame that contains all the variables used in the model.
 3. **family**: A description of the response distribution and link function to be used in the model. This can be a family function, a call to a family function or a character string naming the family. By default a linear `gaussian` model is applied. So this line would not have been necessary. There are [standard family functions `stats::family()`](https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html)that will work with {**brms**}, but there are also [special family functions `brms::brmsfamily()`](https://paul-buerkner.github.io/brms/reference/brmsfamily.html) that work only for {**brms**} models. Additionally you can [specify custom families](https://paul-buerkner.github.io/brms/reference/custom_family.html) for use in brms with the `brms::custom_family()` function.
-4. *prior*: The next two lines specify priors for the normal and the uniform distribution. As you can see this is another place where parts for the formula are provided for the `brms::brm()` function work. --- `class` specifies the parameter class. It defaults to "b" ((i.e. population-level -- 'fixed' -- effects)). (There is also the argument `group` for grouping of factors for group-level effects. Not used in this code example.) --- Besides the "b" class there are other classes for the "Intercept" and the standard deviation "Sigma" on the population level: There is also a "sd" class for the standard deviation of group-level effects. Finally there is the special case of `class = "cor"` to set the same prior on every correlation matrix. --- `ub = 50` sets the upper bound to 50. There is also a `lb` (lower bound). Both bounds are for parameter restriction, so that population-level effects must fall within a certain interval using the `lb` and `ub` arguments. `lb` and `ub` default to `NULL`, i.e. there is no restriction.
+4. **prior**: The next two lines specify priors for the normal and the uniform distribution. As you can see this is another place where parts for the formula are provided for the `brms::brm()` function work. --- `class` specifies the parameter class. It defaults to "b" ((i.e. population-level -- 'fixed' -- effects)). (There is also the argument `group` for grouping of factors for group-level effects. Not used in this code example.) --- Besides the "b" class there are other classes for the "Intercept" and the standard deviation "Sigma" on the population level: There is also a "sd" class for the standard deviation of group-level effects. Finally there is the special case of `class = "cor"` to set the same prior on every correlation matrix. --- `ub = 50` sets the upper bound to 50. There is also a `lb` (lower bound). Both bounds are for parameter restriction, so that population-level effects must fall within a certain interval using the `lb` and `ub` arguments. `lb` and `ub` default to `NULL`, i.e. there is no restriction.
 5. **iter**: Number of total iterations per chain (including `warmup`; defaults to 2000).
 6. **warmup**: A positive integer specifying number of warmup iterations. This also specifies the number of iterations used for stepsize adaptation, so warmup draws should not be used for inference. The number of warmup should not be larger than iter and the default is iter/2.
 7. **chains**: Number of `r glossary("Markov chains")` (defaults to 4). 
@@ -3513,15 +3634,34 @@ If you want detailed diagnostics for the HMC chains, call
 the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan)
 for more information.
 
-::: callout-caution
-###### Launch of shinystan turned off
+***
+:::: {#prp-shinystan}
+Launch of shinystan turned off
+
+::: callout-warning
 
 I turned off the evaluation of the following chunk that should launch {*shinystan*). Besides that the evaluation takes time
-I am not yet ready to understand the many configurable options programmed with a {**shiny**) interface. A short investigation showed that there are several pages of documentation of different packages that I would need to study. These incldue:
+I am not yet ready to understand the many configurable options programmed with a {**shiny**) interface. 
+::::
+
+:::
+***
+
+
+A short investigation showed that there are several pages of documentation of different packages that I would need to study. These include:
+
+:::: {prp-stan-literature}
+
+Package documentation of Stan and friends
+
+::: callout-tip
 
 - [Interface to shinystan](https://paul-buerkner.github.io/brms/reference/launch_shinystan.brmsfit.html) (`brms::launch_shinystan`)
-- Possibly also [Using the ShinyStan GUI with rstanarm models](https://mc-stan.org/rstanarm/reference/launch_shinystan.stanreg.html)
-- And maybe also selected chapters from the [rstanarm documentation](https://mc-stan.org/rstanarm/index.html), from the [{**rstan**} documentation](https://mc-stan.org/rstan/) or generally from [Stan User’s Guide](https://mc-stan.org/docs/stan-users-guide/index.html) resp. [Stan Language Reference Manual](https://mc-stan.org/docs/reference-manual/index.html. Ooops, this opens up Pandora's box!
+- I believe that it is also very important to understand [RStan: the R interface to Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html).
+- Possibly I should read [Using the ShinyStan GUI with rstanarm models](https://mc-stan.org/rstanarm/reference/launch_shinystan.stanreg.html)
+- And maybe it could be also helpful to read selected chapters from the [rstanarm documentation](https://mc-stan.org/rstanarm/index.html), from the [{**rstan**} documentation](https://mc-stan.org/rstan/) or generally from [Stan User’s Guide](https://mc-stan.org/docs/stan-users-guide/index.html) resp. [Stan Language Reference Manual](https://mc-stan.org/docs/reference-manual/index.html. 
+
+Ooops, this opens up Pandora's box!
 
 I do not even understand completely what the different packages do. What follows is a first try where I copied from the documentation pages:
 
@@ -3532,6 +3672,9 @@ I do not even understand completely what the different packages do. What follows
 > Stan is a state-of-the-art platform for statistical modeling and high-performance statistical computation.
 
 :::
+
+::::
+***
 
 ```{r}
 #| label: detailed-diganostic-chains-brms-b4.1
@@ -3547,8 +3690,14 @@ I do not even understand completely what the different packages do. What follows
 brms:::print.brmsfit(b4.1)
 
 ```
+For the interpretation of this output I am going to use the explication in the [How to use brms](https://github.com/paul-buerkner/brms#how-to-use-brms) section of the {**brms**} GitHup page.
 
-
+1. **Top**: On the top of the output, some general information on the model is given, such as family, formula, number of iterations and chains.
+2. **Upper Middle**: If the data were grouped the next part would display group-level effects separately for each grouping factor in terms of standard deviations and (in case of more than one group-level effect per grouping factor) correlations between group-level effects. (This part is absent above as there are no grouping factors.)
+3. **Lower Middle: here Middle**: Next follow the display of the population-level effects (i.e. regression coefficients). If incorporated, autocorrelation effects and family specific parameters (e.g., the residual standard deviation ‘sigma’ in normal models) are also given.
+    In general, every parameter is summarized using the mean (`Estimate`) and the standard deviation (`Est.Error`) of the posterior distribution as well as two-sided 95% credible intervals (`l-95% CI` and `u-95% CI`) based on quantiles. The last three values (`ESS_bulk`, `ESS_tail`, and `Rhat`) provide information on how well the algorithm could estimate the posterior distribution of this parameter. If `Rhat` is considerably greater than 1, the algorithm has not yet converged and it is necessary to run more iterations and / or set stronger priors.
+4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (HMC) Method. This means that it is not a `r glossary("Markov Chains", "Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
+    Instead of doing the random walk, NUTS does jumps of length x. Each jump doubles as the algorithm continues to run. This happens until the trajectory reaches a point where it wants to return to the starting point.
 
 ```{r}
 #| label: print-stan-like-summary-brms-b4.1
@@ -3595,7 +3744,7 @@ brms:::summary.brmsfit(b4.1, prob = .89)
 
 ```
 
-Here's the `brms::brm()` code for the model with the very narrow `_μ_`
+Here's the `brms::brm()` code for the model with the very narrow `μ`
 prior corresponding to the `rethinking::quap()` code in
 @lst-post-dist-quap-m4.2.
 
@@ -3658,7 +3807,7 @@ variance/covariance matrix for the single-level `_β_` parameters.
 ###### brms::vcov()
 
 Referring to a similar situation with `rethinking::vcov()` in
-@lst-calc-var-cov-m4.1-a I cannot write `brms::vcov()`, but have to use
+@lst-vcov-matrix-m4.1 I cannot write `brms::vcov()`, but have to use
 either `brms:::vcov.brmsfit(b4.1)` or just `vcov(b4.1)`. The weird thing
 is that the first time it also works with `brms::vcov()` but only the
 first time!
@@ -3836,7 +3985,7 @@ Kurz refers only shortly to both `overthinking` blocks of this section:
     @sec-under-the-hood-multivariate-sampling-a): Again Kurz remarked
     that `brms::as_draws_df()` is not the same as
     `rethinking::extract.samples()`. What this exactly means will
-    (hopefully) explained later in @sec-markov-chain-monte-carlo.
+    (hopefully) explained later in @sec-chap09-markov-chain-monte-carlo.
 
 ### Linear prediction
 
@@ -4016,21 +4165,24 @@ tibble(n = 1:n_lines,
   ggtitle("log(b) ~ dnorm(0, 1)") +
   theme_classic()
 ```
+***
+:::: {#prp-p-value-problem}
+Torturing data until they fit your expectations / desires
 
 ::: callout-tip
-###### Literature reference
-
 The paper by Simmons, Nelson and Simonsohn (2011), [False-positive
 psychology: Undisclosed flexibility in data collection and analysis
 allows presenting anything as
 significant](https://journals.sagepub.com/doi/10.1177/0956797611417632),
 is often cited as an introduction to the problem.
 :::
+::::
+***
 
 #### Finding the posterior distribution
 
 Unlike with McElreath's `rethinking::quap()` formula syntax, Kurz is not
-aware that we can just specify something like `weight – xbar` in the
+aware if we can just specify something like `weight – xbar` in the
 `formula` argument in `brms::brm()`.
 
 However, the alternative is easy: Just make a new variable in the data
@@ -4046,21 +4198,8 @@ d2_b <-
   mutate(weight_c = weight - mean(weight))
 ```
 
-Unlike with McElreath's {**rethinking**} package, the conventional
-`brms::brm()` syntax doesn't mirror the statistical notation. But here
-are the analogues to the exposition at the bottom of page 97:
+Remember: The detailed explication of the syntax for the following `brms::brm()` function are in @tbl-mirror-rethinking-tidyverse and @lst-post-dist-brms-b4.1.
 
-| {**rethinking**} package                                    | {**brms**} package: `brms::brm()`          |
-|------------------------------------|------------------------------------|
-| $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$ | `family = gaussian`                        |
-| $\mu_i = \alpha + \beta \text{weight}_i$                    | `height ~ 1 + weight_c`                 |
-| $\alpha \sim \operatorname{Normal}(178, 20)$                | `prior(normal(178, 20), class = Intercept` |
-| $\beta \sim \operatorname{Log-Normal}(0, 1)$                | `prior(lognormal(0, 1), class = b)`        |
-| $\sigma \sim \operatorname{Uniform}(0, 50)$                 | `prior(uniform(0, 50), class = sigma)`     |
-
-: Mirror the statistical notation of the rethinking package with the
-tidyverse approach using the brms package
-{#tbl-mirror-rethinking-tidyverse}
 
 ```{r}
 #| label: find-and-summarize-post-dist-b
@@ -5359,7 +5498,7 @@ But it worked and resulted in the same 827 records.
 ##### Choice of knots
 
 Now we start with the spline procedure as mentioned in
-@sec-procedure-for-generating-b-splines with choosing number and
+@prp-procedure-for-generating-b-splines with choosing number and
 location of knots:
 
 ```{r}
@@ -5817,7 +5956,7 @@ glory.
 #### Smooth functions for a rough world
 
 Taking the reference to Woods Book about Additive Generalized Models
-(see @sec-resources-for-gams) Kurz adds two bonus section:
+(see @prp-resources-for-gams) Kurz adds two bonus section:
 
 -   Smooth functions with `brms::s()` and
 -   Group predictors with matrix columns
@@ -5851,7 +5990,7 @@ We have an overall intercept (`class = Intercept`), a single $\beta$
 parameter for year (`class = b`), a $\sigma$ parameter
 (`class = sigma`), and an unfamiliar parameter of `class = sds`. I'm not
 going to go into that last parameter in any detail, here. We'll need to
-work our way up through @sec-models-with-memory and the multilevel model
+work our way up through @sec-chap13-models-with-memory and the multilevel model
 to get a full picture of what it means. The important thing to note here
 is that the priors for our `s()`-based alternative to the B-spline
 models, above, are going to look a little different. Here's how we might
@@ -5967,12 +6106,13 @@ explication is both confusing and frustrating! I hope that with more
 knowledge and experience in fitting models I will be able to fill the
 gaps.
 
-------------------------------------------------------------------------
+***
+:::: {#prp-resources-for-gams2}
+Again: Resources for GAMs
 
 ::: callout-tip
-###### Again: Resources for GAMs {#sec-again-resources-for-gams}
 
-This is an addition to the in @sec-resources-for-gams already collected
+This is an addition to the in @prp-resources-for-gams already collected
 resources on `r glossary("Generalized Additive Model", "GAMS")`.
 
 -   For more on the B-splines and smooths, more generally, check out the
@@ -5998,12 +6138,13 @@ resources on `r glossary("Generalized Additive Model", "GAMS")`.
     thing](https://www.tjmahr.com/random-effects-penalized-splines-same-thing/),
     where he outlined the connections between penalized smooths, such as
     you might fit with {**mgcv**}, with the multilevel model, which
-    we'll learn all about starting in @sec-models-with-memory, which
+    we'll learn all about starting in @sec-chap13-models-with-memory, which
     helps explain what's going on with the `s()` function in our last
     two models, `b4.10` and `b4.11`.
 :::
 
-------------------------------------------------------------------------
+::::
+***
 
 #### Group predictors with matrix columns
 
@@ -6038,7 +6179,7 @@ $$ {#eq-multiple-regression-model}
 where $y_i$ was some continuous variable collected across participants,
 $i$. The $\alpha$ term was the intercept and the $\theta$ term was the
 regression slope for a binary variable $z$--we'll practice with binary
-predictors in @sec-categorical-variables-b. More to our interest, the
+predictors in the section for categorical-variables in @sec-chap05-many-variables-spurious-waffles. More to our interest, the
 last portion of the equation is a compact way to convey there are $K$
 additional predictors and their associated regression coefficients,
 which we might more explicitly express as
@@ -6183,26 +6324,46 @@ populations. So domain-specific information has gone into this prior.
 The `σ` prior is a flat prior, an uniform one, that functions just to
 constrain `σ` to have positive probability between zero and 50 cm.
 
+
+##### Plotting the priors
+
+***
+:::: {#prp-always-plot-priors}
+Always plot the priors!
+
 ::: callout-important
-Always plot your priors, so you have a sense of the assumption they
+Ir is important to plot your priors, so you have a sense of the assumption they
 build into your model.
 :::
+::::
+***
 
 `graphics::curve()` draws a curve corresponding to a function over the
 interval `[from, to]`. How to use the interval? Experiment with it to
 get a range that will show all possible values.
 
-::: callout-tip
-Very useful is the knowledge that if you double $\sigma$ and add that
-value before and after the mean (subtract resp. add) then you will get
-an area where 95% of all expected values should be found.
+***
+:::: {#prp-knowledge-priors}
+
+Using scientific knowledge to build priors
+
+::: callout-important
+Very useful is the knowledge that if you double $\sigma$ and subtract resp. add that value to the mean, then you will get an area where 95% of all expected values should be found.
 
 For instance a standard deviation of 20 cm with a mean of 178 cm would
 imply that 95% of individual heights lie between 138 cm and 218 cm.
 That's a very large range. The same calculation happens with $\sigma$
 where a standard deviation of 50 means that 95% of all values lie in the
 range of 100 cm.
+
+Using scientific knowledge to build priors is not cheating. The
+important thing is that your priors are not based on the values in the
+data, but only on what you know about the data before you see it.
+
 :::
+
+::::
+***
 
 ```{r}
 #| label: fig-priors-r
@@ -6213,6 +6374,9 @@ range of 100 cm.
 curve(dnorm(x, 178, 20), from = 100, to = 250)
 curve(dunif(x, 0, 50), from = -10, to = 60)
 ```
+
+
+##### Prior predictive simulation
 
 It'll help to see what these priors imply about the distribution of
 individual heights. The `r glossary("prior predictive simulation")` is
@@ -6227,7 +6391,7 @@ Remember, every posterior is also potentially a prior for a subsequent
 analysis, so you can process priors just like posteriors.
 
 Instead of using the density family of distributions when plotting the
-priors we are going now to use the random family.
+priors we are going now to use the random family of distributions (i.e., using `rnorm()` and `runif()` instead of `dnorm()` and `dunif()`.
 
 ```{r}
 #| label: fig-prior-predictive-sim-r
@@ -6240,23 +6404,8 @@ sample_mu_r <- rnorm(1e4, 178, 20)
 sample_sigma_r <- runif(1e4, 0, 50)
 prior_h_r <- rnorm(1e4, sample_mu_r, sample_sigma_r)
 rethinking::dens(prior_h_r, norm.comp = TRUE)
-
-## R code 4.15 ###########################
-sample_mu2_r <- rnorm(1e4, 178, 100)
-prior_h2_r <- rnorm(1e4, sample_mu2_r, sample_sigma_r)
-rethinking::dens(prior_h2_r, norm.comp = TRUE)
 ```
 
-Now we have impossible data like negative heights and some humans
-greater than 400 cm. In this case it doesn't matter but this is not
-always the case. We have to use our scientific knowledge to construct
-sensible priors.
-
-::: callout-important
-Using scientific knowledge to build priors is not cheating. The
-important thing is that your priors are not based on the values in the
-data, but only on what you know about the data before you see it.
-:::
 
 #### EMPTY: Grid approximation of the posterior distribution
 
@@ -6267,7 +6416,12 @@ data, but only on what you know about the data before you see it.
 I skipped the grid approximation:. It has mostly only educational value
 as it works only with a few parameters and is computationally expensive.
 
-`rethinking:quap()` consists of three parts:
+***
+:::: {#prp-using-quap}
+
+`rethinking:quap()` has three parts to complete
+
+::: note-important
 
 1.  A formula or `base::alist()` of formulas that define the likelihood
     and priors.
@@ -6275,8 +6429,15 @@ as it works only with a few parameters and is computationally expensive.
 3.  Some options like start values of method for search optimization.
     Note that the list of start values is a regular `list()`, not an
     `alist()` like the formula list is.
+:::
+
+::::
+***
 
 ```{r}
+#| label: post-dist-quap-r4.1
+#| attr-source: '#lst-post-dist-quap-r4-1 lst-cap="Finding the posterior distribution with rethinking::quap(): Model r4.1"'
+
 ## R code 4.26 modified #############
 data(package = "rethinking", list = "Howell1")
 d_r <- Howell1
@@ -6298,6 +6459,26 @@ rethinking::precis(r4.1)
 
 #### Sampling from a quap
 
+How do we get samples from the quadratic approximate posterior distribution? The answer … requires recognizing that a quadratic approximation to a posterior distribution with more than one parameter dimension —- `μ` and `σ` each contribute one dimension — is just a multi-dimensional Gaussian distribution. Therefore we need not one mean but a list of means and not one variance but a matrix of variances and covariances.
+
+```{r}
+#| label: vcov-matrix-r4.1
+#| attr-source: '#lst-cov-matrix-r4.1 lst-cap="Calculate Variance-Covariance Matrix for the Fitted Model Object r4.1 and its Decomposing"'
+#| results: hold
+
+
+## R code 4.32 ################
+rethinking::vcov(r4.1)
+
+## R code 4.33 #######################
+base::diag(rethinking::vcov(r4.1))      # <1>
+stats::cov2cor(rethinking::vcov(r4.1))  # <2>
+```
+
+
+## STOPPED ORIGINAL HERE! (2023-08-20)
+
+
 ### Tidyverse
 
 #### EMPTY: Why are normal distribution normal?
@@ -6305,6 +6486,8 @@ rethinking::precis(r4.1)
 #### EMPTY: A language for describing models
 
 #### Gausian model of heights
+
+##### Plotting the priors
 
 ```{r}
 #| label: fig-priors-t
@@ -6320,8 +6503,10 @@ ggplot(aes(x = x, y = dunif(x, min = 0, max = 50))) +
 geom_line()
 ```
 
-We simulate from both priors at once to get a *prior probability
-distribution* of `heights.`
+
+##### Prior predictive simulation
+
+We simulate from both priors at once to get a `r glossary("prior predictive simulation")` of `heights.`
 
 ```{r}
 #| label: fig-prior-predictive-sim-t
@@ -6340,9 +6525,7 @@ set.seed(4)
   geom_density(fill = "deepskyblue")
 ```
 
-`ggplot2::geom_density()` computes and draws kernel density estimates. A
-data is not mentioned (= `NULL`) the data will be inherited from the
-plot data as specified in the call to `ggplot2::ggplot()`.
+In contrast to @fig-prior-predictive-sim2-a where we have seen negative heights and giants of more than 5 meter, the prior predictive simulation here is better but still -- with our world knowledge - not realistic as there never have been people of about three meter. But [Robert Pershing Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) as the largest man ever measured with 2.72 meter is pretty near of the maximum height in @fig-prior-predictive-sim-t.
 
 #### Finding the posterior distribution with brm
 
@@ -6365,10 +6548,51 @@ t4.1 <-
       seed = 4,
       file = "fits/t04.01")
 
-plot(t4.1)
+print(t4.1)
 ```
 
-## STOPPED HERE! (B: 2023-08-18)
+The `summary()` functions for `brmsfit` objects gives identical results. A slightly different output results from a Stan-like summary with `t4.1$fit`.
+
+To get different intervals than the 95% default values you can use the `prob` argument for the `print()` or `summary()` function, for instance `summary(t4.1, prob = .89)`.
+
+
+#### Sampling from a brm() fit
+
+```{r}
+#| label: vcov-t4.1
+#| attr-source: '# lst-vcov-t4.1 lst-cap="Compute variance-covariance matrix for model t.41"'
+brms:::vcov.brmsfit(t4.1)
+```
+
+
+```{r}
+#| label: sample-post-dist-t4.1
+#| attr-source: '#lst-sample-post-dist-t4.1 lst-cap="Sample posterior distribution from t4.1"'
+
+post_t <- brms::as_draws_df(t4.1)
+head(post_t)
+```
+
+```{r}
+#| label: cov-t4.1
+#| attr-source: '# lst-cov-t4.1 lst-cap="Compute covariance matrix for model t.41"'
+
+post_t |> 
+    select(b_Intercept:sigma) |> 
+    cov()
+```
+
+```{r}
+#| label: cor-t4.1
+#| attr-source: '# lst-cor-t4.1 lst-cap="Compute correlation matrix for model t.41"'
+
+post_t |> 
+    select(b_Intercept:sigma) |> 
+    cor()
+```
+
+
+## STOPPED TIDYVERSE HERE! (B: 2023-08-20)
 
 ```{r}
 #| label: session-info
