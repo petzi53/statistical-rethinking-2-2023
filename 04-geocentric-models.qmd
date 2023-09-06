@@ -9,24 +9,6 @@ library(tidyverse)
 library(patchwork)
 ```
 
-```{r}
-#| label: set-glossary
-
-library(glossary)
-glossary_path("glossary.yml")
-glossary_popup("hover")
-```
-
-```{r}
-#| label: glossary-style
-#| results: asis
-
-glossary_style(color = "#0066cc", 
-               text_decoration = "underline double 1px",
-               def_bg = "#333",
-               def_color = "white")
-```
-
 ## `ORIGINAL`
 
 ### Why normal distributions? {#sec-why-normal-dist-a}
@@ -221,7 +203,7 @@ Read the above statement as:
 
 ::: callout-important
 The first line in these kind of models always defines the likelihood
-function used in Bayes' theorem. The other lines define priors.
+function used in `r glossary("Bayes’ theorem")`. The other lines define priors.
 :::
 
 Both of the lines in the model of @eq-globe-tossing-model are
@@ -233,16 +215,15 @@ probabilistic: Some values are more plausible than others, but very many
 different values are plausible under any model. Later, we'll have models
 with deterministic definitions in them.
 
-##### From model definition to Bayes' theorem
+##### From model definition to Bayes’ theorem
 
-To relate the mathematical format of @eq-globe-tossing-model to Bayes'
-theorem, you could use the model definition to define the posterior
+To relate the mathematical format of @eq-globe-tossing-model to `r glossary("Bayes’ theorem")`, you could use the model definition to define the posterior
 distribution:
 
 ------------------------------------------------------------------------
 
 ::: {#def-from-model-to-bayes-theorem}
-From model definition to Bayes' theorem
+From model definition to Bayes’ theorem
 
 $$
 Pr(p|w,n) = \frac{\operatorname{Binomial(w|n,p)}\operatorname{Uniform(p|0,1)}}{\int\operatorname{Binomial(w|n,p)}\operatorname{Uniform(p|0,1)}dp}
@@ -279,6 +260,10 @@ Compare to the calculations in earlier chapters, for example with
 
 ### Gaussian model of height {#sec-gaussian-model-of-height-a}
 
+In this section we want a single measurement variable to model as a Gaussian distribution. It is a preparation for the linear regression model in @sec-linear-prediction-a  where we will construct and add a predictor variable to the model. 
+
+For the moment, we want just a single measurement variable to model as a Gaussian distribution. There will be two parameters describing the distribution’s shape, the `r glossary("mean")` `μ` and the `r glossary("standard deviation")` `σ`. `r glossary("Bayesian updating")` will allow us to consider every possible combination of values for `μ` and `σ` and to score each combination by its relative plausibility, in light of the data. These relative plausibilities are the `r glossary("posterior probability", "posterior probabilities")` of each combination of values `μ`, `σ`.
+
 There are an infinite number of possible Gaussian distributions. Some
 have small means. Others have large means. Some are wide, with a large
 `σ`. Others are narrow. We want our Bayesian machine to consider every
@@ -286,6 +271,8 @@ possible distribution, each defined by a combination of `μ` and `σ`, and
 rank them by posterior plausibility. Posterior plausibility provides a
 measure of the logical compatibility of each possible distribution with
 the data and model.
+
+Keep in mind that the “estimate” here will be the entire posterior distribution, not any point within it. And as a result, the posterior distribution will be a distribution of Gaussian distributions. Yes, a distribution of distributions. 
 
 #### The data
 
@@ -381,8 +368,8 @@ Our goal is to model the data in `d2_a` using a Gaussian distribution.
 
 ```{r}
 #| label: fig-dist-heights-a
-#| fig-cap: "The distribution of the heights data,overlaid by an ideal Gaussian distribution: rethinking version"
-#| attr-source: '#lst-fig-dist-heights-a lst-cap="Plot the distribution of the heights of adults: rethinking version"'
+#| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution: rethinking version"
+#| attr-source: '#lst-fig-dist-heights-a lst-cap="Plot the distribution of the heights of adults, overlaid by an ideal Gaussian distribution: rethinking version"'
 
 rethinking::dens(d2_a$height, norm.comp = TRUE)
 ```
@@ -438,8 +425,8 @@ $Pr(μ,σ) = Pr(μ)Pr(σ)$.
 
 ------------------------------------------------------------------------
 
-::: {#def-prior-height-model}
-Priors for heights model
+::: {#def-height-linear-model-m4.1}
+###### Linear heights model
 
 $$
 \begin{align*}
@@ -447,7 +434,7 @@ h_{i} \sim \operatorname{Normal}(μ, σ) \space \space (1) \\
 μ \sim \operatorname{Normal}(178, 20)  \space \space (2) \\ 
 μ \sim \operatorname{Uniform}(0, 50)   \space \space (3)      
 \end{align*}
-$$ {#eq-prior-height-model}
+$$ {#eq-height-linear-model-m4.1}
 
 1.  First line represents the likelihood.
 2.  Second line is the chosen `μ`(mu, mean) prior.
@@ -505,7 +492,7 @@ curve(dunif(x, 0, 50), from = -10, to = 60)
 
 ##### Prior predictive simulation
 
-> Once you've chosen priors for *h, μ*, and *σ*, these imply a joint
+> Once you've chosen priors for `h`, `μ`, and `σ`, these imply a joint
 > prior distribution of individual heights. By simulating from this
 > distribution, you can see what your choices imply about observable
 > height. This helps you diagnose bad choices.
@@ -547,7 +534,7 @@ shaped distribution.
 
 ##### Simulate heights from priors with large sd
 
-Prior predictive simulation is very useful for assigning sensible
+`r glossary("Prior predictive simulation")` is very useful for assigning sensible
 priors, because it can be quite hard to anticipate how priors influence
 the observable variables. As an example, consider a much flatter and
 less informative prior for `μ`, like $μ \sim Normal(178, 100)$. Priors
@@ -597,42 +584,45 @@ This is not recommended because it is
 Therefor the grid approximation technique has limited relevance. Later
 on we will use the quadratic approximation with `rethinking::quap()`.
 
+The strategy is the same grid approximation strategy as before in @lst-grid-approx-base-demo. But now there are two dimensions, and so there is a geometric (literally) increase in bother. The next code chunk is complex, so I will explain it line by line:
+
 ```{r}
 #| label: grid-approx-posterior-a
+#| attr-source: '#lst-grid-approx-posterior-a lst-cap="Grid approximation of the posterior distribution: rethinking version"'
 
 ## R code 4.16 ##################################
 
 # establish range of μ and σ values, respectively, to calculate over 
 # as well as how many points to calculate in-between. 
-mu.list_a <- seq(from = 150, to = 160, length.out = 100)
-sigma.list_a <- seq(from = 7, to = 9, length.out = 100)
+mu.list_a <- seq(from = 150, to = 160, length.out = 100)  # <1>
+sigma.list_a <- seq(from = 7, to = 9, length.out = 100)   # <1>
 
 # expands μ & σ values into a matrix of all of the combinations
-post_a <- expand.grid(mu_a = mu.list_a, sigma_a = sigma.list_a)
+post_a <- expand.grid(mu_a = mu.list_a, sigma_a = sigma.list_a) # <2>
 
 # compute the log-likelihood at each combination of μ and σ
-post_a$LL <- sapply(1:nrow(post_a), function(i) {
-  sum(
-    dnorm(d2_a$height, post_a$mu[i], post_a$sigma[i], log = TRUE)
-  )
-})
+post_a$LL <- sapply(1:nrow(post_a), function(i) {                 # <3>
+  sum(                                                            # <3>
+    dnorm(d2_a$height, post_a$mu[i], post_a$sigma[i], log = TRUE) # <3>
+  )                                                               # <3>
+})                                                                # <3>
 
 # multiply the prior by the likelihood
 # as the priors are on the log scale adding = multiplying
-post_a$prod <- post_a$LL + dnorm(post_a$mu_a, 178, 20, TRUE) +
-  dunif(post_a$sigma_a, 0, 50, TRUE)
+post_a$prod <- post_a$LL + dnorm(post_a$mu_a, 178, 20, TRUE) +    # <4>
+  dunif(post_a$sigma_a, 0, 50, TRUE)                              # <4>
 
 # getting back on the probability scale without rounding error 
-post_a$prob <- exp(post_a$prod - max(post_a$prod))
+post_a$prob <- exp(post_a$prod - max(post_a$prod))                # <5>
 
 ```
 
-> **Comment to the last line**: the obstacle for getting back on the
-> probability scale is that rounding error is always a threat when
-> moving from log-probability to probability. If you use the obvious
-> approach, like `exp( post$prod )`, you'll get a vector full of zeros,
-> which isn't very helpful. This is a result of R's rounding very small
-> probabilities to zero.
+1. Establish the range of `μ` and `σ` values, respectively, to calculate over, as well as how many points to calculate in-between. 
+2. Expand those chosen `μ` and `σ` values into a matrix of all of the combinations of `μ` and `σ`. This matrix is stored in a data frame, `post_a`. 
+3. Compute the log-likelihood at each combination of `μ` and `σ`. This line looks so awful, because we have to be careful here to do everything on the log scale. Otherwise rounding error will quickly make all of the posterior probabilities zero. So what `sapply()` does is pass the unique combination of `μ` and `σ` on each row of post to a function that computes the log-likelihood of each observed height, and adds all of these log-likelihoods together (`sum()`). 
+4. Multiply the prior by the likelihood to get the product that is proportional to the posterior density. The priors are also on the log scale, and so we add them to the log-likelihood, which is equivalent to multiplying the raw densities by the likelihood. 
+5. Finally, the obstacle for getting back on the probability scale is that rounding error is always a threat when moving from log-probability to probability. If you use the obvious approach, like `exp(post_a$prod)`, you’ll get a vector full of zeros, which isn’t very helpful. This is a result of R’s rounding very small probabilities to zero. Remember, in large samples, all unique samples are unlikely. This is why you have to work with log-probability. The code in the box dodges this problem by scaling all of the log-products by the maximum log-product. As a result, the values in `post_a$prob` are not all zero, but they also aren’t exactly probabilities. Instead they are relative posterior probabilities. But that’s good enough for what we wish to do with these values.
+
 
 **Plot contour lines**
 
@@ -669,7 +659,7 @@ like it did in @sec-sampling-to-summarize, when you sampled values of
 `p` from the posterior distribution for the globe tossing example. The
 only new trick is that since there are two parameters, and we want to
 sample combinations of them, we first randomly sample row numbers in
-post in proportion to the values in \`post_a\$prob´. Then we pull out
+`post_a` in proportion to the values in `post_a$prob`. Then we pull out
 the parameter values on those randomly sampled rows.
 
 ```{r}
@@ -850,7 +840,7 @@ non-Bayesian procedures do, just without any priors.
 
 1.  We start with the Howell1 data frame for adults `d2_a` (age \>= 18).
     We will place the R code equivalents into an `alist()` We are going
-    to use the @def-prior-height-model. (Code 4.27).
+    to use the @def-height-linear-model-m4.1. (Code 4.27).
 2.  Then we fit the model with `rethinking::quap()` to the data in the
     data frame `d2_a` (Code 4.28) to `m4.1`.
 3.  Now we can have a look with `rethinking::precis()` at the posterior
@@ -1075,7 +1065,7 @@ Confusing m4.1 (Gaussian distribution) with m4.3 (height-weight against each oth
 
 ::: callout-warning
 
-Frankly speaking I had troubles to understand why the correlation is almost 0. It turned out that I had unconsciously in mind a correlation between height and weight, an issue that is raised later in this chapter with m4.3. 
+Frankly speaking I had troubles to understand why the correlation is almost 0. It turned out that I had unconsciously in mind a correlation between height and weight, an issue that is raised later in this chapter with `m4.3`. 
 
 But here there is only a Gaussian distribution of height under discussion, and not the correlation between height and weight.
 :::
@@ -1110,9 +1100,12 @@ In fact: The square roots of the variance vector results in the standard deviati
 
 > Scaling a covariance matrix into a correlation one can be achieved in many ways, mathematically most appealing by multiplication with a diagonal matrix from left and right, or more efficiently by using `base::sweep(.., FUN = "/")` twice. The `stats::cov2cor()` function is even a bit more efficient, and provided mostly for didactical reasons.
 
-I have taken how to compute the covariance matrix with `base::sweep()` from a [StackOverflow](https://stats.stackexchange.com/a/407954/207389) answer
+For computing the covariance matrix with `base::sweep()` see the answer in  [StackOverflow](https://stats.stackexchange.com/a/407954/207389).
 
 ```{r}
+#| label: compute-vcov-with-sweep
+#| attr-source: '#lst-compute-vcov-with-sweep lst-cap="Compute covariance matrix using sweep()"'
+
 R <- stats::cov2cor(rethinking::vcov(m4.1))
 S <- sqrt(base::diag(rethinking::vcov(m4.1)))
 
@@ -1201,12 +1194,11 @@ post4_a <- MASS::mvrnorm(n = 1e4, mu = rethinking::coef(m4.1),
 plot(post4_a)
 ```
 
-### Linear prediction
+### Linear prediction {#sec-linear-prediction-a}
 
 What we've done until now is just a Gaussian model of height in a
-population of adults. But typically, we are interested in modeling how
-an outcome is related to some other variable, a predictor variable. If
-the predictor variable has any statistical association with the outcome
+population of adults. But it doesn’t really have the usual feel of "regression" to it. Typically, we are interested in modeling how
+an outcome is related to some other variable, a `r glossary("predictor variable")`. If the predictor variable has any statistical association with the outcome
 variable, then we can use it to predict the outcome. When the predictor
 variable is built inside the model in a particular way, we'll have
 linear regression.
@@ -1234,18 +1226,20 @@ variables?
 
 ##### Model definition
 
-Recall @def-prior-height-model for the Gaussian height model. How do we
-get `weight` into this model? Let `_x_` be the name for the column of
-weight measurements, `d2_a$weight`. Let the average of the `_x_` values
-be $\overline{x}$, "ex bar". Now we have a predictor variable `_x_`,
-which is a list of measures of the same length as `_h_`. To get weight
-into the model, we define the mean `_μ_` as a function of the values in
-`_x_`.
+The strategy is to make the parameter for the mean of a Gaussian distribution, `μ`, into a linear function of the predictor variable and other, new parameters that we invent. This strategy is often simply called the `r glossary("linear model")`. The linear model strategy instructs the golem to assume that the predictor variable has a constant and additive relationship to the mean of the outcome. We ask the golem: “Consider all the lines that relate one variable to the other. Rank all of these lines by plausibility, given these data.” The golem answers with a posterior distribution.
+
+Recall @def-height-linear-model-m4.1 for the Gaussian height model. How do we
+get `weight` into this model? Let $x$ be the name for the column of
+weight measurements, `d2_a$weight`. Let the average of the $x$ values
+be $\overline{x}$, "ex bar". Now we have a predictor variable `$x$,
+which is a list of measures of the same length as $h$. To get weight
+into the model, we define the mean $\mu$ as a function of the values in
+$x$.
 
 ------------------------------------------------------------------------
 
-::: {#def-height-weight-linear-model}
-Linear model height against weight
+::: {#def-height-weight-linear-model1-m4.3}
+###### Linear model height against weight (Version 1 of m4.3)
 
 $$
 \begin{align*}
@@ -1255,11 +1249,11 @@ h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\
 \beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
 \end{align*}
-$$ {#eq-height-weight-linear-model}
+$$ {#eq-height-weight-linear-model1-m4.3}
 
 (1) **Likelihood (Probability of the data)**: The first line is nearly
     identical to before, except now there is a little index $i$ on the
-    $μ$ as well as the $h$. You can read $h_{i}$ as "each height" and
+    $μ$ as well as on the $h$. You can read $h_{i}$ as "each height" and
     $\mu_{i}$ as "each $μ$" The mean $μ$ now depends upon unique values
     on each row $i$. So the little $i$ on $\mu_{i}$ indicates that *the
     mean depends upon the row*.
@@ -1277,7 +1271,7 @@ $$ {#eq-height-weight-linear-model}
     remaining lines in the model define distributions for the unobserved
     variables. These variables are commonly known as parameters, and
     their distributions as priors. There are three parameters:
-    $\alpha, \beta, \sigma$. You've seen priors for $\alpha$ and $\beta$
+    $\alpha, \beta, \sigma$. You've seen priors for $\alpha$ and $\sigma$
     before, although $\sigma$ was called $\mu$ back then. (More details
     in @sec-priors-a)
 :::
@@ -1286,7 +1280,9 @@ $$ {#eq-height-weight-linear-model}
 
 ##### Linear model {#sec-linear-model-a}
 
-The value $x_{i}$ in the second line of @def-height-weight-linear-model
+The mean $\mu$ is no longer a parameter to be estimated. Rather, as seen in the second line of the model, $\mu_{i}$ is constructed from other parameters, $\alpha$ and $\beta$, and the observed variable $x$. This line is not a stochastic relationship—there is no `~` in it, but rather an `=` in it—because the definition of $\mu_{i}$ is deterministic. That is to say that, once we know $\alpha$ and $\beta$ and $x_{i}$, we know $\mu_{i}$ with certainty.
+
+The value $x_{i}$ in the second line of @def-height-weight-linear-model1-m4.3
 is just the weight value on row $i$. It refers to the same individual as
 the height value, $h_{i}$, on the same row. The parameters $\alpha$ and
 $\beta$ are more mysterious. Where did they come from? We made them up.
@@ -1302,7 +1298,7 @@ in the posterior distribution. So when you want to know something about
 the data, you ask your golem by inventing a parameter for it. This will
 make more and more sense as you progress.
 
-What does the second line of @def-height-weight-linear-model? It tells
+What does the second line of @def-height-weight-linear-model1-m4.3? It tells
 the regression golem that you are asking two questions about the mean of
 the outcome.
 
@@ -1325,7 +1321,7 @@ question.
 
 ##### Priors {#sec-priors-a}
 
-The prior for $\beta$ in @def-height-weight-linear-model deserves
+The prior for $\beta$ in @def-height-weight-linear-model1-m4.3 deserves
 explanation. Why have a Gaussian prior with mean zero? This prior places
 just as much probability below zero as it does above zero, and when
 $\beta = 0$, weight has no relationship to height. To figure out what
@@ -1500,8 +1496,8 @@ corresponding R code as footnotes:
 
 ------------------------------------------------------------------------
 
-::: {#def-find-post-dist}
-Finding the posterior distribution
+::: {#def-height-weight-linear-model2-m4.3}
+###### Linear model height against weight (Version 2 of m4.3)
 
 $$
 \begin{align*}
@@ -1511,7 +1507,7 @@ h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\
 \beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50)  \space \space (5) \\    
 \end{align*} 
-$$ {#eq-find-post-dist-m4.3}
+$$ {#eq-height-weight-linear-model2-m4.3}
 
 ```         
 height ~ dnorm(mu, sigma)     # <1>
@@ -1534,13 +1530,13 @@ the R assignment operator, `<-` instead of the symbol `=`.
 ## R code 4.42 #############################
 
 # define the average weight, x-bar
-xbar <- mean(d2_a$weight)
+xbar_a <- mean(d2_a$weight)
 
 # fit model
 m4.3 <- rethinking::quap(
   alist(
     height ~ dnorm(mu, sigma),
-    mu <- a + b * (weight - xbar),
+    mu <- a + b * (weight - xbar_a),
     a ~ dnorm(178, 20),
     b ~ dlnorm(0, 1),
     sigma ~ dunif(0, 50)
@@ -2125,16 +2121,16 @@ the code you can write yourself.
 Now let's walk through generating an 89% prediction interval for actual
 heights, not just the average height, `μ`. This means we'll incorporate
 the standard deviation `σ` and its uncertainty as well. Remember, the
-first line of the statistical model in @eq-find-post-dist-m4.3 is:
+first line of the statistical model in @eq-height-weight-linear-model2-m4.3 is:
 
 ------------------------------------------------------------------------
 
-::: {#def-mod-line-1-a}
-Remember the first line of @eq-find-post-dist-m4.3
+::: {#def-height-weight-linear-model-first-line-m4.3}
+###### Remember the first line of @eq-height-weight-linear-model2-m4.3
 
 $$
 h_{i} \sim \operatorname{Normal}(μ_{i}, σ)
-$$ {#eq-mod-line-1-a}
+$$ {#eq-height-weight-linear-model-first-line-m4.3}
 :::
 
 ------------------------------------------------------------------------
@@ -3036,7 +3032,7 @@ symmetry in the table of content.
 
 ### Model describing language
 
-#### From model definition to Bayes' theorem
+#### From model definition to Bayes’ theorem
 
 We can use grid approximation to work through our globe tossing model.
 
@@ -3168,12 +3164,12 @@ and understandable as the weird base R syntax in
 The plot of the heights distribution compared with the standard Gaussian
 distribution is missing in Kurz's version. I added this plot by using
 the last example of [How to Plot a Normal Distribution in
-R](https://www.statology.org/plot-normal-distribution-r/).
+R](https://www.statology.org/plot-normal-distribution-r/). It uses the `ggplot2::stat_function()` to compute and draw a function as a continuous curve. This makes it easy to superimpose a function on top of an existing plot.
 
 ```{r}
 #| label: fig-dist-heights-b
 #| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution: tidyverse version"
-#| attr-source: '#lst-fig-dist-heights-b lst-cap="Plot the distribution of the heights of adults: tidyverse version"'
+#| attr-source: '#lst-fig-dist-heights-b lst-cap="Plot the distribution of the heights of adults, overlaid by an ideal Gaussian distribution: tidyverse version"'
 
 p0 <- 
     d2_b |> 
@@ -3189,7 +3185,7 @@ p0 <-
 p0
 ```
 
-##### Plot the mean prior
+##### Plot the mean prior (mu)
 
 Here is the shape for the prior $μ \sim Normal(178, 20)$.
 
@@ -3203,12 +3199,15 @@ p1 <-
     
   ggplot(aes(x = x, y = dnorm(x, mean = 178, sd = 20))) +
   geom_line() +
-  scale_x_continuous(breaks = seq(from = 100, to = 250, by = 75)) +
+  scale_x_continuous(breaks = seq(from = 100, to = 250, by = 25)) +
   labs(title = "mu ~ dnorm(178, 20)",
        y = "density")
 
 p1
 ```
+
+As there is only one variable y (= `dnorm(x, mean = 178, sd = 20)`) we need to specify x as a sequence of 1501 points t provide a x and y aesthetic for the plot.
+
 
 ##### Plot the prior of the standard deviation (sigma)
 
@@ -3362,7 +3361,7 @@ the calculation of the posterior distribution. This technique has
 limited relevance. Later on we will use the quadratic approximation with
 `brms::brm()`.
 
-It is the same technique we have use in
+It is the same technique we have used in
 @sec-sampling-from-a-grid-approximate-posterior respectively in the
 tidyverse version in @sec-grid-approximation-b. As there is no
 conceptually new information to learn, I am not going into the details
@@ -3708,6 +3707,10 @@ b4.1$fit
 
 
 ```{r}
+#| label: fig-plot-b4.1
+#| fig-cap: "Plot model b4.1"
+#| attr-source: '#lst-fig-plot-b4.1 lst-cap="Plot model b4.1"'
+
 brms:::plot.brmsfit(b4.1)
 ```
 
@@ -3724,8 +3727,7 @@ contrary: Adding `brms::` would result into the message: "Error:
 'summary' is not an exported object from 'namespace:brms'".
 
 As I really want to specify explicitly the method these generic
-functions should use, I need to use the syntax `brms:::print.brmsfit()`
-or `brms:::summary.brmsfit()` respectively.
+functions should use, I need to use the syntax with *three* columns, like `brms:::print.brmsfit()` or `brms:::summary.brmsfit()` respectively.
 
 In this respect I have to learn more about S3 classes. There are many
 important web resources about this subject that I have found with the
@@ -3831,16 +3833,24 @@ head(post_b)
 
 The functions of the family `as_draws()` transform `brmsfit` objects to
 `draws` objects, a format supported by the {**posterior**} package.
-{brms} currently imports the family of `as_draws()`functions from the
+{**brms**} currently imports the family of `as_draws()`functions from the
 {**posterior**} package, a tool for working with posterior
-distributions.
+distributions, i.e. for fitting Bayesian models or working with output from Bayesian models. (See as an introduction [The posterior R package](https://mc-stan.org/posterior/articles/posterior.html))
 
 @lst-put-hmc-into-df-b produced the {**brms**} version of what McElreath
 achieved with `extract.samples()` in @lst-extract-samples-m4.1-a.
-However, what happened under the hood was different. Whereas rethinking
-used the `mvnorm()` function from the {**MASS**} package, with
-{**brms**} we just extracted the iterations of the HMC chains and put
-them in a data frame.
+However, what happened under the hood was different. Whereas {**rethinking**} used the `mvnorm()` function from the {**MASS**} package with {**brms**} we just extracted the iterations of the `r glossary("HMC")` chains and put them in a data frame. 
+
+It’s also noteworthy that the `as_draws_df()` is part of a larger class of `as_draws()` functions {**brms**} currently imports from the {**posterior**} package. 
+
+```{r}
+#| label: show-class-post-dist
+#| attr-source: '#lst-show-class-post-dist lst-cap="Show classes of the posterior distribution post_b, an object created by as_draws() function"'
+
+class(post_b)
+```
+
+Besides of class `tbl_df` and `tbl`, [subclasses of data.frame with different behavior](https://tibble.tidyverse.org/reference/tbl_df-class.html) the `as_draws_df()` function has created the `draws` class, the parent class of all supported [draws formats](https://mc-stan.org/posterior/articles/posterior.html#draws-formats). 
 :::
 
 Now `select()` the columns containing the draws from the desired
@@ -4011,8 +4021,7 @@ d2_b |>
 ```{r}
 #| label: fig-sim-heights-only-with-priors-b
 #| fig-cap: "Simulating heights from the model, using only the priors: tidyverse version"
-
-## I STOPPED HERE WITH attr-source
+#| attr-source: '#lst-fig-sim-heights-only-with-priors-b lst-cap="Simulate heights from the model, using only the priors: tidyverse version"'
 
 set.seed(2971)
 # how many lines would you like?
@@ -4055,8 +4064,7 @@ tibble(b = rlnorm(1e4, meanlog = 0, sdlog = 1)) %>%
 ```
 
 ::: callout-note
-Kurz used with `mean`and `sd`an abbreviated version of the argument
-names `meanlog` and `sdlog`.
+Kurz wrote just `mean` and `sd` instead of `meanlog` and `sdlog.` These shorter argument names work because of the [partial matching feature in argument evaluation](https://cran.r-project.org/doc/manuals/R-lang.html#Argument-matching) of R functions. But for educational reason (misunderstanding, clashing with other matching arguments and less readable code) I apply this technique only sometimes in interactive use.
 :::
 
 I am not very skilled with the Log-Normal distribution, and so I am
@@ -4210,13 +4218,13 @@ b4.3 <-
       family = gaussian,
       height ~ 1 + weight_c,
       prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(lognormal(0, 1), class = b, lb = 0),
                 brms::prior(uniform(0, 50), class = sigma, ub = 50)),
       iter = 2000, warmup = 1000, chains = 4, cores = 4,
       seed = 4,
       file = "fits/b04.03")
 
-brms:::summary.brmsfit(b4.3)
+# brms:::summary.brmsfit(b4.3)
 ```
 
 Here are the trace plots.
@@ -4433,7 +4441,7 @@ that value back.
 ```{r}
 #| label: fig-raw-data-line2-b4.3
 #| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: tidyverse version"
-#| code-summary: "Reproducing Figure 4.6 of SR2"
+#| attr-source: '#lst-fig-raw-data-line2-b4.3 lst-cap="Reproducing Figure 4.6 of SR2 with adjusted x-axis"'
 
 labels <-
   c(-10, 0, 10) + mean(d2_b$weight) %>% 
@@ -4441,8 +4449,8 @@ labels <-
 
 d2_b %>%
   ggplot(aes(x = weight_c, y = height)) +
-  geom_abline(intercept = brms:::fixef.brmsfit(b4.3)[[1]], 
-              slope     = brms:::fixef.brmsfit(b4.3)[[2]]) +
+  geom_abline(intercept = brms::fixef(b4.3, probs = c(0.055, 0.945))[[1]], 
+              slope     = brms::fixef(b4.3, probs = c(0.055, 0.945))[[2]]) +
   geom_point(shape = 1, size = 2, color = "royalblue") +
   scale_x_continuous("weight",
                      breaks = c(-10, 0, 10),
@@ -4453,34 +4461,68 @@ d2_b %>%
 
 Furthermore note the use of the `brms:::fixef.brmsfit()` function within
 `ggplot2::geom_abline()`. The function extracts the population-level
-('fixed') effects from a `brmsfit` object. Let's try and see what
-`brms::fixef()` produces:
+('fixed') effects from a `brmsfit` object. 
+
+::: callout-note
+###### Extract population-level ("fixed") effects {#sec-fixed-effects}
+
+I do not know what it means exactly that `brms::fixef()` extracts the population-level ('fixed') effect from a `brmsfit` object. After I googled it turned out that there is a great discussion about [Fixed Effects in Linear Regression](https://statisticsglobe.com/fixed-effects-linear-regression) and generally about fixed, random and mixec models (See Cross Validated [here](https://stats.stackexchange.com/questions/4700/what-is-the-difference-between-fixed-effect-random-effect-and-mixed-effect-mode) and [here](https://stats.stackexchange.com/questions/21760/what-is-a-difference-between-random-effects-fixed-effects-and-marginal-model)).
+
+At the moment I do not understand background and essence of this differentiation. What follows is a quote and summary of short glossary entry in [statistics.com](https://www.statistics.com/glossary/fixed-effects/).
+
+> The term “fixed effects” (as contrasted with “random effects”) is related to how particular coefficients in a model are treated – as fixed or random values. Which approach to choose depends on both the nature of the data and the objective of the study. A fixed effect approach can be used for both random and non-random samples. Random effect models are usually applied only to random samples. 
+
+Following the rest of the glossary entry in statistics.com:
+
+Suppose the data at hand are values of the annual income of 100 school teachers – T1: $N_{1}=30$ males and T2: $N_{2}=70$ females.
+
+1. Suppose the 100 individuals has been drawn randomly from a population, for example, from all school teachers of New York.
+    a. If the question of interest is the average income of New York school teachers, then the random effects approach is reasonable. We treat $T_{i}$ as values of a random variable taking on two values – $T_{1}$ and $T_{2}$ . For example, we simply use the mean of the 100 values as an estimate of the average income of New York teachers.
+    b. If the question of interest is the average income of female and male teachers separately, then we treat $T_{1}$ and $T_{2}$ as two fixed values.
+2. Suppose a researcher decided to pick up $N_{1}=30$ male teachers randomly from all male teachers of New York, and $N_{2}=70$ female teachers from all female teachers. In this case, only the fixed effect approach is reasonable – because the $N_{1}$ values $T_{1}$ and the $N_{2}$ values of $T_{1}$ in the sample of 100 have not been drawn randomly from the population of interest.
+
+There are also academic papers on this topic ([Let's Talk About Fixed Effects](https://link.springer.com/article/10.1007/s11577-020-00699-8)), tutorials ([Fixed Effects Regression](https://www.econometrics-with-r.org/10-3-fixed-effects-regression.html), [Fixed or Random Effects](https://bookdown.org/Yuleng/polimethod/fixed.html)) and R packages ([fixest]https://lrberge.github.io/fixest/index.html, see it's [introduction](https://lrberge.github.io/fixest/articles/fixest_walkthrough.html)) dedicated especially to this subject. 
+
+:::
+
+Let's try and see what `brms::fixef()` produces:
 
 ```{r}
 #| label: using-fixef-b
 #| attr-source: '#lst-using-fixef-b lst-cap="Extract population-level estimates from a brmsfit object"'
 #| code-summary: "Extract population-level estimates from a brmsfit object"
 
-brms::fixef(b4.3)
+brms::fixef(b4.3, probs = c(0.055, 0.945))
 ```
 
 So the function `ggplot2::geom_abline()` has used the intercept (`a`)
 and the slope (`b`) of the estimate column.
 
 ::: callout-note
-Instead of using \[1\] and \[2\] I have used \[\[1\]\] and \[\[2\]\].
+###### My code changes in using the `brms::fixef()` in @lst-fig-raw-data-line2-b4.3
+
+1. Slightly different use of the extracting operator `[`
+
+Instead of using `[1]` and `[2]` I have used `[[1]]` and `[[2]]`.
 
 > `[` selects sub-lists: it always returns a list. If you use it with a
 > single positive integer, it returns a list of length one. `[[` selects
 > an element within a list. (from [Advanced
 > R](https://adv-r.hadley.nz/subsetting.html#subsetting-answers), 2nd
 > ed.)
-:::
 
-::: {-callout-note}
-Remember: `brms::fixef(x)` is equivalent to `brms:::fixef.brmsfit(x)` if
+2. Different percentiles
+
+McElreath uses a 89% probability mass as CI (`r glossary("compatibility interval")`, aka credible interval or confidence interval). But the default value for the `probs` arguments is `c(0.025, 0.975)`, a 95% interval. To reproduce the Figure 4.6 I have therefore used `probs = c(0.055, 0.945)`.
+
+3. Direct function call
+
+`brms::fixef(x)` is equivalent to `brms:::fixef.brmsfit(x)` if
 `x` is a `brmsfit` object.
 :::
+
+
+
 
 ##### Adding uncertainty around the mean
 
@@ -4581,6 +4623,15 @@ print(b4.3_150)
 plot(b4.3_352)
 print(b4.3_352)
 ```
+
+::: callout-note
+###### Checking MCMC chains with trace plots and trank plots
+
+At the moment I didn't learn how to interpret these types of graphic output. McElreath's explains in later video lectures that it is important that `r glossary("trace plot")` cover the same location in the vertical axis (e.g. they do not jump around) and show that all different chains alternate in their (top) positions. I mentioned here the top position because this is the place where irregularities can be detected more easily. 
+
+In the above example it is difficult to decide if this is the case because the color differences of the different chains are weak. But it is general difficult to inspect trace plot, therefore McElreath proposes trace rank plots or `r glossary("trank plot")` (his terminus) in @sec-checking-the-chain.
+:::
+
 
 We'll need to put the chains of each model into data frames.
 
@@ -6295,7 +6346,7 @@ language is important because it closes the gap between scientific
 knowledge resp. assumptions and the statistical model. Models are
 mappings of one set of variables through a probability distribution onto
 another set of variables. In these language for models, defines the
-first line the likelihood function used in Bayes' theorem. The other
+first line the likelihood function used in `r glossary("Bayes’ theorem")`. The other
 lines define priors.
 
 The procedure: 1. First, we recognize a set of variables to work with.
@@ -6307,7 +6358,7 @@ their probability distributions defines a *joint generative model* that
 can be used both to simulate hypothetical observations as well as
 analyze real ones.
 
-#### Gaussian model of heights
+#### Gaussian model of heights {#sec-gaussian-model-of-heights-r}
 
 With the dataset of adults (age \>=18) of the !Kung San foraging people
 our goal is to model the height values using a Gaussian distribution. To
@@ -6413,8 +6464,7 @@ rethinking::dens(prior_h_r, norm.comp = TRUE)
 
 #### Finding the posterior distribution with quap
 
-I skipped the grid approximation:. It has mostly only educational value
-as it works only with a few parameters and is computationally expensive.
+I skipped the grid approximation and the sampling from it. It has mostly only educational value as it works only with a few parameters and is computationally expensive. Besides it has complex code that has no additional conceptual value to understand the purpose of the procedure.
 
 ***
 :::: {#prp-using-quap}
@@ -6457,23 +6507,99 @@ r4.1 <- rethinking::quap(
 rethinking::precis(r4.1)
 ```
 
-#### Sampling from a quap
+#### Sampling from the quap
 
-How do we get samples from the quadratic approximate posterior distribution? The answer … requires recognizing that a quadratic approximation to a posterior distribution with more than one parameter dimension —- `μ` and `σ` each contribute one dimension — is just a multi-dimensional Gaussian distribution. Therefore we need not one mean but a list of means and not one variance but a matrix of variances and covariances.
+I skip the long and diffusing discussion about the `r glossary("dispersion matrix", "covariance matrix")`.
+
+Instead of sampling single values from a simple Gaussian distribution, we sample vectors of values from a multi-dimensional Gaussian distribution. The {**rethinking**} package provides a convenience function to do exactly that:
 
 ```{r}
-#| label: vcov-matrix-r4.1
-#| attr-source: '#lst-cov-matrix-r4.1 lst-cap="Calculate Variance-Covariance Matrix for the Fitted Model Object r4.1 and its Decomposing"'
-#| results: hold
+#| label: extract-samples-r4.1
+#| attr-source: '#lst-extract-samples-r4.1 lst-cap="Extract sample vectors of values from the multi-dimensional Gaussian distribution of r4.1: rethinking version"'
 
 
-## R code 4.32 ################
-rethinking::vcov(r4.1)
-
-## R code 4.33 #######################
-base::diag(rethinking::vcov(r4.1))      # <1>
-stats::cov2cor(rethinking::vcov(r4.1))  # <2>
+## R code 4.34 #######################
+post_r <- rethinking::extract.samples(r4.1, n = 1e4)
+rethinking::precis(post_r)
 ```
+We have ended up with a data frame, `post_t`, with 10,000 (1e4) rows and two columns, one column for `μ` and one for `σ`. Each value is a sample from the posterior, so the mean and standard deviation of each column will be very close to the `r glossary("MAP")` values from @lst-post-dist-quap-r4-1.
+
+#### Linear prediction
+
+How do we take our Gaussian model from @sec-gaussian-model-of-heights-r that finally resulted in the `r glossary("prior predictive simulation")` of @fig-prior-predictive-sim-r and add `r glossary("predictor variable", "predictor variables")` to it?
+
+I we plot height against weight of our data in `d2_r` we will intuitively see that there is a relationship. How to make this vague observation into a more precise quantitative `r glossary("statistical model")`?
+
+We are using the same procedure as in {@sec-gaussian-model-height-r}:
+
+1. Construct the model specification: As always we have to construct sensible priors. It helps to plot a `r glossary("prior predictive simulation")`. In comparison to @eq-height-linear-model-m4.1 we have to add a prior for the new
+parameter, `β`. It turned out that this prior has to be in log-scale to prevent height and weight values below zero.
+2. Then we have to incorporate our new model @eq-height-weight-linear-model2-m4.3 for the mean into the model specification inside `rethinking::quap()`
+3. With the resulting model we are able to plot the posterior inference
+against the data. 
+
+##### Step 1: Construct model with sensible priors
+
+***
+::: {#def-height-weight-linear-model-r4.3}
+
+###### Linear model height against weight (model r4.3)
+
+$$
+\begin{align*}
+h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\ 
+μ_{i} = \alpha + \beta(x_{i}-\overline{x}) \space \space (2) \\
+\alpha \sim \operatorname{Normal}(178, 20) \space \space (3)  \\ 
+\beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
+\sigma \sim \operatorname{Uniform}(0, 50)  \space \space (5) \\    
+\end{align*} 
+$$ {#eq-height-weight-linear-model-r4.3}
+
+:::
+***
+
+##### Step 2: Incorporate new model into quap function
+
+```{r}
+#| label: find-post-dist-r4.3
+#| attr-source: '#lst-find-post-dist-r4.3 lst-cap="Find the posterior distribution of the linear height-weight model: rethinking version"'
+
+## R code 4.42 #############################
+
+# define the average weight, x-bar
+xbar_r <- mean(d2_r$weight)
+
+# fit model
+r4.3 <- rethinking::quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * (weight - xbar_r),
+    a ~ dnorm(178, 20),
+    b ~ dlnorm(0, 1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = d2_r
+)
+
+# summary result
+## R code 4.44 ############################
+rethinking::precis(r4.3)
+```
+##### Step 3: Plot the posterior inference
+
+```{r}
+#| label: fig-raw-data-line-r4.3
+#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: rethinking version"
+#| attr-source: '#lst-fig-raw-data-line-r4.3 lst-cap="Height against weight with linear regression"'
+
+## R code 4.46 ############################################
+plot(height ~ weight, data = d2_r, col = rethinking::rangi2)
+post_r4.3 <- rethinking::extract.samples(r4.3)
+a_map <- mean(post_r4.3$a)
+b_map <- mean(post_r4.3$b)
+curve(a_map + b_map * (x - xbar_r), add = TRUE)
+```
+
 
 
 ## STOPPED ORIGINAL HERE! (2023-08-20)
@@ -6558,11 +6684,7 @@ To get different intervals than the 95% default values you can use the `prob` ar
 
 #### Sampling from a brm() fit
 
-```{r}
-#| label: vcov-t4.1
-#| attr-source: '# lst-vcov-t4.1 lst-cap="Compute variance-covariance matrix for model t.41"'
-brms:::vcov.brmsfit(t4.1)
-```
+Again I will skip some details of the complex and confusing `r glossary("dispersion matrix")` discussion. The important thing in the tidyverse framework is, that we have to put the `r glossary("HMC")` chains result of `brms::brm()` in a data frame. We do that with the important `brms::as_draws_df()` function:
 
 
 ```{r}
@@ -6572,6 +6694,8 @@ brms:::vcov.brmsfit(t4.1)
 post_t <- brms::as_draws_df(t4.1)
 head(post_t)
 ```
+
+From here we can compute `r glossary("covariance")` and `r glossary("correlation")`.
 
 ```{r}
 #| label: cov-t4.1
@@ -6591,8 +6715,66 @@ post_t |>
     cor()
 ```
 
+***
+::: callout-note
+###### TODO attr-source
+Check if all code chunk have an `attr-source:` attribute. The last one I did was in @lst-fig-sim-heights-only-with-priors-b.
+:::
+***
 
 ## STOPPED TIDYVERSE HERE! (B: 2023-08-20)
+
+## Practice
+
+Problems are labeled Easy (E), Medium (M), and Hard (H).
+
+### 4E1
+
+In the model definition below, which line is the likelihood?
+
+$$
+y_{i} \sim \operatorname{Normal}(\mu, \sigma) \\
+\mu \sim \operatorname{Normal}(0, 10) \\
+\sigma \sim \operatorname{Exponential}(1)
+$$ {#eq-4e1}
+
+**My answer**: $y_{i} \sim \operatorname{Normal}(\mu, \sigma)$, the other lines are priors.
+
+### 4E2
+
+In the model definition just above, how many parameters are in the posterior distribution? 
+
+**My answer**: Just one.
+
+::: callout-warning
+#### Wrong Answer
+
+In the definition @eq-4e1 $y_{i}$  is not to be estimated, but represents the data we have at hand and want to understand through parameters. Erroneously I took this for the parameter. The correct answer is $\mu$ and §\sigma$ as both are the parameters which we attempt to estimate. So the correct answer is: Two
+:::
+
+### 4E3
+
+Using the model definition above, write down the appropriate form of `r glossary("Bayes’ theorem")` that includes the proper likelihood and priors.
+
+
+### 4E4
+
+In the model definition below, which line is the linear model?
+
+$$
+y_{i} \sim \operatorname{Normal}(\mu, \sigma) \\
+\mu_{i} = \alpha + \beta{x_{i}} \\
+\alpha \sim \operatorname{Normal}(0, 10) \\
+\beta \sim \operatorname{Normal}(0, 1) \\
+\sigma \sim \operatorname{Exponential}(1)
+$$
+**My answer**: $\mu_{i} = \alpha + \beta{x_{i}}$
+
+### 4E5
+
+In the model definition just above, how many parameters are in the posterior distribution?
+
+**My answer**: There are three parameters.
 
 ```{r}
 #| label: session-info

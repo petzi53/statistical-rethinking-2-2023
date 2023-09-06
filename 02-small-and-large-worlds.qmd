@@ -2,6 +2,7 @@
 
 ```{r}
 #| label: setup
+#| echo: true
 
 library(tidyverse)
 ```
@@ -2936,26 +2937,22 @@ distribution.
 ```{r}
 #| label: grid-approx-base-demo
 #| attr-source: '#lst-grid-approx-base-demo lst-cap="Five steps of the grid approximation technique using only functions of base R"'
-#| echo: true
-#| eval: false
 
 ## R code 2.3 ###########################################
+
 p_grid <- seq(from = 0, to = 1, length.out = 20)    # <1>
 prior <- rep(1, 20)                                 # <2>
 likelihood <- dbinom(6, size = 9, prob = p_grid)    # <3>
 unstd.posterior <- likelihood * prior               # <4>
 posterior <- unstd.posterior / sum(unstd.posterior) # <5>
+
 ```
 
-1.  Define the grid. This means you decide how many points to use in
-    estimating the posterior, and then you make a list of the parameter
-    values on the grid.
-2.  Compute the value of the prior at each parameter value on the grid.
-3.  Compute the likelihood at each parameter value.
-4.  Compute the unstandardized posterior at each parameter value, by
-    multiplying the prior by the likelihood.
-5.  Finally, standardize the posterior, by dividing each value by the
-    sum of all values.
+1. Define the grid. This means you decide how many points to use in estimating the posterior, and then you make a list of the parameter values on the grid.
+2. Compute the value of the prior at each parameter value on the grid.
+3. Compute the likelihood at each parameter value.
+4. Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood.
+5. Finally, standardize the posterior, by dividing each value by the sum of all values.
 
 ##### Tidyverse
 
