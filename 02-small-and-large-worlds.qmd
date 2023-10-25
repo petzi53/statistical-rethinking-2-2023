@@ -586,7 +586,7 @@ generates all combination of variables as well but needs as input a
 dataset. The range between 0 and 1 is divided into 50 part and then it
 generates all combinations by varying all columns from left to right.
 The first column is the slowest, the second is faster and so on.). It
-generates 450 data points (50 \* 9 trials).
+generates 450 data points ($50 \times 9$ trials).
 
 ```{r}
 #| label: bayesian-update-1
@@ -663,10 +663,10 @@ number 52 there are differences in the column `lagged_n_trials` and `lagged_n_su
 The function `dplyr::lag()` finds the "previous" values in a vector (time series). This is useful for comparing values behind of the current values. See [Compute lagged or leading values](https://dplyr.tidyverse.org/reference/lead-lag.html).
 
 We need to get the immediately previous values for drawing the prior
-probabilities in the current graph (= dashed line or $linetype = 2$ in
+probabilities in the current graph (= dashed line or `linetype = 2` in
 {**ggplot2**} parlance). In the relation with the posterior probabilities the
 difference form the prior possibility is always $1$ (this is the
-option $default = 1$ in the `dplyr::lag()` function. This is now the correct
+option `default = 1` in the `dplyr::lag()` function. This is now the correct
 explanation for the differences starting after rows 51 (and not 50).
 
 ##### Annotation (4): `dplyr::ungroup()` {#sec-annotation-4-ungroup}
@@ -726,7 +726,7 @@ To-do: Construct labelling specification for toss results
 
 ::: my-checklist-container
 To get a better replication I would need to change the labels for the
-facets from $n = n\_trials$ to the appropriate string length of the
+facets from `n = n_trials` to the appropriate string length of the
 results, e.g., for $n = 3$ I would need $W, L, W$.
 
 This was not done by Kurz. I have tried it but didn't succeed up to now
@@ -754,7 +754,7 @@ tbl5
 ##### Annotation (6): Normalizing {#sec-annotation-6-normalize}
 
 The code lines in annotation 6 normalize the prior and the likelihood by
-grouping the data by $n\_trials$. Dividing every prior and likelihood
+grouping the data by `n\_trials`. Dividing every prior and likelihood
 values by their respective sum puts them both in a probability metric.
 This metric is important for the comparisons of different probabilities.
 
@@ -780,9 +780,9 @@ tbl6
 The remainder of the code prepares the plot by using the 50 grid points
 in the range from $0$ to $1$ as the x-axis; prior and likelihood as y-axis.
 To distinguish the prior from the likelihood it uses a dashed line for
-the prior ($linetyp = 2$) and a full line (default) for the likelihood.
+the prior (`linetyp = 2`) and a full line (default) for the likelihood.
 The x-axis has three breaks ($0, 0.5, 1$) whereas the y-axis has no
-break and no scale ($scales = "free_y"$).
+break and no scale (`scales = "free_y"`).
 
 ```{r}
 #| label: fig-bayesian-update-7
@@ -799,6 +799,8 @@ tbl7 <- tbl6 %>%
   ggplot2::facet_wrap(~ strip, scales = "free_y") 
 
 ```
+
+## I STOPPED HERE!! SECOND PASS (2023-10-25) {.unnumbered}
 
 ## Components of the Model
 
@@ -1107,7 +1109,6 @@ This figure demonstrates that the area in the whole parameter space is
 *1.0*. It is a nice example how to calculate the probability *mass* (in
 contrast to the curve of the probability *density*).
 
-## I STOPPED HERE!! SECOND PASS (2023-10-25) {.unnumbered}
 
 ## Making the Model Go
 
