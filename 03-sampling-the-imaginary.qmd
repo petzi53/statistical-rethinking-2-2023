@@ -687,19 +687,19 @@ To produce Figure 3.2 of the book we apply following code lines:
 
 # upper left panel
 p1 <-
-  samples_b %>% 
+  samples_b  |>  
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = samples_b %>% filter(samples_b < .5), fill = "deepskyblue") +
+  geom_area(data = samples_b  |>  filter(samples_b < .5), fill = "deepskyblue") +
   labs(x = "proportion of water (p)",
        y = "density")
 
 # upper right panel
 p2 <- 
-  samples_b %>% 
+  samples_b  |>  
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = samples_b %>% filter(samples_b > .5 & samples_b < .75), fill = "deepskyblue") +
+  geom_area(data = samples_b  |>  filter(samples_b > .5 & samples_b < .75), fill = "deepskyblue") +
   labs(x = "proportion of water (p)",
        y = "density")
 

@@ -1,9 +1,10 @@
 # Golem of Prague
 
-A golem (goh-lem) is a clay robot from Jewish folklore. It stands as a
-metaphor for scientific models. Like in the folklore they are made of
-dust (silicon chips), are very powerful but also very dumb and therefore
-dangerous.
+> “A golem (goh-lem) is a clay robot from Jewish folklore” ([McElreath, 2020, p. 1](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=20&annotation=KPEPLRLA))
 
-There is nothing more in this chapter. I opened this file only to get
+The golem stands as a metaphor for scientific models. Like in the folklore they
+are made of dust (silicon chips), are very powerful but also very dumb
+and therefore dangerous.
+
+There are many remarks about philosophy of science. As I knew most of the already in its general form there is nothing more for me to learn in this chapter. I opened this file only to get
 the same header numbers as in the book.

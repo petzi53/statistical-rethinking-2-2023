@@ -1,0 +1,375 @@
+
+.listing {
+    font-weight: bold;
+}
+
+.figure-caption {
+    font-weight: bold;
+    font-size: var(--bs-body-font-size);
+    text-align: center;
+}
+
+
+/* ##############   Resources   ############# */
+
+.my-resource {
+  margin: 1em 0;
+  border: 2px solid gray;
+  border-left: 10px solid teal;
+  border-radius: 10px;
+}
+
+.my-resource-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: white;
+  background-color: rgb(123, 173, 173);
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/books-48.png");
+}
+
+.my-resource-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Example   ############# */
+
+.my-example {
+  margin: 1em 0;
+  border: 2px solid gray;
+  border-left: 10px solid #36648B;
+  border-radius: 10px;
+}
+
+.my-example-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: white;
+  background-color: #5CACEE;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/example-64.png");
+}
+
+
+.my-example-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Exercise   ############# */
+
+.my-exercise {
+  margin: 1em 0;
+  border: 2px solid darkseagreen;
+  border-left: 10px solid #698B69;
+  border-radius: 10px;
+}
+
+.my-exercise-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #C1FFC1;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/thinking-face-48.png");
+}
+
+.my-exercise-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   R Code   ############# */
+
+.r-code {
+  margin: 1em 0;
+  border: 2px solid burlywood;
+  border-left: 10px solid #8B7355;
+  border-radius: 10px;
+}
+
+.r-code-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #FFD39B;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/r-code.png");
+}
+
+.r-code-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Solution   ############# */
+
+.my-solution {
+  margin: 1em 0;
+  border: 2px solid darkseagreen;
+  border-left: 10px solid #698B69;
+  border-radius: 10px;
+}
+
+.my-solution-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #C1FFC1;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/thinking-face-48.png");
+}
+
+.my-solution-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Watch out!   ############# */
+
+.my-watch-out {
+  margin: 1em 0;
+  border: 2px solid #8B5A2B;
+  border-left: 10px solid #CD853F;
+  border-radius: 10px;
+}
+
+.my-watch-out-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: orange;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/eyes-94.png");
+}
+
+.my-watch-out-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Procedure   ############# */
+
+.my-procedure {
+  margin: 1em 0;
+  border: 2px solid #8B7B8B;
+  border-left: 10px solid thistle;
+  border-radius: 10px;
+}
+
+.my-procedure-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #FFE1FF;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/procedure-32.png");
+}
+
+.my-procedure-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Checklist / ToDo  ############# */
+
+.my-checklist {
+  margin: 1em 0;
+  border: 2px solid #36648B;
+  border-left: 10px solid steelblue;
+  border-radius: 10px;
+}
+
+.my-checklist-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: white;
+  background-color: #63B8FF;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/checklist-80.png");
+}
+
+.my-checklist-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Objectives   ############# */
+
+.my-objectives {
+  margin: 1em 0;
+  border: 2px solid #548B54;
+  border-left: 10px solid #548B54;
+  border-radius: 10px;
+}
+
+.my-objectives-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #eef9eb;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/bullseye-48.png");
+}
+
+.my-objectives-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Typo   ############# */
+
+.my-typo {
+  margin: 1em 0;
+  border: 2px solid black;
+  border-left: 10px solid #8B7D6B;
+  border-radius: 10px;
+}
+
+.my-typo-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: bisque;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/spelling-64.png");
+}
+
+.my-typo-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+/* ##############   Important   ############# */
+
+.my-important {
+  margin: 1em 0;
+  border: 2px solid #f90439;
+  border-left: 10px solid #f90439;
+  border-radius: 10px;
+}
+
+.my-important-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #fee9ee;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/double-exclamation-48.png");
+}
+
+.my-important-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}

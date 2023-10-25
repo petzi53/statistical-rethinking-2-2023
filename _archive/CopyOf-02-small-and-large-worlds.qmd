@@ -2,43 +2,34 @@
 
 ```{r}
 #| label: setup
-#| echo: TRUE
-
+#| echo: true
 
 library(tidyverse)
 ```
 
-## ORIGINAL {.unnumbered}
-
-::: my-objectives
-::: my-objectives-header
-Learning Objectives
-:::
-
-::: my-objectives-container
-> "This chapter focuses on the small world. It explains probability
-> theory in its essential form: counting the ways things can happen.
-> Bayesian inference arises automatically from this perspective. Then
-> the chapter presents the stylized components of a Bayesian statistical
-> model, a model for learning from data. Then it shows you how to
-> animate the model, to produce estimates.
-
-> All this work provides a foundation for the next chapter, in which
-> you'll learn to summarize Bayesian estimates, as well as begin to
-> consider large world obligations." ([McElreath, 2020, p.
-> 20](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=39&annotation=I8UG2HET))
-:::
-:::
-
-The text references many times to the notions of small and large worlds:
+## Original {.unnumbered}
 
 -   The **small world** is the self-contained logical world of the
     model.
 -   The **large world** is the broader context in which one deploys a
     model.
 
-## TIDYVERSE {.unnumbered}
+**Meta Remark (Study Guide)**
+
+> This chapter focuses on the small world. It explains probability
+> theory in its essential form: counting the ways things can happen.
+> Bayesian inference arises automatically from this perspective. Then
+> the chapter presents the stylized components of a Bayesian statistical
+> model, a model for learning from data. Then it shows you how to
+> animate the model, to produce estimates.
+>
+> All this work provides a foundation for the next chapter, in which
+> you'll learn to summarize Bayesian estimates, as well as begin to
+> consider large world obligations.
+
+## Tidyverse {.unnumbered}
+
+**Meta Remark (My Replication Strategy)**
 
 The work by Solomon Kurz has many references to R specifics, so that
 people new to R can follow the course. Most of these references are not
@@ -47,58 +38,57 @@ also very important references to other relevant articles I do not know.
 But I will put these kind of references for now aside and will me mostly
 concentrate on the replication and understanding of the code examples.
 
-One challenge for Kurz was to replicate *all* the graphics of the
-original version, even if they were produced just for understanding of
-procedures and argumentation without underlying R code. By contrast I
-will use only those code lines that are essential to display Bayesian
-results. Therefore I will not replicate for example the very extensive
-explication how to produce with `tidyverse` means the graphics of the
-garden of forking data.
+One challenge for the author (Kurz) was to replicate all the graphics of
+the original version, even if they were produced just for understanding
+without underlying code. I will use only code lines that are essential
+to display Bayesian results. Therefore I will not replicate the very
+extensive explication how to produce with tidyverse means the graphic of
+the garden of forking data.
 
 ## The Garden of Forking Data
 
-### ORIGINAL
+### Original
 
-**Bayesian inference is counting of possibilities**
+::: callout-tip
+###### Bayesian inference is counting of possibilities
 
-> "Bayesian inference is really just counting and comparing of
-> possibilities." ([McElreath, 2020, p.
-> 20](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=39&annotation=JYNC25AE))
-
-> "In order to make good inference about what actually happened, it
-> helps to consider everything that could have happened. A Bayesian
-> analysis is a garden of forking data, in which alternative sequences
-> of events are cultivated. As we learn about what did happen, some of
-> these alternative sequences are pruned. In the end, what remains is
-> only what is logically consistent with our knowledge." ([McElreath,
-> 2020, p. 21](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=40&annotation=Q2R6DERJ))
+Bayesian inference is really just counting and comparing of
+possibilities. ... In order to make good inference about what actually
+happened, it helps to consider everything that could have happened. A
+Bayesian analysis is a garden of forking data, in which alternative
+sequences of events are cultivated. As we learn about what did happen,
+some of these alternative sequences are pruned. In the end, what remains
+is only what is logically consistent with our knowledge.
+:::
 
 #### Counting possibilities
 
-> "Suppose there's a bag, and it contains four marbles. These marbles
+> Suppose there's a bag, and it contains four marbles. These marbles
 > come in two colors: blue and white. We know there are four marbles in
 > the bag, but we don't know how many are of each color. We do know that
-> there are five possibilities: (1) \[⚪⚪⚪⚪\], (2) \[⚫⚪⚪⚪\],
-> (3)\[⚫⚫⚪⚪\], (4) \[⚫⚫⚫⚪\], (5) \[⚫⚫⚫⚫\]. These are t These
-> These are the only possibilities consistent with what we know about
-> the contents of the bag. Call these five possibilities the
-> *conjectures*.
+> there are five possibilities: (1) \[⚪⚪⚪⚪\], (2) \[⚫⚪⚪⚪\], (3)
+> \[⚫⚫⚪⚪\], (4) \[⚫⚫⚫⚪\], (5) \[⚫⚫⚫⚫\]. These are the only
+> possibilities consistent with what we know about the contents of the
+> bag. **Call these five possibilities the *conjectures*.**
 >
 > Our goal is to figure out which of these conjectures is most
 > plausible, given some evidence about the contents of the bag. We do
 > have some evidence: A sequence of three marbles is pulled from the
 > bag, one at a time, replacing the marble each time and shaking the bag
-> before drawing another marble. The sequence that emerges is: ⚫⚪⚫,
-> in that order. These are the data.
+> before drawing another marble. **The sequence that emerges is: ⚫⚪⚫,
+> in that order. These are the data.** (bold emphasis pb)
 >
 > So now let's plant the garden and see how to use the data to infer
 > what's in the bag. Let's begin by considering just the single
-> conjecture, \[ \], that the bag contains one blue and three white
-> marbles." ([McElreath, 2020, p.
-> 21](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=40&annotation=RRD6HU9Y))
+> conjecture, \[⚫⚪⚪⚪\], that the bag contains one blue and three
+> white marbles. ...
+>
+> ...
+>
+> Notice that even though the three white marbles look the same from a
+> data perspective---we just record the color of the marbles, after
+> all---they are really different events. This is important, because it
+> means that there are three more ways to see ⚪ than to see ⚫.
 
 |              |                        |
 |--------------|------------------------|
@@ -110,32 +100,24 @@ garden of forking data.
 | \[⚫⚫⚫⚫\] | 4 × 0 × 4 = 0          |
 
 I have bypassed the counting procedure related with the step-by-step
-visualization of the garden of forking data. It is important to
-understand that the multiplication in the above table is still a
-summarized counting:
+visualization of the garden of forking data. The multiplication in the
+above table is still a summarized counting:
 
-::: my-important
-::: my-important-header
-Multiplication is just a shortcut for counting
+::: callout-important
+> Multiplication is just a shortcut to enumerating and counting up all
+> of the paths through the garden that could produce all the
+> observations.
 :::
 
-::: my-important-container
-"Notice that the number of ways to produce the data, for each
-conjecture, can be computed by first counting the number of paths in
-each"ring" of the garden and then by multiplying these counts together."
-([McElreath, 2020, p.
-23](zotero://select/groups/5243560/items/NFUEVASQ))
-([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=42&annotation=R9UIIW9R))
+> Notice that the number of ways to produce the data, for each
+> conjecture, can be computed by first counting the number of paths in
+> each "ring" of the garden and then by multiplying these counts
+> together. ... The fact that numbers are multiplied during calculation
+> doesn't change the fact that this is still just counting of logically
+> possible paths. This point will come up again, when you meet a formal
+> representation of Bayesian inference.
 
-"Multiplication is just a shortcut to enumerating and counting up all of
-the paths through the garden that could produce all the observations."
-([McElreath, 2020, p.
-25](zotero://select/groups/5243560/items/NFUEVASQ))
-([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=44&annotation=KUC4ZHP4))
-:::
-:::
-
-The multiplication in the table above has to be interpreted the
+The multiplication in the above table has to be interpreted the
 following way:
 
 1.  The possibility of the conjecture that the bag contains four white
@@ -155,7 +137,7 @@ following way:
 
 #### Combining Other Information
 
-> "We may have additional information about the relative plausibility of
+> We may have additional information about the relative plausibility of
 > each conjecture. This information could arise from knowledge of how
 > the contents of the bag were generated. It could also arise from
 > previous data. Whatever the source, it would help to have a way to
@@ -167,25 +149,46 @@ following way:
 > ways in which each conjecture is compatible with the observed data.
 > This comparison suggests that \[⚫⚫⚫⚪\] is slightly more plausible
 > than \[⚫⚫⚪⚪\], and both are about three times more plausible than
-> \[⚫⚪⚪⚪\]. Since these are our initial counts, and we are going to
-> update them next, let's label them *prior*." ([McElreath, 2020, p.
-> 25](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=44&annotation=WECXDWEV))
+> \[⚫⚪⚪⚪\]. **Since these are our initial counts, and we are going
+> to update them next, let's label them *prior*.** (bold emphasis pb)
 
-::: my-procedure
-::: my-procedure-header
-Bayesian Updating Process
+::: callout-tip
+###### Principle of Indifference
+
+As we will see later: the choice of the prior is not relevant for the
+final result. This is called the *Principle of Indifference*.
+
+The only difference between a good or bad choice is the time (the number
+of steps) the updating process needs to produce the final result.
+
+Before seeing any data the most common solution is to assign an equal
+number of ways that each conjecture could be correct.
 :::
 
-::: my-procedure-container
+> Which assumption should we use, when there is no previous information
+> about the conjectures? The most common solution is to assign an equal
+> number of ways that each conjecture could be correct, before seeing
+> any data. This is sometimes known as the **PRINCIPLE OF
+> INDIFFERENCE**: When there is no reason to say that one conjecture is
+> more plausible than another, weigh all of the conjectures equally. ...
+>
+> For the sort of problems we examine in this book, the principle of
+> indifference results in inferences very comparable to mainstream
+> non-Bayesian approaches, most of which contain implicit equal
+> weighting of possibilities. For example a typical non-Bayesian
+> confidence interval weighs equally all of the possible values a
+> parameter could take, regardless of how implausible some of them are.
+> In addition, many non-Bayesian procedures have moved away from equal
+> weighting, through the use of penalized likelihood and other methods.
+
+**Bayesian Updating Process**
+
 Here's how we do the updating:
 
 1.  First we count the numbers of ways each conjecture could produce the
     new observation, ⚫.
 2.  Then we multiply each of these new counts by the prior numbers of
     ways for each conjecture.
-:::
-:::
 
 |     |              |     |                    |     |              |     |            |     |
 |--------|--------|--------|--------|--------|--------|--------|--------|--------|
@@ -197,99 +200,448 @@ Here's how we do the updating:
 |     | \[⚫⚫⚫⚪\] |     | 3                  |     | 9            |     | 9 × 3 = 27 |     |
 |     | \[⚫⚫⚫⚫\] |     | 4                  |     | 0            |     | 0 × 4 = 0  |     |
 
-::: callout-caution
+::: {.callout-note style="color: blue;"}
+###### Typo
+
 In the book the table header "Ways to produce" includes ⚪ instead of
 --- as I think is correct --- ⚫.
 :::
 
 #### From Counts to Probability
 
-::: my-important
-::: my-important-header
-Principle of honest ignorance (McElreath)
-:::
+::: {.callout-tip style="color: green"}
+###### Principle of honest ignorance
 
-::: my-important-container
-> "When we don't know what caused the data, potential causes that may
-> produce the data in more ways are more plausible." ([McElreath, 2020,
-> p. 26](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=45&annotation=9EKVZNHR))
-:::
+*When we don't know what caused the data, potential causes that may
+produce the data in more ways are more plausible*.
 :::
 
 Two reasons for using probabilities instead of counts:
 
 1.  Only relative value matters.
-2.  Counts will fast grow very large and difficult to manipulate.
+2.  Counts will very fast grow very large and difficult to manipulate.
 
-$$
-\begin{align*}
-\text{plausibility of p after } D_{New} = \frac{\text{ways p can produce }D_{New} \times \text{prior plausibility p}}{\text{sum of product}}
-\end{align*}
-$$
+![](img/plausibility-formula-1-min.png){fig-align="center"}
 
-::: my-example
-::: my-example-header
-Constructing plausibilities by standardizing
-:::
+```{=html}
+<center>
+  That little <span style="font-size: 40px;">∝</span> means <em>proportional to</em>.
+</center>
+```
+**Standardizing the plausibility**
 
-::: my-example-container
-| Possible composition | p    | Ways to produce data | Plausibility |
-|----------------------|------|----------------------|--------------|
-| \[⚪⚪⚪⚪\]         | 0    | 0                    | 0            |
-| \[⚫⚪⚪⚪\]         | 0.25 | 3                    | 0.15         |
-| \[⚫⚫⚪⚪\]         | 0.5  | 8                    | 0.40         |
-| \[⚫⚫⚫⚪\]         | 0.75 | 9                    | 0.45         |
-| \[⚫⚫⚫⚫\]         | 1    | 0                    | 0            |
-:::
-:::
+![](img/plausibility-formula-2-min.png){fig-align="center"}
 
-::: r-code
-::: r-code-header
-::: {#cnj-2-1}
-: Compute these plausibilities in R
-:::
-:::
-
-::: r-code-container
 ```{r}
-#| label: code-2-1
-#| attr-source: '#lst-code-2-1 lst-cap="Compute Plausibilities in R"'
+#| label: compute-plausibilities
 
+## R code 2.1
 ways <- c(0, 3, 8, 9, 0)
 ways / sum(ways)
 ```
-:::
+
+I understand that in the above code we assume as the very first prior
+plausibility the ways the results can be produced by the assumed
+conjecture proportion of blue marbles. It corresponds to the parameter
+value. This conclusion is somewhat hidden as our very first calculation
+already takes three drawn marbles (⚫⚪⚫) into account. From another
+perspective this could also be seen as the first draw (⚫) followed by
+two Bayesian updates (⚪⚫). This corresponds to the following counting:
+(In the second and third draw the first factor of the multiplication is
+always the prior.)
+
+1.  First draw ⚫: 0,1,2,3,4 ways corresponding to the 4 chosen
+    conjectures.
+2.  Second draw ⚪: 0 x 4 = 0, 1 x 3 = 3, 2 x 2 = 4, 3 x 1 = 3, 4 x 0 =
+    0
+3.  Third draw ⚫: 0 x 0 = 0, 3 x 1 = 3, 4 x 2 = 8, 3 x 3 = 9, 0 x 4 = 0
+
+This demonstration shows that the book example of ⚫⚪⚫ already
+contains three priors: The first is identical with the conjectured
+proportion of blue marbles (0,1,2,3,4) and is equivalent to the
+parameter value for each conjecture. The second and third marbles
+already uses Bayesian updating.
+
+**Names of the different parts of the formula**
+
+Data = ⚫⚪⚫.
+
+-   A conjectured proportion of blue marbles, *p*, is usually called a
+    **PARAMETER** value. It's just a way of indexing possible
+    explanations of the data. For instance one conjectured proportion of
+    one blue marble could be: ⚫⚪⚪⚪ (`p = 1`). The others are:
+    ⚪⚪⚪⚪ (`p = 0`), ⚫⚫⚪⚪ (`p = 2` , ⚫⚫⚫⚪ (`p = 3`), and
+    ⚫⚫⚫⚫ (`p = 4` ways).
+-   The relative number of ways that a value *p* can produce the data is
+    usually called a **LIKELIHOOD**. It is derived by enumerating all
+    the possible data sequences that could have happened and then
+    eliminating those sequences inconsistent with the data. For
+    instance: `0.00, 0.15, 0.40, 0.45, 0.00`
+-   The prior plausibility of any specific *p* is usually called the
+    **PRIOR PROBABILITY**. For instance: `0, 3, 8, 9, 0`
+-   The new, updated plausibility of any specific *p* is usually called
+    the **POSTERIOR PROBABILITY**. For instance: `0, 3, 16, 27, 0`
+
+### Tidyverse
+
+#### Counting possibilities
+
+> If we're willing to code the marbles as 0 = "white" 1 = "blue", we can
+> arrange the possibility data in a tibble as follows.
+
+::: {.callout-note style="color: blue;"}
+###### Changed code slightly
+
+I changed `rep()` to `rep.int()` and added `L` to the value of p1 resp.
+p5 to get integers (instead of doubles).
 :::
 
-> "These plausibilities are also *probabilities*---they are non-negative
-> (zero or positive) real numbers that sum to one. And all of the
-> mathematical things you can do with probabilities you can also do with
-> these values. Specifically, each piece of the calculation has a direct
-> partner in applied probability theory. These partners have stereotyped
-> names, so it's worth learning them, as you'll see them again and
-> again.
+```{r}
+#| label: create-marble-data
+
+d <-
+  tibble::tibble(p1 = 0L,
+         p2 = rep.int(1:0, times = c(1, 3)),
+         p3 = rep.int(1:0, times = c(2, 2)),
+         p4 = rep.int(1:0, times = c(3, 1)),
+         p5 = 1L)
+
+head(d)
+```
+
+> You might depict the possibility data in a plot.
+
+```{r}
+#| label: fig-show-marble-data
+#| fig-cap: "Marble Data"
+#| attr-source: '#lst-marble-data lst-cap="Code listing to show the marble data as graph"'
+#| code-summary: "Show the marble data as graph"
+#| echo: true
+
+d %>% 
+  set_names(1:5) %>%    # <1>
+  mutate(x = 1:4) %>%  # <2> 
+  pivot_longer(-x, names_to = "possibility") %>%  # <3>
+  mutate(value = value %>% as.character()) %>%    # <4>
+  
+  ggplot(aes(x = x, y = possibility, fill = value)) + # <5>
+  geom_point(shape = 21, size = 5) + # <5>
+  scale_fill_manual(values = c("white", "navy")) + # <5>
+  scale_x_discrete(NULL, breaks = NULL) + # <5>
+  theme(legend.position = "none") # <5>
+ 
+```
+
+1. Change the column names from p\<number\> to \<number\>.
+2. Add a new column with the values 1 to 4 for each row.
+3. Convert data frame from wide to long, excluding the `x` column.
+4. Change the variable type of `value` column from double to character.
+5. Plot the results.
+
+At first I could not understand the code lines. I had to execute line by
+line to see what happens:
+
+##### Annotation (1)
+
+```{r}
+#| label: using-set-names
+
+set_names(d, 1:5)
+```
+
+`rlang::set_names()` comes from {**rlang**} package which contains
+function for base types and core tidyverse features. It is exported to
+{**purrr**}, a package with tools for functional programming. It is
+equivalent to `stats::setNames()` but has more features and stricter
+argument checking. I does nothing more as to change the column names
+from p\<number\> to \<number\>. If one had used just numbers for the
+probability columns this line wouldn't have been necessary as it is
+shown in the next chunk. (I omitted the `utils::head()` argument of the
+last line as it is not necessary.)
+
+```{r}
+#| label: create-marble-data-2
+
+df <-
+  tibble(`1` = 0,
+         `2` = rep(1:0, times = c(1, 3)),
+         `3` = rep(1:0, times = c(2, 2)),
+         `4` = rep(1:0, times = c(3, 1)),
+         `5` = 1)
+
+df
+```
+
+It is interesting to see that the first and last column are doubles and
+not integers. I believe that the reason is that these two columns do not
+have variations, e.g. do not contain both variable values, so that R
+assumes the more general class of `numeric` and type of `double`.
+
+-   `class(5L)` and `typeof(5L`) both results to *integer* .
+-   Whereas `class(5)` is *integer* but `typeof(5)` is *double*.
+
+```{r}
+#| label: number-types
+
+class(5L)
+typeof(5L)
+class(5)
+typeof(5)
+```
+
+##### Annotation (2)
+
+After understanding what `stats::set_names()` does the next line with
+`dplyr::mutate()` is easy. It adds a new column `x` with the values 1 to
+4 for each row.
+
+```{r}
+#| label: add-x-column
+
+df <- df |> 
+    set_names(1:5) |> 
+    mutate(x = 1:4)
+df
+```
+
+##### Annotation (3)
+
+I understood that the data frame is converted from a wide to a long
+structure. But together with the pipe and not naming the first parameter
+`-x` I did not catch the essence of the command.
+
+A first understanding comes from the fact, that it is wrong to covert
+all columns to the long format:
+
+```{r}
+#| label: wrong-long-conversion
+
+pivot_longer(data = df, cols = everything(), names_to = "possibility") |> 
+    print(n = 24)
+```
+
+This (wrong) example shows that it is mandatory to exclude `x` from the
+conversion. Otherwise it would be included and integrated into the
+`possibility` column.
+
+```{r}
+#| label: correct-long-conversion
+
+(d <- 
+    pivot_longer(data = df, cols = -x, names_to = "possibility"))
+
+```
+
+The above code line for the conversion from wide to long is equivalent
+with naming explicitly all column names to convert:
+
+```{r}
+#| label: test-if-identical
+
+d1 <- pivot_longer(data = df, cols = -x, names_to = "possibility")
+d2 <- pivot_longer(data = df, 
+                   cols = c(`1`, `2`, `3`, `4`, `5`), 
+                   names_to = "possibility")
+identical(d1, d2)
+```
+
+The identity demonstrates: The `-x` parameter excludes the `x` column
+from the wide to long transformation. It is a shorthand for naming all 5
+columns that should be transformed.
+
+Instead of the `base::identical()` function you could also use
+`base::all.equal()`. Comparing data frames is a rather complicated
+action summarized by a blog post from Sharla Gelfand. But keep in mind
+that the publication date is 2020-02-17 and that therefore some commands
+are outdated. Most important: use `base::all.equal()` instead of
+`dplyr::all_equal()`.
+
+::: {.callout-warning style="color: orange;"}
+> `dplyr::all_equal()` allows you to compare data frames, optionally
+> ignoring row and column names. It is deprecated as of dplyr 1.1.0,
+> because it makes it too easy to ignore important differences.
+
+The current version of the {**dplyr**} packages is 1.1.2.
+:::
+
+##### Annotation (4)
+
+```{r}
+#| label: change-column-type
+(d <- d |> 
+    mutate(value = value %>% as.character()))
+```
+
+The `value` column is of type `double` as can be seen in the result of
+Annotation (3). For the plot it has to be changed to the type of
+`character`. Otherwise it could not be used with the `fill` option.
+
+##### Annotation (5)
+
+The plot uses code from the {**ggplot2**} package, which I do understand
+and will therefore not explain here.
+
+```{r}
+#| label: plot-possibilities-conjectures
+
+d |> 
+  ggplot(aes(x = x, y = possibility, fill = value)) + 
+  geom_point(shape = 21, size = 5) + 
+  scale_fill_manual(values = c("white", "navy")) +
+  scale_x_discrete(NULL, breaks = NULL) + 
+  theme(legend.position = "none")
+```
+
+##### Summarize the Possiblity Structure
+
+> Here's the basic structure of the possibilities per marble draw.
+
+```{r}
+#| label: tbl-basic-prob-struct
+#| tbl-cap: possibility-structure
+
+tibble(draw    = 1:3,
+       marbles = 4) %>% 
+  mutate(possibilities = marbles ^ draw) %>% 
+  kableExtra::kbl() |> 
+  kableExtra::kable_classic(full_width = F)
+```
+
+::: {.callout-note style="color: blue"}
+###### Table Packages Used
+
+Kurz employed the {**flextable**} package to print tables. As I have no
+experience with this package, I will apply {**kableExtra**} in this
+document.\
+\
+Until now I had used most of the time kableExtra and sometimes DT. For a
+short compilation of available table packages see the section on [Other
+packages for creating
+tables](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html)
+in the R Markdown Cookbook. The following excursion on tables follows
+the blog article [Top 7 Packages for Making Beautiful Tables in
+R](https://towardsdatascience.com/top-7-packages-for-making-beautiful-tables-in-r-7683d054e541)
+by Devashree Madhugiri.
+:::
+
+#### Excursion: Tables
+
+-   [{**gt**}](https://gt.rstudio.com/): The gt package offers a
+    different and easy-to-use set of functions that helps us build
+    display tables from tabular data. The gt philosophy states that a
+    comprehensive collection of table parts can be used to create a
+    broad range of functional tables. These are the table body, the
+    table footer, the spanner column labels, the column labels, and the
+    table header. (I should look into the {**gt**} package in more
+    detail as it is developed by the RStudio/Posit team, that stands not
+    only for high quality but also for tidyverse compatibility.)
+
+    ![](https://gt.rstudio.com/reference/figures/gt_parts_of_a_table.svg)
+
+-   [{**formattable**}](https://renkun-ken.github.io/formattable/):
+    Formattable data frames are data frames that will be displayed in
+    HTML tables using formatter functions. This package includes
+    techniques to produce data structures with predefined formatting
+    rules, such that the objects maintain the original data but are
+    formatted. The package consists of several standard formattable
+    objects, including percent, comma, currency, accounting, and
+    scientific.
+
+-   [{**kableExtra**}](https://haozhu233.github.io/kableExtra/): It
+    extends the basic functionality of `knitr::kable()` tables. Although
+    `knitr::kable()` is simple by design, it has many features missing
+    which are usually available in other packages. {**kableExtra**} has
+    filled the gap nicely. One of the best thing about {**kableExtra**}
+    is that most of its table capabilities work for both HTML and PDF
+    formats.
+
+-   [{**DT**}](https://rstudio.github.io/DT/): dt is an abbreviation of
+    'DataTables.' Data objects in R can be rendered as HTML tables using
+    the JavaScript library 'DataTables' (typically via R Markdown or
+    Shiny).
+
+-   [{**flextable**}](https://davidgohel.github.io/flextable/): This
+    package helps you to create reporting table from a data frame
+    easily. You can merge cells, add headers, add footers, change
+    formatting, and set how data in cells is displayed. Table content
+    can also contain mixed types of text and image content. Tables can
+    be embedded from R Markdown documents into HTML, PDF, Word, and
+    PowerPoint documents and can be embedded using Package Officer for
+    Microsoft Word or PowerPoint documents. Tables can also be exported
+    as R plots or graphic files, e.g., png, pdf, and jpeg.
+
+-   [{**reactable**}](https://glin.github.io/reactable/): `reactable()`
+    creates a data table from tabular data with sorting and pagination
+    by default. The data table is an HTML widget that can be used in R
+    Markdown documents and Shiny applications or viewed from an R
+    console. It is based on the React Table library and made with
+    reactR. Features are:
+
+    -   It creates a data table with sorting, filtering, and pagination
+    -   It has built-in column formatting
+    -   It supports custom rendering via R or JavaScript
+    -   It works seamlessly within R Markdown documents and the Shiny
+        app
+
+-   [{**ractablefmtr**}](https://kcuilla.github.io/reactablefmtr/index.html):
+    The package improves the appearance and formatting of tables created
+    using the reactable R library. It includes many conditional
+    formatters that are highly customizable and easy to use.
+
+I sure there are other packages as well. But the above seven packages
+are a first starting point to learn creating and displaying
+sophisticated data tables in R.
+
+> The authors of R Markdown Cookbook (Yihui Xie, Christophe Dervieux,
+> Emily Riederer) mention also several other table packages in the
+> section [Other packages for creating
+> tables](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html):
 >
-> -   A conjectured proportion of blue marbles, p, is usually called a
->     `r glossary("parameter")` value. It's just a way of indexing
->     possible explanations of the data.
-> -   The relative number of ways that a value p can produce the data is
->     usually called a `r glossary("likelihood")`. It is derived by
->     enumerating all the possible data sequences that could have
->     happened and then eliminating those sequences inconsistent with
->     the data.
-> -   The prior plausibility of any specific p is usually called the
->     `r glossary("prior probability")`.
-> -   The new, updated plausibility of any specific p is usually called
->     the `r glossary("posterior probability")`." ([McElreath, 2020, p.
->     27](zotero://select/groups/5243560/items/NFUEVASQ))
->     ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=46&annotation=ZDYLMTTI))
-
-### TIDYVERSE (empty)
+> -   **rhandsontable** ([Owen
+>     2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-rhandsontable)):
+>     Also similar to **DT**, and has an Excel feel (e.g., you can edit
+>     data directly in the table). Visit
+>     <https://jrowen.github.io/rhandsontable/> to learn more about it.
+>
+> -   **pixiedust** ([Nutter
+>     2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-pixiedust)):
+>     Features creating tables for models (such as linear models)
+>     converted through the **broom** package ([Robinson, Hayes, and
+>     Couch
+>     2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-broom)).
+>     It supports Markdown, HTML, and LaTeX output formats. Its
+>     repository is at <https://github.com/nutterb/pixiedust>.
+>
+> -   **stargazer** ([Hlavac
+>     2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-stargazer)):
+>     Features formatting regression models and summary statistics
+>     tables. The package is available on CRAN at
+>     <https://cran.r-project.org/package=stargazer>.
+>
+> -   **xtable** ([Dahl et al.
+>     2019](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-xtable)):
+>     Perhaps the oldest package for creating tables---the first release
+>     was made in 2000. It supports both LaTeX and HTML formats. The
+>     package is available on CRAN at
+>     <https://cran.r-project.org/package=xtable>.
+>
+> I'm not going to introduce the rest of packages, but will just list
+> them here: **tables** ([Murdoch
+> 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tables)),
+> **pander** ([Daróczi and Tsegelskyi
+> 2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-pander)),
+> **tangram** ([S. Garbett
+> 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tangram)),
+> **ztable** ([Moon
+> 2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-ztable)),
+> and **condformat** ([Oller Moreno
+> 2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-condformat)).
 
 ## Building a Model
 
-### ORIGINAL
+### Original
+
+**Globe-tossing**
 
 We are going to use a toy example, but it has the same structure as a
 typical statistical analyses. The first nine samples produce the
@@ -297,97 +649,66 @@ following data:
 
 `W L W W W L W L W` (W indicates water and L indicates land.)
 
-::: my-procedure
-::: my-procedure-header
-Designing a simple Bayesian model
-:::
+Designing a simple Bayesian model benefits from a design loop with three
+steps.
 
-::: my-procedure-container
-> "Designing a simple Bayesian model benefits from a design loop with
-> three steps.
->
-> 1.  Data story: Motivate the model by narrating how the data might
->     arise.
-> 2.  Update: Educate your model by feeding it the data.
-> 3.  Evaluate: All statistical models require supervision, leading to
->     model revision." ([McElreath, 2020, p.
->     28](zotero://select/groups/5243560/items/NFUEVASQ))
->     ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=47&annotation=KFNYKUC2))
-:::
-:::
+1.  **Data story**: Motivate the model by narrating how the data might
+    arise.
+2.  **Update**: Educate your model by feeding it the data.
+3.  **Evaluate**: All statistical models require supervision, leading to
+    model revision.
 
 #### A Data Story
 
-> "Bayesian data analysis usually means producing a story for how the
+> Bayesian data analysis usually means producing a story for how the
 > data came to be. This story may be *descriptive*, specifying
 > associations that can be used to predict outcomes, given observations.
 > Or it may be *causal*, a theory of how some events produce other
-> events." ([McElreath, 2020, p.
-> 28](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=47&annotation=D2IR5ZX3))
+> events.
 
-> "... all data stories are complete, in the sense that they are
-> sufficient for specifying an algorithm for simulating new data."
-> ([McElreath, 2020, p.
-> 28](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=47&annotation=A3EQXFBY))
+All data stories have to be complete in the sense that they are
+sufficient for specifying an algorithm for simulating new data.
 
-::: my-example
-::: my-example-header
-Data story for our case
-:::
-
-::: my-example-container
-> "The data story in this case is simply a restatement of the sampling
-> process:
+> You can motivate your data story by trying to explain how each piece
+> of data is born. This usually means describing aspects of the
+> underlying reality as well as the sampling process. The data story in
+> ... \[our toy case of globe-tossing\] is simply a restatement of the
+> sampling process:
 >
-> (1) The true proportion of water covering the globe is $p$.
-> (2) A single toss of the globe has a probability p of producing a
->     water ($W$) observation. It has a probability $1 − p$ of producing
->     a land ($L$) observation.
-> (3) Each toss of the globe is independent of the others." ([McElreath,
->     2020, p. 29](zotero://select/groups/5243560/items/NFUEVASQ))
->     ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=48&annotation=YPPK73D9))
-:::
-:::
-
-Data stories are important:
-
-> "Most data stories are much more specific than are the verbal
-> hypotheses that inspire data collection. Hypotheses can be vague, such
-> as"it's more likely to rain on warm days." When you are forced to
-> consider sampling and measurement and make a precise statement of how
-> temperature predicts rain, many stories and resulting models will be
-> consistent with the same vague hypothesis. Resolving that ambiguity
-> often leads to important realizations and model revisions, before any
-> model is fit to data." ([McElreath, 2020, p.
-> 29](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=48&annotation=852Q3WN5))
+> 1.  The true proportion of water covering the globe is *`p`*.
+> 2.  A single toss of the globe has a probability *`p`* of producing a
+>     water (W) observation. It has a probability `1 – p` of producing a
+>     land (L) observation.
+> 3.  Each toss of the globe is independent of the others.
 
 #### Bayesian Updating
 
-> "Each possible proportion may be more or less plausible, given the
-> evidence. A Bayesian model begins with one set of plausibilities
-> assigned to each of these possibilities. These are the prior
-> plausibilities. Then it updates them in light of the data, to produce
-> the posterior plausibilities. This updating process is a kind of
-> learning, called `r glossary("Bayesian updating")`." ([McElreath,
-> 2020, p. 29](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=48&annotation=XIYIZHVD))
+> A Bayesian model begins with one set of plausibilities assigned to
+> each of these possibilities. These are the prior plausibilities. Then
+> it updates them in light of the data, to produce the posterior
+> plausibilities. This updating process is a kind of learning, called
+> **BAYESIAN UPDATING**.
+>
+> ...
+>
+> For the sake of the example only, let's program our Bayesian machine
+> to initially assign the same plausibility to every proportion of
+> water, every value of *p*. We'll do better than this later.
+>
+> ...
+>
+> Every time a "W" is seen, the peak of the plausibility curve moves to
+> the right, towards larger values of *p*. Every time an "L" is seen, it
+> moves the other direction. The maximum height of the curve increases
+> with each sample, meaning that fewer values of *p* amass more
+> plausibility as the amount of evidence increases. As each new
+> observation is added, the curve is updated consistent with all
+> previous observations.
 
-::: my-important
-::: my-important-header
-How a Bayesian model learns
-:::
-
-::: my-important-container
-@fig-2-5-book-copy helps to understand the Bayesian updating process. In
-@lst-fig-bayesian-update we will learn how to write R code to reproduce
-the book's figure as @fig-bayesian-update. To inspect the different
-steps of the updating process is essential to understand Bayesian
-statistics!
-:::
-:::
+To see the results of the different (updating) steps I am going to
+reproduce Figure 2.5 (How a Bayesian model learns) of the book. In the
+tidyverse-version we will learn how to write R code to reproduce the
+graphic.
 
 ![Copy of Figure 2.5: **How a Bayesian model learns**. In each plot,
 previous plausibilities (dashed curve) are updated in light of the
@@ -399,81 +720,197 @@ fig-alt="Nine small diagrams to show the relationship between plausibility again
 
 Keep in mind two cautious principles:
 
-> "First, the model's certainty is no guarantee that the model is a good
-> one." ([McElreath, 2020, p.
-> 31](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=50&annotation=QYALLSPY))
-> "Second, it is important to supervise and critique your model's work."
-> ([McElreath, 2020, p.
-> 31](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=50&annotation=M7UKAL3D))
+1.  <div>
 
-::: my-watch-out
-::: my-watch-out-header
-Test Before You Est(imate)
-:::
+    > -   First, **the model's certainty is no guarantee that the model
+    >     is a good one**. ... \[M\]odels of all sorts---Bayesian or
+    >     not---can be very confident about an inference, even when the
+    >     model is seriously misleading. This is because the inferences
+    >     are conditional on the model. What your model is telling you
+    >     is that, given a commitment to this particular model, it can
+    >     be very sure that the plausible values are in a narrow range.
+    >     Under a different model, things might look differently.
+    >
+    > -   Second, **it is important to supervise and critique your
+    >     model's work**. ... When something is irrelevant to the
+    >     machine, it won't affect the inference directly. But it may
+    >     affect it indirectly ... So it is important to check the
+    >     model's inferences in light of aspects of the data it does not
+    >     know about. Such checks are an inherently creative enterprise,
+    >     left to the analyst and the scientific community. Golems are
+    >     very bad at it. (emphasis pb)
 
-::: my-watch-out-container
+    </div>
+
+Further keep in mind that
+
+> the goal is not to test the truth value of the model's assumptions. We
+> know the model's assumptions are never exactly right, in the sense of
+> matching the true data generating process. ... Moreover, models do not
+> need to be exactly true in order to produce highly precise and useful
+> inferences.
+>
+> Instead, the objective is to check the model's adequacy for some
+> purpose. This usually means asking and answering additional questions,
+> beyond those that originally constructed the model. Both the questions
+> and answers will depend upon the scientific context. So it's hard to
+> provide general advice.
+
+### Video
+
+#### Bayesian Probability of the Water Proportion
+
+[R Code snippet
+2.1](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=50):
+Statistical Rethinking 2023 - Lecture 02, Slide 50.
+
+```{r}
+#| label: probability-water
+
+sample <- c("W", "L", "W", "W", "W", "L", "W", "L", "W")
+W <- sum(sample == "W") # number of W observed
+L <- sum(sample == "L") # number of L observed
+p <- c(0, 0.25, 0.5, 0.75, 1) # proportions W
+
+# using vectorized version instead of sapply()
+# see: https://github.com/rmcelreath/stat_rethinking_2023/issues/6
+get_ways <- function(q) (q * 4)^W * ((1 - q) * 4)^L
+ways <- get_ways(p)
+prob <- ways / sum(ways)
+cbind(p, ways, prob)
+
+```
+
+`prob` is called the **posterior distribution** because it's posterior
+to the sample to the updating we did in light of the data.
+
+This estimator is optimal you cannot do better than this if your model
+is correct and the model here doesn't mean the particular value of P -
+it means the generative hypothesis about how the garden is drawn given a
+particular value of P.
+
+#### Test Before You Est(imate)
+
 In the planned third version of the book McElreath wants to include from
 the beginning the evaluation part of the process. It is mentioned in the
 book already in this chapter 2 but without practical implementation and
 code examples. But we can find some remarks in his [Statistical
-Rethinking Videos 2023b
-37:40](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=37m40s).
+Rethinking Videos
+2023](https://www.youtube.com/playlist?list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus).
 
-I will not go into details here, because my focus is on the second
-edition. But I will add as a kind of summary general advises for the
-testing procedure:
+> We want to worry about the correctness of code in scientific data
+> analysis as well because scientific data analysis is in the vast
+> majority of fields a kind of amateur software development. There is
+> scripting and we want to document our code and we need to worry about
+> errors and want to have a reliable workflow that does some quality
+> assurance. So we've coded a generative simulation and we've coded an
+> estimator and now we'd like to test our estimator with our generative
+> simulation.
+> ([37:40](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=37m40s))
 
-::: my-procedure
-::: my-procedure-header
-Evaluation procedure
-:::
-
-::: my-procedure-container
 1.  Code a generative simulation
 2.  Code an estimator
-3.  Test the estimator with (1)
-    -   where the answer is known
-    -   at extreme values
-    -   explore different sampling designs
-    -   develop generally an intuition for sampling and estimation
-:::
+3.  Test (2) with (1)
+
+##### Simulating the Globe Tossing
+
+[![R Code 2.3, Statistical Rethinking 2023 - Lecture 02, \[Slide
+54\](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54).](img/code-sim-globe-tossing-min.png){fig-alt="code snippet for a simulation of globe tossing"}](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54)
+
+```{r}
+#| label: sim-globe-tossing
+
+# function to toss a globe covered p by water N times
+sim_globe <- function(p = 0.7, N = 9) {
+  sample(c("W", "L"), size = N, prob = c(p, 1 - p), replace = TRUE)
+}
+sim_globe()
+```
+
+You can simulate the experiment arbitrary times for any particular
+proportion of water you like. This is a way to explore the design of an
+experiment as well as debug the code.
+([39:55](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=39m55s)).
+
+```{r}
+#| label: replicate-sim
+#| lst-cap: "R code snippet 2.4: Replicate simulation"
+
+# replicate simulation 10 times with different p values (here: p = 0.5)
+replicate(sim_globe(p = 0.5, N = 9), n = 10) 
+```
+
+::: callout-warning
+###### Quarto cannot list & execute code in the same chunk
+
+2023-05-08: `lst-label` and `lst-cap` are only working in display code
+snippets but not in snippets to execute. See [lst-cap and lst-label in
+Quarto?](https://community.rstudio.com/t/lst-cap-and-lst-label-in-quarto/157173)
+and [lst-label and lst-cap do not produce listing caption and
+reference](https://github.com/quarto-dev/quarto-cli/issues/1580).
 :::
 
-Here are some references to get some ideas of the necessary R Code:
+2023-07-23: In the meanwhile I found a work around:
 
-::: my-resource
-::: my-resource-header
-R Code snippets for testing procedure
-:::
+```{r}
+#| label: replicate-sim2
+#| attr-source: '#lst-replicate-sim2 lst-cap="R code snippet 2.4: Replicate simulation"'
 
-::: my-resource-container
--   **Simulating globe tossing**: Statistical Rethinking 2023 - Lecture
-    02, [Slide
-    54](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=54)
--   **Simulate the experiment arbitrary times for any particular
-    proportion**: This is a way to explore the design of an experiment
-    as well as debug the code. ([Video 2023-02
-    39:55](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2&t=39m55s))
--   **Test the simulation at extreme values**: R code snippets at [Slide
-    57](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=57).
-:::
-:::
-:::
-:::
+replicate(sim_globe(p = 0.5, N = 9), n = 10) 
+```
 
-### TIDYVERSE
+##### Test the simulation at extreme values
 
-Instead of vectors the tidyverse approach works best with data frames
-respectively tibbles. So let's save the globe-tossing data
-`W L W W W L W L W` into a tibble:
+R code snippets 2.5 and 2.6: [Slide
+57](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02?slide=57).
+
+```{r}
+#| label: test-sim-extrem-values
+sim_globe(p = 1, N = 10) # test, when p = 1
+
+sum(sim_globe(p = 0.5, N = 1e4) == "W") / 1e4 # test 1e4 (10.000) times
+```
+
+##### Code an estimator and test it with the simulation
+
+In the following compute_posterior() function I could not manage to get
+working the part with the bars. As far as I understand it comes from the
+`animint` or `animint2` package but I did not know how to fill in the
+second required parameter `x.name`.
+
+```{r}
+#| label: test-est-with-sim
+
+# function to compute posterior distribution 
+compute_posterior <- function(the_sample, poss = c(0, 0.25, 0.5, 0.75, 1)) {
+  W <- sum(the_sample == "W") # number of W observed
+  L <- sum(the_sample == "L") # number of L observed
+  get_ways <- function(q) (q * 4)^W * ((1 - q) * 4)^L
+  ways <- get_ways(poss)
+  # ways <- sapply(poss, function(q) (q * 4)^W * ((1 - q) * 4)^L)
+  post <- ways / sum(ways)
+  # cannot find second parameter of function make_bar()
+  # bars <- sapply(post, function(q) animint2::make_bar(q)) 
+  data.frame(poss, ways, post = round(post, 3))
+}
+
+compute_posterior(sim_globe())
+```
+
+##### Summary
+
+1.  Test the estimator where the answer is known
+2.  Explore different sampling designs
+3.  Develop intuition for sampling and estimation
+
+### Tidyverse
+
+Let's save our globe-tossing data `W L W W W L W L W` in a tibble:
 
 ```{r}
 #| label: globe-tossing-data
-#| attr-source: '#lst-globe-tossing-data lst-cap="Save globe tossing data int to tibble"'
 
-(d <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")))
+(d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")))
 ```
 
 #### A Data Story
@@ -482,101 +919,106 @@ respectively tibbles. So let's save the globe-tossing data
 
 For the updating process we need to add to the data the cumulative
 number of trials, `n_trials`, and the cumulative number of successes,
-`n_successes` with `toss == "w"`.
+`n_successes` (i.e., `toss == "w"`).
 
 ```{r}
 #| label: bayesian-updating-start
-#| attr-source: '#lst-bayesian-updating-start lst-cap="Bayesian updating preparation"'
 
 (
   d <-
   d %>% 
-  dplyr::mutate(n_trials  = 1:9,
+  mutate(n_trials  = 1:9,
          n_success = cumsum(toss == "w"))
   )
 
 ```
 
-The program code for reproducing the Figure 2.5 of the book (here in
-this document it is @fig-2-5-book-copy) is pretty complex. I have to
-inspect the results line by line. At first I will give a short
-introduction what each line does. In the next steps I will explain each
-step more in detail and show the result of the corresponding lines of
-code.
+The program code for reproducing the Figure 2.5 of the book (here in in
+this document it is @fig-2-5-book-copy) is pretty complex. Again I have
+to inspect the results line by line as I had done for the
+@lst-marble-data. At first I will give a short introduction what each
+line does. In the next steps I will explain each step more in detail and
+show the result of the corresponding lines of code.
 
-::: my-watch-out
-::: my-watch-out-header
-Parameter $k$ in `lag()` changed to $default$
+::: {.callout-warning style="color: orange;"}
+###### Preliminary Explanation of the Next Graph
+
+The grid approximation used for the Bayesian updating in the next graph
+are explained later in this chapter.#
+
+In the meanwhile I called the code from the following code chunk line by
+line and inspected the result to understand what it does.
 :::
 
-::: my-watch-out-container
+::: {.callout-note style="color: blue;"}
+###### Changed parameter name
+
 In the following listing I had to change in the `lag()` function the
-parameter $k$ of the Kurz'sche version to $default$ as it is described
+parameter `k` of the Kurz'sche version to `default` as it is described
 in the corresponding [help
 file](https://dplyr.tidyverse.org/reference/lead-lag.html). I don't
-understand why $k$ was used. Maybe $k$ was the name of the parameter of
+understand why `k`\`was used. Maybe `k` was the name of the parameter of
 a previous {**dplyr**} version?
 :::
-:::
-
-
 
 ```{r}
-#| label: fig-bayesian-update
+#| label: fig-bayesian-model-learning
 #| echo: true
-#| fig-cap: "How a Bayesian model learns: Replicating book figure 2.5"
-#| attr-source: '#lst-fig-bayesian-update lst-cap="Bayesian updating: How a model learns"'
+#| fig-cap: "How a Bayesian model learns"
 #| code-summary: "Code: **How a Bayesian model learns**"
 #| code-annotation: true
 
-## (0) starting with tibble from the previous two code chunks #####
-d <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |>
-    dplyr::mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+# starting data
+d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |>
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
 
-## (1) create tibble from all input combinations ################
-sequence_length <- 50  
-d %>%                 
-  tidyr::expand_grid(p_water = seq(from = 0, to = 1,  
-                            length.out = sequence_length)) %>%  
-    
-## (2) group data by the `p-water` parameter ####################
-  dplyr::group_by(p_water) %>% 
+sequence_length <- 50  # <1>
 
-## (3) create columns filled with the value of the previous rows #####
-  dplyr::mutate(lagged_n_trials  = dplyr::lag(n_trials, default = 1), 
-         lagged_n_success = dplyr::lag(n_success, default = 1)) %>% 
-
-## (4) restore the original ungrouped data structure #######
-  dplyr::ungroup() %>% 
-
-## (5) calculate prior and likelihood & store values ######
-  dplyr::mutate(prior      = ifelse(n_trials == 1, .5, 
-                             dbinom(x    = lagged_n_success, 
-                                    size = lagged_n_trials,  
-                                    prob = p_water)),        
-         likelihood = dbinom(x    = n_success,  
-                             size = n_trials,   
-                             prob = p_water),   
-         strip      = stringr::str_c("n = ", n_trials)) %>%  
+d %>%                 # <1>
+  expand_grid(p_water = seq(from = 0, to = 1,  # <1>
+                            length.out = sequence_length)) %>%  # <1>
+  group_by(p_water) %>% # <2>
+  mutate(lagged_n_trials  = lag(n_trials, default = 1), # <3>
+         lagged_n_success = lag(n_success, default = 1)) %>% # <3>
+  ungroup() %>%  # <4>
+  mutate(prior      = ifelse(n_trials == 1, .5, # <5>
+                             dbinom(x    = lagged_n_success, # <5>
+                                    size = lagged_n_trials,  # <5>
+                                    prob = p_water)),        # <5>
+         likelihood = dbinom(x    = n_success,  # <5>
+                             size = n_trials,   # <5>
+                             prob = p_water),   # <5>
+         strip      = str_c("n = ", n_trials)) %>%  # <5>
   
-## (6) normalize prior and likelihood ##########################
-  dplyr::group_by(n_trials) %>% 
-  dplyr::mutate(prior      = prior / sum(prior),               
-         likelihood = likelihood / sum(likelihood)) %>% 
+  # normalize prior and likelihood 
+  group_by(n_trials) %>% # <6>
+  mutate(prior      = prior / sum(prior),               # <6>
+         likelihood = likelihood / sum(likelihood)) %>% # <6>
   
-  ## (7) plot the result ########################################
-  ggplot2::ggplot(ggplot2::aes(x = p_water)) + 
-  ggplot2::geom_line(ggplot2::aes(y = prior), linetype = 2) +  
-  ggplot2::geom_line(ggplot2::aes(y = likelihood)) +           
-  ggplot2::scale_x_continuous("proportion water",     
-                     breaks = c(0, .5, 1)) + 
-  ggplot2::scale_y_continuous("plausibility", breaks = NULL) +  
-  ggplot2::theme(panel.grid = ggplot2::element_blank()) +                
-  ggplot2::facet_wrap(~ strip, scales = "free_y") +            
-  ggplot2::theme_bw()                                  
-  
+  # plot the result
+  ggplot(aes(x = p_water)) + # <7>
+  geom_line(aes(y = prior), linetype = 2) +  # <7>
+  geom_line(aes(y = likelihood)) +           # <7>
+  scale_x_continuous("proportion water",     # <7>
+                     breaks = c(0, .5, 1)) + # <7>
+  scale_y_continuous("plausibility", breaks = NULL) +  # <7>
+  theme(panel.grid = element_blank()) +                # <7>
+  facet_wrap(~ strip, scales = "free_y")               # <7>
 
 ```
+
+1.  Creates a tibble from all combinations of inputs.
+    @sec-annotation-1-expand-grid.
+2.  Group data by the parameter `p-water`. @sec-annotation-2-group_by.
+3.  Create two columns filled with the value of the previous row using
+    the `lag()` function. @sec-annotation-3-lag.
+4.  Restore the original ungrouped data structure.
+    @sec-annotation-4-ungroup.
+5.  Calculate Prior and Likelihood and create a column for each
+    parameter. @sec-annotation-5-dbinom.
+6.  Normalize Prior and Likelihood to put both of them in a probability
+    metric. @sec-annotation-6-normalize.
+7.  Plot the result. @sec-annotation-7-ggplot.
 
 ##### Annotation (1): `tidyr::expand_grid()` {#sec-annotation-1-expand-grid}
 
@@ -589,15 +1031,20 @@ The first column is the slowest, the second is faster and so on.). It
 generates 450 data points (50 \* 9 trials).
 
 ```{r}
-#| label: bayesian-update-1
-#| attr-source: '#lst-bayesian-update-1 lst-cap="Create a tibble from all input combinations"'
+#| label: bayesian-model-learning-anno1
+#| echo: true
 
-tbl <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
-    dplyr::mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling
+
+### add code lines of annotation here? #########################################
 sequence_length <- 50
 
 tbl %>% 
-  tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
+  expand_grid(p_water = seq(from = 0, to = 1, 
                             length.out = sequence_length))
 ```
 
@@ -606,107 +1053,163 @@ tbl %>%
 At first I did not understand the line `group_by(p_water)`. Why has the
 data to be grouped when every row has a different value --- as I have
 thought from a cursory inspection of the result? But it turned out that
-after 50 records the parameter `p_water` is repeating its value.
+after 100 records the parameter `p_water` is repeating its value.
 
+::: {.callout-tip style="color: green;"}
+## Special table format
+
+For a better comparison (and for a later cross reference I will append
+to the next code chunk a new column ID with line number and a table
+format where one can scroll the long table with it 450 rows.
+:::
 
 ```{r}
-#| label: bayesian-update-2
-#| attr-source: '#lst-bayesian-update-2 lst-cap="Bayesian Updating: Lagged with groupping"'
+#| label: tbl-bayesian-model-learning-anno2-1
+#| tbl-cap: "Bayesian Updating: Lagged with groupping"
+
+# starting data
+tbl1 <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |>
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
 
 tbl1 <- tbl %>% 
-  tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
+  expand_grid(p_water = seq(from = 0, to = 1, 
                             length.out = sequence_length)) %>% 
     
-  dplyr::group_by(p_water) %>% 
-  dplyr::mutate(lagged_n_trials  = dplyr::lag(n_trials, default = 1),
-         lagged_n_success = dplyr::lag(n_success, default = 1)) %>% 
-  dplyr::ungroup() |> 
+  #### add code lines to show effect of annoation <2> ######################
+  group_by(p_water) %>% 
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup() |> 
     
 
   # add new column ID with row numbers 
   # and relocate it to be the first column
-  dplyr::mutate(ID = dplyr::row_number()) |> 
-  dplyr::relocate(ID, .before = toss) 
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
 
-# show 2 records from different groups
-tbl1[c(1:2, 50:52, 100:102, 150:152), ] 
+ # provide a different format and a scroll box for the table
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
+tbl1
 ```
 
 I want to see the differences in detail. So I will provide also the
 ungrouped version.
 
 ```{r}
-#| label: bayesian-update-2a
-#| attr-source: '#lst-bayesian-update-2a lst-cap="Bayesian Updating: Lagged without groupping"'
+#| label: tbl-bayesian-model-learning-anno2-2
+#| tbl-cap: "Bayesian Updating: Lagged without groupping (FALSE)"
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling without grouping
+sequence_length <- 50
 
 tbl2 <- tbl %>% 
-  tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
+  expand_grid(p_water = seq(from = 0, to = 1, 
                             length.out = sequence_length)) |> 
     
-  dplyr::mutate(lagged_n_trials  = dplyr::lag(n_trials, default = 1),
-         lagged_n_success = dplyr::lag(n_success, default = 1)) |> 
+  ### add code lines to show effect without annotation <2> ##################
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) |> 
   
   # add new column ID with row numbers and relocate it as first column
-  dplyr::mutate(ID = dplyr::row_number()) |> 
-  dplyr::relocate(ID, .before = toss) 
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
 
-# show the same records without grouping
-tbl2[c(1:2, 50:52, 100:102, 150:152), ] 
+  # provide a different format and a scroll box for the table
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
+tbl2
 ```
 
-It turned out that the two version differ after 51 records in the lagged variables. (Not after 50 as I would have assumed. Apparently this has to do with the `lag()`
+It turned out that the two version differ after 51 records. (Not after
+50 as one would have assumed. Apparently this has to do with the `lag()`
 command because the first 51 records are identical. Beginning with row
-number 52 there are differences in the column `lagged_n_trials` and `lagged_n_success`. This pattern is repeated: Original version always changes after 100 records. The version without grouping changes after 50 rows starting with row 51.
+number 52 there are differences in the column `lagged_n_trials`:
+
+-   In the original version `lagged_n_trials` remains `1` until 100
+    (included), then it changes to `2`.
+-   In the version without grouping however `lagged_n_trials` changes to
+    `2` with record 52. (not 51)
+-   This pattern is repeated: Original version always changes after 100
+    records. The version without grouping changes after 50 rows but
+    starting with row 51.
+-   The same differences appear with `lagged_n_success` but 50 records
+    later: The first difference appears after row 101.
 
 ##### Annotation (3): `dplyr::lag()` {#sec-annotation-3-lag}
 
-The function `dplyr::lag()` finds the "previous" values in a vector (time series). This is useful for comparing values behind of the current values. See [Compute lagged or leading values](https://dplyr.tidyverse.org/reference/lead-lag.html).
+The next line uses the `dplyr::lag()` command: The function (`lag()`)
+finds the "previous" values in a vector (time series). This is useful
+for comparing values behind of the current values. See [Compute lagged
+or leading values](https://dplyr.tidyverse.org/reference/lead-lag.html).
 
 We need to get the immediately previous values for drawing the prior
-probabilities in the current graph (= dashed line or $linetype = 2$ in
-{**ggplot2**} parlance). In the relation with the posterior probabilities the
-difference form the prior possibility is always $1$ (this is the
-option $default = 1$ in the `dplyr::lag()` function. This is now the correct
-explanation for the differences starting after rows 51 (and not 50).
+probabilities in the current graph (= dashed line or `linetype = 2` in
+ggplot parlance). In the relation with the posterior probabilities the
+difference form the prior possibility is always `1`\` (this is the
+option `default = 1` in the `lag()` function. This is now the correct
+explanation for the differences starting with rows 52 resp. 102 (and not
+51 resp. 101).
+
+The result is already shown under @sec-annotation-2-group_by in the
+result of the code listing @tbl-bayesian-model-learning-anno2-1.
+
+```{r}
+#| label: bayesian-model-learning-anno3
+
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl3 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, 
+                            length.out = sequence_length)) %>% 
+  group_by(p_water) %>% 
+    
+  ### add code lines of annotation <3> ####################################
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup()
+tbl3
+```
 
 ##### Annotation (4): `dplyr::ungroup()` {#sec-annotation-4-ungroup}
 
-This is just the reversion of the grouping command `group_by(p_water)`.
+This is just the reversion of the grouping command `group_by(p_water)`
+mentioned in @sec-annotation-2-group_by.
 
-##### Annotation (5): `dbinom()` {#sec-annotation-5-dbinom}
+##### Annotation (5): dbinom() {#sec-annotation-5-dbinom}
 
 This is the core of the prior and likelihood calculation. It uses
 `base::dbinom()`, to calculate two alternative events. `dbinom()` is the
 R function for the binomial distribution, a distribution provided by the
 probability theory for "coin tossing" problems.
 
-:::::{.my-resource}
-:::{.my-resource-header}
-Exploring the `dbinom()` function
-:::
-::::{.my-resource-container}
-The [distribution zoo](https://ben18785.shinyapps.io/distribution-zoo/) is a nice resource to explore the shapes and properties of important Bayesian distributions. This interactive {**shiny**} app was developed by [Ben Lambert](https://ben-lambert.com/bayesian/) and [Fergus Cooper](https://www.cs.ox.ac.uk/people/fergus.cooper/site/).
-
-Choose "Discrete Univariate" as the "Category of Distribution" and then select as "Binomial" as the "Distribution Type".
-
-See also the two blog entries [An Introduction to the Binomial
-Distribution](https://www.statology.org/binomial-distribution/) and [A
-Guide to dbinom, pbinom, qbinom, and rbinom in
-R](https://www.statology.org/dbinom-pbinom-qbinom-rbinom-in-r/) of the
-Statology website.
-::::
-:::::
-
-
 The "`d`" in `dbinom()` stands for *density*. Functions named in this
 way almost always have corresponding partners that begin with "`r`" for
 random samples and that begin with "`p`" for cumulative probabilities.
 See for example the [help
 file](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Binomial.html).
+See also the blog entries [An Introduction to the Binomial
+Distribution](https://www.statology.org/binomial-distribution/) and [A
+Guide to dbinom, pbinom, qbinom, and rbinom in
+R](https://www.statology.org/dbinom-pbinom-qbinom-rbinom-in-r/) of the
+Statalogy website.
 
-
-The results of each of the different calculation (prior and likelihood)
-are collected with `dplyr::mutate()` into two new generated columns.
+The results of each of the different calculation (prior and pikelihood)
+are collected in with `mutate()` into two new generated columns.
 
 There is no prior for the first trial, so it is assumed that it is 0.5.
 The formula for the binomial distribution uses for the prior the
@@ -715,88 +1218,151 @@ two lines provide the essential calculations: They match the 50 grid
 points as assumed water probabilities of every trial to their trial
 outcome (`W` or `L`) probabilities.
 
-The last `dplyr::mutate()` command generates the $strip$ variable consisting of the
-prefix $n =$ followed by the counts of the number of trials. This will
-later provide the title for the the different facets of the plot. 
-
-::: my-checklist
-::: my-checklist-header
-To-do: Construct labelling specification for toss results
-:::
-
-::: my-checklist-container
-To get a better replication I would need to change the labels for the
-facets from $n = n\_trials$ to the appropriate string length of the
-results, e.g., for $n = 3$ I would need $W, L, W$.
-
-This was not done by Kurz. I have tried it but didn't succeed up to now
-(2023-10-25).
-:::
-:::
+The third `mutate()` generates the `strip` variable consisting of the
+prefix "N =" followed by the counts of the number of trials. This will
+later provide the title for the the different facets of the plot.
 
 ```{r}
-#| label: bayesian-update-5
-#| attr-source: '#lst-bayesian-update-5 lst-cap="Bayesian Updating: Calculating prior and likelihood"'
+#| label: tbl-bayesian-model-learning-anno5
+#| tbl-cap: "Bayesian Updating: Calculating prior and likelihood"
 
-tbl5 <- tbl1 %>% 
-  dplyr::mutate(prior      = ifelse(n_trials == 1, .5,
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl5 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, 
+                            length.out = sequence_length)) %>% 
+  group_by(p_water) %>% 
+    
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup() %>% 
+    
+  ### add code lines of annotation <5> ########################
+  mutate(prior      = ifelse(n_trials == 1, .5,
                              dbinom(x    = lagged_n_success, 
                                     size = lagged_n_trials, 
                                     prob = p_water)),
          likelihood = dbinom(x    = n_success, 
                              size = n_trials, 
                              prob = p_water),
-         strip      = stringr::str_c("n = ", n_trials)) 
+         strip      = str_c("n = ", n_trials)) |> 
  
+  # provide table scroll box
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
 tbl5
 ```
 
 ##### Annotation (6): Normalizing {#sec-annotation-6-normalize}
 
 The code lines in annotation 6 normalize the prior and the likelihood by
-grouping the data by $n\_trials$. Dividing every prior and likelihood
+grouping the data by `n_trials`. Dividing every prior and likelihood
 values by their respective sum puts them both in a probability metric.
 This metric is important for the comparisons of different probabilities.
 
 > If you don't normalize (i.e., divide the density by the sum of the
 > density), their respective heights don't match up with those in the
 > text. Furthermore, it's the normalization that makes them directly
-> comparable. (Kurz in section [Bayesian Updating](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#bayesian-updating.) of chapter 2)
+> comparable.
 
 ```{r}
-#| label: bayesian-update-6
-#| attr-source: '#lst-bayesian-update-6 lst-cap="Bayesian Updating: Normalizing prior and likelihood"'
+#| label: tbl-bayesian-model-learning-anno6
+#| tbl-cap: "Bayesian Updating: Normalizing prior and likelihood"
 
-tbl6 <- tbl5 %>% 
-  dplyr::group_by(n_trials) %>% 
-  dplyr::mutate(prior      = prior / sum(prior),
-         likelihood = likelihood / sum(likelihood))
+# starting data
+tbl <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+# start of bayesian modeling with grouping (as in the original)
+sequence_length <- 50
+
+tbl6 <- tbl %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, 
+                            length.out = sequence_length)) %>% 
+  group_by(p_water) %>% 
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% 
+  ungroup() %>% 
+  mutate(prior      = ifelse(n_trials == 1, .5,
+                             dbinom(x    = lagged_n_success, 
+                                    size = lagged_n_trials, 
+                                    prob = p_water)),
+         likelihood = dbinom(x    = n_success, 
+                             size = n_trials, 
+                             prob = p_water),
+         strip      = str_c("n = ", n_trials)) |> 
     
+  ### add code lines of annotation <6> ################## 
+  group_by(n_trials) %>% 
+  mutate(prior      = prior / sum(prior),
+         likelihood = likelihood / sum(likelihood)) %>% 
+    
+  # provide table scrool box for better comparison of the results
+  mutate(ID = row_number()) |> 
+  relocate(ID, .before = toss) |> 
+  kableExtra::kbl() %>%
+  kableExtra::kable_classic() %>%
+  kableExtra::scroll_box(height = "600px")
 tbl6
 ```
 
 ##### Annotation (7): {#sec-annotation-7-ggplot}
 
 The remainder of the code prepares the plot by using the 50 grid points
-in the range from $0$ to $1$ as the x-axis; prior and likelihood as y-axis.
-To distinguish the prior from the likelihood it uses a dashed line for
-the prior ($linetyp = 2$) and a full line (default) for the likelihood.
-The x-axis has three breaks ($0, 0.5, 1$) whereas the y-axis has no
-break and no scale ($scales = "free_y"$).
+in the range from 0 to 1 as the x-axis; prior and likelihood as y-axis.
+To distinguish the prior from the likelihood is uses a dashed line for
+the prior (`linetyp = 2`) and a full line (default) for the likelihood.
+The x-axis has three breaks (`0, 0.5, 1`) whereas the y-axis has no
+break and no scale (`scales = "free_y"`).
 
 ```{r}
-#| label: fig-bayesian-update-7
-#| attr-source: '#lst-fig-bayesian-update-7 lst-cap="Demonstrating Bayesian Updating"'
+#| label: fig-bayesian-model-learning-anno7
+#| fig-cap: "Demonstrating Bayesian Updating"
+#| echo: true
 
-tbl7 <- tbl6 %>% 
-  ggplot2::ggplot(ggplot2::aes(x = p_water)) + 
-  ggplot2::geom_line(ggplot2::aes(y = prior), 
-            linetype = 2) + 
-  ggplot2::geom_line(ggplot2::aes(y = likelihood)) + 
-  ggplot2::scale_x_continuous("proportion water", breaks = c(0, .5, 1)) + 
-  ggplot2::scale_y_continuous("plausibility", breaks = NULL) + 
-  ggplot2::theme(panel.grid = ggplot2::element_blank()) + 
-  ggplot2::facet_wrap(~ strip, scales = "free_y") 
+# starting data
+d <- tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |> 
+    mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
+
+sequence_length <- 50
+
+d %>% 
+  expand_grid(p_water = seq(from = 0, to = 1, 
+                            length.out = sequence_length)) %>% # <1>
+  group_by(p_water) %>% # <2>
+  mutate(lagged_n_trials  = lag(n_trials, default = 1),
+         lagged_n_success = lag(n_success, default = 1)) %>% # <3>
+  ungroup() %>% # <4>
+  mutate(prior      = ifelse(n_trials == 1, .5,
+                             dbinom(x    = lagged_n_success, 
+                                    size = lagged_n_trials, 
+                                    prob = p_water)),
+         likelihood = dbinom(x    = n_success, 
+                             size = n_trials, 
+                             prob = p_water),
+         strip      = str_c("n = ", n_trials)) %>% # <5>
+  
+  group_by(n_trials) %>% # <6>
+  mutate(prior      = prior / sum(prior),
+         likelihood = likelihood / sum(likelihood)) %>% # <6>
+  
+  ### add code for annotation <7> for plotting the result ##############
+  ggplot(aes(x = p_water)) + # <7>
+  geom_line(aes(y = prior), 
+            linetype = 2) + # <7>
+  geom_line(aes(y = likelihood)) + # <7>
+  scale_x_continuous("proportion water", breaks = c(0, .5, 1)) + # <7>
+  scale_y_continuous("plausibility", breaks = NULL) + # <7>
+  theme(panel.grid = element_blank()) + # <7>
+  facet_wrap(~ strip, scales = "free_y") # <7>
 
 ```
 
@@ -1025,7 +1591,7 @@ tibble(prob = seq(from = 0, to = 1, by = .01)) %>%
   geom_line() +
   labs(x = "probability",
        y = "binomial likelihood") +
-  theme(panel.grid = ggplot2::element_blank())
+  theme(panel.grid = element_blank())
 
 ```
 
@@ -1103,11 +1669,12 @@ tibble(a = 0,
 
 ```
 
-This figure demonstrates that the area in the whole parameter space is
+This figure demonstrates that the area in the whole paramater space is
 *1.0*. It is a nice example how to calculate the probability *mass* (in
 contrast to the curve of the probability *density*).
 
-## I STOPPED HERE!! SECOND PASS (2023-10-25) {.unnumbered}
+I will skip the excursus and plot about the equivalence of
+`Uniform(0,1)` and the beta distribution calculated with `dbeta().`
 
 ## Making the Model Go
 
@@ -1217,14 +1784,14 @@ d <-
 ```
 
 In comparison to my very detailed code annotations of
-@fig-bayesian-update there are different lines of code, but generally
-there is nothing conceptually new: We use again `expand_grid()` to
-create a tibble of input combinations and create with `mutate()` two
-columns for prior and likelihood. We do not use the `lag()` functions as
-we calculate only for one prior and one likelihood. Kurz advises us that
-is "easier to just make each column of the plot separately. We can then
-use the elegant and powerful syntax from [Thomas Lin
-Pedersen](https://www.data-imaginist.com/)'s (2022) [patchwork
+@fig-bayesian-model-learning there are different lines of code, but
+generally there is nothing conceptually new: We use again
+`expand_grid()` to create a tibble of input combinations and create with
+`mutate()` two columns for prior and likelihood. We do not use the
+`lag()` functions as we calculate only for one prior and one likelihood.
+Kurz advises us that is "easier to just make each column of the plot
+separately. We can then use the elegant and powerful syntax from [Thomas
+Lin Pedersen](https://www.data-imaginist.com/)'s (2022) [patchwork
 package](https://patchwork.data-imaginist.com/) to combine them."
 
 ```{r}
@@ -2381,15 +2948,11 @@ posterior <- unstd.posterior / sum(unstd.posterior) # <5>
 
 ```
 
-1.  Define the grid. This means you decide how many points to use in
-    estimating the posterior, and then you make a list of the parameter
-    values on the grid.
-2.  Compute the value of the prior at each parameter value on the grid.
-3.  Compute the likelihood at each parameter value.
-4.  Compute the unstandardized posterior at each parameter value, by
-    multiplying the prior by the likelihood.
-5.  Finally, standardize the posterior, by dividing each value by the
-    sum of all values.
+1. Define the grid. This means you decide how many points to use in estimating the posterior, and then you make a list of the parameter values on the grid.
+2. Compute the value of the prior at each parameter value on the grid.
+3. Compute the likelihood at each parameter value.
+4. Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood.
+5. Finally, standardize the posterior, by dividing each value by the sum of all values.
 
 ##### Tidyverse
 
@@ -2574,4 +3137,4 @@ brms::posterior_summary(b2.1) %>%
 
 ## Practice
 
-## I STOPPED HERE! (1st. pass, 2023-08-01) TO BE CONTINUED {.unnumbered}
+## I STOPPED HERE! (2023-08-01) TO BE CONTINUED {.unnumbered}

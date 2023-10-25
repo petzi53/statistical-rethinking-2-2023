@@ -7,6 +7,10 @@ book:
   date: last-modified
   date-format: YYYY-MM-DD HH:mm
   favicon: "img/favicon.ico"
+  site-url: https://bookdown.org/pbaumgartner/sr2-notes/
+  repo-url: https://github.com/petzi53/statistical-rethinking-2-2023
+  repo-branch: master
+  repo-actions: [edit, issue]
 
   chapters:
     - index.qmd
@@ -22,10 +26,12 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
-    css: glossary.css
+    css:
+     - quarto.css
+     - glossary.css
     number-sections: true
     toc-depth: 5
-    toc-expand: 2
+    toc-expand: 3
     code-fold: false
     code-tools: true
     code-link: true
@@ -43,13 +49,19 @@ editor: visual
 execute:
     freeze: auto
 
+crossref:
+  appendix-title: "Appendix"
+  appendix-delim: ":"
+
 language:
-   crossref-fig-title: "Picture"
-   crossref-prp-title: "Callout"
+   crossref-fig-title: "Graph"
+   crossref-prp-title: "Procedure"
+   crossref-lem-title: "Solution"
+   crossref-cnj-title: "R Code"
 
 # https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/language/_language.yml
    callout-tip-title: "Resource"         # green
    callout-note-title: "Note"            # blue
    callout-warning-title: "Wach out!"    # orange
-   callout-important-title: "Procedure"  # red
-   callout-caution-title: "TODO"         # yellow
+   callout-important-title: "Important"  # red
+   callout-caution-title: "Typo"         # yellow
