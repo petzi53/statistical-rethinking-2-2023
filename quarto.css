@@ -43,6 +43,42 @@
   border-bottom-right-radius: 10px;
 }
 
+/* ##############   Note   ############# */
+
+.my-note {
+  margin: 1em 0;
+  border: 2px solid #2780e3;
+  border-left: 10px solid #2780e3;
+  border-radius: 10px;
+}
+
+.my-note-header {
+  margin-left: 0;
+  padding-left:  60px;
+  padding-top:  5px;
+  padding-bottom: 0.1em;
+  color: black;
+  background-color: #ecf4fd;
+  border-top-right-radius: 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: 15px center;
+  background-image: url("img/icons8/note-48.png");
+}
+
+
+.my-note-container {
+  padding-top: 5px;
+  padding-left: 10px;
+  color: black;
+  background-color: white;
+  border-bottom-right-radius: 10px;
+}
+
+
+
 /* ##############   Example   ############# */
 
 .my-example {
@@ -112,14 +148,14 @@
 
 /* ##############   R Code   ############# */
 
-.r-code {
+.my-r-code {
   margin: 1em 0;
   border: 2px solid burlywood;
   border-left: 10px solid #8B7355;
   border-radius: 10px;
 }
 
-.r-code-header {
+.my-r-code-header {
   margin-left: 0;
   padding-left:  60px;
   padding-top:  5px;
@@ -135,7 +171,7 @@
   background-image: url("img/icons8/r-code.png");
 }
 
-.r-code-container {
+.my-r-code-container {
   padding-top: 5px;
   padding-left: 10px;
   color: black;
