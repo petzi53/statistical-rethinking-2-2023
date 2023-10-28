@@ -1,3 +1,11 @@
+---
+filters: 
+  - quarto
+  - nameref
+nameref:
+  section-number: true
+---
+
 # Small and Large Worlds {#sec-small-and-large-worlds}
 
 ```{r}
@@ -188,7 +196,7 @@ Here's how we do the updating:
 :::
 
 |     |              |     |                    |     |              |     |            |     |
-|--------|--------|--------|--------|--------|--------|--------|--------|--------|
+|-----|--------------|-----|--------------------|-----|--------------|-----|------------|-----|
 |     |              |     |                    |     |              |     |            |     |
 |     | Conjecture   |     | Ways to produce ⚫ |     | Prior counts |     | New count  |     |
 |     | \[⚪⚪⚪⚪\] |     | 0                  |     | 0            |     | 0 × 0 = 0  |     |
@@ -244,14 +252,14 @@ Constructing plausibilities by standardizing
 :::
 :::
 
-::: {.my-r-code}
-::: {.my-r-code-header}
+::: my-r-code
+::: my-r-code-header
 ::: {#cnj-2-1}
 : Compute these plausibilities in R
 :::
 :::
 
-::: {.my-r-code-container}
+::: my-r-code-container
 ```{r}
 #| label: code-2-1
 
@@ -382,10 +390,10 @@ How a Bayesian model learns
 
 ::: my-important-container
 @fig-2-5-book-copy helps to understand the Bayesian updating process. In
-@cnj-fig-bayesian-updating we will learn how to write R code to reproduce
-the book's figure as @fig-bayesian-update. To inspect the different
-steps of the updating process is essential to understand Bayesian
-statistics!
+@cnj-fig-bayesian-updating we will learn how to write R code to
+reproduce the book's figure as @fig-bayesian-update. To inspect the
+different steps of the updating process is essential to understand
+Bayesian statistics!
 :::
 :::
 
@@ -469,23 +477,21 @@ Instead of vectors the tidyverse approach works best with data frames
 respectively tibbles. So let's save the globe-tossing data
 `W L W W W L W L W` into a tibble:
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-data}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-data}
 : Save globe tossing data into a tibble
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: globe-tossing-data
 
 (d <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")))
 ```
-
-::::
-:::::
-
+:::
+:::
 
 #### A Data Story
 
@@ -495,14 +501,14 @@ For the updating process we need to add to the data the cumulative
 number of trials, `n_trials`, and the cumulative number of successes,
 `n_successes` with `toss == "w"`.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian-updating-start}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian-updating-start}
 : Bayesian updating preparation
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: bayesian-updating-start
 
@@ -514,10 +520,8 @@ number of trials, `n_trials`, and the cumulative number of successes,
   )
 
 ```
-
-::::
-:::::
-
+:::
+:::
 
 The program code for reproducing the Figure 2.5 of the book (here in
 this document it is @fig-2-5-book-copy) is pretty complex. I have to
@@ -541,14 +545,14 @@ a previous {**dplyr**} version?
 :::
 :::
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-bayesian-update}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-bayesian-update}
 : Bayesian updating: How a model learns
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-bayesian-update
 #| echo: true
@@ -603,11 +607,8 @@ d %>%
   
 
 ```
-
-
-
-::::
-:::::
+:::
+:::
 
 ##### Annotation (1): `tidyr::expand_grid()` {#sec-annotation-1-expand-grid}
 
@@ -619,15 +620,14 @@ generates all combinations by varying all columns from left to right.
 The first column is the slowest, the second is faster and so on.). It
 generates 450 data points ($50 \times 9$ trials).
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian-update-1}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian-update-1}
 : Bayesian Update: Create tibble with all Input combinations
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-
+::: my-r-code-container
 ```{r}
 #| label: bayesian-update-1
 
@@ -639,11 +639,8 @@ tbl %>%
   tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
                             length.out = sequence_length))
 ```
-
-
-::::
-:::::
-
+:::
+:::
 
 ##### Annotation (2): `dplyr::group_by()` {#sec-annotation-2-group_by}
 
@@ -652,14 +649,14 @@ data to be grouped when every row has a different value --- as I have
 thought from a cursory inspection of the result? But it turned out that
 after 50 records the parameter `p_water` is repeating its value.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian-update-2}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian-update-2}
 : Bayesian Updating: Lagged with grouping
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: bayesian-update-2
 
@@ -681,22 +678,20 @@ tbl1 <- tbl %>%
 # show 2 records from different groups
 tbl1[c(1:2, 50:52, 100:102, 150:152), ] 
 ```
-
-::::
-:::::
-
+:::
+:::
 
 I want to see the differences in detail. So I will provide also the
 ungrouped version.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian-update-2a}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian-update-2a}
 : Bayesian Updating: Lagged without grouping
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: bayesian-update-2a
 
@@ -714,25 +709,31 @@ tbl2 <- tbl %>%
 # show the same records without grouping
 tbl2[c(1:2, 50:52, 100:102, 150:152), ] 
 ```
+:::
+:::
 
-
-::::
-:::::
-
-It turned out that the two version differ after 51 records in the lagged variables. (Not after 50 as I would have assumed. Apparently this has to do with the `lag()`
-command because the first 51 records are identical. Beginning with row
-number 52 there are differences in the column `lagged_n_trials` and `lagged_n_success`. This pattern is repeated: Original version always changes after 100 records. The version without grouping changes after 50 rows starting with row 51.
+It turned out that the two version differ after 51 records in the lagged
+variables. (Not after 50 as I would have assumed. Apparently this has to
+do with the `lag()` command because the first 51 records are identical.
+Beginning with row number 52 there are differences in the column
+`lagged_n_trials` and `lagged_n_success`. This pattern is repeated:
+Original version always changes after 100 records. The version without
+grouping changes after 50 rows starting with row 51.
 
 ##### Annotation (3): `dplyr::lag()` {#sec-annotation-3-lag}
 
-The function `dplyr::lag()` finds the "previous" values in a vector (time series). This is useful for comparing values behind of the current values. See [Compute lagged or leading values](https://dplyr.tidyverse.org/reference/lead-lag.html).
+The function `dplyr::lag()` finds the "previous" values in a vector
+(time series). This is useful for comparing values behind of the current
+values. See [Compute lagged or leading
+values](https://dplyr.tidyverse.org/reference/lead-lag.html).
 
 We need to get the immediately previous values for drawing the prior
 probabilities in the current graph (= dashed line or `linetype = 2` in
-{**ggplot2**} parlance). In the relation with the posterior probabilities the
-difference form the prior possibility is always $1$ (this is the
-option `default = 1` in the `dplyr::lag()` function. This is now the correct
-explanation for the differences starting after rows 51 (and not 50).
+{**ggplot2**} parlance). In the relation with the posterior
+probabilities the difference form the prior possibility is always $1$
+(this is the option `default = 1` in the `dplyr::lag()` function. This
+is now the correct explanation for the differences starting after rows
+51 (and not 50).
 
 ##### Annotation (4): `dplyr::ungroup()` {#sec-annotation-4-ungroup}
 
@@ -745,30 +746,34 @@ This is the core of the prior and likelihood calculation. It uses
 R function for the binomial distribution, a distribution provided by the
 probability theory for "coin tossing" problems.
 
-:::::{.my-resource}
-:::{.my-resource-header}
+::: my-resource
+::: my-resource-header
 Exploring the `dbinom()` function
 :::
-::::{.my-resource-container}
-The [distribution zoo](https://ben18785.shinyapps.io/distribution-zoo/) is a nice resource to explore the shapes and properties of important Bayesian distributions. This interactive {**shiny**} app was developed by [Ben Lambert](https://ben-lambert.com/bayesian/) and [Fergus Cooper](https://www.cs.ox.ac.uk/people/fergus.cooper/site/).
 
-Choose "Discrete Univariate" as the "Category of Distribution" and then select as "Binomial" as the "Distribution Type".
+::: my-resource-container
+The [distribution zoo](https://ben18785.shinyapps.io/distribution-zoo/)
+is a nice resource to explore the shapes and properties of important
+Bayesian distributions. This interactive {**shiny**} app was developed
+by [Ben Lambert](https://ben-lambert.com/bayesian/) and [Fergus
+Cooper](https://www.cs.ox.ac.uk/people/fergus.cooper/site/).
+
+Choose "Discrete Univariate" as the "Category of Distribution" and then
+select as "Binomial" as the "Distribution Type".
 
 See also the two blog entries [An Introduction to the Binomial
 Distribution](https://www.statology.org/binomial-distribution/) and [A
 Guide to dbinom, pbinom, qbinom, and rbinom in
 R](https://www.statology.org/dbinom-pbinom-qbinom-rbinom-in-r/) of the
 Statology website.
-::::
-:::::
-
+:::
+:::
 
 The "`d`" in `dbinom()` stands for *density*. Functions named in this
 way almost always have corresponding partners that begin with "`r`" for
 random samples and that begin with "`p`" for cumulative probabilities.
 See for example the [help
 file](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/Binomial.html).
-
 
 The results of each of the different calculation (prior and likelihood)
 are collected with `dplyr::mutate()` into two new generated columns.
@@ -780,9 +785,10 @@ two lines provide the essential calculations: They match the 50 grid
 points as assumed water probabilities of every trial to their trial
 outcome (`W` or `L`) probabilities.
 
-The last `dplyr::mutate()` command generates the $strip$ variable consisting of the
-prefix $n =$ followed by the counts of the number of trials. This will
-later provide the title for the the different facets of the plot. 
+The last `dplyr::mutate()` command generates the $strip$ variable
+consisting of the prefix $n =$ followed by the counts of the number of
+trials. This will later provide the title for the the different facets
+of the plot.
 
 ::: my-checklist
 ::: my-checklist-header
@@ -799,14 +805,14 @@ This was not done by Kurz. I have tried it but didn't succeed up to now
 :::
 :::
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian.update-5}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian.update-5}
 : Bayesian Updating: Calculating prior and likelihood
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: bayesian-update-5
 
@@ -822,10 +828,8 @@ tbl5 <- tbl1 %>%
  
 tbl5
 ```
-
-::::
-:::::
-
+:::
+:::
 
 ##### Annotation (6): Normalizing {#sec-annotation-6-normalize}
 
@@ -837,16 +841,18 @@ This metric is important for the comparisons of different probabilities.
 > If you don't normalize (i.e., divide the density by the sum of the
 > density), their respective heights don't match up with those in the
 > text. Furthermore, it's the normalization that makes them directly
-> comparable. (Kurz in section [Bayesian Updating](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#bayesian-updating.) of chapter 2)
+> comparable. (Kurz in section [Bayesian
+> Updating](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#bayesian-updating.)
+> of chapter 2)
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian-update-6}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian-update-6}
 : Bayesian Updating: Normalizing prior and likelihood
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: bayesian-update-6
 
@@ -857,28 +863,26 @@ tbl6 <- tbl5 %>%
     
 tbl6
 ```
+:::
+:::
 
-::::
-:::::
-
-
-##### Annotation (7): Graphical demonstration of Bayesian updating  {#sec-annotation-7-ggplot}
+##### Annotation (7): Graphical demonstration of Bayesian updating {#sec-annotation-7-ggplot}
 
 The remainder of the code prepares the plot by using the 50 grid points
-in the range from $0$ to $1$ as the x-axis; prior and likelihood as y-axis.
-To distinguish the prior from the likelihood it uses a dashed line for
-the prior (`linetyp = 2`) and a full line (default) for the likelihood.
-The x-axis has three breaks ($0, 0.5, 1$) whereas the y-axis has no
-break and no scale (`scales = "free_y"`).
+in the range from $0$ to $1$ as the x-axis; prior and likelihood as
+y-axis. To distinguish the prior from the likelihood it uses a dashed
+line for the prior (`linetyp = 2`) and a full line (default) for the
+likelihood. The x-axis has three breaks ($0, 0.5, 1$) whereas the y-axis
+has no break and no scale (`scales = "free_y"`).
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-bayesian-update-7}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-bayesian-update-7}
 : Bayesian updating: Graphical demonstration
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-bayesian-update-7
 #| fig-cap: "Graphical demonstration: 9 steps of Bayesian updating"
@@ -894,11 +898,8 @@ tbl6 %>%
   ggplot2::facet_wrap(~ strip, scales = "free_y") 
 
 ```
-
-::::
-:::::
-
-
+:::
+:::
 
 ## Components of the Model
 
@@ -906,13 +907,22 @@ tbl6 %>%
 
 We observed three components of the model:
 
-> “(1) The number of ways each conjecture could produce an observation 
-> (2) The accumulated number of ways each conjecture could produce the entire data
-> (3) The initial plausibility of each conjectured cause of the data” ([McElreath, 2020, p. 32](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=51&annotation=R4M54D6K))
+> "(1) The number of ways each conjecture could produce an observation
+> (2) The accumulated number of ways each conjecture could produce the
+> entire data (3) The initial plausibility of each conjectured cause of
+> the data" ([McElreath, 2020, p.
+> 32](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=51&annotation=R4M54D6K))
 
 #### Variables
 
-> “Variables are just symbols that can take on different values. In a scientific context, variables include things we wish to infer, such as proportions and rates, as well as things we might observe, the data. … Unobserved variables are usually called `r glossary("parameter", "parameters")`.” ([McElreath, 2020, p. 32](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=51&annotation=C7C4PCB6))
+> "Variables are just symbols that can take on different values. In a
+> scientific context, variables include things we wish to infer, such as
+> proportions and rates, as well as things we might observe, the data.
+> ... Unobserved variables are usually called
+> `r glossary("parameter", "parameters")`." ([McElreath, 2020, p.
+> 32](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=51&annotation=C7C4PCB6))
 
 Take as example the globe tossing models: There are three variables: `W`
 and `L` (water or land) and the proportion of water and land `p`. We
@@ -922,47 +932,82 @@ defined above.
 
 #### Definitions
 
-> “Once we have the variables listed, we then have to define each of them. In defining each, we build a model that relates the variables to one another. Remember, the goal is to count all the ways the data could arise, given the assumptions. This means, as in the globe tossing model, that for each possible value of the unobserved variables, such as $p$, we need to define the relative number of ways—the probability—that the values of each observed variable could arise. And then for each unobserved variable, we need to define the prior plausibility of each value it could take.” ([McElreath, 2020, p. 33](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=52&annotation=EWFRB9S7))
+> "Once we have the variables listed, we then have to define each of
+> them. In defining each, we build a model that relates the variables to
+> one another. Remember, the goal is to count all the ways the data
+> could arise, given the assumptions. This means, as in the globe
+> tossing model, that for each possible value of the unobserved
+> variables, such as $p$, we need to define the relative number of
+> ways---the probability---that the values of each observed variable
+> could arise. And then for each unobserved variable, we need to define
+> the prior plausibility of each value it could take." ([McElreath,
+> 2020, p. 33](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=52&annotation=EWFRB9S7))
 
-:::::{.my-note}
-:::{.my-note-header}
-:::::: {#cor-expand-grid}
-: Calculate the prior plausibility of the values of each observed variable in R
-::::::
+::: my-note
+::: my-note-header
+::: {#cor-expand-grid}
+: Calculate the prior plausibility of the values of each observed
+variable in R
 :::
-::::{.my-note-container}
-There are different functions in R that generate all combination of variables supplied by vectors, factors or data columns: `base::expand.grid()` or in the tidyverse `tidyr::expand()`, `tidyr::expand_grid()` and `tidyr::crossing()`.
-These functions can be used to calculate and generate the relative number of ways (= the probability) that the values of each observed variable could arise.  We have seen a first demonstration in @cnj-bayesian-update-1. We will see many more examples in later sections and chapters.
-::::
-:::::
+:::
 
+::: my-note-container
+There are different functions in R that generate all combination of
+variables supplied by vectors, factors or data columns:
+`base::expand.grid()` or in the tidyverse `tidyr::expand()`,
+`tidyr::expand_grid()` and `tidyr::crossing()`. These functions can be
+used to calculate and generate the relative number of ways (= the
+probability) that the values of each observed variable could arise. We
+have seen a first demonstration in @cnj-bayesian-update-1. We will see
+many more examples in later sections and chapters.
+:::
+:::
 
 ##### Observed Variables
 
-> “For the count of water W and land L, we define how plausible any combination of W and L would be, for a specific value of p. This is very much like the marble counting we did earlier in the chapter. Each specific value of p corresponds to a specific plausibility of the data, as in @fig-bayesian-update-7.
+> "For the count of water W and land L, we define how plausible any
+> combination of W and L would be, for a specific value of p. This is
+> very much like the marble counting we did earlier in the chapter. Each
+> specific value of p corresponds to a specific plausibility of the
+> data, as in @fig-bayesian-update-7.
 >
->So that we don’t have to literally count, we can use a mathematical function that tells us the right plausibility. In conventional statistics, a distribution function assigned to an observed variable is usually called a `r glossary("likelihood")`. That term has special meaning in nonBayesian statistics, however.” ([McElreath, 2020, p. 33](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=52&annotation=TLDIVS8K))
+> So that we don't have to literally count, we can use a mathematical
+> function that tells us the right plausibility. In conventional
+> statistics, a distribution function assigned to an observed variable
+> is usually called a `r glossary("likelihood")`. That term has special
+> meaning in nonBayesian statistics, however." ([McElreath, 2020, p.
+> 33](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=52&annotation=TLDIVS8K))
 
-For our globe tossing procedure we use instead of counting a mathematical function to calculate the probability of all combinations.
+For our globe tossing procedure we use instead of counting a
+mathematical function to calculate the probability of all combinations.
 
- > “In this case, once we add our assumptions that (1) every toss is independent of the other tosses and (2) the probability of W is the same on every toss, probability theory provides a unique answer, known as the `r glossary("binomial distribution")`. This is the common “coin tossing” distribution.” ([McElreath, 2020, p. 33](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=52&annotation=E5HEDDW4))
+> "In this case, once we add our assumptions that (1) every toss is
+> independent of the other tosses and (2) the probability of W is the
+> same on every toss, probability theory provides a unique answer, known
+> as the `r glossary("binomial distribution")`. This is the common"coin
+> tossing" distribution." ([McElreath, 2020, p.
+> 33](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=52&annotation=E5HEDDW4))
 
-:::::{.my-resource}
-::::{.my-resource-container}
-See also @sec-annotation-5-dbinom for a resource to explore the binomial distribution.
-::::
-:::::
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-likelihood-globe-tossing}
-: Likelihood for prob = 0.5 in the globe tossing example
-::::::
+::: my-resource
+::: my-resource-container
+See also @sec-annotation-5-dbinom for a resource to explore the binomial
+distribution.
 :::
-::::{.my-r-code-container}
+:::
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-likelihood-globe-tossing}
+: Likelihood for prob = 0.5 in the globe tossing example
+:::
+:::
+
+::: my-r-code-container
 The likelihood in the globe-tossing example (9 trials, 6 with `W` and 3
 with `L`) is easily computed:
-
 
 ```{r}
 #| label: likelihood-prob-0.5-a
@@ -971,7 +1016,10 @@ with `L`) is easily computed:
 dbinom(6, size = 9, prob = 0.5)
 ```
 
-> “Change the 0.5 to any other value, to see how the value changes.” ([McElreath, 2020, p. 34](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=53&annotation=7USE7U6W))
+> "Change the 0.5 to any other value, to see how the value changes."
+> ([McElreath, 2020, p.
+> 34](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=53&annotation=7USE7U6W))
 
 In this example it is assumed that the probability of `W` and `L` are
 equal distributed. We calculated how plausible the combination of $6W$
@@ -982,10 +1030,8 @@ To get a better idea what the best estimation of the probability is, we
 could vary systematically the $p$ value and look for the maximum. A
 demonstration how this is done can be seen in @sec-calcu-10-probs. It
 shows a maximum at $prob = 0.7$.
-::::
-:::::
-
-
+:::
+:::
 
 ##### Unobserved Variables
 
@@ -993,78 +1039,103 @@ Even variables that are not observed (= parameters) we need to define
 them. In the globe-tossing model there is only one parameter ($p$), but
 most models have more than one unobserved variables.
 
-:::::{.my-important}
-:::{.my-important-header}
+::: my-important
+::: my-important-header
 Parameter & Prior
 :::
-::::{.my-important-container}
-For every parameter we must provide a distribution of prior
-plausibility, its `r glossary("Prior Probability")`. This is also true when the number of trials is null ($N = 0$), e.g. even in the initial state of information we need a prior. (See @cnj-fig-bayesian-update, where a flat prior was used.)
-::::
-:::::
 
+::: my-important-container
+For every parameter we must provide a distribution of prior
+plausibility, its `r glossary("Prior Probability")`. This is also true
+when the number of trials is null ($N = 0$), e.g. even in the initial
+state of information we need a prior. (See @cnj-fig-bayesian-update,
+where a flat prior was used.)
+:::
+:::
 
 When you have a previous estimate, that can become the prior. As a
-result, each estimate (`r glossary("posterior probability")`) becomes then the prior for the next step (as you have seen in @cnj-fig-bayesian-update).
+result, each estimate (`r glossary("posterior probability")`) becomes
+then the prior for the next step (as you have seen in
+@cnj-fig-bayesian-update).
 
-> “So where do priors come from? They are both engineering assumptions, chosen to help the machine learn, and scientific assumptions, chosen to reflect what we know about a phenomenon.” ([McElreath, 2020, p. 35](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=C5Q2WBUL))
+> "So where do priors come from? They are both engineering assumptions,
+> chosen to help the machine learn, and scientific assumptions, chosen
+> to reflect what we know about a phenomenon." ([McElreath, 2020, p.
+> 35](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=C5Q2WBUL))
 
-> “Within Bayesian data analysis in the natural and social sciences, the prior is considered to be just part of the model. As such it should be chosen, evaluated, and revised just like all of the other components of the model.” ([McElreath, 2020, p. 35](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=GQX776IE))
+> "Within Bayesian data analysis in the natural and social sciences, the
+> prior is considered to be just part of the model. As such it should be
+> chosen, evaluated, and revised just like all of the other components
+> of the model." ([McElreath, 2020, p.
+> 35](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=GQX776IE))
 
-> “Beyond all of the above, there’s no law mandating we use only one prior. If you don’t have a strong argument for any particular prior, then try different ones. Because the prior is an assumption, it should be interrogated like other assumptions: by altering it and checking how sensitive inference is to the assumption.” ([McElreath, 2020, p. 35](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=H9FQKLCU))
+> "Beyond all of the above, there's no law mandating we use only one
+> prior. If you don't have a strong argument for any particular prior,
+> then try different ones. Because the prior is an assumption, it should
+> be interrogated like other assumptions: by altering it and checking
+> how sensitive inference is to the assumption." ([McElreath, 2020, p.
+> 35](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=H9FQKLCU))
 
-
-
-
-:::::{.my-resource}
-:::{.my-resource-header}
+::: my-resource
+::: my-resource-header
 More on the difference between Bayesian and frequentist statistics?
 :::
-::::{.my-resource-container}
-Check out McElreath's lecture, [*Understanding
-Bayesian statistics without frequentist language*](https://youtu.be/yakg94HyWdE) at Bayes@Lund2017 (20 April 2017).
-::::
-:::::
 
-
+::: my-resource-container
+Check out McElreath's lecture, [*Understanding Bayesian statistics
+without frequentist language*](https://youtu.be/yakg94HyWdE) at
+Bayes\@Lund2017 (20 April 2017).
+:::
+:::
 
 #### A Model is Born
 
-> “The observed variables W and L are given relative counts through the binomial distribution.” ([McElreath, 2020, p. 36](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=55&annotation=8FL6YY2Q))
+> "The observed variables W and L are given relative counts through the
+> binomial distribution." ([McElreath, 2020, p.
+> 36](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=55&annotation=8FL6YY2Q))
 
 $$W∼Binomial(n,p) \space where\space N = W + L$$ {#eq-globe-tossing-binomial-dist}
 
-> “The above is just a convention for communicating the assumption that the relative counts of ways to realize $W$ in $N$ trials with probability $p$ on each trial comes from the binomial distribution.” ([McElreath, 2020, p. 36](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=55&annotation=H9UKQXP2))
+> "The above is just a convention for communicating the assumption that
+> the relative counts of ways to realize $W$ in $N$ trials with
+> probability $p$ on each trial comes from the binomial distribution."
+> ([McElreath, 2020, p.
+> 36](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=55&annotation=H9UKQXP2))
 
 Our binomial likelihood contains a parameter for an unobserved variable,
 *p*.
 
 $$p∼Uniform(0,1)$$ {#eq-uniform-prior}
 
-The formula expresses the model assumption that the entire range of possible
-values for $p$ are equally plausible.
+The formula expresses the model assumption that the entire range of
+possible values for $p$ are equally plausible.
 
-
-### TIDYVERSE
-
-
+MY TIDYVERSE
 
 Given a probability of .5, (e.g. equal probability to both events `W`
-and `L`) we use the `dbinom()` function to determine the likelihood
-of 6 out of 9 tosses coming out water in @cnj-likelihood-globe-tossing.
+and `L`) we use the `dbinom()` function to determine the likelihood of 6
+out of 9 tosses coming out water in @cnj-likelihood-globe-tossing.
 
 McElreath suggests:
 
-> “Change the 0.5 to any other value, to see how the value changes.” ([McElreath, 2020, p. 34](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=53&annotation=7USE7U6W))
+> "Change the 0.5 to any other value, to see how the value changes."
+> ([McElreath, 2020, p.
+> 34](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=53&annotation=7USE7U6W))
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-calcu-10-probs}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-calcu-10-probs}
 : Calculation likelihood with 10 different values of `prob`
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: likelihood-10-probs
 
@@ -1074,17 +1145,14 @@ McElreath suggests:
 
 ```
 
-
 ```{r}
 #| label: filter-max
 
 d  |>  
     dplyr::filter(likelihood == max(likelihood))
 ```
-
-::::
-:::::
-
+:::
+:::
 
 In the series of values you will notice several point:
 
@@ -1095,23 +1163,23 @@ In the series of values you will notice several point:
     near the real distribution of about $0.71$. (see [How Much of the
     Earth Is Covered by
     Water?](https://www.thedailyeco.com/how-much-of-the-earth-is-covered-by-water-122.html))
-2.  You see that the first `prob` ($0$) and last `prob` ($1$) values are both
-    zero. From the result (6 $W$ and 3 $L$) `prob` cannot be 0 or 1
+2.  You see that the first `prob` ($0$) and last `prob` ($1$) values are
+    both zero. From the result (6 $W$ and 3 $L$) `prob` cannot be 0 or 1
     because there a both $W$ and $L$ in the observed sample.
 
 @cnj-calcu-10-probs is my interpretation from the quote "Change the 0.5
 to any other value, to see how the value changes." Kurz has another
 interpretation when he draws a graph of 100 `prob` values from 0 to 1:
 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-calcu-100-probs}
-: Plot likelihood for 100 values of `prob` from $0$ to $1$, by steps of $0.01$
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-calcu-100-probs}
+: Plot likelihood for 100 values of `prob` from $0$ to $1$, by steps of
+$0.01$
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-likelihood-100-prob
 #| fig-cap: "Likelihood for 100 values of prob, from 0 to 1, by steps of 0.01"
@@ -1125,10 +1193,8 @@ tibble::tibble(prob = seq(from = 0, to = 1, by = .01)) %>%
   ggplot2::theme_bw()
 
 ```
-
-::::
-:::::
-
+:::
+:::
 
 In contrast to $p = 0.5$ with a probability of $0.16$ the
 @fig-likelihood-100-prob shows a maximum at about $p = 0.7$ and a
@@ -1141,18 +1207,25 @@ high. The reason is that there are many other configurations
 Even if all these other distributions have a small probability they
 "eat" all with their share from the maximum.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-piror-prob-dens}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-piror-prob-dens}
 : Prior as a probability distribution for the parameter
-::::::
 :::
-::::{.my-r-code-container}
-> “The prior is a `r glossary("probability distribution")` for the parameter. In general, for a uniform prior from $a$ to $b$, the probability of any point in the interval is $1/(b − a)$. If you’re bothered by the fact that the probability of every value of $p$ is $1$, remember that every probability distribution must sum (integrate) to $1$.” ([McElreath, 2020, p. 35](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=3TQ9MKDM))
+:::
+
+::: my-r-code-container
+> "The prior is a `r glossary("probability distribution")` for the
+> parameter. In general, for a uniform prior from $a$ to $b$, the
+> probability of any point in the interval is $1/(b − a)$. If you're
+> bothered by the fact that the probability of every value of $p$ is
+> $1$, remember that every probability distribution must sum (integrate)
+> to $1$." ([McElreath, 2020, p.
+> 35](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=54&annotation=3TQ9MKDM))
 
 Kurz demonstrates the truth of this quote with several $b$ values while
 holding $a$ constant:
-
 
 ```{r}
 #| label: uniform-prior1
@@ -1191,63 +1264,131 @@ tibble::tibble(a = 0,
 This figure demonstrates that the area in the whole parameter space is
 *1.0*. It is a nice example how to calculate the probability *mass* (in
 contrast to the curve of the probability *density*).
-
-
-::::
-:::::
-
-
-
-## I STOPPED HERE!! SECOND PASS (2023-10-26) {.unnumbered}
+:::
+:::
 
 ## Making the Model Go
 
-### Bayes' Theorem
-
-#### Original
-
-> Once you have named all the variables and chosen definitions for each,
-> a Bayesian model can update all of the prior distributions to their
-> purely logical consequences: the **POSTERIOR DISTRIBUTION**. For every
-> unique combination of data, likelihood, parameters, and prior, there
-> is a unique posterior distribution. This distribution contains the
-> relative plausibility of different parameter values, conditional on
-> the data and model. The posterior distribution takes the form of the
-> probability of the parameters, conditional on the data.
+> "Once you have named all the variables and chosen definitions for
+> each, a Bayesian model can update all of the prior distributions to
+> their purely logical consequences: the ´r glossary("posterior
+> distribution")\`. For every unique combination of data, likelihood,
+> parameters, and prior, there is a unique posterior distribution. This
+> distribution contains the relative plausibility of different parameter
+> values, conditional on the data and model. The posterior distribution
+> takes the form of the probability of the parameters, conditional on
+> the data." ([McElreath, 2020, p.
+> 36](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=55&annotation=P5JNFN9Y))
 
 In the case of the globe-tossing model we can write:
 
 $$
 Pr(p|W, L)
-$$
+$$ {#eq-prob-globe-tossing}
 
 This has to be interpreted as "the probability of each possible value of
-*p*, conditional on the specific *W* and *L* that we observed."
+*p*, conditional on the specific $W$ and $L$ that we observed."
+
+### Bayes' Theorem
+
+#### ORIGINAL
+
+The Bayes' theorem or Bayes' rule gives Bayesian data analysis its name.
+What follows is a quick derivation of it. At first glance this might be
+too theoretical but after reading different books on Bayesian statistics
+I got the impression that it is not only important to know where the
+formula comes from but also what it stands for.
+
+::: my-theorem
+::: my-theorem-header
+::: {#thm-bayes-theorem}
+: Bayes Theorem
+:::
+:::
+
+::: my-theorem-container
+> "The joint probability of the data W and L and any particular value of
+> p is:" ([McElreath, 2020, p.
+> 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=TTB5EEEJ))
 
 $$
-Pr(p|W,L) = \frac{Pr(W,L|p)Pr(p)}{Pr(W,L)}
-$$
+Pr(W, L, p) = Pr(W, L \mid p) Pr(p)
+$$ {#eq-joint-prob-globe-tossing}
 
-> And this is Bayes' theorem. It says that the probability of any
-> particular value of *p*, considering the data, is equal to the product
-> of the relative plausibility of the data, conditional on *p*, and the
-> prior plausibility of *p*, divided by this thing Pr(*W, L*), which
-> I'll call the *average probability of the data*.
+> "This just says that the probability of $W$, $L$ and $p$ is the
+> product of $Pr(W, L \mid p)$ and the prior probability $Pr(p)$."
+> ([McElreath, 2020, p.
+> 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=742VW7N2))
+> It is also true that:
+
+"This just says that the probability of W, L and p is the product of
+Pr(W, L\|p) and the prior probability Pr(p)."
+
+$$
+Pr(W, L, p) = Pr(W, L \mid p) Pr(W, L)
+$$ \> "All I've done is reverse which probability is conditional, on the
+right-hand side." ([McElreath, 2020, p.
+37](zotero://select/groups/5243560/items/NFUEVASQ))
+([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=PFQL3HIR))
+
+> "Now since both right-hand sides above are equal to the same thing,
+> $Pr(W, L, p)$, they are also equal to one another:" ([McElreath, 2020,
+> p. 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=WEIB5BKN))
+
+$$
+\begin{align*}
+Pr(W, L \mid p) Pr(p) = Pr(W, L \mid p) Pr(W, L) \\
+Pr(W, L \mid p) = \frac{Pr(W, L \mid p) Pr(p)}{Pr(W, L)}
+\end{align*} 
+$$ {#eq-bayes-theorem}
+
+> "And this is `r glossary("Bayes’ theorem")`. It says that the
+> probability of any particular value of $p$, considering the data, is
+> equal to the product of the relative plausibility of the data,
+> conditional on $p$, and the prior plausibility of $p$, divided by this
+> thing $Pr(W, L)$, which I'll call the *average probability of the
+> data*." ([McElreath, 2020, p.
+> 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=EECURSC4))
 
 Expressed in words:
 
 $$
 Posterior = \frac{Probability\space of\space the\space data\space ✕\space Prior}{Average\space probability\space of\space the\space data}
-$$
-
-Other names for the *average probability of the data*:
+$$ Other names for the somewhat confusing *average probability of the
+data*:
 
 -   evidence
 -   average likelihood
 -   marginal likelihood
 
-The job of the average probability of the data is just to standardize
-the posterior, to ensure it sums (integrates) to one.
+> "The probability $Pr(W, L)$ is literally the average probability of
+> the data. Averaged over what? Averaged over the prior. It's job is
+> just to standardize the posterior, to ensure it sums (integrates) to
+> one. In mathematical form:" ([McElreath, 2020, p.
+> 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=6J5GL8BK))
+
+$$
+PR(W, L) = E(Pr(W, L \mid p)) = \int Pr(W, L \mid p) Pr(p) dp
+$$
+
+> "The operator E means to take an *expectation.* Such averages are
+> commonly called *marginals* in mathematical statistics, and so you may
+> also see this same probability called a *marginal likelihood*. And the
+> integral above just defines the proper way to compute the average over
+> a continuous distribution of values, like the infinite possible values
+> of $p$." ([McElreath, 2020, p.
+> 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=QPMLS5NG))
+:::
+:::
+
+## I STOPPED HERE!! SECOND PASS (2023-10-28) {.unnumbered}
 
 ::: callout-important
 ###### Key lesson

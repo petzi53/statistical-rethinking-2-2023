@@ -54,11 +54,16 @@ crossref:
   appendix-delim: ":"
 
 language:
-   crossref-fig-title: "Graph"
-   crossref-prp-title: "Procedure"
-   crossref-lem-title: "Solution"
-   crossref-cnj-title: "R Code"
-   crossref-cor-title: "Note"
+   crossref-fig-title: "Graph"       # replaces "Figure"
+
+   crossref-thm-title: "Theorem"
+   crossref-lem-title: "Solution"    # replaces "Lemma"
+   crossref-cor-title: "Note"        # replaces "Corollary"
+   crossref-prp-title: "Procedure"   # replaces "Proposition"
+   crossref-cnj-title: "R Code"      # replaces "Conjecture"
+   crossref-def-title: "Definition"
+   crossref-exm-title: "Example"
+   crossref-exr-title: "Exercise"
 
 # https://github.com/quarto-dev/quarto-cli/blob/main/src/resources/language/_language.yml
    callout-tip-title: "Resource"         # green
