@@ -128,18 +128,22 @@ Multiplication is just a shortcut for counting
 :::
 
 ::: my-important-container
-"Notice that the number of ways to produce the data, for each
-conjecture, can be computed by first counting the number of paths in
-each"ring" of the garden and then by multiplying these counts together."
-([McElreath, 2020, p.
-23](zotero://select/groups/5243560/items/NFUEVASQ))
-([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=42&annotation=R9UIIW9R))
+> "Notice that the number of ways to produce the data, for each
+> conjecture, can be computed by first counting the number of paths in
+> each"ring" of the garden and then by multiplying these counts
+> together." ([McElreath, 2020, p.
+> 23](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=42&annotation=R9UIIW9R))
 
-"Multiplication is just a shortcut to enumerating and counting up all of
-the paths through the garden that could produce all the observations."
-([McElreath, 2020, p.
-25](zotero://select/groups/5243560/items/NFUEVASQ))
-([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=44&annotation=KUC4ZHP4))
+> "Multiplication is just a shortcut to enumerating and counting up all
+> of the paths through the garden that could produce all the
+> observations." ([McElreath, 2020, p.
+> 25](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=44&annotation=KUC4ZHP4))
+
+> "Multiplication is just compressed counting." ([McElreath, 2020, p.
+> 37](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=IH6782AE))
 :::
 :::
 
@@ -182,14 +186,14 @@ following way:
 
 ::: my-procedure
 ::: my-procedure-header
-Bayesian Updating Process
+::: {#prp-bayesian-updating}
+: Bayesian Updating
+:::
 :::
 
 ::: my-procedure-container
-Here's how we do the updating:
-
 1.  First we count the numbers of ways each conjecture could produce the
-    new observation, ⚫.
+    new observation, for instance drawing a blue marble.
 2.  Then we multiply each of these new counts by the prior numbers of
     ways for each conjecture.
 :::
@@ -307,7 +311,9 @@ following data:
 
 ::: my-procedure
 ::: my-procedure-header
-Designing a simple Bayesian model
+::: {#prp-designing-bayesian-model}
+: Designing a simple Bayesian model
+:::
 :::
 
 ::: my-procedure-container
@@ -390,10 +396,10 @@ How a Bayesian model learns
 
 ::: my-important-container
 @fig-2-5-book-copy helps to understand the Bayesian updating process. In
-@cnj-fig-bayesian-updating we will learn how to write R code to
-reproduce the book's figure as @fig-bayesian-update. To inspect the
-different steps of the updating process is essential to understand
-Bayesian statistics!
+@cnj-fig-bayesian-update we will learn how to write R code to reproduce
+the book's figure as @fig-bayesian-update. To inspect the different
+steps of the updating process is essential to understand Bayesian
+statistics!
 :::
 :::
 
@@ -435,7 +441,9 @@ testing procedure:
 
 ::: my-procedure
 ::: my-procedure-header
-Evaluation procedure
+::: {#prp-bayesian-updating}
+: Model evaluation
+:::
 :::
 
 ::: my-procedure-container
@@ -895,6 +903,7 @@ tbl6 %>%
   ggplot2::scale_x_continuous("proportion water", breaks = c(0, .5, 1)) + 
   ggplot2::scale_y_continuous("plausibility", breaks = NULL) + 
   ggplot2::theme(panel.grid = ggplot2::element_blank()) + 
+  ggplot2::theme_bw() +
   ggplot2::facet_wrap(~ strip, scales = "free_y") 
 
 ```
@@ -1028,7 +1037,7 @@ with $16\%$ a pretty low probability.
 
 To get a better idea what the best estimation of the probability is, we
 could vary systematically the $p$ value and look for the maximum. A
-demonstration how this is done can be seen in @sec-calcu-10-probs. It
+demonstration how this is done can be seen in @cnj-calcu-10-probs. It
 shows a maximum at $prob = 0.7$.
 :::
 :::
@@ -1388,65 +1397,72 @@ $$
 :::
 :::
 
-## I STOPPED HERE!! SECOND PASS (2023-10-28) {.unnumbered}
 
-::: callout-important
-###### Key lesson
 
+::: my-important
+::: my-important-header
+Key lesson about Bayes' theorem
+:::
+
+::: my-important-container
 The posterior is proportional to the product of the prior and the
 probability of the data.
 :::
+:::
 
-> \[E\]ach specific value of *p*, the number of paths through the garden
-> of forking data is the product of the prior number of paths and the
-> new number of paths. **Multiplication is just compressed counting.**
-> The average probability on the bottom just standardizes the counts so
-> they sum to one. (emphasis is mine)
-
-> \[The following graph\] illustrates the multiplicative interaction of
-> a prior and a probability of data. On each row, a prior on the left is
+> @fig-2-6-book "illustrates the multiplicative interaction of a prior
+> and a probability of data. On each row, a prior on the left is
 > multiplied by the probability of data in the middle to produce a
 > posterior on the right. The probability of data in each case is the
 > same. The priors however vary. As a result, the posterior
-> distributions vary.
+> distributions vary." ([McElreath, 2020, p.
+> 38](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=57&annotation=MRV5EKMJ))
 
-![Figure 2.6 of the original book](img/SR2-fig2_6-min.jpg){#fig-2-6-book
+![The original Figure 2.6 from the
+book](img/SR2-fig2_6-min.jpg){#fig-2-6-book
 fig-alt="The posterior distribution as a product of the prior distribution and likelihood. Top: A flat prior constructs a posterior that is simply proportional to the likelihood. Middle: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. Bottom: A peaked prior that shifts and skews the posterior, relative to the likelihood."}
+
+#### TIDYVERSE
 
 For my understanding it is important to reproduce the above graph with R
 code as it is shown in the next section.
 
-#### Tidyverse
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-2-6-book}
+: The posterior distribution as a product of the prior distribution and
+likelihood
+:::
+:::
 
-> \[The following graph\] illustrates the multiplicative interaction of
-> a prior and a probability of data. On each row, a prior on the left is
-> multiplied by the probability of data in the middle to produce a
-> posterior on the right. The probability of data in each case is the
-> same. The priors however vary. As a result, the posterior
-> distributions vary.
-
+::: my-r-code-container
 ```{r}
-#| label: prepare-model
-#| attr-source: '#lst-prepare-model lst-cap="The posterior distribution as a product of the prior distribution and likelihood."'
+#| label: prepare-fig-2-6-book
 
 sequence_length <- 1e3
 
 d <-
-  tibble(probability = seq(from = 0, to = 1, length.out = sequence_length)) %>% 
-  expand_grid(row = c("flat", "stepped", "Laplace"))  %>% 
-  arrange(row, probability) %>% 
-  mutate(prior = ifelse(row == "flat", 1,
-                        ifelse(row == "stepped", rep(0:1, each = sequence_length / 2),
-                               exp(-abs(probability - 0.5) / .25) / ( 2 * 0.25))),
-         likelihood = dbinom(x = 6, size = 9, prob = probability)) %>% 
-  group_by(row) %>% 
-  mutate(posterior = prior * likelihood / sum(prior * likelihood)) %>% 
-  pivot_longer(prior:posterior)  %>% 
-  ungroup() %>% 
-  mutate(name = factor(name, levels = c("prior", "likelihood", "posterior")),
-         row  = factor(row, levels = c("flat", "stepped", "Laplace")))
+  tibble::tibble(probability = seq(from = 0, to = 1, 
+                                   length.out = sequence_length)) %>% 
+  tidyr::expand_grid(row = c("flat", "stepped", "Laplace"))  %>% 
+  dplyr::arrange(row, probability) %>% 
+  dplyr::mutate(
+      prior = ifelse(row == "flat", 1,
+              ifelse(row == "stepped", rep(0:1, each = sequence_length / 2),
+                    exp(-abs(probability - 0.5) / .25) / ( 2 * 0.25))),
+      likelihood = dbinom(x = 6, size = 9, prob = probability)) %>% 
+  dplyr::group_by(row) %>% 
+  dplyr::mutate(posterior = prior * likelihood / sum(prior * likelihood)) %>% 
+  tidyr::pivot_longer(prior:posterior)  %>% 
+  dplyr::ungroup() %>% 
+  dplyr::mutate(
+      name = forcats::fct(name, levels = c("prior", "likelihood", "posterior")),
+      row  = forcats::fct(row, levels = c("flat", "stepped", "Laplace")))
 
 ```
+:::
+:::
 
 In comparison to my very detailed code annotations of
 @fig-bayesian-update there are different lines of code, but generally
@@ -1459,435 +1475,358 @@ use the elegant and powerful syntax from [Thomas Lin
 Pedersen](https://www.data-imaginist.com/)'s (2022) [patchwork
 package](https://patchwork.data-imaginist.com/) to combine them."
 
-```{r}
-#| label: fig-plot-model
-#| fig-cap: "Figure 2.6 from book reproduced with tidyverse code shows the posterior distribution as a product of the prior distribution and likelihood. Top: A flat prior constructs a posterior that is simply proportional to the likelihood. Middle: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. Bottom: A peaked prior that shifts and skews the posterior, relative to the likelihood. Cormpare it with @fig-2-6-book."
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-plot-2-6-book}
+: Reproduction of book's @fig-2-6-book
+:::
+:::
 
-library(patchwork)
+::: my-r-code-container
+```{r}
+#| label: fig-plot-2-6-book
+#| fig-cap: "This is the reproduction of @fig-2-6-book from the book coded with tidyverse approach. It shows the posterior distribution as a product of the prior distribution and likelihood. TOP: A flat prior constructs a posterior that is simply proportional to the likelihood. MIDDLE: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. BOTTOM: A peaked prior that shifts and skews the posterior, relative to the likelihood."
 
 p1 <-
   d %>%
-  filter(row == "flat") %>% 
-  ggplot(aes(x = probability, y = value)) +
-  geom_line() +
-  scale_x_continuous(NULL, breaks = NULL) +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme(panel.grid = element_blank()) +
-  facet_wrap(~ name, scales = "free_y")
+  dplyr::filter(row == "flat") %>% 
+  ggplot2::ggplot(ggplot2::aes(x = probability, y = value)) +
+  ggplot2::geom_line() +
+  ggplot2::scale_x_continuous(NULL, breaks = NULL) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::theme(panel.grid = element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ name, scales = "free_y")
 
 p2 <-
   d %>%
-  filter(row == "stepped") %>% 
-  ggplot(aes(x = probability, y = value)) +
-  geom_line() +
-  scale_x_continuous(NULL, breaks = NULL) +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme(panel.grid = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_blank()) +
-  facet_wrap(~ name, scales = "free_y")
+  dplyr::filter(row == "stepped") %>% 
+  ggplot2::ggplot(ggplot2::aes(x = probability, y = value)) +
+  ggplot2::geom_line() +
+  ggplot2::scale_x_continuous(NULL, breaks = NULL) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank(),
+        strip.background = ggplot2::element_blank(),
+        strip.text = ggplot2::element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ name, scales = "free_y")
 
 p3 <-
   d %>%
-  filter(row == "Laplace") %>% 
-  ggplot(aes(x = probability, y = value)) +
-  geom_line() +
-  scale_x_continuous(NULL, breaks = c(0, .5, 1)) +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme(panel.grid = element_blank(),
-        strip.background = element_blank(),
-        strip.text = element_blank()) +
-  facet_wrap(~ name, scales = "free_y")
+  dplyr::filter(row == "Laplace") %>% 
+  ggplot2::ggplot(ggplot2::aes(x = probability, y = value)) +
+  ggplot2::geom_line() +
+  ggplot2::scale_x_continuous(NULL, breaks = c(0, .5, 1)) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank(),
+        strip.background = ggplot2::element_blank(),
+        strip.text = ggplot2::element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ name, scales = "free_y")
 
 # combine
-# library(patchwork) # defined in setup chunk
+library(patchwork) 
 p1 / p2 / p3
 
 ```
+:::
+:::
 
-@fig-plot-model shows that the same likelihood with a different prior
-results in a different posterior.
+@fig-plot-2-6-book replicates @fig-2-6-book. It shows that the same
+likelihood with a different prior results in a different posterior.
 
 ### Motors
 
-#### Original
+#### ORIGINAL
 
-> Recall that your Bayesian model is a machine, a figurative golem. It
-> has built-in definitions for the likelihood, the parameters, and the
-> prior. And then at its heart lies a motor that processes data,
-> producing a posterior distribution. The action of this motor can be
-> thought of as *conditioning* the prior on the data. As explained in
-> the previous section, this conditioning is governed by the rules of
-> probability theory, which defines a uniquely logical posterior for set
-> of assumptions and observations.
->
-> However, knowing the mathematical rule is often of little help,
-> because many of the interesting models in contemporary science cannot
-> be conditioned formally, no matter your skill in mathematics. And
-> while some broadly useful models like linear regression can be
-> conditioned formally, this is only possible if you constrain your
-> choice of prior to special forms that are easy to do mathematics with.
-> We'd like to avoid forced modeling choices of this kind, instead
-> favoring conditioning engines that can accommodate whichever prior is
-> most useful for inference.
->
-> What this means is that various numerical techniques are needed to
-> approximate the mathematics that follows from the definition of Bayes'
-> theorem. In this book, you'll meet three different conditioning
-> engines, numerical techniques for computing posterior distributions:
+The production of the posterior distribution is driven by a motor that
+conditions with it calculation the prior to the data. However, besides
+of simple and special restrictive models, often there is no formal
+mathematical solution. Therefore we need numerical techniques to
+approximate the mathematics.
 
-What are the numerical techniques for computing posterior distributions
-explained in the book?
-
-1.  Grid approximation
-2.  Quadratic approximation
-3.  Markov chain Monte Carlo (MCMC)
-
-> There are many other engines, and new ones are being invented all the
-> time. But the three you'll get to know here are common and widely
-> useful. (p. 39)
-
-::: callout-tip
-**Rethinking: How you fit the model is part of the model**. Earlier in
-this chapter, I implicitly defined the model as a composite of a prior
-and a likelihood. That definition is typical. But in practical terms, we
-should also consider how the model is fit to data as part of the model.
-In very simple problems, like the globe tossing example that consumes
-this chapter, calculation of the posterior density is trivial and
-foolproof. In even moderately complex problems, however, the details of
-fitting the model to data force us to recognize that our numerical
-technique influences our inferences. This is because different mistakes
-and compromises arise under different techniques. The same model fit to
-the same data using different techniques may produce different answers.
-When something goes wrong, every piece of the machine may be suspect.
-And so our golems carry with them their updating engines, as much slaves
-to their engineering as they are to the priors and likelihoods we
-program into them.
+::: my-objectives
+::: my-objectives-header
+Learning three different conditioning engines
 :::
 
-#### Tidyverse
+::: my-objectives-container
+> “In this book, you’ll meet three different conditioning engines, numerical techniques for computing posterior distributions: 
+>
+> (1) Grid approximation 
+> (2) Quadratic approximation 
+> (3) Markov chain Monte Carlo (MCMC) 
+>
+> There are many other engines, and new ones are being invented all the time. But the three you’ll get to know here are common and widely useful. In addition, as you learn them, you’ll also learn principles that will help you understand other techniques.” ([McElreath, 2020, p. 39](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=58&annotation=4CYVRVT6))
 
-In my own words: Processing the built-in definitions for the likelihood,
-the parameters, and the prior produces the posterior distribution. This
-process is governed by the rule of probability theory. But knowing the
-mathematics does generally not help for two reasons:
-
--   Many of the interesting models in contemporary science cannot be
-    conditioned formally
--   Though some broadly useful models like linear regression can be
-    conditioned formally, this is only possible if you constrain your
-    choice of prior to special forms that are easy to do mathematics
-    with.
-
-Therefore are various numerical techniques needed to approximate the
-mathematics that follows from the definition of Bayes' theorem. From the
-three widely useful methods (grid approximation, quadratic approximation
-and MCMC) covered in the SR2-book the tidyverse version of this material
-concentrates on using the [{**brms**}
-package](https://paul-buerkner.github.io/brms/).
-
-::: {.callout-caution style="color: orange;"}
-###### Jumping quickly into MCMC
-
-> The consequence is that this version will jump rather quickly into
-> MCMC. This will be awkward at times because it will force us to
-> contend with technical issues in earlier problems in the text than
-> McElreath originally did.
 :::
+:::
+
+::: my-watch-out
+::: my-watch-out-header
+Fitting the model is part of the model
+:::
+
+::: my-watch-out-container
+> "... the details of fitting the model to data force us to recognize
+> that our numerical technique influences our inferences. This is
+> because different mistakes and compromises arise under different
+> techniques. The same model fit to the same data using different
+> techniques may produce different answers." ([McElreath, 2020, p.
+> 39](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=58&annotation=KY35YK8M))
+:::
+:::
+
+#### TIDYVERSE (empty)
 
 ### Grid approximation
 
-#### Original
+#### ORIGINAL
 
-> While most parameters are *continuous*, capable of taking on an
-> infinite number of values, it turns out that we can achieve an
-> excellent approximation of the continuous posterior distribution by
-> considering only a finite grid of parameter values. At any particular
-> value of a parameter, *p*', it's a simple matter to compute the
-> posterior probability: just multiply the prior probability of *p*' by
-> the likelihood at *p*'. Repeating this procedure for each value in the
-> grid generates an approximate picture of the exact posterior
-> distribution. This procedure is called **GRID APPROXIMATION**.
+> "One of the simplest conditioning techniques is grid approximation.
+> While most parameters are continuous, capable of taking on an infinite
+> number of values, it turns out that we can achieve an excellent
+> approximation of the continuous posterior distribution by considering
+> only a finite grid of parameter values." ([McElreath, 2020, p.
+> 39](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=58&annotation=53UNNMMU))
 
-Grid approximation is very useful as a pedagogical tool. But in most of
-your real modeling, grid approximation isn't practical because it scales
-poorly, as the number of parameters increases.
+Grid approximation is very useful as a pedagogical tool. But often it
+isn't practical because it scales poorly, as the number of parameters
+increases.
 
-1.  Define the grid. This means you decide how many points to use in
-    estimating the posterior, and then you make a list of the parameter
-    values on the grid.
-2.  Compute the value of the prior at each parameter value on the grid.
-3.  Compute the likelihood at each parameter value.
-4.  Compute the unstandardized posterior at each parameter value, by
-    multiplying the prior by the likelihood.
-5.  Finally, standardize the posterior, by dividing each value by the
-    sum of all values.
+::: my-procedure
+::: my-procedure-header
+::: {#prp-grid-approx}
+: Grid Approximation
+:::
+:::
 
-In the globe tossing model the five steps are as follows:
+::: my-procedure-container
+> “Here is the recipe: 
+>
+> (1) Define the grid. This means you decide how many points to use in estimating the posterior, and then you make a list of the parameter values on the grid. 
+> (2) Compute the value of the prior at each parameter value on the grid. 
+> (3) Compute the likelihood at each parameter value. 
+> (4) Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood. 
+> (5) Finally, standardize the posterior, by dividing each value by the sum of all values.” ([McElreath, 2020, p. 40](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=59&annotation=23IXIX8K))
 
+:::
+:::
+
+I will outline in the globe tossing model the necessary steps for grid approximation. In addition to the 5 and 20 points approximation I will add 100 and 1000 points to see how the inferences changes with higher values.
+
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-steps}
+: 6 Steps for Grid Approximation for the Globe Tossing Model
+:::
+:::
+
+::: my-r-code-container
 ```{r}
-#| label: fig-grid-approx-base1
-#| fig-cap: "Grid Approximation with 20 points with `prior = 1`"
+#| label: fig-grid-approx-5-and-20
+#| fig-cap: "Grid Approximation with 5 and 20 points. You can see that the approximation gets a lot better with 20 than with 5 points. After 100 points there is no much improvement. This conforms to McElreath remark that 'there won’t be much change in inference after the first 100.' ([McElreath, 2020, p. 40](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=59&annotation=4K3FRPY5))"
 
 # 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
+p_grid5 <- seq(from = 0, to = 1, length.out = 5)
+p_grid20 <- seq(from = 0, to = 1, length.out = 20)
+p_grid100 <- seq(from = 0, to = 1, length.out = 100)
+p_grid1000 <- seq(from = 0, to = 1, length.out = 1000)
 
 # 2. define prior
-prior <- rep(1, 20)
+prior5 <- rep(1, 5)
+prior20 <- rep(1, 20)
+prior100 <- rep(1, 100)
+prior1000 <- rep(1, 1000)
 
 # 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
+likelihood5 <- dbinom(x = 6, size = 9, prob = p_grid5)
+likelihood20 <- dbinom(x = 6, size = 9, prob = p_grid20)
+likelihood100 <- dbinom(x = 6, size = 9, prob = p_grid100)
+likelihood1000 <- dbinom(x = 6, size = 9, prob = p_grid1000)
 
 # 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
+unstd.posterior5 <- likelihood5 * prior5
+unstd.posterior20 <- likelihood20 * prior20
+unstd.posterior100 <- likelihood100 * prior100
+unstd.posterior1000 <- likelihood1000 * prior1000
 
 # 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
+posterior5 <- unstd.posterior5 / sum(unstd.posterior5)
+posterior20 <- unstd.posterior20 / sum(unstd.posterior20)
+posterior100 <- unstd.posterior100 / sum(unstd.posterior100)
+posterior1000 <- unstd.posterior1000 / sum(unstd.posterior1000)
 
-# 6 display the posterior distribution
-## R code 2.4
-plot(p_grid, posterior,
+
+# 6. display posterior distributions
+op <- par(mfrow = c(2, 2))
+
+## R code 2.4 for 5 points
+plot(p_grid5, posterior5,
+  type = "b",
+  xlab = "probability of water", ylab = "posterior probability"
+)
+mtext('5 points with "prior = 1"')
+
+## R code 2.4 for 20 points
+plot(p_grid20, posterior20,
   type = "b",
   xlab = "probability of water", ylab = "posterior probability"
 )
 mtext('20 points with "prior = 1"')
 
+## R code 2.4 for 100 points
+plot(p_grid100, posterior100,
+  type = "b",
+  xlab = "probability of water", ylab = "posterior probability"
+)
+mtext('100 points with "prior = 1"')
+
+## R code 2.4 for 1000 points
+plot(p_grid1000, posterior1000,
+  type = "b",
+  xlab = "probability of water", ylab = "posterior probability"
+)
+mtext('1000 points with "prior = 1"')
+
+par(op)
 
 ```
 
-``` r
-#| label: lst-own-tidyverse
-#| lst-cap: "My own tidyverse plot <-  just for learning purposes"
+:::
+:::
 
-# # instead of books R code 2.4 I will use a tidyverse approach
-# df <- dplyr::bind_cols("prob" = p_grid, "post" = posterior)
-# ggplot2::ggplot(df, ggplot2::aes(x = prob, y = post)) +
-#     ggplot2::geom_line() +
-#     ggplot2::geom_point()
-```
+### TIDYVERSE
 
-##### Change likelihood parameters
+Instead of just to replicate the globe-tossing steps with tidyverse code as in @cnj-globe-tossing-steps I will experiment with different priors to see their influences against the posterior distribution.
+
+@fig-different-priors uses Kurz’ last code chunk in his [grid approximation section](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#grid-approximation). But I have adapted it to include the three uniform priors and to show also the (small) effect of 100 points grids.
+
+
+:::::{.my-experiment}
+:::{.my-experiment-header}
+Experiment: The effect of different priors and of different numbers of grid points.
+:::
+::::{.my-experiment-container}
+
 
 The parameters for the calculated likelihood is based on the binomial
 distribution and is shaping the above plot:
 
--   x = number of water events `W`
--   size = number of sample trials = number of observations
--   prob = success probability on each trial = probability of `W` (water
+-   `x` = number of water events $W$
+-   `size` = number of sample trials = number of observations
+-   `prob` = success probability on each trial = probability of $W$ (water
     event)
 
-It does not matter in the code for @fig-grid-approx-base1 what prior
-probability is chosen in the range from 0 to 1, if the probability of
-`W` is greater than zero and --- and by definition of the binomial
-function --- equal for all 20 events. This does not only conform to
-values but also for functions.
 
-```{r}
-#| label: fig-grid-approx-base1a
-#| fig-cap: "Grid Approximation with 20 points with `prior = 0.1`"
+I will only change `prob` and approximate the five different prior variants with 5, 20 and 100 points. I want to see how the effects of different priors on the posterior distribution by different number of events (grid points). The priors I will use are uniform priors of $0.1$, $0.5$ and $0.9$, and the two suggestion by McElreath $ifelse(p\_grid < 0.5, 0, 1)$ and $exp(-5 * abs(p\_grid - 0.5))$.
 
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- rep(0.1, 20)
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points with "prior = 0.1"')
-```
-
-##### Changing prior parameters
-
-To see the influence of the prior probability on the posterior
-probability by using the same likelihood the book offers two code
-snippets. Replace the definition of the prior from the `grid-approx-a`
-chunk (number 2 in the code snippet) --- one at a time --- with the
-following lines of code:
-
-``` r
-#| label: lst-different-priors
-#| lst-cap: "Using two different priors"
-prior <- ifelse(p_grid < 0.5, 0, 1)
-prior <- exp(-5 * abs(p_grid - 0.5))
-```
-
-The rest of the code remains the same.
-
-```{r}
-#| label: fig-grid-approx-base2
-#| fig-cap: "Grid Approximation with prior of `ifelse(p_grid < 0.5, 0, 1)`"
-
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- ifelse(p_grid < 0.5, 0, 1)
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points with a prior of "ifelse(p_grid < 0.5, 0, 1)"')
-```
-
-@fig-grid-approx-base2 employs as prior `ifelse(p_grid < 0.5, 0, 1)`,
-meaning that if `prob` is smaller than 0.5 use zero as prior otherwise
-1.
-
-```{r}
-#| label: fig-grid-approx-base3
-#| fig-cap: "Grid Approximation with prior of `exp(-5 * abs(p_grid - 0.5))`"
-
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
-
-# 2. define prior
-prior <- exp(-5 * abs(p_grid - 0.5))
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 6, size = 9, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points with prior of "exp(-5 * abs(p_grid - 0.5))"')
-```
-
-##### Disadvantage
-
-Grid approximation is very expansive. The number of unique values to
-consider in the grid grows rapidly as the number of parameters in the
-model increases. For the single-parameter globe tossing model, it's no
-problem to compute a grid of 100 or 1000 values. But for two parameters
-approximated by 100 values each, that's already 100^2^ = 10.000 values
-to compute. For 10 parameters, the grid becomes many billions of values.
-These days, it's routine to have models with hundreds or thousands of
-parameters. The grid approximation strategy scales very poorly with
-model complexity, so it won't get us very far. But it is a very useful
-didactically as it help to understand the general principle.
-
-#### Reconsideration
-
-::: callout-caution
-###### Puzzlement
-
-As demonstrated in @fig-plot-model a different prior with the same
-likelihood has different posteriors. So the curves of all three examples
-are different.
-
-But what I do not understand is the fact that in the third example the
-result is very different from the other two priors: About 0.5 and not
-0.7. My explication: I have only 9 trials. With many more trials the
-difference in the density would balance out bit by bit.
-
-But it turns out, that all three show about the same maximum I thought
-that the chosen prior did not have any effect the outcome. But it turns
-out that different priors results in different PDFs.\
-My explication: I have only 9 trials. With many more trials the
-difference in the density would balance out bit by bit.
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-globe-tossing-different-priors}
+: Globe tossing with different priors and grid points
+::::::
 :::
-
-I am going to test my hypothesis. To demonstrate that with more Bayesian
-updates we will approach the correct result 0b about 0.7 I will work
-with 1000 samples.
+::::{.my-r-code-container}
 
 ```{r}
-#| label: fig-grid-approx-base4
-#| fig-cap: "Grid Approximation with prior of `exp(-5 * abs(p_grid - 0.5))`"
+#| label: fig-different-priors
+#| fig-cap: "The effect of different priors and of different numbers of grid points."
+#| fig-height: 12
 
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
 
-# 2. define prior
-prior <- exp(-5 * abs(p_grid - 0.5))
-
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 600, size = 1e3, prob = p_grid)
-
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points for a 1000 samples with prior of "exp(-5 * abs(p_grid - 0.5))"')
+# prepare the plot by producing the data
+tibble::tibble(n_points = c(5, 20, 100)) %>% 
+  dplyr::mutate(p_grid = purrr::map(n_points, ~seq(from = 0, to = 1, 
+                                            length.out = .))) %>% 
+  tidyr::unnest(p_grid) %>% 
+  tidyr::expand_grid(priors = c("0.1",
+                         "0.5",
+                         "0.9",
+                         "ifelse(p_grid < 0.5, 0, 1)", 
+                         "exp(-5 * abs(p_grid - 0.5))")) %>% 
+  dplyr::mutate(prior = dplyr::case_when(
+    priors == "0.1" ~ 0.1,
+    priors == "0.5" ~ 0.5,
+    priors == "0.9" ~ 0.9,
+    priors == "ifelse(p_grid < 0.5, 0, 1)" ~ ifelse(p_grid < 0.5, 0, 1),
+    priors == "exp(-5 * abs(p_grid - 0.5))" ~ exp(-5 * abs(p_grid - 0.5))
+  )) |> 
+  dplyr::mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>% 
+  dplyr::mutate(posterior = likelihood * prior / sum(likelihood * prior)) %>% 
+  dplyr::mutate(n_points = stringr::str_c("# points = ", n_points),
+         priors   = stringr::str_c("prior = ", priors)) %>% 
+  
+  # plot the data
+  ggplot2::ggplot(ggplot2::aes(x = p_grid, y = posterior)) +
+  ggplot2::geom_line() +
+  ggplot2::geom_point() +
+  ggplot2::labs(x = "probability of water",
+       y = "posterior probability") +
+  ggplot2::theme(panel.grid = element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_grid(priors ~ n_points, scales = "free")
 ```
 
-In fact the posterior distribution is nearer to the correct result of
-0.7. In @fig-grid-approx-base3 we have a maximum at about 0.52 and in
-@fig-grid-approx-base4 we have already 0.58. We should also taking into
-account that with more samples our proportion of W to L will approach
-the real Water:Land proportion of about 0.71 too.
+::::
+:::::
+
+Inspecting the output we can draw some conclusions:
+
+It does not matter what uniform prior
+probability is chosen in the range from 0 to 1, if the probability of
+$W$ is greater than zero and --- and by definition of the binomial
+function --- equal for all events (grid points). This does not only conform to
+values but also for functions that generates values.
+
+The only outlier in this sequence of different priors is the exponential function. But even this prior will finally give way if the number of observed events (approaching the real probability of 0.71) rises. 
 
 I will demonstrate this with 10000 samples and a W:L proportion of 7:3.
 
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-globe-tossing-many-samples}
+: Diminishing effect of the prior with rising amout of data
+::::::
+:::
+::::{.my-r-code-container}
+
 ```{r}
-#| label: fig-grid-approx-base5
-#| fig-cap: "Grid Approximation with prior of `exp(-5 * abs(p_grid - 0.5))`"
+#| label: fig-grid-many-samples
+#| fig-cap: "Grid Approximation with prior of exp(-5 * abs(p_grid - 0.5)) drawing 10,000 samples with a W proportion of 0.7"
 
-# 1. define grid
-p_grid <- seq(from = 0, to = 1, length.out = 20)
+d <-
+    # 1.  define grid
+    tibble(p_grid = seq(from = 0, to = 1, length.out = 100),
+    # 2. define prior          
+           prior  = 1) %>%      
+    # 3. compute likelihood at each value in grid
+    mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>%  
+    # 4. compute product of likelihood and prior
+    mutate(unstd_posterior = likelihood * prior) %>% 
+    # 5. standardize the posterior, so it sums to 1
+    mutate(posterior = unstd_posterior / sum(unstd_posterior))   
 
-# 2. define prior
-prior <- exp(-5 * abs(p_grid - 0.5))
+  d %>% 
+  ggplot(aes(x = p_grid, y = posterior)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "100 point grid approximation of 10000 samples with prior 
+       of exp(-5 * abs(p_grid - 0.5)) and a proportion of W:L = 7:3.",
+       x = "probability of water",
+       y = "posterior probability") +
+  theme(panel.grid = element_blank()) +
+  theme_bw()
 
-# 3. compute likelihood at each value in grid
-likelihood <- dbinom(x = 7e3, size = 1e4, prob = p_grid)
 
-# 4. compute product of likelihood and prior
-unstd.posterior <- likelihood * prior
-
-# 5. standardize the posterior, so it sums to 1
-posterior <- unstd.posterior / sum(unstd.posterior)
-
-# 6 display the posterior distribution 
-## R code 2.4
-plot(p_grid, posterior,
-  type = "b",
-  xlab = "probability of water", ylab = "posterior probability"
-)
-mtext('20 points for a 10000 samples with prior of "exp(-5 * abs(p_grid - 0.5))" and W:L = 7:3.' )
 ```
+
+
+::::
+:::::
 
 In this example the maximum of probability is already 0.68! We can say
 that **with every chosen prior we will get finally the correct
@@ -1901,154 +1840,22 @@ process of approximation has not reached a state where the probability
 maximum is near the correct result. The problem is: Most time we do not
 know the correct solution and can't therefore decide if we have had
 enough Bayesian updates.
+::::
+:::::
 
-#### Tidyverse
-
-We just employed grid approximation in the @fig-plot-model chunk. To get
-nice smooth lines, we computed in the @lst-prepare-model chunk the
-posterior over 1,000 evenly-spaced points on the probability space. Here
-we'll prepare for the left panel of Figure 2.7 with just 5 evenly-spaced
-points.
-
-As a reminder I will add comments for the five steps for the grid
-approximation procedure. As it is explained in detail on several other
-places I will not produce code annotations.
-
-##### Produce grid data
-
-```{r}
-#| label: grid-approx1
-
-(
-  d <-
-    # 1. define grid
-    tibble(p_grid = seq(from = 0, to = 1, length.out = 5), 
-           
-    # 2. define (compute) prior  
-           prior  = 1) %>%
-        
-    # 3. compute likelihood at each value in grid
-    mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>% 
-        
-    # 4. compute product of likelihood and prior
-    mutate(unstd_posterior = likelihood * prior) %>%  
-        
-    # 5. standardize the posterior, so it sums to 1
-    mutate(posterior = unstd_posterior / sum(unstd_posterior))   
-)
-
-```
-
-##### Plot with only 5 points
-
-The next step is to plot the above results to get the left panel of
-Figure 2.5
-
-```{r}
-#| label: plot-grid-approx1
-
-p1 <- 
-    d |> 
-    ggplot(aes(x = p_grid, y = posterior)) +
-      geom_point() +
-      geom_line() +
-      labs(subtitle = "5 points",
-           x = "probability of water",
-           y = "posterior probability") +
-      theme(panel.grid = element_blank())
-p1
-```
-
-##### Produce grid with 20 points and plot result
-
-Now the same with 20 evenly spaced points to get the right panel of
-Figure 2.7.
-
-```{r}
-#| label: grid-approx2
-
-p2 <-
-  tibble(p_grid = seq(from = 0, to = 1, length.out = 20),
-         prior  = 1) %>%
-  mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>%
-  mutate(unstd_posterior = likelihood * prior) %>%
-  mutate(posterior = unstd_posterior / sum(unstd_posterior)) %>% 
-  
-  ggplot(aes(x = p_grid, y = posterior)) +
-  geom_point() +
-  geom_line() +
-  labs(subtitle = "20 points",
-       x = "probability of water",
-       y = "posterior probability") +
-  theme(panel.grid = element_blank())
-p2
-```
-
-##### Combine plots with {patchwork}
-
-And finally we display the two graphics with the `+` operator of
-{**patchwork**} side by side and annotate the plot with
-`patchwork::plot_annotation()`.
-
-```{r}
-#| label: plot-grid-approx-b2
-
-# needs library(patchwork) = defined in setup chunk
-p1 + p2 + plot_annotation(title = "More grid points make for smoother approximations")
-```
-
-##### Using differnt prior functions
-
-To see the influence of the prior probability on the posterior
-probability by using the same likelihood the book offers two code
-snippets. Replace the definition of the prior (number 2 in the code
-snippet) --- one at a time --- with the following lines of code:
-
-```{r}
-#| label: lst-different-priors
-#| lst-cap: "Two other prior functions to try out what happens with different priors."
-
-prior <- ifelse(p_grid < 0.5, 0, 1)
-prior <- exp(-5 * abs(p_grid - 0.5))
-```
-
-What follows is a condensed way to make the four plots all at once. It
-is a pretty complex program snippet not only using
-`tidyr::expand_grid()` --- as already explained ---, but also
-`tidyr::unnest()` which expands a list-column containing data frames
-into rows and columns.
-
-```{r}
-#| label: fig-different-priors-5-and-20-points
-#| fig-cap: "The effect of different priors and of different amounts of grid points."
-
-
-# prepare the plot by producing the data
-tibble(n_points = c(5, 20)) %>% 
-  mutate(p_grid = purrr::map(n_points, ~seq(from = 0, to = 1, length.out = .))) %>% 
-  unnest(p_grid) %>% 
-  expand_grid(priors = c("ifelse(p_grid < 0.5, 0, 1)", "exp(-5 * abs(p_grid - 0.5))")) %>% 
-  mutate(prior = ifelse(priors == "ifelse(p_grid < 0.5, 0, 1)", 
-                        ifelse(p_grid < 0.5, 0, 1),
-                        exp(-5 * abs(p_grid - 0.5)))) %>% 
-  mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>% 
-  mutate(posterior = likelihood * prior / sum(likelihood * prior)) %>% 
-  mutate(n_points = str_c("# points = ", n_points),
-         priors   = str_c("prior = ", priors)) %>% 
-  
-  # plot the data
-  ggplot(aes(x = p_grid, y = posterior)) +
-  geom_line() +
-  geom_point() +
-  labs(x = "probability of water",
-       y = "posterior probability") +
-  theme(panel.grid = element_blank()) +
-  facet_grid(n_points ~ priors, scales = "free")
-```
 
 ### Quadratic Approximation
 
-#### Original
+Grid approximation is very costly.
+
+> “The reason is that the number of unique values to consider in the grid grows rapidly as the number of parameters in your model increases. For the single-parameter globe tossing model, it’s no problem to compute a grid of 100 or 1000 values. But for two parameters approximated by 100 values each, that’s already 100^2 = 10,000 values to compute. For 10 parameters, the grid becomes many billions of values. These days, it’s routine to have models with hundreds or thousands of parameters.” ” ([McElreath, 2020, p. 41f](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=60&annotation=7E79NMUP))
+
+Even grid approximation strategy scales poorly with model complexity it is very valuable for pedagogical reason. The two other strategies (Quadratic approximation and MCMC Methods) are better understood after examining in detail how grid approximation works.
+
+
+## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
+
+#### ORIGINAL
 
 ##### Concept
 

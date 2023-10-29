@@ -32,7 +32,7 @@ format:
     number-sections: true
     toc-depth: 5
     toc-expand: 3
-    code-fold: false
+    code-fold: true
     code-tools: true
     code-link: true
     code-overflow: scroll
