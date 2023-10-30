@@ -1,4 +1,4 @@
-# Sampling the Imaginary {#sec-sampling-the-imaginary}
+# Sampling the Imaginary {#sec-chap03}
 
 ```{r}
 #| label: setup

@@ -200,7 +200,7 @@ following way:
 :::
 
 |     |              |     |                    |     |              |     |            |     |
-|-----|--------------|-----|--------------------|-----|--------------|-----|------------|-----|
+|--------|--------|--------|--------|--------|--------|--------|--------|--------|
 |     |              |     |                    |     |              |     |            |     |
 |     | Conjecture   |     | Ways to produce ⚫ |     | Prior counts |     | New count  |     |
 |     | \[⚪⚪⚪⚪\] |     | 0                  |     | 0            |     | 0 × 0 = 0  |     |
@@ -441,9 +441,11 @@ testing procedure:
 
 ::: my-procedure
 ::: my-procedure-header
-::: {#prp-bayesian-updating}
+<div>
+
 : Model evaluation
-:::
+
+</div>
 :::
 
 ::: my-procedure-container
@@ -522,7 +524,7 @@ number of trials, `n_trials`, and the cumulative number of successes,
 
 (
   d <-
-  d %>% 
+  d |>  
   dplyr::mutate(n_trials  = 1:9,
          n_success = cumsum(toss == "w"))
   )
@@ -573,19 +575,19 @@ d <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |>
 
 ## (1) create tibble from all input combinations ################
 sequence_length <- 50  
-d %>%                 
+d |>                  
   tidyr::expand_grid(p_water = seq(from = 0, to = 1,  
-                            length.out = sequence_length)) %>%  
+                            length.out = sequence_length)) |>   
     
 ## (2) group data by the `p-water` parameter ####################
-  dplyr::group_by(p_water) %>% 
+  dplyr::group_by(p_water) |>  
 
 ## (3) create columns filled with the value of the previous rows #####
   dplyr::mutate(lagged_n_trials  = dplyr::lag(n_trials, default = 1), 
-         lagged_n_success = dplyr::lag(n_success, default = 1)) %>% 
+         lagged_n_success = dplyr::lag(n_success, default = 1)) |>  
 
 ## (4) restore the original ungrouped data structure #######
-  dplyr::ungroup() %>% 
+  dplyr::ungroup() |>  
 
 ## (5) calculate prior and likelihood & store values ######
   dplyr::mutate(prior      = ifelse(n_trials == 1, .5, 
@@ -595,12 +597,12 @@ d %>%
          likelihood = dbinom(x    = n_success,  
                              size = n_trials,   
                              prob = p_water),   
-         strip      = stringr::str_c("n = ", n_trials)) %>%  
+         strip      = stringr::str_c("n = ", n_trials)) |>   
   
 ## (6) normalize prior and likelihood ##########################
-  dplyr::group_by(n_trials) %>% 
+  dplyr::group_by(n_trials) |>  
   dplyr::mutate(prior      = prior / sum(prior),               
-         likelihood = likelihood / sum(likelihood)) %>% 
+         likelihood = likelihood / sum(likelihood)) |>  
   
   ## (7) plot the result ########################################
   ggplot2::ggplot(ggplot2::aes(x = p_water)) + 
@@ -643,7 +645,7 @@ tbl <- tibble::tibble(toss = c("w", "l", "w", "w", "w", "l", "w", "l", "w")) |>
     dplyr::mutate(n_trials  = 1:9, n_success = cumsum(toss == "w"))
 sequence_length <- 50
 
-tbl %>% 
+tbl |>  
   tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
                             length.out = sequence_length))
 ```
@@ -668,13 +670,13 @@ after 50 records the parameter `p_water` is repeating its value.
 ```{r}
 #| label: bayesian-update-2
 
-tbl1 <- tbl %>% 
+tbl1 <- tbl |>  
   tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
-                            length.out = sequence_length)) %>% 
+                            length.out = sequence_length)) |>  
     
-  dplyr::group_by(p_water) %>% 
+  dplyr::group_by(p_water) |>  
   dplyr::mutate(lagged_n_trials  = dplyr::lag(n_trials, default = 1),
-         lagged_n_success = dplyr::lag(n_success, default = 1)) %>% 
+         lagged_n_success = dplyr::lag(n_success, default = 1)) |>  
   dplyr::ungroup() |> 
     
 
@@ -703,7 +705,7 @@ ungrouped version.
 ```{r}
 #| label: bayesian-update-2a
 
-tbl2 <- tbl %>% 
+tbl2 <- tbl |>  
   tidyr::expand_grid(p_water = seq(from = 0, to = 1, 
                             length.out = sequence_length)) |> 
     
@@ -824,7 +826,7 @@ This was not done by Kurz. I have tried it but didn't succeed up to now
 ```{r}
 #| label: bayesian-update-5
 
-tbl5 <- tbl1 %>% 
+tbl5 <- tbl1 |>  
   dplyr::mutate(prior      = ifelse(n_trials == 1, .5,
                              dbinom(x    = lagged_n_success, 
                                     size = lagged_n_trials, 
@@ -864,8 +866,8 @@ This metric is important for the comparisons of different probabilities.
 ```{r}
 #| label: bayesian-update-6
 
-tbl6 <- tbl5 %>% 
-  dplyr::group_by(n_trials) %>% 
+tbl6 <- tbl5 |>  
+  dplyr::group_by(n_trials) |>  
   dplyr::mutate(prior      = prior / sum(prior),
          likelihood = likelihood / sum(likelihood))
     
@@ -895,7 +897,7 @@ has no break and no scale (`scales = "free_y"`).
 #| label: fig-bayesian-update-7
 #| fig-cap: "Graphical demonstration: 9 steps of Bayesian updating"
 
-tbl6 %>% 
+tbl6 |>  
   ggplot2::ggplot(ggplot2::aes(x = p_water)) + 
   ggplot2::geom_line(ggplot2::aes(y = prior), 
             linetype = 2) + 
@@ -1193,7 +1195,7 @@ $0.01$
 #| label: fig-likelihood-100-prob
 #| fig-cap: "Likelihood for 100 values of prob, from 0 to 1, by steps of 0.01"
 
-tibble::tibble(prob = seq(from = 0, to = 1, by = .01)) %>% 
+tibble::tibble(prob = seq(from = 0, to = 1, by = .01)) |>  
   ggplot2::ggplot(ggplot2::aes(x = prob, y = dbinom(x = 6, size = 9, prob = prob))) +
   ggplot2::geom_line() +
   ggplot2::labs(x = "probability",
@@ -1240,7 +1242,7 @@ holding $a$ constant:
 #| label: uniform-prior1
 
 tibble::tibble(a = 0,
-       b = c(1, 1.5, 2, 3, 9)) %>% 
+       b = c(1, 1.5, 2, 3, 9)) |>  
   dplyr::mutate(prob = 1 / (b - a))
 ```
 
@@ -1253,10 +1255,10 @@ distribution to calculate the probabilities for a uniform distribution:
 #| fig-cap: "Graphical demonstration that the probability of every value of $p$ is $1$"
 
 tibble::tibble(a = 0,
-       b = c(1, 1.5, 2, 3, 9)) %>% 
-  tidyr::expand_grid(parameter_space = seq(from = 0, to = 9, length.out = 500)) %>% 
+       b = c(1, 1.5, 2, 3, 9)) |>  
+  tidyr::expand_grid(parameter_space = seq(from = 0, to = 9, length.out = 500)) |>  
   dplyr::mutate(prob = dunif(parameter_space, a, b),
-         b    = stringr::str_c("b = ", b)) %>% 
+         b    = stringr::str_c("b = ", b)) |>  
   
   ggplot2::ggplot(ggplot2::aes(x = parameter_space, y = prob)) +
   ggplot2::geom_area() +
@@ -1397,8 +1399,6 @@ $$
 :::
 :::
 
-
-
 ::: my-important
 ::: my-important-header
 Key lesson about Bayes' theorem
@@ -1444,18 +1444,18 @@ sequence_length <- 1e3
 
 d <-
   tibble::tibble(probability = seq(from = 0, to = 1, 
-                                   length.out = sequence_length)) %>% 
-  tidyr::expand_grid(row = c("flat", "stepped", "Laplace"))  %>% 
-  dplyr::arrange(row, probability) %>% 
+                                   length.out = sequence_length)) |>  
+  tidyr::expand_grid(row = c("flat", "stepped", "Laplace"))  |>  
+  dplyr::arrange(row, probability) |>  
   dplyr::mutate(
       prior = ifelse(row == "flat", 1,
               ifelse(row == "stepped", rep(0:1, each = sequence_length / 2),
                     exp(-abs(probability - 0.5) / .25) / ( 2 * 0.25))),
-      likelihood = dbinom(x = 6, size = 9, prob = probability)) %>% 
-  dplyr::group_by(row) %>% 
-  dplyr::mutate(posterior = prior * likelihood / sum(prior * likelihood)) %>% 
-  tidyr::pivot_longer(prior:posterior)  %>% 
-  dplyr::ungroup() %>% 
+      likelihood = dbinom(x = 6, size = 9, prob = probability)) |>  
+  dplyr::group_by(row) |>  
+  dplyr::mutate(posterior = prior * likelihood / sum(prior * likelihood)) |>  
+  tidyr::pivot_longer(prior:posterior)  |>  
+  dplyr::ungroup() |>  
   dplyr::mutate(
       name = forcats::fct(name, levels = c("prior", "likelihood", "posterior")),
       row  = forcats::fct(row, levels = c("flat", "stepped", "Laplace")))
@@ -1488,19 +1488,19 @@ package](https://patchwork.data-imaginist.com/) to combine them."
 #| fig-cap: "This is the reproduction of @fig-2-6-book from the book coded with tidyverse approach. It shows the posterior distribution as a product of the prior distribution and likelihood. TOP: A flat prior constructs a posterior that is simply proportional to the likelihood. MIDDLE: A step prior, assigning zero probability to all values less than 0.5, results in a truncated posterior. BOTTOM: A peaked prior that shifts and skews the posterior, relative to the likelihood."
 
 p1 <-
-  d %>%
-  dplyr::filter(row == "flat") %>% 
+  d |> 
+  dplyr::filter(row == "flat") |>  
   ggplot2::ggplot(ggplot2::aes(x = probability, y = value)) +
   ggplot2::geom_line() +
   ggplot2::scale_x_continuous(NULL, breaks = NULL) +
   ggplot2::scale_y_continuous(NULL, breaks = NULL) +
-  ggplot2::theme(panel.grid = element_blank()) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
   ggplot2::theme_bw() +
   ggplot2::facet_wrap(~ name, scales = "free_y")
 
 p2 <-
-  d %>%
-  dplyr::filter(row == "stepped") %>% 
+  d |> 
+  dplyr::filter(row == "stepped") |>  
   ggplot2::ggplot(ggplot2::aes(x = probability, y = value)) +
   ggplot2::geom_line() +
   ggplot2::scale_x_continuous(NULL, breaks = NULL) +
@@ -1512,8 +1512,8 @@ p2 <-
   ggplot2::facet_wrap(~ name, scales = "free_y")
 
 p3 <-
-  d %>%
-  dplyr::filter(row == "Laplace") %>% 
+  d |> 
+  dplyr::filter(row == "Laplace") |>  
   ggplot2::ggplot(ggplot2::aes(x = probability, y = value)) +
   ggplot2::geom_line() +
   ggplot2::scale_x_continuous(NULL, breaks = c(0, .5, 1)) +
@@ -1551,14 +1551,19 @@ Learning three different conditioning engines
 :::
 
 ::: my-objectives-container
-> “In this book, you’ll meet three different conditioning engines, numerical techniques for computing posterior distributions: 
+> "In this book, you'll meet three different conditioning engines,
+> numerical techniques for computing posterior distributions:
 >
-> (1) Grid approximation 
-> (2) Quadratic approximation 
-> (3) Markov chain Monte Carlo (MCMC) 
+> (1) Grid approximation
+> (2) Quadratic approximation
+> (3) Markov chain Monte Carlo (MCMC)
 >
-> There are many other engines, and new ones are being invented all the time. But the three you’ll get to know here are common and widely useful. In addition, as you learn them, you’ll also learn principles that will help you understand other techniques.” ([McElreath, 2020, p. 39](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=58&annotation=4CYVRVT6))
-
+> There are many other engines, and new ones are being invented all the
+> time. But the three you'll get to know here are common and widely
+> useful. In addition, as you learn them, you'll also learn principles
+> that will help you understand other techniques." ([McElreath, 2020, p.
+> 39](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=58&annotation=4CYVRVT6))
 :::
 :::
 
@@ -1604,19 +1609,27 @@ increases.
 :::
 
 ::: my-procedure-container
-> “Here is the recipe: 
+> "Here is the recipe:
 >
-> (1) Define the grid. This means you decide how many points to use in estimating the posterior, and then you make a list of the parameter values on the grid. 
-> (2) Compute the value of the prior at each parameter value on the grid. 
-> (3) Compute the likelihood at each parameter value. 
-> (4) Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood. 
-> (5) Finally, standardize the posterior, by dividing each value by the sum of all values.” ([McElreath, 2020, p. 40](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=59&annotation=23IXIX8K))
-
+> (1) Define the grid. This means you decide how many points to use in
+>     estimating the posterior, and then you make a list of the
+>     parameter values on the grid.
+> (2) Compute the value of the prior at each parameter value on the
+>     grid.
+> (3) Compute the likelihood at each parameter value.
+> (4) Compute the unstandardized posterior at each parameter value, by
+>     multiplying the prior by the likelihood.
+> (5) Finally, standardize the posterior, by dividing each value by the
+>     sum of all values." ([McElreath, 2020, p.
+>     40](zotero://select/groups/5243560/items/NFUEVASQ))
+>     ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=59&annotation=23IXIX8K))
 :::
 :::
 
-I will outline in the globe tossing model the necessary steps for grid approximation. In addition to the 5 and 20 points approximation I will add 100 and 1000 points to see how the inferences changes with higher values.
-
+I will outline in the globe tossing model the necessary steps for grid
+approximation. In addition to the 5 and 20 points approximation I will
+add 100 and 1000 points to see how the inferences changes with higher
+values.
 
 ::: my-r-code
 ::: my-r-code-header
@@ -1628,7 +1641,7 @@ I will outline in the globe tossing model the necessary steps for grid approxima
 ::: my-r-code-container
 ```{r}
 #| label: fig-grid-approx-5-and-20
-#| fig-cap: "Grid Approximation with 5 and 20 points. You can see that the approximation gets a lot better with 20 than with 5 points. After 100 points there is no much improvement. This conforms to McElreath remark that 'there won’t be much change in inference after the first 100.' ([McElreath, 2020, p. 40](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=59&annotation=4K3FRPY5))"
+#| fig-cap: "Grid Approximation with 5 and 20 points. You can see that the approximation gets a lot better with 20 than with 5 points. After 100 points there is no much improvement. This conforms to McElreath remark that 'there won’t be much change in inference after the first 100.' (McElreath, 2020, p. 40)"
 
 # 1. define grid
 p_grid5 <- seq(from = 0, to = 1, length.out = 5)
@@ -1695,43 +1708,51 @@ mtext('1000 points with "prior = 1"')
 par(op)
 
 ```
-
 :::
 :::
 
-### TIDYVERSE
+#### TIDYVERSE
 
-Instead of just to replicate the globe-tossing steps with tidyverse code as in @cnj-globe-tossing-steps I will experiment with different priors to see their influences against the posterior distribution.
+Instead of just to replicate the globe-tossing steps with tidyverse code
+as in @cnj-globe-tossing-steps I will experiment with different priors
+to see their influences against the posterior distribution.
 
-@fig-different-priors uses Kurz’ last code chunk in his [grid approximation section](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#grid-approximation). But I have adapted it to include the three uniform priors and to show also the (small) effect of 100 points grids.
+@fig-different-priors uses Kurz' last code chunk in his [grid
+approximation
+section](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#grid-approximation).
+But I have adapted it to include the three uniform priors and to show
+also the (small) effect of 100 points grids.
 
-
-:::::{.my-experiment}
-:::{.my-experiment-header}
-Experiment: The effect of different priors and of different numbers of grid points.
+::: my-experiment
+::: my-experiment-header
+Experiment: The effect of different priors and of different numbers of
+grid points.
 :::
-::::{.my-experiment-container}
 
-
+::: my-experiment-container
 The parameters for the calculated likelihood is based on the binomial
 distribution and is shaping the above plot:
 
 -   `x` = number of water events $W$
 -   `size` = number of sample trials = number of observations
--   `prob` = success probability on each trial = probability of $W$ (water
-    event)
+-   `prob` = success probability on each trial = probability of $W$
+    (water event)
 
+I will only change `prob` and approximate the five different prior
+variants with 5, 20 and 100 points. I want to see how the effects of
+different priors on the posterior distribution by different number of
+events (grid points). The priors I will use are uniform priors of $0.1$,
+$0.5$ and $0.9$, and the two suggestion by McElreath
+$ifelse(p\_grid < 0.5, 0, 1)$ and $exp(-5 * abs(p\_grid - 0.5))$.
 
-I will only change `prob` and approximate the five different prior variants with 5, 20 and 100 points. I want to see how the effects of different priors on the posterior distribution by different number of events (grid points). The priors I will use are uniform priors of $0.1$, $0.5$ and $0.9$, and the two suggestion by McElreath $ifelse(p\_grid < 0.5, 0, 1)$ and $exp(-5 * abs(p\_grid - 0.5))$.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-different-priors}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-different-priors}
 : Globe tossing with different priors and grid points
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-different-priors
 #| fig-cap: "The effect of different priors and of different numbers of grid points."
@@ -1739,15 +1760,15 @@ I will only change `prob` and approximate the five different prior variants with
 
 
 # prepare the plot by producing the data
-tibble::tibble(n_points = c(5, 20, 100)) %>% 
+tibble::tibble(n_points = c(5, 20, 100)) |>  
   dplyr::mutate(p_grid = purrr::map(n_points, ~seq(from = 0, to = 1, 
-                                            length.out = .))) %>% 
-  tidyr::unnest(p_grid) %>% 
+                                            length.out = .))) |>  
+  tidyr::unnest(p_grid) |>  
   tidyr::expand_grid(priors = c("0.1",
                          "0.5",
                          "0.9",
                          "ifelse(p_grid < 0.5, 0, 1)", 
-                         "exp(-5 * abs(p_grid - 0.5))")) %>% 
+                         "exp(-5 * abs(p_grid - 0.5))")) |>  
   dplyr::mutate(prior = dplyr::case_when(
     priors == "0.1" ~ 0.1,
     priors == "0.5" ~ 0.5,
@@ -1755,10 +1776,10 @@ tibble::tibble(n_points = c(5, 20, 100)) %>%
     priors == "ifelse(p_grid < 0.5, 0, 1)" ~ ifelse(p_grid < 0.5, 0, 1),
     priors == "exp(-5 * abs(p_grid - 0.5))" ~ exp(-5 * abs(p_grid - 0.5))
   )) |> 
-  dplyr::mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>% 
-  dplyr::mutate(posterior = likelihood * prior / sum(likelihood * prior)) %>% 
+  dplyr::mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) |>  
+  dplyr::mutate(posterior = likelihood * prior / sum(likelihood * prior)) |>  
   dplyr::mutate(n_points = stringr::str_c("# points = ", n_points),
-         priors   = stringr::str_c("prior = ", priors)) %>% 
+         priors   = stringr::str_c("prior = ", priors)) |>  
   
   # plot the data
   ggplot2::ggplot(ggplot2::aes(x = p_grid, y = posterior)) +
@@ -1766,67 +1787,66 @@ tibble::tibble(n_points = c(5, 20, 100)) %>%
   ggplot2::geom_point() +
   ggplot2::labs(x = "probability of water",
        y = "posterior probability") +
-  ggplot2::theme(panel.grid = element_blank()) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
   ggplot2::theme_bw() +
   ggplot2::facet_grid(priors ~ n_points, scales = "free")
 ```
-
-::::
-:::::
+:::
+:::
 
 Inspecting the output we can draw some conclusions:
 
-It does not matter what uniform prior
-probability is chosen in the range from 0 to 1, if the probability of
-$W$ is greater than zero and --- and by definition of the binomial
-function --- equal for all events (grid points). This does not only conform to
-values but also for functions that generates values.
+It does not matter what uniform prior probability is chosen in the range
+from 0 to 1, if the probability of $W$ is greater than zero and --- and
+by definition of the binomial function --- equal for all events (grid
+points). This does not only conform to values but also for functions
+that generates values.
 
-The only outlier in this sequence of different priors is the exponential function. But even this prior will finally give way if the number of observed events (approaching the real probability of 0.71) rises. 
+The only outlier in this sequence of different priors is the exponential
+function. But even this prior will finally give way if the number of
+observed events (approaching the real probability of 0.71) rises.
 
 I will demonstrate this with 10000 samples and a W:L proportion of 7:3.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-many-samples}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-many-samples}
 : Diminishing effect of the prior with rising amout of data
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-grid-many-samples
 #| fig-cap: "Grid Approximation with prior of exp(-5 * abs(p_grid - 0.5)) drawing 10,000 samples with a W proportion of 0.7"
 
 d <-
     # 1.  define grid
-    tibble(p_grid = seq(from = 0, to = 1, length.out = 100),
+    tibble::tibble(p_grid = seq(from = 0, to = 1, length.out = 100),
     # 2. define prior          
-           prior  = 1) %>%      
+           prior  = 1) |>       
     # 3. compute likelihood at each value in grid
-    mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>%  
+    dplyr::mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) |>   
     # 4. compute product of likelihood and prior
-    mutate(unstd_posterior = likelihood * prior) %>% 
+    dplyr::mutate(unstd_posterior = likelihood * prior) |>  
     # 5. standardize the posterior, so it sums to 1
-    mutate(posterior = unstd_posterior / sum(unstd_posterior))   
+    dplyr::mutate(posterior = unstd_posterior / sum(unstd_posterior))   
 
-  d %>% 
-  ggplot(aes(x = p_grid, y = posterior)) +
-  geom_point() +
-  geom_line() +
-  labs(title = "100 point grid approximation of 10000 samples with prior 
+d |>  
+  ggplot2::ggplot(ggplot2::aes(x = p_grid, y = posterior)) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line() +
+  ggplot2::labs(title = "100 point grid approximation of 10000 samples with prior 
        of exp(-5 * abs(p_grid - 0.5)) and a proportion of W:L = 7:3.",
        x = "probability of water",
        y = "posterior probability") +
-  theme(panel.grid = element_blank()) +
-  theme_bw()
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw()
 
 
 ```
-
-
-::::
-:::::
+:::
+:::
 
 In this example the maximum of probability is already 0.68! We can say
 that **with every chosen prior we will get finally the correct
@@ -1840,48 +1860,80 @@ process of approximation has not reached a state where the probability
 maximum is near the correct result. The problem is: Most time we do not
 know the correct solution and can't therefore decide if we have had
 enough Bayesian updates.
-::::
-:::::
-
+:::
+:::
 
 ### Quadratic Approximation
 
 Grid approximation is very costly.
 
-> “The reason is that the number of unique values to consider in the grid grows rapidly as the number of parameters in your model increases. For the single-parameter globe tossing model, it’s no problem to compute a grid of 100 or 1000 values. But for two parameters approximated by 100 values each, that’s already 100^2 = 10,000 values to compute. For 10 parameters, the grid becomes many billions of values. These days, it’s routine to have models with hundreds or thousands of parameters.” ” ([McElreath, 2020, p. 41f](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=60&annotation=7E79NMUP))
+> "The reason is that the number of unique values to consider in the
+> grid grows rapidly as the number of parameters in your model
+> increases. For the single-parameter globe tossing model, it's no
+> problem to compute a grid of 100 or 1000 values. But for two
+> parameters approximated by 100 values each, that's already 100\^2 =
+> 10,000 values to compute. For 10 parameters, the grid becomes many
+> billions of values. These days, it's routine to have models with
+> hundreds or thousands of parameters." " ([McElreath, 2020, p.
+> 41f](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=60&annotation=7E79NMUP))
 
-Even grid approximation strategy scales poorly with model complexity it is very valuable for pedagogical reason. The two other strategies (Quadratic approximation and MCMC Methods) are better understood after examining in detail how grid approximation works.
-
-
-## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
+Even grid approximation strategy scales poorly with model complexity it
+is very valuable for pedagogical reason. The two other strategies
+(`r glossary("Quadratic approximation")` and `r glossary("MCMC")`
+Methods) are better understood after examining in detail how grid
+approximation works.
 
 #### ORIGINAL
 
 ##### Concept
 
-> Under quite general conditions, the region near the peak of the
+> "Under quite general conditions, the region near the peak of the
 > posterior distribution will be nearly Gaussian---or "normal"---in
 > shape. This means the posterior distribution can be usefully
 > approximated by a Gaussian distribution. A Gaussian distribution is
 > convenient, because it can be completely described by only two
 > numbers: the location of its center (mean) and its spread (variance).
-
+>
 > A Gaussian approximation is called "quadratic approximation" because
 > the logarithm of a Gaussian distribution forms a parabola. And a
-> parabola is a quadratic function.
+> parabola is a quadratic function. So this approximation essentially
+> represents any log-posterior with a parabola." ([McElreath, 2020, p.
+> 42](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=61&annotation=2PTP9XSY))
 
-Two steps: 1. Find the posterior mode with some algorithm. The procedure
-does not know where the peak is but it knows the slope under it feet. 2.
-Estimate the curvature near the peak to calculate a quadratic
-approximation. This computation is done by some numerical technique.
+::: my-procedure
+::: my-procedure-header
+::: {#prp-quap}
+: Quadratic Approximation
+:::
+:::
+
+::: my-procedure-container
+1.  **Find the posterior mode** with some optimization algorithm. The
+    procedure does not know where the peak is but it knows the slope
+    under its feet.
+2.  **Estimate the curvature near the peak** to calculate a quadratic
+    approximation. This computation is done by some numerical technique.
+:::
+:::
 
 ##### Computing the quadratic approximation
 
-To compute the quadratic approximation for the globe tossing data, we'll
-use a tool in the {**rethinking**} package: `rethinking::quap()`.
+To compute the `r glossary("quadratic approximation")` for the globe
+tossing data, we'll use a tool in the {**rethinking**} package:
+`rethinking::quap()`.
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-quap-globe-tossing}
+: Quadratic approximation of the globe tossing data
+:::
+:::
+
+::: my-r-code-container
 ```{r}
-#| label: quadratic-approx-9
+#| label: quap-globe-tossing
 
 globe.qa <- rethinking::quap(
   alist(
@@ -1895,48 +1947,72 @@ globe.qa <- rethinking::quap(
 rethinking::precis(globe.qa)
 
 ```
-
-::: callout-warning
-###### `precis()` results not printed correctly from visual mode
-
-The result of `rethinking::precis()` does not display correctly after
-the chunk in RStudio visual mode. But it works in source mode and it
-displayed correctly immediately after the chunk.
-
-The columns of the table are too narrow so that you can't see the header
-and inspect the values. Printing to the console or to the web is
-correct.
-
-A workaround is wrapping the result with `print()` or to render the
-document in source mode. See my [bug
-report](https://github.com/rstudio/rstudio/issues/13227).
+:::
 :::
 
-To use `quap()`, you provide a *formula*, a list of *data* with
-`base::alist()`. `alist()` handles its arguments as if they described
-function arguments. So the values are not evaluated, and tagged
-arguments with no value are allowed. It is most often used in
-conjunction with `base::formals()`.
+> "You can read this kind of approximation like: *Assuming the posterior
+> is Gaussian, it is maximized at* $0.67$, and its standard deviation is
+> $0.16$." ([McElreath, 2020, p.
+> 43](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=62&annotation=RMZS6PQW))
 
-The function `precis` presents a brief summary of the quadratic
-approximation. In this case, it shows the posterior mean value of
-$p = 0.67$, which it calls the "Mean." The curvature is labeled
-"StdDev". This stands for *standard deviation*. This value is the
-standard deviation of the posterior distribution, while the mean value
-is its peak. Finally, the last two values in the `precis` output show
-the 89% percentile interval, which you'll learn more about in the next
-chapter. You can read this kind of approximation like: *Assuming the
-posterior is Gaussian, it is maximized at 0.67, and its standard
-deviation is 0.16*.
+::: my-procedure
+::: my-procedure-header
+::: {#prp-explain-quap}
+: Usage of `rethinking::quap()`
+:::
+:::
+
+::: my-procedure-container
+1.  `rethinking::quap()` needs a *formula*, e.g., a list of *data*
+    provided through `base::alist()`.
+2.  `alist()` handles its arguments as if they described function
+    arguments. So the values are not evaluated, and tagged arguments
+    with no value are allowed. It is most often used in conjunction with
+    `base::formals()`.
+3.  The function `rethinking::precis` presents a brief summary of the
+    quadratic approximation.
+
+```{=html}
+<!-- -->
+```
+a)  **mean**: It shows the posterior mean value of $p = 0.67$. This is
+    the peak of the posterior distribution.
+b)  **sd**: The curvature is labeled "sd" This stands for
+    `r glossary("standard deviation")`. This value is the standard
+    deviation of the posterior distribution.
+c)  **5.5% and 94.5%**: These two values are the
+    `r glossary("percentile", "percentile intervals")` which will
+    explained in @sec-chap03.
+:::
+:::
 
 ##### Computing analytical solution
 
 We want to compare the quadratic approximation with the analytic
 calculation.
 
-```{r}
-#| label: analytical-calc
+> "I'll use the analytical approach here, which uses dbeta. I won't
+> explain this calculation, but it ensures that we have exactly the
+> right answer. You can find an explanation and derivation of it in just
+> about any mathematical textbook on Bayesian inference." ([McElreath,
+> 2020, p. 43](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=62&annotation=FHWLARTT))
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-analytical}
+: Comparing quadratic approximation with analytic calculation using
+`dbeta()`
+:::
+:::
+
+::: my-r-code-container
+```{r}
+#| label: fig-analytical-calc
+#| fig-cap: "Comparing quadratic approximation with analytic calculation"
+
+## R code 2.7 ################################
 # analytic calculation
 W <- 6
 L <- 3
@@ -1946,49 +2022,37 @@ curve(dbeta(x, W + 1, L + 1), from = 0, to = 1)
 curve(dnorm(x, 0.67, 0.16), lty = 2, add = TRUE)
 ```
 
-The solid line curve is the analytical posterior and the dashed curve is
-the quadratic approximation. The dashed curve does alright on its left
-side, but looks pretty bad on its right side. It even assigns positive
-probability to $p = 1$, which we know is impossible, since we saw at
-least one land sample. As the amount of data increases, however, the
-quadratic approximation gets better.
+> "The ~~blue~~ solid line curve is the analytical posterior and the
+> ~~black~~ dashed curve is the quadratic approximation. The ~~black~~
+> solid curve does alright on its left side, but looks pretty bad on its
+> right side. It even assigns positive probability to $p = 1$, which we
+> know is impossible, since we saw at least one land sample"
+> ([McElreath, 2020, p.
+> 43](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=62&annotation=UJVX3WCP))
+:::
+:::
 
-##### Disadvantage
 
-The phenomenon, where the quadratic approximation improves with the
-amount of data, is very common. It's one of the reasons that so many
-classical statistical procedures are nervous about small samples.
-
-Using the quadratic approximation in a Bayesian context brings with it
-all the same concerns. But you can always lean on some algorithm other
-than quadratic approximation, if you have doubts. Indeed, grid
-approximation works very well with small samples, because in such cases
-the model must be simple and the computations will be quite fast. You
-can also use MCMC.
-
-Sometimes the quadratic approximation fails and you will get an error
-message about the "Hessian". A *Hessian* --- named after mathematician
-Ludwig Otto Hesse (1811--1874) --- is a square matrix of second
-derivatives. The standard deviation is typically computed from the
-Hessian, so computing the Hessian is nearly always a necessary step. But
-sometimes the computation goes wrong, and your golem will choke while
-trying to compute the Hessian.
-
-Some other drawbacks will be explicated in later chapter. Therefore MCMC
-seems generally the best option for complex models.
 
 #### Tidyverse
-
-##### Quadratic approximation with different sample size
 
 In the book the calculation is only done for $n = 9$ but McElreath also
 display the graphs for $n = 18$ and $n = 36$ with the same proportion of
 `W` and `L`. Kurz shows how this is done and results into Figure 2.8 in
 the book.
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-ID-text}
+: Quadratic approximation showing the effect of different sample size
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: quap-different-sample-size
-#| attr-source: '#lst-quap-different-sample-size lst-cap="Quadratic approximation with quap() showing the effect of different sample size"'
+#| results: hold
 
 ### quap() with 9 sample size #################################
 globe_qa_9 <- rethinking::quap(
@@ -2027,67 +2091,116 @@ globe_qa_36 <- rethinking::quap(
 rethinking::precis(globe_qa_36)
 ```
 
-::: callout-note
-## Slightly different code
+The results above displays values for sample size $n = 9$ (top), $n = 18$ (middle) and $n = 36$ bottom. You can see that as the amount of data increases
 
-I used a slightly different code than Kurz. I have only changed the data
-values.
+1. the mean approximates the real value
+2. the standard deviation and the percentile intervals gets smaller.
+
+
+
+:::
 :::
 
+
+> "As the amount of data increases, … the quadratic approximation
+> gets better." ([McElreath, 2020, p.
+> 43](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=62&annotation=YQE3PX52))
+
+> "This phenomenon, where the quadratic approximation improves with the
+> amount of data, is very common. It's one of the reasons that so many
+> classical statistical procedures are nervous about small samples:
+> Those procedures use quadratic (or other) approximations that are only
+> known to be safe with infinite data. Often, these approximations are
+> useful with less than infinite data, obviously. But the rate of
+> improvement as sample size increases varies greatly depending upon the
+> details. In some models, the quadratic approximation can remain
+> terrible even with thousands of samples." ([McElreath, 2020, p.
+> 44](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=63&annotation=PD39BQDF))
+
+@fig-quap-compare-analytic-different-n demonstrate that with more data the curve gets smaller and higher, signifying that the model gets more secure about the probability.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-quap-compare-analytic-different-n}
+: Accuracy of the quadratic approximation with different sample sizes
+::::::
+:::
+::::{.my-r-code-container}
+
 ```{r}
-#| label: fig-quadratic-approx
+#| label: fig-quap-compare-analytic-different-n
 #| fig-cap: "Accuracy of the quadratic approximation. In each plot, the exact posterior distribution is plotted as solid curve, and the quadratic approximation is plotted as the dashed curve."
-#| attr-source: '#lst-fig-quadratic-approx lst-cap="Accuracy of the quadratic approximation"'
 
 n_grid <- 100
 
 # wrangle
-tibble(w = c(6, 12, 24),
+tibble::tibble(w = c(6, 12, 24),
        n = c(9, 18, 36),
-       s = c(.16, .11, .08)) %>% 
-  expand_grid(p_grid = seq(from = 0, to = 1, length.out = n_grid)) %>% 
-  mutate(prior = 1,
-         m     = .67)  %>%
-  mutate(likelihood = dbinom(w, size = n, prob = p_grid)) %>%
-  mutate(unstd_grid_posterior = likelihood * prior,
-         unstd_quad_posterior = dnorm(p_grid, m, s)) %>%
-  group_by(w) %>% 
-  mutate(grid_posterior = unstd_grid_posterior / sum(unstd_grid_posterior),
+       s = c(.16, .11, .08)) |>  
+  tidyr::expand_grid(p_grid = seq(from = 0, to = 1, length.out = n_grid)) |>  
+  dplyr::mutate(prior = 1,
+         m     = .67)  |> 
+  dplyr::mutate(likelihood = dbinom(w, size = n, prob = p_grid)) |> 
+  dplyr::mutate(unstd_grid_posterior = likelihood * prior,
+         unstd_quad_posterior = dnorm(p_grid, m, s)) |> 
+  dplyr::group_by(w) |>  
+  dplyr::mutate(grid_posterior = unstd_grid_posterior / sum(unstd_grid_posterior),
          quad_posterior = unstd_quad_posterior / sum(unstd_quad_posterior),
-         n              = str_c("n = ", n)) %>% 
-  mutate(n = factor(n, levels = c("n = 9", "n = 18", "n = 36"))) %>% 
+         n              = stringr::str_c("n = ", n)) |>  
+ dplyr::mutate(n = forcats::fct(n, levels = c("n = 9", "n = 18", "n = 36"))) |>  
   
   # plot
-  ggplot(aes(x = p_grid)) +
-  geom_line(aes(y = grid_posterior)) +
-  geom_line(aes(y = quad_posterior),
+  ggplot2::ggplot(ggplot2::aes(x = p_grid)) +
+  ggplot2::geom_line(ggplot2::aes(y = grid_posterior)) +
+  ggplot2::geom_line(ggplot2::aes(y = quad_posterior),
             color = "grey50") +
-  labs(x = "proportion water",
+  ggplot2::labs(x = "proportion water",
        y = "density") +
-  theme(panel.grid = element_blank()) +
-  facet_wrap(~ n, scales = "free")
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ n, scales = "free")
 
 ```
 
-##### Maximum Likelihood Estimation (MLE)
 
-> The quadratic approximation, either with a uniform prior or with a lot
-> of data, is often equivalent to a maximum likelihood estimate (MLE)
-> and its standard error. The MLE is a very common non-Bayesian
-> parameter estimate. This correspondence between a Bayesian
-> approximation and a common non-Bayesian estimator is both a blessing
-> and a curse. It is a blessing, because it allows us to re-interpret a
-> wide range of published non-Bayesian model fits in Bayesian terms. It
-> is a curse, because maximum likelihood estimates have some curious
-> drawbacks, and the quadratic approximation can share them. (p. 44,
-> emphasis, in the original)
+::::
+:::::
 
-Textbooks highlighting the maximum likelihood method for the generalized
-linear model abound. If this is new to you and you'd like to learn more,
-perhaps check out Roback and Legler's (2021) Beyond multiple linear
-regression: Applied generalized linear models and multilevel models in
-R, Agresti's (2015) Foundations of linear and generalized linear models
-or Dunn and Smyth's (2018) Generalized linear models with examples in R.
+
+
+
+
+
+::: my-resource
+::: my-resource-header
+Textbooks highlighting MLE for GLMs
+:::
+
+Kurz refers to three textbooks that highlight the maximum likelihood
+estimate (`r glossary("MLE")`) for the generalized linear model
+(`r glossary("GLM")`).
+
+::: my-resource-container
+
+- Agresti. (2015). Foundations of Linear and Generalized Linear Models. Wiley.
+- Dobson, A. J., & Barnett, A. G. (2018). An Introduction to Generalized Linear Models (4th ed.). Chapman and Hall/CRC.
+- Dunn, P. K., & Smyth, G. K. (2018). Generalized Linear Models With Examples in R (1st ed. 2018 Edition). Springer.
+
+[@agresti2015; @dobson2018; @dunn2018]
+:::
+:::
+
+
+::: {.callout-note}
+####### Maximum Likelihood Estimation (MLE)
+
+> “The quadratic approximation, either with a uniform prior or with a lot of data, is often equivalent to a `r glossary("MLE", "maximum likelihood estimate")` (MLE) and its `r glossary("standard error")`. The MLE is a very common non-Bayesian parameter estimate. This correspondence between a Bayesian approximation and a common non-Bayesian estimator is both a blessing and a curse. It is a blessing, because it allows us to re-interpret a wide range of published non-Bayesian model fits in Bayesian terms. It is a curse, because maximum likelihood estimates have some curious drawbacks, and the quadratic approximation can share them.” ([McElreath, 2020, p. 44](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=63&annotation=KDENIT9G))
+:::
+
+
+## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
 
 ### Markov Chain Monte Carlo (MCMC)
 
@@ -2224,7 +2337,7 @@ later further exploration.
 ```{r}
 #| label: print-brms-summary
 
-brms::posterior_summary(b2.1) %>% 
+brms::posterior_summary(b2.1) |>  
   round(digits = 2)
 ```
 
@@ -2238,8 +2351,8 @@ brms::posterior_summary(b2.1) %>%
 #| label: fig-demo-MCMC-brms
 #| fig-cap: "Demo of the Markov Chain Monte Carlo (MCMC) method using the globe-tossing data with the {**brms**} package."
 
-brms::as_draws_df(b2.1) %>% 
-  mutate(n = "n = 36") %>%
+brms::as_draws_df(b2.1) |>  
+  mutate(n = "n = 36") |> 
   
   ggplot(aes(x = b_Intercept)) +
   geom_density(fill = "black") +
@@ -2441,9 +2554,9 @@ posterior <- unstd.posterior / sum(unstd.posterior) # <5>
 (
     df <-
         tibble(p_grid = seq(from = 0, to = 1, length.out = 20),      # <1>
-               prior  = 1) %>%                                       # <2>
-        mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) %>%  # <3>
-        mutate(unstd_posterior = likelihood * prior) %>%             # <4>
+               prior  = 1) |>                                        # <2>
+        mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) |>   # <3>
+        mutate(unstd_posterior = likelihood * prior) |>              # <4>
         mutate(posterior = unstd_posterior / sum(unstd_posterior))   # <5>
 )
 ```
@@ -2606,7 +2719,7 @@ b2.1 <-
 
 print(b2.1)
 
-brms::posterior_summary(b2.1) %>% 
+brms::posterior_summary(b2.1) |>  
   round(digits = 2)
 
 ```

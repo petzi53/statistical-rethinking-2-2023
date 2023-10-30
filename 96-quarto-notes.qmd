@@ -1,0 +1,180 @@
+# Comments about using Quarto
+
+Here I will collect some notes about using Quarto. At the moment it is
+just an unordered and unedited collection of all my notes scattered in
+the chapters. These notes divert the attention from my main goal to
+learn and understand Bayesian statistics.
+
+## Table excursion
+
+::: {.callout-note style="color: blue"}
+###### Table Packages Used
+
+Kurz employed the {**flextable**} package to print tables. As I have no
+experience with this package, I will apply {**kableExtra**} in this
+document.\
+\
+Until now I had used most of the time kableExtra and sometimes DT. For a
+short compilation of available table packages see the section on [Other
+packages for creating
+tables](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html)
+in the R Markdown Cookbook. The following excursion on tables follows
+the blog article [Top 7 Packages for Making Beautiful Tables in
+R](https://towardsdatascience.com/top-7-packages-for-making-beautiful-tables-in-r-7683d054e541)
+by Devashree Madhugiri.
+:::
+
+------------------------------------------------------------------------
+
+-   [{**gt**}](https://gt.rstudio.com/): The gt package offers a
+    different and easy-to-use set of functions that helps us build
+    display tables from tabular data. The gt philosophy states that a
+    comprehensive collection of table parts can be used to create a
+    broad range of functional tables. These are the table body, the
+    table footer, the spanner column labels, the column labels, and the
+    table header. (I should look into the {**gt**} package in more
+    detail as it is developed by the RStudio/Posit team, that stands not
+    only for high quality but also for tidyverse compatibility.)
+
+    ![](https://gt.rstudio.com/reference/figures/gt_parts_of_a_table.svg)
+
+-   [{**formattable**}](https://renkun-ken.github.io/formattable/):
+    Formattable data frames are data frames that will be displayed in
+    HTML tables using formatter functions. This package includes
+    techniques to produce data structures with predefined formatting
+    rules, such that the objects maintain the original data but are
+    formatted. The package consists of several standard formattable
+    objects, including percent, comma, currency, accounting, and
+    scientific.
+
+-   [{**kableExtra**}](https://haozhu233.github.io/kableExtra/): It
+    extends the basic functionality of `knitr::kable()` tables. Although
+    `knitr::kable()` is simple by design, it has many features missing
+    which are usually available in other packages. {**kableExtra**} has
+    filled the gap nicely. One of the best thing about {**kableExtra**}
+    is that most of its table capabilities work for both HTML and PDF
+    formats.
+
+-   [{**DT**}](https://rstudio.github.io/DT/): dt is an abbreviation of
+    'DataTables.' Data objects in R can be rendered as HTML tables using
+    the JavaScript library 'DataTables' (typically via R Markdown or
+    Shiny).
+
+-   [{**flextable**}](https://davidgohel.github.io/flextable/): This
+    package helps you to create reporting table from a data frame
+    easily. You can merge cells, add headers, add footers, change
+    formatting, and set how data in cells is displayed. Table content
+    can also contain mixed types of text and image content. Tables can
+    be embedded from R Markdown documents into HTML, PDF, Word, and
+    PowerPoint documents and can be embedded using Package Officer for
+    Microsoft Word or PowerPoint documents. Tables can also be exported
+    as R plots or graphic files, e.g., png, pdf, and jpeg.
+
+-   [{**reactable**}](https://glin.github.io/reactable/): `reactable()`
+    creates a data table from tabular data with sorting and pagination
+    by default. The data table is an HTML widget that can be used in R
+    Markdown documents and Shiny applications or viewed from an R
+    console. It is based on the React Table library and made with
+    reactR. Features are:
+
+    -   It creates a data table with sorting, filtering, and pagination
+    -   It has built-in column formatting
+    -   It supports custom rendering via R or JavaScript
+    -   It works seamlessly within R Markdown documents and the Shiny
+        app
+
+-   [{**ractablefmtr**}](https://kcuilla.github.io/reactablefmtr/index.html):
+    The package improves the appearance and formatting of tables created
+    using the reactable R library. It includes many conditional
+    formatters that are highly customizable and easy to use.
+
+I sure there are other packages as well. But the above seven packages
+are a first starting point to learn creating and displaying
+sophisticated data tables in R.
+
+> The authors of R Markdown Cookbook (Yihui Xie, Christophe Dervieux,
+> Emily Riederer) mention also several other table packages in the
+> section [Other packages for creating
+> tables](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html):
+>
+> -   **rhandsontable** ([Owen
+>     2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-rhandsontable)):
+>     Also similar to **DT**, and has an Excel feel (e.g., you can edit
+>     data directly in the table). Visit
+>     <https://jrowen.github.io/rhandsontable/> to learn more about it.
+>
+> -   **pixiedust** ([Nutter
+>     2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-pixiedust)):
+>     Features creating tables for models (such as linear models)
+>     converted through the **broom** package ([Robinson, Hayes, and
+>     Couch
+>     2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-broom)).
+>     It supports Markdown, HTML, and LaTeX output formats. Its
+>     repository is at <https://github.com/nutterb/pixiedust>.
+>
+> -   **stargazer** ([Hlavac
+>     2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-stargazer)):
+>     Features formatting regression models and summary statistics
+>     tables. The package is available on CRAN at
+>     <https://cran.r-project.org/package=stargazer>.
+>
+> -   **xtable** ([Dahl et al.
+>     2019](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-xtable)):
+>     Perhaps the oldest package for creating tables---the first release
+>     was made in 2000. It supports both LaTeX and HTML formats. The
+>     package is available on CRAN at
+>     <https://cran.r-project.org/package=xtable>.
+>
+> I'm not going to introduce the rest of packages, but will just list
+> them here: **tables** ([Murdoch
+> 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tables)),
+> **pander** ([Daróczi and Tsegelskyi
+> 2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-pander)),
+> **tangram** ([S. Garbett
+> 2023](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-tangram)),
+> **ztable** ([Moon
+> 2021](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-ztable)),
+> and **condformat** ([Oller Moreno
+> 2022](https://bookdown.org/yihui/rmarkdown-cookbook/table-other.html#ref-R-condformat)).
+
+------------------------------------------------------------------------
+
+::: callout-warning
+###### Quarto cannot list & execute code in the same chunk
+
+2023-05-08: `lst-label` and `lst-cap` are only working in display code
+snippets but not in snippets to execute. See [lst-cap and lst-label in
+Quarto?](https://community.rstudio.com/t/lst-cap-and-lst-label-in-quarto/157173)
+and [lst-label and lst-cap do not produce listing caption and
+reference](https://github.com/quarto-dev/quarto-cli/issues/1580).
+:::
+
+2023-07-23: In the meanwhile I found a work around:
+
+```{r}
+#| eval: false
+#| label: replicate-sim2
+#| attr-source: '#lst-replicate-sim2 lst-cap="R code snippet 2.4: Replicate simulation"'
+
+#### USE ANOTHER EXAMPLE WITHOUT REFERENCE TO ANOTHER FUNCTION
+
+replicate(sim_globe(p = 0.5, N = 9), n = 10) 
+```
+
+------------------------------------------------------------------------
+
+::: callout-warning
+###### `precis()` results not printed correctly from visual mode
+
+The result of `rethinking::precis()` does not display correctly after
+the chunk in RStudio visual mode. But it works in source mode and it
+displayed correctly immediately after the chunk.
+
+The columns of the table are too narrow so that you can't see the header
+and inspect the values. Printing to the console or to the web is
+correct.
+
+A workaround is wrapping the result with `print()` or to render the
+document in source mode. See my [bug
+report](https://github.com/rstudio/rstudio/issues/13227).
+:::

@@ -20,6 +20,8 @@ book:
     - 04-geocentric-models.qmd
     - 05-many-variables.qmd
     - 95-references.qmd
+  appendices:
+    - 96-quarto-notes.qmd
 
 bibliography: references.bib
 
