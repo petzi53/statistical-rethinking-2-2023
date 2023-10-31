@@ -1,4 +1,4 @@
-# Geocentric Models
+# Geocentric Models {#sec-chap04}
 
 ## File setup {.unnumbered}
 
@@ -178,7 +178,7 @@ model in that case was always:
 ------------------------------------------------------------------------
 
 ::: {#def-glob-tossing-model}
-Describe the globe tossing model from @sec-sampling-the-imaginary
+Describe the globe tossing model from @sec-chap03
 
 $$
 \begin{align*}
@@ -262,7 +262,7 @@ Compare to the calculations in earlier chapters, for example with
 
 In this section we want a single measurement variable to model as a Gaussian distribution. It is a preparation for the linear regression model in @sec-linear-prediction-a  where we will construct and add a predictor variable to the model. 
 
-For the moment, we want just a single measurement variable to model as a Gaussian distribution. There will be two parameters describing the distribution’s shape, the `r glossary("mean")` `μ` and the `r glossary("standard deviation")` `σ`. `r glossary("Bayesian updating")` will allow us to consider every possible combination of values for `μ` and `σ` and to score each combination by its relative plausibility, in light of the data. These relative plausibilities are the `r glossary("posterior probability", "posterior probabilities")` of each combination of values `μ`, `σ`.
+For the moment, we want just a single measurement variable to model as a Gaussian distribution. There will be two parameters describing the distribution’s shape, the `r glossary("arithmetic mean", "mean")` `μ` and the `r glossary("standard deviation")` `σ`. `r glossary("Bayesian updating")` will allow us to consider every possible combination of values for `μ` and `σ` and to score each combination by its relative plausibility, in light of the data. These relative plausibilities are the `r glossary("posterior probability", "posterior probabilities")` of each combination of values `μ`, `σ`.
 
 There are an infinite number of possible Gaussian distributions. Some
 have small means. Others have large means. Some are wide, with a large
@@ -499,7 +499,7 @@ curve(dunif(x, 0, 50), from = -10, to = 60)
 
 Okay, so how to do this? You can quickly simulate heights by sampling
 from the prior, like you sampled from the posterior back in
-@sec-sampling-the-imaginary. Remember, every posterior is also
+@sec-chap03. Remember, every posterior is also
 potentially a prior for a subsequent analysis, so you can process priors
 just like posteriors.
 
@@ -1175,7 +1175,7 @@ base::plot(post3_a)
 
 The function `rethinking::extract.samples()` is for convenience. It is
 just running a simple simulation of the sort you conducted near the end
-of @sec-sampling-the-imaginary with @lst-sim-pred-samples-a. Here's a
+of @sec-chap03 with @lst-sim-pred-samples-a. Here's a
 peak at the motor. The work is done by a multi-dimensional version of
 `stats::rnorm()`, `MASS::mvrnorm()`. The function `stats::rnorm()`
 simulates random Gaussian values, while `MASS::mvrnorm()` simulates
@@ -3623,7 +3623,7 @@ b4.1 <-
 4. **prior**: The next two lines specify priors for the normal and the uniform distribution. As you can see this is another place where parts for the formula are provided for the `brms::brm()` function work. --- `class` specifies the parameter class. It defaults to "b" ((i.e. population-level -- 'fixed' -- effects)). (There is also the argument `group` for grouping of factors for group-level effects. Not used in this code example.) --- Besides the "b" class there are other classes for the "Intercept" and the standard deviation "Sigma" on the population level: There is also a "sd" class for the standard deviation of group-level effects. Finally there is the special case of `class = "cor"` to set the same prior on every correlation matrix. --- `ub = 50` sets the upper bound to 50. There is also a `lb` (lower bound). Both bounds are for parameter restriction, so that population-level effects must fall within a certain interval using the `lb` and `ub` arguments. `lb` and `ub` default to `NULL`, i.e. there is no restriction.
 5. **iter**: Number of total iterations per chain (including `warmup`; defaults to 2000).
 6. **warmup**: A positive integer specifying number of warmup iterations. This also specifies the number of iterations used for stepsize adaptation, so warmup draws should not be used for inference. The number of warmup should not be larger than iter and the default is iter/2.
-7. **chains**: Number of `r glossary("Markov chains")` (defaults to 4). 
+7. **chains**: Number of `r glossary("Markov chain", "Markov chains")` (defaults to 4). 
 8. **cores**: Number of cores to use when executing the chains in parallel, which defaults to 1 but we recommend setting the `mc.cores` option to be as many processors as the hardware and RAM allow (up to the number of chains).
 9. **seed**: The seed for random number generation to make results reproducible. Kurz has always used for `set.seed()` in other code chunks the chapter number. If `NA` (the default), Stan will set the seed randomly.
 10. **file**: Either `NULL` or a character string. In the latter case, the fitted model object is saved via `base::saveRDS()` in a file named after the string supplied in file. The `.rds` extension is added automatically. If the file already exists, `brms::brm()` will load and return the saved model object instead of refitting the model. Unless you specify the `file_refit` argument as well, the existing files won't be overwritten, you have to manually remove the file in order to refit and save the model under an existing file name. The file name is stored in the brmsfit object for later usage.
@@ -3695,7 +3695,7 @@ For the interpretation of this output I am going to use the explication in the [
 2. **Upper Middle**: If the data were grouped the next part would display group-level effects separately for each grouping factor in terms of standard deviations and (in case of more than one group-level effect per grouping factor) correlations between group-level effects. (This part is absent above as there are no grouping factors.)
 3. **Lower Middle: here Middle**: Next follow the display of the population-level effects (i.e. regression coefficients). If incorporated, autocorrelation effects and family specific parameters (e.g., the residual standard deviation ‘sigma’ in normal models) are also given.
     In general, every parameter is summarized using the mean (`Estimate`) and the standard deviation (`Est.Error`) of the posterior distribution as well as two-sided 95% credible intervals (`l-95% CI` and `u-95% CI`) based on quantiles. The last three values (`ESS_bulk`, `ESS_tail`, and `Rhat`) provide information on how well the algorithm could estimate the posterior distribution of this parameter. If `Rhat` is considerably greater than 1, the algorithm has not yet converged and it is necessary to run more iterations and / or set stronger priors.
-4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (HMC) Method. This means that it is not a `r glossary("Markov Chains", "Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
+4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (HMC) Method. This means that it is not a `r glossary("Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
     Instead of doing the random walk, NUTS does jumps of length x. Each jump doubles as the algorithm continues to run. This happens until the trajectory reaches a point where it wants to return to the starting point.
 
 ```{r}
@@ -6230,7 +6230,7 @@ $$ {#eq-multiple-regression-model}
 where $y_i$ was some continuous variable collected across participants,
 $i$. The $\alpha$ term was the intercept and the $\theta$ term was the
 regression slope for a binary variable $z$--we'll practice with binary
-predictors in the section for categorical-variables in @sec-chap05-many-variables-spurious-waffles. More to our interest, the
+predictors in the section for categorical-variables in @sec-chap05. More to our interest, the
 last portion of the equation is a compact way to convey there are $K$
 additional predictors and their associated regression coefficients,
 which we might more explicitly express as

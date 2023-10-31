@@ -46,7 +46,7 @@ knitr:
     R.options:
       knitr.graphics.auto_pdf: true
 
-editor: visual
+editor: source
 
 execute:
     freeze: auto

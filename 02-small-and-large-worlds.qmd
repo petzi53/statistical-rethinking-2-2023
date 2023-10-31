@@ -6,7 +6,7 @@ nameref:
   section-number: true
 ---
 
-# Small and Large Worlds {#sec-small-and-large-worlds}
+# Small and Large Worlds {#sec-chap02}
 
 ```{r}
 #| label: setup
@@ -1126,7 +1126,7 @@ $$p∼Uniform(0,1)$$ {#eq-uniform-prior}
 The formula expresses the model assumption that the entire range of
 possible values for $p$ are equally plausible.
 
-MY TIDYVERSE
+###TIDYVERSE
 
 Given a probability of .5, (e.g. equal probability to both events `W`
 and `L`) we use the `dbinom()` function to determine the likelihood of 6
@@ -1425,8 +1425,7 @@ fig-alt="The posterior distribution as a product of the prior distribution and l
 
 #### TIDYVERSE
 
-For my understanding it is important to reproduce the above graph with R
-code as it is shown in the next section.
+For my understanding it is important to reproduce the @fig-2-6-book graph with {**tidyverse**} R code as it is shown in the next section.
 
 ::: my-r-code
 ::: my-r-code-header
@@ -1643,6 +1642,8 @@ values.
 #| label: fig-grid-approx-5-and-20
 #| fig-cap: "Grid Approximation with 5 and 20 points. You can see that the approximation gets a lot better with 20 than with 5 points. After 100 points there is no much improvement. This conforms to McElreath remark that 'there won’t be much change in inference after the first 100.' (McElreath, 2020, p. 40)"
 
+## R code 2.3  adapted #########################
+
 # 1. define grid
 p_grid5 <- seq(from = 0, to = 1, length.out = 5)
 p_grid20 <- seq(from = 0, to = 1, length.out = 20)
@@ -1677,6 +1678,8 @@ posterior1000 <- unstd.posterior1000 / sum(unstd.posterior1000)
 # 6. display posterior distributions
 op <- par(mfrow = c(2, 2))
 
+
+## R code 2.4 ######################
 ## R code 2.4 for 5 points
 plot(p_grid5, posterior5,
   type = "b",
@@ -1757,6 +1760,8 @@ $ifelse(p\_grid < 0.5, 0, 1)$ and $exp(-5 * abs(p\_grid - 0.5))$.
 #| label: fig-different-priors
 #| fig-cap: "The effect of different priors and of different numbers of grid points."
 #| fig-height: 12
+
+## R code 2.5 tidyverse integrated ################
 
 
 # prepare the plot by producing the data
@@ -1935,6 +1940,7 @@ tossing data, we'll use a tool in the {**rethinking**} package:
 ```{r}
 #| label: quap-globe-tossing
 
+## R code 2.6 ####################
 globe.qa <- rethinking::quap(
   alist(
     W ~ dbinom(W + L, p), # binomial likelihood
@@ -2035,7 +2041,7 @@ curve(dnorm(x, 0.67, 0.16), lty = 2, add = TRUE)
 
 
 
-#### Tidyverse
+#### TIDYVERSE
 
 In the book the calculation is only done for $n = 9$ but McElreath also
 display the graphs for $n = 18$ and $n = 36$ with the same proportion of
@@ -2044,7 +2050,7 @@ the book.
 
 ::: my-r-code
 ::: my-r-code-header
-::: {#cnj-ID-text}
+::: {#cnj-quap-different-sample-size}
 : Quadratic approximation showing the effect of different sample size
 :::
 :::
@@ -2170,9 +2176,6 @@ tibble::tibble(w = c(6, 12, 24),
 
 
 
-
-
-
 ::: my-resource
 ::: my-resource-header
 Textbooks highlighting MLE for GLMs
@@ -2199,36 +2202,33 @@ estimate (`r glossary("MLE")`) for the generalized linear model
 > “The quadratic approximation, either with a uniform prior or with a lot of data, is often equivalent to a `r glossary("MLE", "maximum likelihood estimate")` (MLE) and its `r glossary("standard error")`. The MLE is a very common non-Bayesian parameter estimate. This correspondence between a Bayesian approximation and a common non-Bayesian estimator is both a blessing and a curse. It is a blessing, because it allows us to re-interpret a wide range of published non-Bayesian model fits in Bayesian terms. It is a curse, because maximum likelihood estimates have some curious drawbacks, and the quadratic approximation can share them.” ([McElreath, 2020, p. 44](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=63&annotation=KDENIT9G))
 :::
 
-
-## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
-
 ### Markov Chain Monte Carlo (MCMC)
 
-#### Original
+#### ORIGINAL
 
-> There are lots of important model types, like multilevel
-> (mixed-effects) models, for which neither grid approximation nor
-> quadratic approximation is always satisfactory. ... As a result,
-> various counterintuitive model fitting techniques have arisen. The
-> most popular of these is **MARKOV CHAIN MONTE CARLO** (MCMC), which is
-> a family of conditioning engines capable of handling highly complex
-> models.
+> “There are lots of important model types, like multilevel (mixed-effects) models, for which neither grid approximation nor quadratic approximation is always satisfactory.” ([McElreath, 2020, p. 45](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=FQU3V949))
 
-> Instead of attempting to compute or approximate the posterior
-> distribution directly, MCMC techniques merely draw samples from the
-> posterior. You end up with a collection of parameter values, and the
-> frequencies of these values correspond to the posterior
-> plausibilities. You can then build a picture of the posterior from the
-> histogram of these samples.
+> “As a result, various counterintuitive model fitting techniques have arisen. The most popular of these is Markov chain Monte Carlo (MCMC), which is a family of conditioning engines capable of handling highly complex models. It is fair to say that MCMC is largely responsible for the insurgence of Bayesian data analysis that began in the 1990s. While MCMC is older than the 1990s, affordable computer power is not, so we must also thank the engineers.” ([McElreath, 2020, p. 45](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=K3L7AAW2))
+
+> “The conceptual challenge with MCMC lies in its highly non-obvious strategy. Instead of attempting to compute or approximate the posterior distribution directly, MCMC techniques merely draw samples from the posterior. You end up with a collection of parameter values, and the frequencies of these values correspond to the posterior plausibilities. You can then build a picture of the posterior from the histogram of these samples.” ([McElreath, 2020, p. 45](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=637IUB2W))
+
 
 The understanding of this not intuitive technique is postponed to
-chapter 9. What follows is just a demonstration of the technique.
+@sec-chap09. What follows is just a demonstration of the technique.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-demo-mcmc-rethinking}
+: Demo of the Markov Chain Monte Carlo (MCMC) method
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
 #| label: fig-demo-MCMC-rethinking
 #| fig-cap: "Demo of the Markov Chain Monte Carlo (MCMC) method using the globe-tossing data and calculated and diplayed with the {**rethinking**} package."
 
-## R code 2.8
+## R code 2.8 #######################
 n_samples <- 1000
 p <- rep(NA, n_samples)
 p[1] <- 0.5
@@ -2243,65 +2243,86 @@ for (i in 2:n_samples) {
   p[i] <- ifelse(runif(1) < q1 / q0, p_new, p[i - 1])
 }
 
-## R code 2.9
+## R code 2.9 #######################
 rethinking::dens(p, xlim = c(0, 1))
 curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
 
 
 ```
 
-It's weird. But it works. The above **METROPOLIS ALGORITHM** is
-explained in Chapter 9.
 
-#### Tidyverse
+::::
+:::::
 
-The {**brms**} package uses a version of MCMC to fit Bayesian models.
-brms stands for Bayesian Regression Models using 'Stan'.
+It's weird. But it works. The `r glossary("metropolis algorithm")` used in #cnj-fig-demo-mcmc-rethinking is explained in @sec-chap09.
 
-Since one of the main goals of \[the Kurz version of SR2\] is to
-highlight {**brms**}, we may as well fit a model. This seems like an
-appropriately named subsection to do so. First we'll have to load the
-package. (If you haven't already installed {**brms**}, you can find
+#### TIDYVERSE
+
+The {**brms**} package uses a version of `r glossary("MCMC")` to fit Bayesian models. `r glossary("brms")` stands for Bayesian Regression Models using `r glossary("Stan Platform", "Stan")`.
+
+The main goals of the Kurz’ version is to highlight the {**brms**} package. Therefore we will use it instead just replicating the {**rethinking**}-version of MCMC. 
+
+If you haven't already installed {**brms**}, you can find
 instructions on how to do on
 [GitHub](https://github.com/paul-buerkner/brms#how-do-i-install-brms) or
 on the [corresponding
-website](https://paul-buerkner.github.io/brms/).)As an exercise we will
-re-fit the model with $W = 24$ and $n = 36$ of
-@lst-quap-different-sample-size and @lst-fig-quadratic-approx.
+website](https://paul-buerkner.github.io/brms/).) 
 
-But before we use {**brms**} we need to detach the {**rethinking**}
-package.
+As an exercise we will re-fit the model with $W = 24$ and $n = 36$ of
+@cnj-quap-different-sample-size and @cnj-quap-globe-tossing.
 
-> **R** will not allow us to use a function from one package that shares
-> the same name as a different function from another package if both
-> packages are open at the same time. The **rethinking** and **brms**
-> packages are designed for similar purposes and, unsurprisingly,
-> overlap in some of their function names. To prevent problems, we will
-> always make sure **rethinking** is detached before using **brms**. To
-> learn more on the topic, see [this R-bloggers
-> post](https://www.r-bloggers.com/2015/04/r-and-package-masking-a-real-life-example/).
-> (This remark comes from [section 4.3.1 of the Kurz
-> version](https://bookdown.org/content/4857/geocentric-models.html#the-data)).
 
-This is the reason why I have not loading the rethinking packages in
-code chunks of this file. Instead I referred to every function of the
-{**rethinking**} packages directly adding `rethinking::` before the
-function call. This has also the advantage to learn which functions come
-from {**rethinking**}.
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+{**brms**} and {**rethinking**} are conflicting packages
+:::
+::::{.my-watch-out-container}
 
-::: callout-warning
-## First compiling
+**Preventing code conflicts**
+
+{**brms**} and {**rethinking**} are packages designed for similar purposes and therefore overlap in some of their function names. If you have loaded {**rethinking**} then you need to detach the package before loading {**brms**}. This is not necessary in my case, because I haven't used the `library()` command.
+
+To learn more on the topic, see [this R-bloggers post](https://www.r-bloggers.com/2015/04/r-and-package-masking-a-real-life-example/). (This remark comes from [section 4.3.1 of the Kurz version](https://bookdown.org/content/4857/geocentric-models.html#the-data)).
+
+**First compiling**
 
 Be patient when you render the following chunk the first time. It need
 some time. Furthermore it results in a very long processing message
-under the compiled chunk. Again this happens only the first because the
+under the compiled chunk. Again this happens only the first time because the
 result is stored in the "fits" folder which you have to create before
 running the chunk.
+::::
+:::::
+
+To resume the necessary preparing steps I collected all to dos in a procedure callout:
+
+:::::{.my-procedure}
+:::{.my-procedure-header}
+:::::: {#prp-chap02-using-brms-first-time}
+: Steps to use {**brms**} the first time
+::::::
 :::
+::::{.my-procedure-container}
+
+1. Prevent code conflicts as explained in the previous watch-out callout.
+2. Download the {**brms**} package
+3. Load the package with `library()` or use the package name followed by a double colon immediately before the function
+4. Create a folder in the working directory of your project. The following code chunks suggest "fits" as folder name. If you are using another name then you have to change the scripts accordingly.
+5. Render the script and be patient especially the first time you ar compiling the script.
+::::
+:::::
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-brms-clobe-tossing}
+: Demonstration of the `brm()` function of the {**brms**} package.
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: demo-brms
-#| attr-source: '#lst-demo-brms lst-cap="Demonstration of the `brm()` function of the {**brms**} package."'
+#| label: brms-globe-tossing
 
 b2.1 <-
   brms::brm(data = list(w = 24), 
@@ -2310,18 +2331,12 @@ b2.1 <-
       brms::prior(beta(1, 1), class = b, lb = 0, ub = 1),
       seed = 2,
       file = "fits/b02.01")
-```
-
-```{r}
-#| label: print-result-b2.1
-#| attr-source: '#lst-print-demo-brms lst-cap="Print the result of the demo of the {**brms**} package."' 
 
 print(b2.1)
 ```
 
-A detailed explanation is postponed to chapter 4. Here I will just copy
-the notes by Kurz to get a first understand and a starting point for a
-later further exploration.
+A detailed explanation of the result is postponed to @sec-chap04. Here I will just copy the notes by Kurz to get a first understanding and a starting point for 
+further exploration in the following chapters.
 
 > For now, focus on the 'Intercept' line. As we'll also learn in Chapter
 > 4, the intercept of a typical regression model with no predictors is
@@ -2368,13 +2383,36 @@ brms::as_draws_df(b2.1) |>
 > and we'll learn a lot about regression with the binomial likelihood in
 > [Chapter
 > 11](https://bookdown.org/content/4857/god-spiked-the-integers.html#god-spiked-the-integers).
+::::
+:::::
 
-#### Reconsideration
+:::::{.my-resource}
+:::{.my-resource-header}
+Using Bayesian Regression Models using Stan {**brms**}
+:::
+::::{.my-resource-container}
 
-##### Bayesian Inference: Some Lessons to Draw
+- Website: [Bayesian regression models using Stan](https://paul-buerkner.github.io/brms/)
+- Bürkner, P-C. (2017). brms: An R Package for Bayesian Multilevel Models Using Stan. Journal of Statistical Software, 80, 1–28. [https://doi.org/10.18637/jss.v080.i01](Ellis, A. (2021). Learn multilevel models: An Introduction to brms. https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/
+) 
+- Bürkner, P-C. (2018). The R Journal: Advanced Bayesian Multilevel Modeling with the R Package brms. The R Journal, 10(1), 395–411. [https://doi.org/10.32614/RJ-2018-017](https://doi.org/10.32614/RJ-2018-017)
+- van de Schoot, R. (2019). BRMS. Series of tutorials how to run the brms package. Rens van de Schoot Webpage. [https://www.rensvandeschoot.com/tutorials/brms/](https://www.rensvandeschoot.com/tutorials/brms/)
+- Nalborczyk, L. (2017). Appendix: An introduction to Bayesian multilevel models using brms | Understanding rumination as a form of inner speech. Retrieved October 31, 2023, from [https://lnalborczyk.github.io/phd_thesis/appendix-brms.html](https://lnalborczyk.github.io/phd_thesis/appendix-brms.html)
+- Nalborczyk, L., Batailler, C., Loevenbruck, H., Vilain, A., & Bürkner, P.-C. (2017). An Introduction to Bayesian Multilevel Models Using brms: A Case Study of Gender Effects on Vowel Variability in Standard Indonesian. [https://doi.org/10.17605/OSF.IO/DPZCB](https://doi.org/10.17605/OSF.IO/DPZCB)
+- Ellis, A. (2021). Learn multilevel models: An Introduction to brms. [https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/](https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/)
+
+
+::::
+:::::
+
+:::::{.my-important}
+:::{.my-important-header}
+Bayesian Inference: Some Lessons to Draw
+:::
+::::{.my-important-container}
 
 The following list summarizes differences between Bayesian and
-Non-Bayesian inference ("Frequentism"):
+Non-Bayesian inference (`r glossary("frequentist statistics")` or "Frequentism"):
 
 1.  **No minimum sampling size**: The minimum sampling size in Bayesian
     inference is one. You are going to update each data point at its
@@ -2384,7 +2422,7 @@ Non-Bayesian inference ("Frequentism"):
     in not getting over confident. It is always accurately representing
     the relative confidence of plausability we should assign to each of
     the possible proportions.
-2.  **Shape embodies sample size**: \*The shape of the posterior
+2.  **Shape embodies sample size**: The shape of the posterior
     distribution embodies all the information that the sample has about
     the process of the proportions. Therefore you do not need to go back
     to the original dataset for new observations. Just take the
@@ -2404,326 +2442,9 @@ Non-Bayesian inference ("Frequentism"):
     arbitrary. (The 95% in Non-Bayesian inference is essentially a
     dogma, a superstition. Even in Non-Bayesian statistics it is
     conceptualized as an arbitrary interval.)
+::::
+:::::
 
-## Synopsis
-
-### Small worlds and the garden of forking data
-
-The chapter starts to build Bayesian models and is focused on the small
-world. It explains probability theory in its essential form: counting
-the ways things can happen. This is shown with **the garden of forking
-data**.
-
-Bayesian inference is really just counting and comparing of
-possibilities. ... In order to make good inference about what actually
-happened, it helps to consider everything that could have happened. A
-Bayesian analysis is a garden of forking data, in which alternative
-sequences of events are cultivated. As we learn about what did happen,
-some of these alternative sequences are pruned. In the end, what remains
-is only what is logically consistent with our knowledge.
-
-#### Bayesian updating: Counting
-
-We may have additional information about the relative plausibility of
-each conjecture. This information could arise from knowledge of how the
-contents of the bag were generated. It could also arise from previous
-data. Whatever the source, it would help to have a way to combine
-different sources of information to update the plausibilities. Luckily
-there is a natural solution: Just multiply the counts. ...
-Multiplication is just a shortcut to enumerating and counting up all of
-the paths through the garden that could produce all the observations.
-
-A Bayesian model begins with one set of plausibilities assigned to each
-of these possibilities. These are the prior plausibilities. Then it
-updates them in light of the data, to produce the posterior
-plausibilities. This updating process is a kind of learning, called
-Bayesian updating.
-
-How to start the updating process?
-
-When there is no reason to say that one conjecture is more plausible
-than another, weigh all of the conjectures equally.
-
-#### From counts to probability
-
-When we don't know what caused the data, potential causes that may
-produce the data in more ways are more plausible.
-
-### Building a model
-
-#### Data story
-
-Bayesian data analysis usually means producing a story for how the data
-came to be. This story may be descriptive, specifying associations that
-can be used to predict outcomes, given observations. Or it may be
-causal, a theory of how some events produce other events.
-
-#### Bayesian updating again
-
-In contrast to non-Bayesian statistical inference with it widespread
-superstition that 30 observations are needed before one can use a
-Gaussian distribution (so-called *asymptotic* behavior), Bayesian
-estimates are valid for any sample size.
-
-This does not mean that more data isn't helpful---it certainly is.
-Rather, the estimates have a clear and valid interpretation, no matter
-the sample size. But the price for this power is dependency upon the
-initial plausibilities, the prior. If the prior is a bad one, then the
-resulting inference will be misleading.
-
-#### Evaluation
-
-1.  Model's certainty (curves narrow and tall) is no guarantee that the
-    model is a good one, because the inferences are conditional on the
-    model. Under a different model, things might look differently.
-2.  It is important to supervise and critique your model's work and to
-    check the model's inferences in light of aspects of the data it does
-    not know about. This usually means asking and answering additional
-    questions, beyond those that originally constructed the model.
-
-### Components of the model
-
--   **List variables**, observed ones (data) and unobserved ones
-    (parameter like proportions of observed variables).
--   **Define variables** by building a model that relates variables to
-    one another.
-    -   **Observed variables**: We don't have to literally count, we can
-        use a mathematical function that tells us the right
-        plausibility, the likelihood. For example in the case of the
-        globe tossing model this is the *binomial distribution*.
-    -   **Unobserved variables (parameters)**: In statistical modeling,
-        many of the most common questions we ask about data are answered
-        directly by parameters. For every parameter we intend our
-        Bayesian machine to consider, we must provide a distribution of
-        prior plausibility, its prior. Because the prior is an
-        assumption, it should be interrogated like other assumptions: by
-        altering it and checking how sensitive inference is to the
-        assumption.
-
-### Making the model go
-
-As mathematical rules often cannot be conditioned formally or you have
-to constrain your choice of prior to special forms that are easy to do
-mathematics with, we need numerical techniques to approximate the
-mathematics.
-
-#### Grid approximation
-
-We can achieve an excellent approximation of the continuous posterior
-distribution by considering only a finite grid of parameter values. At
-any particular value of a parameter, `p`, it's a simple matter to
-compute the posterior probability: just multiply the prior probability
-of `p` by the likelihood at `p`. Repeating this procedure for each value
-in the grid generates an approximate picture of the exact posterior
-distribution.
-
-##### Base R
-
-```{r}
-#| label: grid-approx-base-demo
-#| attr-source: '#lst-grid-approx-base-demo lst-cap="Five steps of the grid approximation technique using only functions of base R"'
-
-## R code 2.3 ###########################################
-
-p_grid <- seq(from = 0, to = 1, length.out = 20)    # <1>
-prior <- rep(1, 20)                                 # <2>
-likelihood <- dbinom(6, size = 9, prob = p_grid)    # <3>
-unstd.posterior <- likelihood * prior               # <4>
-posterior <- unstd.posterior / sum(unstd.posterior) # <5>
-
-```
-
-1.  Define the grid. This means you decide how many points to use in
-    estimating the posterior, and then you make a list of the parameter
-    values on the grid.
-2.  Compute the value of the prior at each parameter value on the grid.
-3.  Compute the likelihood at each parameter value.
-4.  Compute the unstandardized posterior at each parameter value, by
-    multiplying the prior by the likelihood.
-5.  Finally, standardize the posterior, by dividing each value by the
-    sum of all values.
-
-##### Tidyverse
-
-```{r}
-#| label: grid-approx-tidyverse-demo
-#| attr-source: '#lst-grid-approx-tidyverse-demo lst-cap="Five steps of the grid approximation technique using tidyverse functions"'
-#| eval: false
-#| echo: true
-
-(
-    df <-
-        tibble(p_grid = seq(from = 0, to = 1, length.out = 20),      # <1>
-               prior  = 1) |>                                        # <2>
-        mutate(likelihood = dbinom(6, size = 9, prob = p_grid)) |>   # <3>
-        mutate(unstd_posterior = likelihood * prior) |>              # <4>
-        mutate(posterior = unstd_posterior / sum(unstd_posterior))   # <5>
-)
-```
-
-1.  Define grid.
-2.  Define prior.
-3.  Compute likelihood at each value in grid.
-4.  Compute product of likelihood and prior.
-5.  Standardize the posterior.
-
-#### Quadratic approximation
-
-Grid approximation has the disadvantage that the number of unique values
-to consider in the grid grows rapidly as the number of parameters in the
-model increases. In this case quadratic approximation may be an
-alternative.
-
-Under quite general conditions, the region near the peak of the
-posterior distribution will be nearly Gaussian---or "normal"---in shape.
-This means the posterior distribution can be usefully approximated by a
-Gaussian distribution. A Gaussian distribution is convenient, because it
-can be completely described by only two numbers: the location of its
-center (mean) and its spread (variance).
-
-A Gaussian approximation is called "quadratic approximation" because the
-logarithm of a Gaussian distribution forms a parabola. And a parabola is
-a quadratic function.
-
-Two steps of the quadratic approximation technique:
-
-1.  Find the posterior mode. This is usually accomplished by some
-    optimization algorithm, a procedure that virtually "climbs" the
-    posterior distribution, as if it were a mountain. The golem doesn't
-    know where the peak is, but it does know the slope under its feet.
-    There are many well-developed optimization procedures, most of them
-    more clever than simple hill climbing. But all of them try to find
-    peaks.
-2.  Once you find the peak of the posterior, you must estimate the
-    curvature near the peak. This curvature is sufficient to compute a
-    quadratic approximation of the entire posterior distribution. In
-    some cases, these calculations can be done analytically, but usually
-    your computer uses some numerical technique instead.
-
-##### Rethinking
-
-```{r}
-#| label: quadratic-approx-demo
-#| attr-source: '#lst-quadratic-approx-demo lst-cap="Two steps of the quadratic approximation technique"'
-#| eval: false
-#| echo: true
-
-
-globe_qa <- rethinking::quap( # <1>
-  alist(                      # <2>
-    W ~ dbinom(W + L, p),     # <3> 
-    p ~ dunif(0, 1)           # <4> 
-  ), 
-  data = list(W = 6, L = 3)   # <5>
-)
-
-rethinking::precis(globe_qa)  # <6>
-```
-
-1.  To compute the quadratic approximation, the book will use as tool
-    the `rethinking::quap()` function in the rethinking package. With
-    `quap()` you will find the mode of posterior distribution and
-    produce an approximation of the full posterior using the quadratic
-    curvature at the mode.
-2.  To use `quap()`, you provide a formula, a list of data. The formula
-    defines the probability of the data and the prior. `base::alist()`
-    handles its arguments as if they described function arguments. So
-    the values are not evaluated, and tagged arguments with no value are
-    allowed whereas list simply ignores them. `alist()` is most often
-    used in conjunction with formulae.
-3.  Provide formula for the calculation of the binomial likelihood.
-4.  Provide the formula for the prior probability. In this example we
-    choose the uniform distribution between 0 and 1.
-5.  Provide the data for the calculation as a list of values. The chosen
-    names (symbols) correspond to the formula.
-6.  The function `rethinking::precis()` presents a brief summary of the
-    quadratic approximation.
-
-McElreath is using the quadratic approximation for much of the first
-half of this book. For many of the most common procedures in applied
-statistics---linear regression, for example---the approximation works
-very well. Often, it is even exactly correct, not actually an
-approximation at all. Computationally, quadratic approximation is very
-inexpensive, at least compared to grid approximation and MCMC.
-
-Additionally of using `rethinking::quap()`, I will also provide the
-`brms::brm()` alternative as suggested by the {**tidyverse**} version of
-Kurz.
-
-#### Markov chain Monte Carlo (MCMC)
-
-There are lots of important model types, like multilevel (mixed-effects)
-models, for which neither grid approximation nor quadratic approximation
-is always satisfactory. ... As a result, various counterintuitive model
-fitting techniques have arisen. The most popular of these is MCMC, which
-is a family of conditioning engines capable of handling highly complex
-models.
-
-The conceptual challenge with MCMC lies in its highly non-obvious
-strategy. Instead of attempting to compute or approximate the posterior
-distribution directly, MCMC techniques merely draw samples from the
-posterior. You end up with a collection of parameter values, and the
-frequencies of these values correspond to the posterior plausibilities.
-You can then build a picture of the posterior from the histogram of
-these samples.
-
-##### Base R and Rethinking
-
-I will add here without comments a demonstration of this important
-technique. In later chapters we will learn more about it.
-
-```{r}
-#| label: demo-MCMC
-#| attr-source: '#lst-demo-MCMC lst-cap="Demonstration how to estimate the posterior with MCMC"'
-#| eval: false
-
-## R code 2.8 ####################################
-n_samples <- 1000
-p <- rep(NA, n_samples)
-p[1] <- 0.5
-W <- 6
-L <- 3
-for (i in 2:n_samples) {
-  p_new <- rnorm(1, p[i - 1], 0.1)
-  if (p_new < 0) p_new <- abs(p_new)
-  if (p_new > 1) p_new <- 2 - p_new
-  q0 <- dbinom(W, W + L, p[i - 1])
-  q1 <- dbinom(W, W + L, p_new)
-  p[i] <- ifelse(runif(1) < q1 / q0, p_new, p[i - 1])
-}
-
-## R code 2.9 ####################################
-rethinking::dens(p, xlim = c(0, 1))
-curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
-```
-
-##### brms
-
-Again: The following demo comes without comments. It just will give a
-feeling of the structure of the used function. Later I will dive with
-Kurz into the details how to apply the functions of the {**brms**}
-package.
-
-```{r}
-#| label: demo-using-brms
-#| attr-source: '#lst-demo-using-brms lst-cap="Demonstration of using {brms}"'
-#| eval: false
-
-b2.1 <-
-  brms::brm(data = list(w = 24), 
-      family = binomial(link = "identity"),
-      w | trials(36) ~ 0 + Intercept,
-      brms::prior(beta(1, 1), class = b, lb = 0, ub = 1),
-      seed = 2,
-      file = "fits/b02.01")
-
-print(b2.1)
-
-brms::posterior_summary(b2.1) |>  
-  round(digits = 2)
-
-```
+## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
 
 ## Practice
-
-## I STOPPED HERE! (1st. pass, 2023-08-01) TO BE CONTINUED {.unnumbered}

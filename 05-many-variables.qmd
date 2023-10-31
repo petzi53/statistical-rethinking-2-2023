@@ -1,4 +1,4 @@
-# The Many Variables & The Spurious Waffles {#sec-the-many-variables}
+# The Many Variables & The Spurious Waffles {#sec-chap05}
 
 ## File setup {.unnumbered}
 
@@ -11,14 +11,17 @@ library(patchwork)
 
 ## Original
 
-Since most correlations do not indicate causal relationships, we need tools for distinguishing mere association from evidence of causation. This is why so much effort is devoted to `r glossary("multiple regression")`, using more than one predictor variable to simultaneously model an outcome.
+Since most correlations do not indicate causal relationships, we need
+tools for distinguishing mere association from evidence of causation.
+This is why so much effort is devoted to
+`r glossary("multiple regression")`, using more than one predictor
+variable to simultaneously model an outcome.
 
-Reasons given for multiple regression models include:
-1. Statistical "control" for confounds
-2. Multiple and complex causation
-3. `r glossary("Interaction")` of variables
+Reasons given for multiple regression models include: 1. Statistical
+"control" for confounds 2. Multiple and complex causation 3.
+`r glossary("Interaction")` of variables
 
-In this chapter, we begin use multiple regression to deal with simple confounds and to take multiple measurements of association. 
+In this chapter, we begin use multiple regression to deal with simple
+confounds and to take multiple measurements of association.
 
 ### Spurious association
-

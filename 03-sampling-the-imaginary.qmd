@@ -2087,7 +2087,7 @@ rethinking::simplehist(dummy_w_a, xlab = "dummy water count")
 > samples can be drawn from the posterior, as earlier in this chapter,
 > to aid in inference. In neither case is "sampling" a physical act. In
 > both cases, it's just a mathematical device and produces only *small
-> world* (@sec-small-and-large-worlds) numbers.
+> world* (@sec-chap02) numbers.
 
 #### Model checking
 
