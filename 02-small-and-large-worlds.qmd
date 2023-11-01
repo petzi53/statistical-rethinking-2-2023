@@ -8,14 +8,6 @@ nameref:
 
 # Small and Large Worlds {#sec-chap02}
 
-```{r}
-#| label: setup
-#| echo: TRUE
-
-
-library(tidyverse)
-```
-
 ## ORIGINAL {.unnumbered}
 
 ::: my-objectives
@@ -63,7 +55,7 @@ results. Therefore I will not replicate for example the very extensive
 explication how to produce with `tidyverse` means the graphics of the
 garden of forking data.
 
-## The Garden of Forking Data
+## The Garden of Forking Data {#sec-chap02-forking-data}
 
 ### ORIGINAL
 
@@ -1328,22 +1320,15 @@ $$
 Pr(W, L, p) = Pr(W, L \mid p) Pr(p)
 $$ {#eq-joint-prob-globe-tossing}
 
-> "This just says that the probability of $W$, $L$ and $p$ is the
-> product of $Pr(W, L \mid p)$ and the prior probability $Pr(p)$."
-> ([McElreath, 2020, p.
-> 37](zotero://select/groups/5243560/items/NFUEVASQ))
-> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=742VW7N2))
-> It is also true that:
+> “This just says that the probability of W, L and p is the product of Pr(W, L|p) and the prior probability Pr(p). This is like saying that the probability of rain and cold on the same day is equal to the probability of rain, when it’s cold, times the probability that it’s cold. This much is just definition. But it’s just as true that:” ([McElreath, 2020, p. 37](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=Y4JHGXCG))
 
-"This just says that the probability of W, L and p is the product of
-Pr(W, L\|p) and the prior probability Pr(p)."
 
 $$
-Pr(W, L, p) = Pr(W, L \mid p) Pr(W, L)
-$$ \> "All I've done is reverse which probability is conditional, on the
-right-hand side." ([McElreath, 2020, p.
-37](zotero://select/groups/5243560/items/NFUEVASQ))
-([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=PFQL3HIR))
+Pr(W, L, p) = Pr(p \mid W, L) Pr(W, L)
+$$ {#eq-reverse-cond-prob}
+
+
+> “All I’ve done is reverse which probability is conditional, on the right-hand side. It is still a true definition. It’s like saying that the probability of rain and cold on the same day is equal to the probability that it’s cold, when it’s raining, times the probability of rain.” ([McElreath, 2020, p. 37](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=56&annotation=KC37E7XA))
 
 > "Now since both right-hand sides above are equal to the same thing,
 > $Pr(W, L, p)$, they are also equal to one another:" ([McElreath, 2020,
@@ -1352,8 +1337,8 @@ right-hand side." ([McElreath, 2020, p.
 
 $$
 \begin{align*}
-Pr(W, L \mid p) Pr(p) = Pr(W, L \mid p) Pr(W, L) \\
-Pr(W, L \mid p) = \frac{Pr(W, L \mid p) Pr(p)}{Pr(W, L)}
+Pr(W, L \mid p) Pr(p) = Pr(p \mid W, L) Pr(W, L) \\
+Pr(p\mid W, L) = \frac{Pr(W, L \mid p) Pr(p)}{Pr(W, L)}
 \end{align*} 
 $$ {#eq-bayes-theorem}
 
@@ -1370,7 +1355,10 @@ Expressed in words:
 
 $$
 Posterior = \frac{Probability\space of\space the\space data\space ✕\space Prior}{Average\space probability\space of\space the\space data}
-$$ Other names for the somewhat confusing *average probability of the
+$$ {#eq-in-words}
+
+
+Other names for the somewhat confusing *average probability of the
 data*:
 
 -   evidence
@@ -1386,7 +1374,7 @@ data*:
 
 $$
 PR(W, L) = E(Pr(W, L \mid p)) = \int Pr(W, L \mid p) Pr(p) dp
-$$
+$$ {#eq-math-form}
 
 > "The operator E means to take an *expectation.* Such averages are
 > commonly called *marginals* in mathematical statistics, and so you may
@@ -1425,7 +1413,8 @@ fig-alt="The posterior distribution as a product of the prior distribution and l
 
 #### TIDYVERSE
 
-For my understanding it is important to reproduce the @fig-2-6-book graph with {**tidyverse**} R code as it is shown in the next section.
+For my understanding it is important to reproduce the @fig-2-6-book
+graph with {**tidyverse**} R code as it is shown in the next section.
 
 ::: my-r-code
 ::: my-r-code-header
@@ -1720,7 +1709,7 @@ Instead of just to replicate the globe-tossing steps with tidyverse code
 as in @cnj-globe-tossing-steps I will experiment with different priors
 to see their influences against the posterior distribution.
 
-@fig-different-priors uses Kurz' last code chunk in his [grid
+@cnj-globe-tossing-different-priors uses Kurz' last code chunk in his [grid
 approximation
 section](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html#grid-approximation).
 But I have adapted it to include the three uniform priors and to show
@@ -1754,7 +1743,6 @@ $ifelse(p\_grid < 0.5, 0, 1)$ and $exp(-5 * abs(p\_grid - 0.5))$.
 : Globe tossing with different priors and grid points
 :::
 :::
-
 ::: my-r-code-container
 ```{r}
 #| label: fig-different-priors
@@ -1762,9 +1750,9 @@ $ifelse(p\_grid < 0.5, 0, 1)$ and $exp(-5 * abs(p\_grid - 0.5))$.
 #| fig-height: 12
 
 ## R code 2.5 tidyverse integrated ################
-
-
 # prepare the plot by producing the data
+
+tib <- 
 tibble::tibble(n_points = c(5, 20, 100)) |>  
   dplyr::mutate(p_grid = purrr::map(n_points, ~seq(from = 0, to = 1, 
                                             length.out = .))) |>  
@@ -1894,7 +1882,7 @@ approximation works.
 ##### Concept
 
 > "Under quite general conditions, the region near the peak of the
-> posterior distribution will be nearly Gaussian---or "normal"---in
+> posterior distribution will be nearly Gaussian---or"normal"---in
 > shape. This means the posterior distribution can be usefully
 > approximated by a Gaussian distribution. A Gaussian distribution is
 > convenient, because it can be completely described by only two
@@ -1979,9 +1967,8 @@ rethinking::precis(globe.qa)
 3.  The function `rethinking::precis` presents a brief summary of the
     quadratic approximation.
 
-```{=html}
 <!-- -->
-```
+
 a)  **mean**: It shows the posterior mean value of $p = 0.67$. This is
     the peak of the posterior distribution.
 b)  **sd**: The curvature is labeled "sd" This stands for
@@ -2039,8 +2026,6 @@ curve(dnorm(x, 0.67, 0.16), lty = 2, add = TRUE)
 :::
 :::
 
-
-
 #### TIDYVERSE
 
 In the book the calculation is only done for $n = 9$ but McElreath also
@@ -2097,19 +2082,17 @@ globe_qa_36 <- rethinking::quap(
 rethinking::precis(globe_qa_36)
 ```
 
-The results above displays values for sample size $n = 9$ (top), $n = 18$ (middle) and $n = 36$ bottom. You can see that as the amount of data increases
+The results above displays values for sample size $n = 9$ (top),
+$n = 18$ (middle) and $n = 36$ bottom. You can see that as the amount of
+data increases
 
-1. the mean approximates the real value
-2. the standard deviation and the percentile intervals gets smaller.
-
-
-
+1.  the mean approximates the real value
+2.  the standard deviation and the percentile intervals gets smaller.
 :::
 :::
 
-
-> "As the amount of data increases, … the quadratic approximation
-> gets better." ([McElreath, 2020, p.
+> "As the amount of data increases, ... the quadratic approximation gets
+> better." ([McElreath, 2020, p.
 > 43](zotero://select/groups/5243560/items/NFUEVASQ))
 > ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=62&annotation=YQE3PX52))
 
@@ -2125,16 +2108,18 @@ The results above displays values for sample size $n = 9$ (top), $n = 18$ (middl
 > 44](zotero://select/groups/5243560/items/NFUEVASQ))
 > ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=63&annotation=PD39BQDF))
 
-@fig-quap-compare-analytic-different-n demonstrate that with more data the curve gets smaller and higher, signifying that the model gets more secure about the probability.
+@fig-quap-compare-analytic-different-n demonstrate that with more data
+the curve gets smaller and higher, signifying that the model gets more
+secure about the probability.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-quap-compare-analytic-different-n}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-quap-compare-analytic-different-n}
 : Accuracy of the quadratic approximation with different sample sizes
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-quap-compare-analytic-different-n
 #| fig-cap: "Accuracy of the quadratic approximation. In each plot, the exact posterior distribution is plotted as solid curve, and the quadratic approximation is plotted as the dashed curve."
@@ -2169,12 +2154,8 @@ tibble::tibble(w = c(6, 12, 24),
   ggplot2::facet_wrap(~ n, scales = "free")
 
 ```
-
-
-::::
-:::::
-
-
+:::
+:::
 
 ::: my-resource
 ::: my-resource-header
@@ -2186,44 +2167,76 @@ estimate (`r glossary("MLE")`) for the generalized linear model
 (`r glossary("GLM")`).
 
 ::: my-resource-container
-
-- Agresti. (2015). Foundations of Linear and Generalized Linear Models. Wiley.
-- Dobson, A. J., & Barnett, A. G. (2018). An Introduction to Generalized Linear Models (4th ed.). Chapman and Hall/CRC.
-- Dunn, P. K., & Smyth, G. K. (2018). Generalized Linear Models With Examples in R (1st ed. 2018 Edition). Springer.
+-   Agresti. (2015). Foundations of Linear and Generalized Linear
+    Models. Wiley.
+-   Dobson, A. J., & Barnett, A. G. (2018). An Introduction to
+    Generalized Linear Models (4th ed.). Chapman and Hall/CRC.
+-   Dunn, P. K., & Smyth, G. K. (2018). Generalized Linear Models With
+    Examples in R (1st ed. 2018 Edition). Springer.
 
 [@agresti2015; @dobson2018; @dunn2018]
 :::
 :::
 
-
-::: {.callout-note}
+::: callout-note
 ####### Maximum Likelihood Estimation (MLE)
 
-> “The quadratic approximation, either with a uniform prior or with a lot of data, is often equivalent to a `r glossary("MLE", "maximum likelihood estimate")` (MLE) and its `r glossary("standard error")`. The MLE is a very common non-Bayesian parameter estimate. This correspondence between a Bayesian approximation and a common non-Bayesian estimator is both a blessing and a curse. It is a blessing, because it allows us to re-interpret a wide range of published non-Bayesian model fits in Bayesian terms. It is a curse, because maximum likelihood estimates have some curious drawbacks, and the quadratic approximation can share them.” ([McElreath, 2020, p. 44](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=63&annotation=KDENIT9G))
+> "The quadratic approximation, either with a uniform prior or with a
+> lot of data, is often equivalent to a
+> `r glossary("MLE", "maximum likelihood estimate")` (MLE) and its
+> `r glossary("standard error")`. The MLE is a very common non-Bayesian
+> parameter estimate. This correspondence between a Bayesian
+> approximation and a common non-Bayesian estimator is both a blessing
+> and a curse. It is a blessing, because it allows us to re-interpret a
+> wide range of published non-Bayesian model fits in Bayesian terms. It
+> is a curse, because maximum likelihood estimates have some curious
+> drawbacks, and the quadratic approximation can share them."
+> ([McElreath, 2020, p.
+> 44](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=63&annotation=KDENIT9G))
 :::
 
 ### Markov Chain Monte Carlo (MCMC)
 
 #### ORIGINAL
 
-> “There are lots of important model types, like multilevel (mixed-effects) models, for which neither grid approximation nor quadratic approximation is always satisfactory.” ([McElreath, 2020, p. 45](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=FQU3V949))
+> "There are lots of important model types, like multilevel
+> (mixed-effects) models, for which neither grid approximation nor
+> quadratic approximation is always satisfactory." ([McElreath, 2020, p.
+> 45](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=FQU3V949))
 
-> “As a result, various counterintuitive model fitting techniques have arisen. The most popular of these is Markov chain Monte Carlo (MCMC), which is a family of conditioning engines capable of handling highly complex models. It is fair to say that MCMC is largely responsible for the insurgence of Bayesian data analysis that began in the 1990s. While MCMC is older than the 1990s, affordable computer power is not, so we must also thank the engineers.” ([McElreath, 2020, p. 45](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=K3L7AAW2))
+> "As a result, various counterintuitive model fitting techniques have
+> arisen. The most popular of these is Markov chain Monte Carlo (MCMC),
+> which is a family of conditioning engines capable of handling highly
+> complex models. It is fair to say that MCMC is largely responsible for
+> the insurgence of Bayesian data analysis that began in the 1990s.
+> While MCMC is older than the 1990s, affordable computer power is not,
+> so we must also thank the engineers." ([McElreath, 2020, p.
+> 45](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=K3L7AAW2))
 
-> “The conceptual challenge with MCMC lies in its highly non-obvious strategy. Instead of attempting to compute or approximate the posterior distribution directly, MCMC techniques merely draw samples from the posterior. You end up with a collection of parameter values, and the frequencies of these values correspond to the posterior plausibilities. You can then build a picture of the posterior from the histogram of these samples.” ([McElreath, 2020, p. 45](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=637IUB2W))
-
+> "The conceptual challenge with MCMC lies in its highly non-obvious
+> strategy. Instead of attempting to compute or approximate the
+> posterior distribution directly, MCMC techniques merely draw samples
+> from the posterior. You end up with a collection of parameter values,
+> and the frequencies of these values correspond to the posterior
+> plausibilities. You can then build a picture of the posterior from the
+> histogram of these samples." ([McElreath, 2020, p.
+> 45](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=64&annotation=637IUB2W))
 
 The understanding of this not intuitive technique is postponed to
 @sec-chap09. What follows is just a demonstration of the technique.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-demo-mcmc-rethinking}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-demo-mcmc-rethinking}
 : Demo of the Markov Chain Monte Carlo (MCMC) method
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-demo-MCMC-rethinking
 #| fig-cap: "Demo of the Markov Chain Monte Carlo (MCMC) method using the globe-tossing data and calculated and diplayed with the {**rethinking**} package."
@@ -2249,78 +2262,91 @@ curve(dbeta(x, W + 1, L + 1), lty = 2, add = TRUE)
 
 
 ```
+:::
+:::
 
-
-::::
-:::::
-
-It's weird. But it works. The `r glossary("metropolis algorithm")` used in #cnj-fig-demo-mcmc-rethinking is explained in @sec-chap09.
+It's weird. But it works. The `r glossary("metropolis algorithm")` used
+in #cnj-fig-demo-mcmc-rethinking is explained in @sec-chap09.
 
 #### TIDYVERSE
 
-The {**brms**} package uses a version of `r glossary("MCMC")` to fit Bayesian models. `r glossary("brms")` stands for Bayesian Regression Models using `r glossary("Stan Platform", "Stan")`.
+The {**brms**} package uses a version of `r glossary("MCMC")` to fit
+Bayesian models. `r glossary("brms")` stands for Bayesian Regression
+Models using `r glossary("Stan Platform", "Stan")`.
 
-The main goals of the Kurz’ version is to highlight the {**brms**} package. Therefore we will use it instead just replicating the {**rethinking**}-version of MCMC. 
+The main goals of the Kurz' version is to highlight the {**brms**}
+package. Therefore we will use it instead just replicating the
+{**rethinking**}-version of MCMC.
 
-If you haven't already installed {**brms**}, you can find
-instructions on how to do on
+If you haven't already installed {**brms**}, you can find instructions
+on how to do on
 [GitHub](https://github.com/paul-buerkner/brms#how-do-i-install-brms) or
-on the [corresponding
-website](https://paul-buerkner.github.io/brms/).) 
+on the [corresponding website](https://paul-buerkner.github.io/brms/).)
 
 As an exercise we will re-fit the model with $W = 24$ and $n = 36$ of
 @cnj-quap-different-sample-size and @cnj-quap-globe-tossing.
 
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 {**brms**} and {**rethinking**} are conflicting packages
 :::
-::::{.my-watch-out-container}
 
+::: my-watch-out-container
 **Preventing code conflicts**
 
-{**brms**} and {**rethinking**} are packages designed for similar purposes and therefore overlap in some of their function names. If you have loaded {**rethinking**} then you need to detach the package before loading {**brms**}. This is not necessary in my case, because I haven't used the `library()` command.
+{**brms**} and {**rethinking**} are packages designed for similar
+purposes and therefore overlap in some of their function names. If you
+have loaded {**rethinking**} then you need to detach the package before
+loading {**brms**}. This is not necessary in my case, because I haven't
+used the `library()` command.
 
-To learn more on the topic, see [this R-bloggers post](https://www.r-bloggers.com/2015/04/r-and-package-masking-a-real-life-example/). (This remark comes from [section 4.3.1 of the Kurz version](https://bookdown.org/content/4857/geocentric-models.html#the-data)).
+To learn more on the topic, see [this R-bloggers
+post](https://www.r-bloggers.com/2015/04/r-and-package-masking-a-real-life-example/).
+(This remark comes from [section 4.3.1 of the Kurz
+version](https://bookdown.org/content/4857/geocentric-models.html#the-data)).
 
 **First compiling**
 
 Be patient when you render the following chunk the first time. It need
 some time. Furthermore it results in a very long processing message
-under the compiled chunk. Again this happens only the first time because the
-result is stored in the "fits" folder which you have to create before
-running the chunk.
-::::
-:::::
+under the compiled chunk. Again this happens only the first time because
+the result is stored in the "fits" folder which you have to create
+before running the chunk.
+:::
+:::
 
-To resume the necessary preparing steps I collected all to dos in a procedure callout:
+To resume the necessary preparing steps I collected all to dos in a
+procedure callout:
 
-:::::{.my-procedure}
-:::{.my-procedure-header}
-:::::: {#prp-chap02-using-brms-first-time}
+::: my-procedure
+::: my-procedure-header
+::: {#prp-chap02-using-brms-first-time}
 : Steps to use {**brms**} the first time
-::::::
 :::
-::::{.my-procedure-container}
+:::
 
-1. Prevent code conflicts as explained in the previous watch-out callout.
-2. Download the {**brms**} package
-3. Load the package with `library()` or use the package name followed by a double colon immediately before the function
-4. Create a folder in the working directory of your project. The following code chunks suggest "fits" as folder name. If you are using another name then you have to change the scripts accordingly.
-5. Render the script and be patient especially the first time you ar compiling the script.
-::::
-:::::
+::: my-procedure-container
+1.  Prevent code conflicts as explained in the previous watch-out
+    callout.
+2.  Download the {**brms**} package
+3.  Load the package with `library()` or use the package name followed
+    by a double colon immediately before the function
+4.  Create a folder in the working directory of your project. The
+    following code chunks suggest "fits" as folder name. If you are
+    using another name then you have to change the scripts accordingly.
+5.  Render the script and be patient especially the first time you ar
+    compiling the script.
+:::
+:::
 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-brms-clobe-tossing}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-brms-clobe-tossing}
 : Demonstration of the `brm()` function of the {**brms**} package.
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: brms-globe-tossing
 
@@ -2335,8 +2361,9 @@ b2.1 <-
 print(b2.1)
 ```
 
-A detailed explanation of the result is postponed to @sec-chap04. Here I will just copy the notes by Kurz to get a first understanding and a starting point for 
-further exploration in the following chapters.
+A detailed explanation of the result is postponed to @sec-chap04. Here I
+will just copy the notes by Kurz to get a first understanding and a
+starting point for further exploration in the following chapters.
 
 > For now, focus on the 'Intercept' line. As we'll also learn in Chapter
 > 4, the intercept of a typical regression model with no predictors is
@@ -2367,13 +2394,14 @@ brms::posterior_summary(b2.1) |>
 #| fig-cap: "Demo of the Markov Chain Monte Carlo (MCMC) method using the globe-tossing data with the {**brms**} package."
 
 brms::as_draws_df(b2.1) |>  
-  mutate(n = "n = 36") |> 
+  dplyr::mutate(n = "n = 36") |> 
   
-  ggplot(aes(x = b_Intercept)) +
-  geom_density(fill = "black") +
-  scale_x_continuous("proportion water", limits = c(0, 1)) +
-  theme(panel.grid = element_blank()) +
-  facet_wrap(~ n)
+  ggplot2::ggplot(ggplot2::aes(x = b_Intercept)) +
+  ggplot2::geom_density(fill = "gray") +
+  ggplot2::scale_x_continuous("proportion water", limits = c(0, 1)) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ n)
 
 ```
 
@@ -2383,36 +2411,48 @@ brms::as_draws_df(b2.1) |>
 > and we'll learn a lot about regression with the binomial likelihood in
 > [Chapter
 > 11](https://bookdown.org/content/4857/god-spiked-the-integers.html#god-spiked-the-integers).
-::::
-:::::
+:::
+:::
 
-:::::{.my-resource}
-:::{.my-resource-header}
+::: my-resource
+::: my-resource-header
 Using Bayesian Regression Models using Stan {**brms**}
 :::
-::::{.my-resource-container}
 
-- Website: [Bayesian regression models using Stan](https://paul-buerkner.github.io/brms/)
-- Bürkner, P-C. (2017). brms: An R Package for Bayesian Multilevel Models Using Stan. Journal of Statistical Software, 80, 1–28. [https://doi.org/10.18637/jss.v080.i01](Ellis, A. (2021). Learn multilevel models: An Introduction to brms. https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/
-) 
-- Bürkner, P-C. (2018). The R Journal: Advanced Bayesian Multilevel Modeling with the R Package brms. The R Journal, 10(1), 395–411. [https://doi.org/10.32614/RJ-2018-017](https://doi.org/10.32614/RJ-2018-017)
-- van de Schoot, R. (2019). BRMS. Series of tutorials how to run the brms package. Rens van de Schoot Webpage. [https://www.rensvandeschoot.com/tutorials/brms/](https://www.rensvandeschoot.com/tutorials/brms/)
-- Nalborczyk, L. (2017). Appendix: An introduction to Bayesian multilevel models using brms | Understanding rumination as a form of inner speech. Retrieved October 31, 2023, from [https://lnalborczyk.github.io/phd_thesis/appendix-brms.html](https://lnalborczyk.github.io/phd_thesis/appendix-brms.html)
-- Nalborczyk, L., Batailler, C., Loevenbruck, H., Vilain, A., & Bürkner, P.-C. (2017). An Introduction to Bayesian Multilevel Models Using brms: A Case Study of Gender Effects on Vowel Variability in Standard Indonesian. [https://doi.org/10.17605/OSF.IO/DPZCB](https://doi.org/10.17605/OSF.IO/DPZCB)
-- Ellis, A. (2021). Learn multilevel models: An Introduction to brms. [https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/](https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/)
+::: my-resource-container
+-   Website: [Bayesian regression models using
+    Stan](https://paul-buerkner.github.io/brms/)
+-   Bürkner, P-C. (2017). brms: An R Package for Bayesian Multilevel
+    Models Using Stan. Journal of Statistical Software, 80, 1--28.
+    [https://doi.org/10.18637/jss.v080.i01](Ellis,%20A.%20(2021).%20Learn%20multilevel%20models:%20An%20Introduction%20to%20brms.%20https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/)
+-   Bürkner, P-C. (2018). The R Journal: Advanced Bayesian Multilevel
+    Modeling with the R Package brms. The R Journal, 10(1), 395--411.
+    <https://doi.org/10.32614/RJ-2018-017>
+-   van de Schoot, R. (2019). BRMS. Series of tutorials how to run the
+    brms package. Rens van de Schoot Webpage.
+    <https://www.rensvandeschoot.com/tutorials/brms/>
+-   Nalborczyk, L. (2017). Appendix: An introduction to Bayesian
+    multilevel models using brms \| Understanding rumination as a form
+    of inner speech. Retrieved October 31, 2023, from
+    <https://lnalborczyk.github.io/phd_thesis/appendix-brms.html>
+-   Nalborczyk, L., Batailler, C., Loevenbruck, H., Vilain, A., &
+    Bürkner, P.-C. (2017). An Introduction to Bayesian Multilevel Models
+    Using brms: A Case Study of Gender Effects on Vowel Variability in
+    Standard Indonesian. <https://doi.org/10.17605/OSF.IO/DPZCB>
+-   Ellis, A. (2021). Learn multilevel models: An Introduction to brms.
+    <https://awellis.github.io/learnmultilevelmodels/walkthrough-brms.html/>
+:::
+:::
 
-
-::::
-:::::
-
-:::::{.my-important}
-:::{.my-important-header}
+::: my-important
+::: my-important-header
 Bayesian Inference: Some Lessons to Draw
 :::
-::::{.my-important-container}
 
+::: my-important-container
 The following list summarizes differences between Bayesian and
-Non-Bayesian inference (`r glossary("frequentist statistics")` or "Frequentism"):
+Non-Bayesian inference (`r glossary("frequentist statistics")` or
+"Frequentism"):
 
 1.  **No minimum sampling size**: The minimum sampling size in Bayesian
     inference is one. You are going to update each data point at its
@@ -2442,9 +2482,509 @@ Non-Bayesian inference (`r glossary("frequentist statistics")` or "Frequentism")
     arbitrary. (The 95% in Non-Bayesian inference is essentially a
     dogma, a superstition. Even in Non-Bayesian statistics it is
     conceptualized as an arbitrary interval.)
+:::
+:::
+
+
+
+## Practice
+
+### Easy
+
+#### 2E1 {#sec-chap02-e1}
+
+::: my-solution
+::: my-solution-header
+####### Example 2E1: Which of the expressions below correspond to the statement: *the probability of rain on Monday*? {#chap-02-e1}
+:::
+
+::: my-solution-container
+(1) $Pr(rain)$
+(2) $Pr(rain \mid Monday)$
+(3) $Pr(Monday \mid rain)$
+(4) $\frac{Pr(rain, Monday)}{Pr(Monday)}$
+
+------------------------------------------------------------------------
+
+::: solution
+2.  and 4.
+
+::: callout-warning
+Originally I believed that only 2. is true. But both [Erik
+Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-e1)
+and [Jake
+Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2)
+also mentioned choice 4.
+
+The explication by [Erik
+Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-e1)
+convinced me:
+
+(4) $\frac{Pr(rain, Monday)}{Pr(Monday)}$ - reads as "the probability
+    that is raining and a Monday, divided by the probability of it being
+    a Monday" which is the same as "the probability of rain, given that
+    it is Monday. This is simply just the Bayes theorem in action.
+:::
+:::
+:::
+:::
+
+#### 2E2 {#sec-chap02-e2}
+
+::: my-solution
+::: my-solution-header
+####### Example 2E2: Which of the following statements corresponds to the expression: $Pr(Monday|rain)$?
+:::
+
+::: my-solution-container
+(1) The probability of rain on Monday.
+(2) The probability of rain, given that it is Monday.
+(3) The probability that it is Monday, given that it is raining.
+(4) The probability that it is Monday and that it is raining.
+
+------------------------------------------------------------------------
+
+::: solution
+3.  
+:::
+:::
+:::
+
+#### 2E3 {#sec-chap02-e3}
+
+::: my-solution
+::: my-solution-header
+####### Example 2E3: Which of the expressions below correspond to the statement: *the probability that it is Monday, given that it is raining*? {#chap-02-e3}
+:::
+
+::: my-solution-container
+$(1) Pr(Monday|rain)$ $(2) Pr(rain|Monday)$
+$(3) Pr(rain|Monday) Pr(Monday)$
+$(4) \frac{Pr(rain|Monday) Pr(Monday)} {Pr(rain)}$
+$(5) \frac{Pr(Monday|rain) Pr(rain)} {Pr(Monday)}$
+
+------------------------------------------------------------------------
+
+::: solution
+1.  and 4. 
+:::
+
+::: callout-warning
+Again I did not see/know that 4. the `r glossary("bayes’ theorem")` is
+also a correct solution. Again
+[Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-e3)
+and Thompson had 1. and 4. as solution. This time [Jake
+Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2)
+has a short explanation:
+
+> Answer option (1) is the standard notation for the conditional
+> probability. Answer option (4) is equivalent, as this is [Bayes'
+> Theorem](https://en.wikipedia.org/wiki/Bayes'_theorem#Statement_of_theorem).
+:::
+:::
+:::
+
+#### 2E4 {#sec-chap02-e4}
+
+::: my-solution
+::: my-solution-header
+####### Example 2E4: Does probability exist?
+:::
+
+::: my-solution-container
+The Bayesian statistician Bruno de Finetti (1906--1985) began his 1973
+book on probability theory with the declaration: "PROBABILITY DOES NOT
+EXIST." The capitals appeared in the original, so I imagine de Finetti
+wanted us to shout this statement. What he meant is that probability is
+a device for describing uncertainty from the perspective of an observer
+with limited knowledge; it has no objective reality. Discuss the globe
+tossing example from the chapter, in light of this statement. What does
+it mean to say "the probability of water is 0.7"?
+
+See [@finetti2017; @galavotti2008]
+
+------------------------------------------------------------------------
+
+::: solution
+As an observer we collected evidence (tossing the globe and collecting how many often our index finger hold the globe over water) that "the probability of water is 0.7". But the word "probability" is only necessary as we have only limited knowledge. Beings with unlimited knowledge (e.g., "God") would say "the earth has a proportion of 0.71:0.29 of water to land". The word "probability" would not be necessary.
+
+::: {.callout-warning}
+The answers to this question differ widely. One answer I like especially is from [Jake Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2): 
+
+> The idea is that probability is only a subjective perception of the likelihood that something will happen. In the globe tossing example, the result will always be either “land” or “water” (i.e., 0 or 1). When we toss the globe, we don’t know what the result will be, but we know it will always be “land” or “water.” To express our uncertainty in the outcome, we use probability. Because we know that water is more likely than land, we may say that the probability of “water” is 0.7; however, we’ll never actually observe a result of 0.7 waters, or observe any probability. We will only ever observe the two results of “land” and “water.”
+
+:::
+:::
+:::
+:::
+
+
+
+### Middle
+
+#### 2M1 {#sec-chap02-m1}
+
+::: my-solution
+::: my-solution-header
+####### Example 2M1: Globe tossing model -- Compute and plot the grid approximate posterior distribution for each of the following sets of observations.
+:::
+
+::: my-solution-container
+In each case, assume a uniform prior for $p$.
+
+(1) $W, W, W$ 
+(2) $W, W, W, L$ 
+(3) $L, W, W, L, W, W, W$
+
+------------------------------------------------------------------------
+
+::: solution
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2M1}
+: Compute and plot the grid approximate posterior distribution
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: fig-example-2m1
+#| fig-cap: "Globe tossing model -- Compute and plot the grid approximate posterior distribution with a uniform prior"
+
+
+# prepare the plot by producing the data 
+df_2m1 <- tibble::tibble(grid_2m1 = 
+                 seq(from = 0, to = 1, length.out = 20)) |> 
+  dplyr::mutate(prior = 1,
+                likelihood_1 = dbinom(3, size = 3, prob = grid_2m1),
+                likelihood_2 = dbinom(3, size = 4, prob = grid_2m1),
+                likelihood_3 = dbinom(5, size = 7, prob = grid_2m1),
+                posterior_1 = likelihood_1 * 
+                  prior / sum(likelihood_1 * prior),
+                posterior_2 = likelihood_2 * 
+                  prior / sum(likelihood_2 * prior),
+                posterior_3 = likelihood_3 * 
+                  prior / sum(likelihood_3 * prior))
+
+  
+  # plot the data
+  ggplot2::ggplot(data = df_2m1) + 
+    ggplot2::geom_line(ggplot2::aes(x = grid_2m1, y = posterior_1, 
+                                linetype = "(1) W, W, W")) +
+    ggplot2::geom_line(ggplot2::aes(x = grid_2m1, y = posterior_2,
+                                linetype = "(2) W, W, W, L")) +
+    ggplot2::geom_line(ggplot2::aes(x = grid_2m1, y = posterior_3,
+              linetype = "(3) L, W, W, L, W, W, W")) +
+    ggplot2::scale_linetype_manual("Data:", 
+                        values = c("solid", "dashed", "dotted")) +
+  ggplot2::labs(title = 
+  "Exercise 2M1: Grid approximation with uniform prior = 1, 20 points",
+                x = "probability of water",
+                y = "posterior probability") +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw() 
+
+
+```
+
 ::::
 :::::
 
+My original code was with 100 points and a uniform prior of 0.5. The shape of the curves conformed to both [Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-m1--m2) and [Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2), but the values of the y-axis were different. For a better comparison I chanced my code to the prior 0f 1 with 20 points.
+
+BTW: The code from Thompson is very advanced. Obviously he is very experienced with R.
+
+:::
+:::
+:::
+
+#### 2M2 {#sec-chap02-m2}
+
+::: my-solution
+::: my-solution-header
+####### Example 2M2: Now assume a prior for $p$ that is equal to zero when $p < 0.5$ and is a positive constant when $p ≥ 0.5$. 
+:::
+
+::: my-solution-container
+Again compute and plot the grid approximate posterior distribution for each of the sets of the observations
+
+(1) $W, W, W$ 
+(2) $W, W, W, L$ 
+(3) $L, W, W, L, W, W, W$
+
+------------------------------------------------------------------------
+
+::: solution
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2M1}
+: Compute and plot the grid approximate posterior distribution
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: fig-example-2m2
+#| fig-cap: "Globe tossing model -- Compute and plot the grid approximate posterior distribution with a prior for p that is equal to zero when p < 0.5 and is a positive constant when p ≥ 0.5"
+
+# prepare the plot by producing the data 
+df_2m2 <- tibble::tibble(grid_2m2 = 
+                 seq(from = 0, to = 1, length.out = 20)) |> 
+  dplyr::mutate(prior = ifelse(grid_2m2 < 0.5, 0, 1)) |> 
+  dplyr::mutate(likelihood_1 = dbinom(3, size = 3, prob = grid_2m2),
+                likelihood_2 = dbinom(3, size = 4, prob = grid_2m2),
+                likelihood_3 = dbinom(5, size = 7, prob = grid_2m2),
+                posterior_1 = likelihood_1 * 
+                  prior / sum(likelihood_1 * prior),
+                posterior_2 = likelihood_2 * 
+                  prior / sum(likelihood_2 * prior),
+                posterior_3 = likelihood_3 * 
+                  prior / sum(likelihood_3 * prior))
+
+  
+  # plot the data
+  ggplot2::ggplot(data = df_2m2) + 
+    ggplot2::geom_line(ggplot2::aes(x = grid_2m2, y = posterior_1, 
+                                linetype = "(1) W, W, W")) +
+    ggplot2::geom_line(ggplot2::aes(x = grid_2m2, y = posterior_2,
+                                linetype = "(2) W, W, W, L")) +
+    ggplot2::geom_line(ggplot2::aes(x = grid_2m2, y = posterior_3,
+              linetype = "(3) L, W, W, L, W, W, W")) +
+    ggplot2::scale_linetype_manual("Data:", 
+                        values = c("solid", "dashed", "dotted")) +
+  ggplot2::labs(title = 
+  "Exercise 2M2: Grid approximation with 20 points a prior for p that is 
+equal to zero when p < 0.5 and is a positive constant when p ≥ 0.5",
+                x = "probability of water",
+                y = "posterior probability") +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw() 
+
+
+```
+
+::::
+:::::
+
+
+
+
+
+:::
+:::
+:::
+
+#### 2M3 {#sec-chap02-m3}
+
+::: my-solution
+::: my-solution-header
+####### Example 2M3: Suppose there are two globes, one for Earth and one for Mars.
+:::
+
+::: my-solution-container
+The Earth globe is $70\%$ covered in water. The Mars globe is $100\%$ land. Further suppose that one of these globes—you don’t know which—was tossed in the air and produced a “land” observation. Assume that each globe was equally likely to be tossed. Show that the posterior probability that the globe was the Earth, conditional on seeing “land” ($Pr(Earth \mid land)$), is $0.23$.
+
+
+------------------------------------------------------------------------
+
+::: solution
+
+What do we know?
+
+$$
+\begin{align*}
+Pr(land \mid Earth) = 1 - 0.7 = 0.3 \\
+Pr(land \mid Mars) = 1 \\
+Pr(Earth) = Pr(Mars) = 0.5 \\
+\text{Bayes’ theorem} = Pr(Earth \mid land) = \frac{Pr(land\mid Earth) Pr(Earth)}{Pr(land)} \\
+Pr(land) \text{is the only value that is missing, can be caluclated by:} \\
+Pr(land) = Pr(land \mid Earth)Pr(Earth) + Pr(land \mid Mars)Pr(Mars) \\
+Pr(land) = 0.3 \times 0.5 + 1 \times 0.5 = 0.15 + 0.5 = 0.65 \\
+\text{now we can plug in all values in Bayes’ theorem} \\
+Pr(Earth \mid land) = \frac{0.3 \times 0.5 }{0.65} = 0.2307692
+\end{align*}
+$$
+
+::: {.callout-warning}
+I have to confess that I didn't know the solution. I had to cheat and look at the solution of [Aidan Marshall](https://github.com/AidanMar/Statistical-Rethinking-Solutions/blob/main/Chapter%202%20-%20SMALL%20WORLDS%20AND%20LARGE%20WORLDS.ipynb), [Taras Svirskyi](https://github.com/jffist/statistical-rethinking-solutions/blob/master/ch02_hw.R), [Jake Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2) and [Erik Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-m3). All of them knew the correct answer! 
+
+My answers follows the solution of Erik Kusch. By this occasion I detected an error in my writing down the derivation of the Bayes' theorem (@thm-bayes-theorem). No surprise that I failed this exercise and all the others with the Bayes’ theorem as part of the solution (\nameref{sec-chap02-e1} and \nameref{sec-chap02-e3}).
+:::
+
+
+
+
+
+
+
+:::
+:::
+:::
+
+
 ## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
 
-## Practice
+#### 2M4 {#sec-chap02-m4}
+
+::: my-solution
+::: my-solution-header
+####### Example 2M4: Suppose you have a deck with only three cards {#example-2m4}
+:::
+
+::: my-solution-container
+Each card has two sides, and each side is either black or white. One
+card has two black sides. The second card has one black and one white
+side. The third card has two white sides.
+
+Now suppose all three cards are placed in a bag and shuffled. Someone
+reaches into the bag and pulls out a card and places it flat on a table.
+A black side is shown facing up, but you don't know the color of the
+side facing down.
+
+Show that the probability that the other side is also black is 2/3. Use
+the counting method from section \nameref{sec-chap02-forking-data} to
+approach this problem. This means counting up the ways that each card
+could produce the observed data (a black side facing up on the table).
+
+------------------------------------------------------------------------
+
+::: solution
+The solution.
+:::
+:::
+:::
+
+#### 2M5 {#sec-chap02-m5}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+#### 2M6 {#sec-chap02-m6}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+#### 2M7 {#sec-chap02-m7}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+### Hard
+
+#### 2H1 {#sec-chap02-h1}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+#### 2H2 {#sec-chap02-h2}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+#### 2H3 {#sec-chap02-h3}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+#### 2H4 {#sec-chap02-h4}
+
+::: my-solution
+::: my-solution-header
+####### Example example-number and title
+:::
+
+::: my-solution-container
+description
+
+------------------------------------------------------------------------
+
+::: solution
+the solution
+:::
+:::
+:::
+
+
+## Session Info
+
+```{r}
+#| label: session-info
+sessionInfo()
+```
+
