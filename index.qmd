@@ -1,7 +1,18 @@
+---
+filters: 
+  - quarto
+  - nameref
+nameref:
+  section-number: true
+---
+
 # Preface {.unnumbered}
 
 ::: {.callout-note style="color: blue;"}
-## This is work in progress: Included 118 of 555 of the {**rethinking**} code chunks $\approx$ 21,3% of the book content.
+This is work in progress: I have finished in a first draft the first 4 chapters, e.g., $\approx 21\%$ of the book content.
+
+I am working on a second draft where I will shorten my notes but include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft is currently working on the exercises of the second chapter, e.g. it has finished e.g., $\approx 8\%$ of the book content.
+
 :::
 
 ## Content and Goals of this Book {.unnumbered}

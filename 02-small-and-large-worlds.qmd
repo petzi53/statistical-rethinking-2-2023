@@ -2,8 +2,6 @@
 filters: 
   - quarto
   - nameref
-nameref:
-  section-number: true
 ---
 
 # Small and Large Worlds {#sec-chap02}
@@ -2493,20 +2491,21 @@ Non-Bayesian inference (`r glossary("frequentist statistics")` or
 
 #### 2E1 {#sec-chap02-e1}
 
-::: my-solution
-::: my-solution-header
-####### Example 2E1: Which of the expressions below correspond to the statement: *the probability of rain on Monday*? {#chap-02-e1}
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2E1: Which of the expressions below correspond to the statement: *the probability of rain on Monday*? {#chap-02-e1}
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 (1) $Pr(rain)$
 (2) $Pr(rain \mid Monday)$
 (3) $Pr(Monday \mid rain)$
 (4) $\frac{Pr(rain, Monday)}{Pr(Monday)}$
 
-------------------------------------------------------------------------
+***
 
-::: solution
+**My Solution**
+
 2.  and 4.
 
 ::: callout-warning
@@ -2523,51 +2522,56 @@ convinced me:
 (4) $\frac{Pr(rain, Monday)}{Pr(Monday)}$ - reads as "the probability
     that is raining and a Monday, divided by the probability of it being
     a Monday" which is the same as "the probability of rain, given that
-    it is Monday. This is simply just the Bayes theorem in action.
+    it is Monday. This is simply just the Bayes theorem in action."
 :::
-:::
-:::
-:::
+
+
+::::
+:::::
+
 
 #### 2E2 {#sec-chap02-e2}
 
-::: my-solution
-::: my-solution-header
-####### Example 2E2: Which of the following statements corresponds to the expression: $Pr(Monday|rain)$?
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2E2: Which of the following statements corresponds to the expression: $Pr(Monday|rain)$?
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 (1) The probability of rain on Monday.
 (2) The probability of rain, given that it is Monday.
 (3) The probability that it is Monday, given that it is raining.
 (4) The probability that it is Monday and that it is raining.
 
-------------------------------------------------------------------------
 
-::: solution
-3.  
-:::
-:::
-:::
+***
+
+**My Solution**
+
+3. 
+
+::::
+:::::
+
 
 #### 2E3 {#sec-chap02-e3}
 
-::: my-solution
-::: my-solution-header
-####### Example 2E3: Which of the expressions below correspond to the statement: *the probability that it is Monday, given that it is raining*? {#chap-02-e3}
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2E3: Which of the expressions below correspond to the statement: *the probability that it is Monday, given that it is raining*? {#chap-02-e3}
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 $(1) Pr(Monday|rain)$ $(2) Pr(rain|Monday)$
 $(3) Pr(rain|Monday) Pr(Monday)$
 $(4) \frac{Pr(rain|Monday) Pr(Monday)} {Pr(rain)}$
 $(5) \frac{Pr(Monday|rain) Pr(rain)} {Pr(Monday)}$
 
-------------------------------------------------------------------------
+***
 
-::: solution
-1.  and 4. 
-:::
+**My Solution**
+
+1. and 4. 
 
 ::: callout-warning
 Again I did not see/know that 4. the `r glossary("bayes’ theorem")` is
@@ -2581,17 +2585,18 @@ has a short explanation:
 > probability. Answer option (4) is equivalent, as this is [Bayes'
 > Theorem](https://en.wikipedia.org/wiki/Bayes'_theorem#Statement_of_theorem).
 :::
-:::
-:::
+
+::::
+:::::
 
 #### 2E4 {#sec-chap02-e4}
 
-::: my-solution
-::: my-solution-header
-####### Example 2E4: Does probability exist?
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2E4: Does probability exist?
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 The Bayesian statistician Bruno de Finetti (1906--1985) began his 1973
 book on probability theory with the declaration: "PROBABILITY DOES NOT
 EXIST." The capitals appeared in the original, so I imagine de Finetti
@@ -2603,9 +2608,10 @@ it mean to say "the probability of water is 0.7"?
 
 See [@finetti2017; @galavotti2008]
 
-------------------------------------------------------------------------
+***
 
-::: solution
+**My Solution**
+
 As an observer we collected evidence (tossing the globe and collecting how many often our index finger hold the globe over water) that "the probability of water is 0.7". But the word "probability" is only necessary as we have only limited knowledge. Beings with unlimited knowledge (e.g., "God") would say "the earth has a proportion of 0.71:0.29 of water to land". The word "probability" would not be necessary.
 
 ::: {.callout-warning}
@@ -2614,31 +2620,32 @@ The answers to this question differ widely. One answer I like especially is from
 > The idea is that probability is only a subjective perception of the likelihood that something will happen. In the globe tossing example, the result will always be either “land” or “water” (i.e., 0 or 1). When we toss the globe, we don’t know what the result will be, but we know it will always be “land” or “water.” To express our uncertainty in the outcome, we use probability. Because we know that water is more likely than land, we may say that the probability of “water” is 0.7; however, we’ll never actually observe a result of 0.7 waters, or observe any probability. We will only ever observe the two results of “land” and “water.”
 
 :::
-:::
-:::
-:::
 
+
+::::
+:::::
 
 
 ### Middle
 
 #### 2M1 {#sec-chap02-m1}
 
-::: my-solution
-::: my-solution-header
-####### Example 2M1: Globe tossing model -- Compute and plot the grid approximate posterior distribution for each of the following sets of observations.
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M1: Globe tossing model -- Compute and plot the grid approximate posterior distribution for each of the following sets of observations
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 In each case, assume a uniform prior for $p$.
 
 (1) $W, W, W$ 
 (2) $W, W, W, L$ 
 (3) $L, W, W, L, W, W, W$
 
-------------------------------------------------------------------------
+***
 
-::: solution
+**My Solution**
+
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-2M1}
@@ -2647,7 +2654,7 @@ In each case, assume a uniform prior for $p$.
 :::
 ::::{.my-r-code-container}
 ```{r}
-#| label: fig-example-2m1
+#| label: fig-exercise-2m1
 #| fig-cap: "Globe tossing model -- Compute and plot the grid approximate posterior distribution with a uniform prior"
 
 
@@ -2694,26 +2701,29 @@ My original code was with 100 points and a uniform prior of 0.5. The shape of th
 BTW: The code from Thompson is very advanced. Obviously he is very experienced with R.
 
 :::
-:::
-:::
+
+
+::::
+
 
 #### 2M2 {#sec-chap02-m2}
 
-::: my-solution
-::: my-solution-header
-####### Example 2M2: Now assume a prior for $p$ that is equal to zero when $p < 0.5$ and is a positive constant when $p ≥ 0.5$. 
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M2: Now assume a prior for $p$ that is equal to zero when $p < 0.5$ and is a positive constant when $p ≥ 0.5$. 
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 Again compute and plot the grid approximate posterior distribution for each of the sets of the observations
 
 (1) $W, W, W$ 
 (2) $W, W, W, L$ 
 (3) $L, W, W, L, W, W, W$
 
-------------------------------------------------------------------------
+***
 
-::: solution
+**My Solution**
+
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-2M1}
@@ -2722,7 +2732,7 @@ Again compute and plot the grid approximate posterior distribution for each of t
 :::
 ::::{.my-r-code-container}
 ```{r}
-#| label: fig-example-2m2
+#| label: fig-exercise-2m2
 #| fig-cap: "Globe tossing model -- Compute and plot the grid approximate posterior distribution with a prior for p that is equal to zero when p < 0.5 and is a positive constant when p ≥ 0.5"
 
 # prepare the plot by producing the data 
@@ -2765,27 +2775,21 @@ equal to zero when p < 0.5 and is a positive constant when p ≥ 0.5",
 :::::
 
 
-
-
-
-:::
-:::
-:::
+::::
 
 #### 2M3 {#sec-chap02-m3}
 
-::: my-solution
-::: my-solution-header
-####### Example 2M3: Suppose there are two globes, one for Earth and one for Mars.
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M3: Suppose there are two globes, one for Earth and one for Mars.
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 The Earth globe is $70\%$ covered in water. The Mars globe is $100\%$ land. Further suppose that one of these globes—you don’t know which—was tossed in the air and produced a “land” observation. Assume that each globe was equally likely to be tossed. Show that the posterior probability that the globe was the Earth, conditional on seeing “land” ($Pr(Earth \mid land)$), is $0.23$.
 
+***
 
-------------------------------------------------------------------------
-
-::: solution
+**My Solution**
 
 What do we know?
 
@@ -2801,7 +2805,7 @@ Pr(land) = 0.3 \times 0.5 + 1 \times 0.5 = 0.15 + 0.5 = 0.65 \\
 \text{now we can plug in all values in Bayes’ theorem} \\
 Pr(Earth \mid land) = \frac{0.3 \times 0.5 }{0.65} = 0.2307692
 \end{align*}
-$$
+$$ {#eq-2m3}
 
 ::: {.callout-warning}
 I have to confess that I didn't know the solution. I had to cheat and look at the solution of [Aidan Marshall](https://github.com/AidanMar/Statistical-Rethinking-Solutions/blob/main/Chapter%202%20-%20SMALL%20WORLDS%20AND%20LARGE%20WORLDS.ipynb), [Taras Svirskyi](https://github.com/jffist/statistical-rethinking-solutions/blob/master/ch02_hw.R), [Jake Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2) and [Erik Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-m3). All of them knew the correct answer! 
@@ -2817,19 +2821,20 @@ My answers follows the solution of Erik Kusch. By this occasion I detected an er
 
 :::
 :::
-:::
 
 
-## I STOPPED HERE!! SECOND PASS (2023-10-29) {.unnumbered}
+::::
+
+
 
 #### 2M4 {#sec-chap02-m4}
 
-::: my-solution
-::: my-solution-header
-####### Example 2M4: Suppose you have a deck with only three cards {#example-2m4}
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M4: Suppose you have a deck with only three cards {#exercise-2m4}
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
 Each card has two sides, and each side is either black or white. One
 card has two black sides. The second card has one black and one white
 side. The third card has two white sides.
@@ -2844,141 +2849,423 @@ the counting method from section \nameref{sec-chap02-forking-data} to
 approach this problem. This means counting up the ways that each card
 could produce the observed data (a black side facing up on the table).
 
-------------------------------------------------------------------------
+***
 
-::: solution
-The solution.
+**My Solution**
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2M4}
+: Deck with three cards B/B, B/W, and W/W
+::::::
 :::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-2m4
+
+ways_card_bb <- 2
+ways_card_bw <- 1
+ways_card_ww <- 0
+
+likelihood <- c(ways_card_bb, ways_card_bw, ways_card_ww)
+prior <- c(1, 1, 1)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+posterior[1]
+
+```
+
+::::
+:::::
+
+
 :::
+
+::: {.callout-warning}
+Again it seems that the way I tried to solve the exercise was wrong even if I got the correct result 1/3. I thought it would be enough to count the whole cards as ways and not the sides of the cards. Why? I thought that every card has just one side to make it visible for the observer. 
+
+So my solution counted the sample space as {B/B, B/W, W/W} and ways to produce a cards with a black side in front as {B/B, B/W}. $\frac{Ways}{Sample Space} = \frac{2}{3}$
+
+But with the next example my method yields $\frac{3}{4}$ whereas the solution of other people resulted in $0.8$.
+:::
+
+
 :::
 
 #### 2M5 {#sec-chap02-m5}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M5: Deck with four cards B/B, B/W, W/W, and B/B
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
-description
+Again suppose a card is drawn from the bag and a black side appears face up. Again calculate the probability that the other side is black.
 
-------------------------------------------------------------------------
+***
 
-::: solution
-the solution
+**My Solution**
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2M5}
+: Deck with four cards B/B, B/W, W/W, and B/B
+::::::
 :::
-:::
-:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-2m5
+
+ways_card_bb <- 2
+ways_card_bw <- 1
+ways_card_ww <- 0
+
+likelihood <- c(ways_card_bb, ways_card_bw, 
+                ways_card_ww, ways_card_bb)
+prior <- c(1, 1, 1, 1)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+posterior[1] + posterior[4]
+
+```
+
+::::
+:::::
+
+
+
+::::
+:::::
 
 #### 2M6 {#sec-chap02-m6}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M6: Card deck where cards with a black side are heavier
+:::
+::::{.my-exercise-container}
+
+Imagine that black ink is heavy, and so cards with black sides are heavier than cards with white sides. As a result, it’s less likely that a card with black sides is pulled from the bag. 
+
+So again assume there are three cards: B/B, B/W, and W/W. After experimenting a number of times, you conclude that for every way to pull the B/B card from the bag, there are 2 ways to pull the B/W card and 3 ways to pull the W/W card. 
+
+Again suppose that a card is pulled and a black side appears face up. Show that the probability the other side is black is now 0.5. Use the counting method, as before.
+
+***
+
+**My Solution**
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2M6}
+: Deck with three cards with different probability to draw
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-2m6
+
+ways_card_bb <- 2
+ways_card_bw <- 1
+ways_card_ww <- 0
+
+likelihood <- c(ways_card_bb, ways_card_bw, ways_card_ww)
+prior <- c(1, 2, 3)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+posterior[1]
+
+```
+
+
+:::
 :::
 
-::: my-solution-container
-description
-
-------------------------------------------------------------------------
-
-::: solution
-the solution
 :::
-:::
-:::
+::::
 
 #### 2M7 {#sec-chap02-m7}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2M7: Card showing a black side face up before drawing a second card
+:::
+::::{.my-exercise-container}
+
+Assume again the original card problem, with a single card showing a black side face up. Before looking at the other side, we draw another card from the bag and lay it face up on the table. The face that is shown on the new card is white. Show that the probability that the first card, the one showing a black side, has black on its other side is now 0.75. Use the counting method, if you can. 
+
+Hint: Treat this like the sequence of globe tosses, counting all the ways to see each observation, for each possible first card.
+
+***
+
+**My Solution**
+
+We have in the original card problem three cards: B/B, B/W, and W/W. Two cards show B and W. The probability that the first card is B/B is 0.75. 
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2M7}
+: Card showing a black side face up before drawing a second card
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-2m7
+
+# 2 choices for first card, with 3 options for second card: 2 W/W + 1 W/B
+ways_card_bb <- 2 * 3
+ways_card_bw <- 1 * 2
+ways_card_ww <- 0
+
+likelihood <- c(ways_card_bb, ways_card_bw, ways_card_ww)
+prior <- c(1, 1, 1)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+posterior[1]
+
+```
+
 :::
 
-::: my-solution-container
-description
 
-------------------------------------------------------------------------
+:::
+:::
 
-::: solution
-the solution
+::: {.callout-note}
+[Aidan Marshall](https://github.com/AidanMar/Statistical-Rethinking-Solutions/blob/main/Chapter%202%20-%20SMALL%20WORLDS%20AND%20LARGE%20WORLDS.ipynb) has interesting different solutions of this and the previous exercises using the Bayes’ rule.
 :::
-:::
-:::
+
+
+::::
+
+
+
 
 ### Hard
 
 #### 2H1 {#sec-chap02-h1}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2H1: Two species of panda bear differ in their family size
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
-description
+Suppose there are two species of panda bear. Both are equally common in the wild and live in the same places. They look exactly alike and eat the same food, and there is yet no genetic assay capable of telling them apart. 
 
-------------------------------------------------------------------------
+They differ however in their family sizes. Species A gives birth to twins 10% of the time, otherwise birthing a single infant. Species B births twins 20% of the time, otherwise birthing singleton infants. Assume these numbers are known with certainty, from many years of field research. 
 
-::: solution
-the solution
+Now suppose you are managing a captive panda breeding program. You have a new female panda of unknown species, and she has just given birth to twins. What is the probability that her next birth will also be twins?
+
+***
+
+**My Solution**
+
+
+
+$$
+\begin{align*}
+Pr(A) = 0.5 \\
+Pr(B) = 0.5 \\
+Pr(twins \mid A) = 0.1 \\
+Pr(twins \mid B) = 0.2 \\
+Pr(twins) = (0.1 + 0.2) / 2 = 0.15 \\
+\text{} \\
+Pr(A \mid twins) = \frac{Pr(twins \mid A)Pr(A)}{Pr(twins)} \\
+Pr(A \mid twins) = \frac{0.1 \times 0.5}{0.15} = 0.3333 \\
+\text{} \\
+Pr(B \mid twins) = \frac{Pr(twins \mid B)Pr(B)}{Pr(twins)} \\
+Pr(B \mid twins) = \frac{0.2 \times 0.5}{0.15} = 0.6667 \\
+\text{} \\
+Pr(twins) = Pr(A \mid twins)Pr(twins \mid A) + Pr(B \mid twins)Pr(twins \mid B)\\
+Pr(twins) = \frac{1}{3}  \times 0.1 + \frac{2}{3} \times 0.2 = \frac{0.1}{3} + \frac{0.4}{3} = \frac{0.5}{3} = \frac{1}{6} \text{  or}\\    
+Pr(twins) = (0.3333 * 0.1) + (0.6667 * 0.2) = 0.16667
+\end{align*}
+$$ {#eq-2h1}
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2H1}
+: Probability that the next birth are twins again
+::::::
 :::
-:::
-:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-2H1
+#| results: hold
+
+
+## species A and B are each likely
+prob_A <- 0.5
+prob_B <- 0.5
+prior <- c(prob_A, prob_B)
+
+## the likelihood to give birth twins for species A and B
+twins_likelihood_A <-  0.1
+twins_likelihood_B <-  0.2
+likelihood <- c(twins_likelihood_A, twins_likelihood_B)
+
+## posterior probability of each species giving birth twins
+posterior <-  prior * likelihood
+posterior <- posterior / sum(posterior)
+
+glue::glue(
+  'Posterior probability of giving birth to twins: 
+  for species A = {round(posterior[1], 4)},
+  for species B = {round(posterior[2], 4)}.')
+
+glue::glue(
+  'Probability that the next birth are twins:
+  Summarize the probability of each panda times 
+  their appriopriate probability to give birth to twins = {(round(sum(posterior * likelihood), 4))}'
+)
+
+```
+
+::::
+:::::
+
+::::
+:::::
+
+
 
 #### 2H2 {#sec-chap02-h2}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2H2: Probability for Panda A after first birth of twins to birth twins again with its second birth
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
-description
+Recall all the facts from the problem above. Now compute the probability that the panda we have is from species A, assuming we have observed only the first birth and that it was twins.
 
-------------------------------------------------------------------------
+***
 
-::: solution
-the solution
-:::
-:::
-:::
+**My Solution**
+
+$$
+\begin{align*}
+Pr(twins \mid A) = Pr(A \mid twins) \times Pr(A \mid twins) \\
+Pr(twins \mid A) = \frac{1}{3} \times \frac{1}{3} = \frac{1}{9} = 0.1111
+\end{align*}
+$$ {#eq-2h2}
+
+***
+
+All the other people have just taken the already computed for species A the probability of the first generation to give birth twins (= 0.3333). But I understood the question in the different: We should calculate the probability of twins for the second birth given that we know the panda is from species A and that the first birth were twins.
+::::
+:::::
+
+
 
 #### 2H3 {#sec-chap02-h3}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2H3: Second birth is a singleton infant.
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
-description
+Continuing on from the previous problem, suppose the same panda mother has a second birth and that it is not twins, but a singleton infant. Compute the posterior probability that this panda is species A.
 
-------------------------------------------------------------------------
+***
 
-::: solution
-the solution
+**My Solution**
+
+$$
+\begin{align*}
+Pr(singleton \mid A) = 1 - Pr(twins \mid A) = 1 - 0.1 = 0.9 \\
+Pr(singleton \mid B) = 1 - Pr(twins \mid B) = 1 - 0.2 = 0.8 \\
+Pr(twins \mid A) = \frac{1}{3} \text{ = first birth} \\
+Pr(twins \mid B) = \frac{2}{3} \text{ = first birth} \\
+Pr(singleton) = Pr(singleton \mid A) * Pr(twins \mid A) + \\
++ Pr(singleton \mid B) * Pr(twins \mid B) \\
+Pr(singleton) = (0.9 * \frac{1}{3}) + (0.8 * \frac{2}{3}) = \frac{0.9}{3} + \frac{1.6}{3} = \frac{2.5}{3} = \frac{5}{6} \text{ = second birth} \\
+\\
+Pr(A \mid singleton) = \frac{Pr(singleton | A)Pr(twins \mid A)}{Pr(singleton)} \\
+Pr(A \mid singleton) = \frac{0.9 * \frac{1}{3}}{\frac{5}{6}} = \frac{\frac{0.9}{3}}{\frac{5}{6}} = \frac{5.4}{15} = 0.36
+\end{align*}
+$$ {#eq-2h3}
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2H3}
+: Probability of {twins, singleton} for species A
+::::::
 :::
-:::
-:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-2H3
+
+## the likelihood to give birth twins for species A and B
+twins_likelihood_A <-  0.1
+twins_likelihood_B <-  0.2
+
+## the likelihood to birth sinlgeton for species A and B
+singleton_likelihood_A <-  1 - twins_likelihood_A
+singleton_likelihood_B <-  1 - twins_likelihood_B
+
+
+# likelihood for each species is Pr(twins) * Pr(singleton)
+likelihood_A <- twins_likelihood_A * singleton_likelihood_A
+likelihood_B <- twins_likelihood_B * singleton_likelihood_B
+
+# posterior probabilities
+likelihood <- c(likelihood_A, likelihood_B)
+prior <- c(1, 1)
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+# print result
+glue::glue('Posterior probability for singleton
+in second birth for species A = {posterior[1]}.')
+
+
+```
+
+I had it wrong. Instead of multiplying $Pr(singleton \mid species)$ with the previous calculation of  $Pr(twins \mid species)$ I computed the $Pr(species \mid singleton)$ following the pattern of @eq-2h1.
+::::
+:::::
+
+
+
+::::
+:::::
+
+## I STOPPED HERE!! SECOND PASS (2023-11-05) {.unnumbered}
 
 #### 2H4 {#sec-chap02-h4}
 
-::: my-solution
-::: my-solution-header
-####### Example example-number and title
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 2H4: Bayesian inference with data of different type
 :::
+::::{.my-exercise-container}
 
-::: my-solution-container
-description
+A common boast of Bayesian statisticians is that Bayesian inference makes it easy to use all of the data, even if the data are of different types. So suppose now that a veterinarian comes along who has a new genetic test that she claims can identify the species of our mother panda. But the test, like all tests, is imperfect. This is the information you have about the test: 
 
-------------------------------------------------------------------------
+- The probability it correctly identifies a species A panda is 0.8. 
+- The probability it correctly identifies a species B panda is 0.65. 
 
-::: solution
-the solution
-:::
-:::
-:::
+The vet administers the test to your panda and tells you that the test is positive for species A. First ignore your previous information from the births and compute the posterior probability that your panda is species A. Then redo your calculation, now using the birth data as well.
+
+***
+
+**My Solution**
+
+Here comes the solution
+
+::::
+:::::
+
 
 
 ## Session Info
