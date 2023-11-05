@@ -1948,6 +1948,18 @@ rethinking::precis(globe.qa)
 > 43](zotero://select/groups/5243560/items/NFUEVASQ))
 > ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=62&annotation=RMZS6PQW))
 
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+Sometimes the `quap()` functions returns an error
+:::
+::::{.my-watch-out-container}
+ 
+If the `quap()` function does not compile because of an error, just try rendering the function or file again. The reason for the error? The function has chosen randomly a bad starting point for the approximation. (Later we will learn how to set start values to prevent such errors.) 
+::::
+:::::
+
+
+
 ::: my-procedure
 ::: my-procedure-header
 ::: {#prp-explain-quap}
@@ -3058,7 +3070,7 @@ Exercise 2H1: Two species of panda bear differ in their family size
 
 Suppose there are two species of panda bear. Both are equally common in the wild and live in the same places. They look exactly alike and eat the same food, and there is yet no genetic assay capable of telling them apart. 
 
-They differ however in their family sizes. Species A gives birth to twins 10% of the time, otherwise birthing a single infant. Species B births twins 20% of the time, otherwise birthing singleton infants. Assume these numbers are known with certainty, from many years of field research. 
+They differ however in their family sizes. Species A gives birth to twins 10% of the time, otherwise birthing a single infant. Species B births twins 20% of the time, otherwise birthing single infants. Assume these numbers are known with certainty, from many years of field research. 
 
 Now suppose you are managing a captive panda breeding program. You have a new female panda of unknown species, and she has just given birth to twins. What is the probability that her next birth will also be twins?
 
@@ -3074,7 +3086,8 @@ Pr(A) = 0.5 \\
 Pr(B) = 0.5 \\
 Pr(twins \mid A) = 0.1 \\
 Pr(twins \mid B) = 0.2 \\
-Pr(twins) = (0.1 + 0.2) / 2 = 0.15 \\
+Pr(twins) = \text{average of twins} \\
+Pr(twins) = (0.1 * 0.5) + (0.2 * 0.5) \text = (0.1 + 0.2) / 2 = 0.15 \\
 \text{} \\
 Pr(A \mid twins) = \frac{Pr(twins \mid A)Pr(A)}{Pr(twins)} \\
 Pr(A \mid twins) = \frac{0.1 \times 0.5}{0.15} = 0.3333 \\
@@ -3169,11 +3182,11 @@ All the other people have just taken the already computed for species A the prob
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
-Exercise 2H3: Second birth is a singleton infant.
+Exercise 2H3: Second birth is a single infant.
 :::
 ::::{.my-exercise-container}
 
-Continuing on from the previous problem, suppose the same panda mother has a second birth and that it is not twins, but a singleton infant. Compute the posterior probability that this panda is species A.
+Continuing on from the previous problem, suppose the same panda mother has a second birth and that it is not twins, but a single infant. Compute the posterior probability that this panda is species A.
 
 ***
 
@@ -3181,23 +3194,24 @@ Continuing on from the previous problem, suppose the same panda mother has a sec
 
 $$
 \begin{align*}
-Pr(singleton \mid A) = 1 - Pr(twins \mid A) = 1 - 0.1 = 0.9 \\
-Pr(singleton \mid B) = 1 - Pr(twins \mid B) = 1 - 0.2 = 0.8 \\
-Pr(twins \mid A) = \frac{1}{3} \text{ = first birth} \\
-Pr(twins \mid B) = \frac{2}{3} \text{ = first birth} \\
-Pr(singleton) = Pr(singleton \mid A) * Pr(twins \mid A) + \\
-+ Pr(singleton \mid B) * Pr(twins \mid B) \\
-Pr(singleton) = (0.9 * \frac{1}{3}) + (0.8 * \frac{2}{3}) = \frac{0.9}{3} + \frac{1.6}{3} = \frac{2.5}{3} = \frac{5}{6} \text{ = second birth} \\
+Pr(single \mid A) = 1 - Pr(twins \mid A) = 1 - 0.1 = 0.9 \\
+Pr(single \mid B) = 1 - Pr(twins \mid B) = 1 - 0.2 = 0.8 \\
+Pr(A) = \frac{1}{3} \text{ = first twin birth for A} \\
+Pr(B) = \frac{2}{3} \text{ = first twin birth for B} \\
+\text{second birth is singelton} \\
+Pr(single) = Pr(single \mid A)Pr(A)
++ Pr(single \mid B)Pr(B)\\
+Pr(single) = (0.9 \times \frac{1}{3}) + (0.8 \times \frac{2}{3}) = \frac{0.9}{3} + \frac{1.6}{3} = \frac{2.5}{3} = \frac{5}{6} \\
 \\
-Pr(A \mid singleton) = \frac{Pr(singleton | A)Pr(twins \mid A)}{Pr(singleton)} \\
-Pr(A \mid singleton) = \frac{0.9 * \frac{1}{3}}{\frac{5}{6}} = \frac{\frac{0.9}{3}}{\frac{5}{6}} = \frac{5.4}{15} = 0.36
+Pr(A \mid single) = \frac{Pr(single \mid A)Pr(A)}{Pr(single)} \\
+Pr(A \mid single) = \frac{0.9 \times \frac{1}{3}}{\frac{5}{6}} = \frac{\frac{0.9}{3}}{\frac{5}{6}} = \frac{5.4}{15} = 0.36
 \end{align*}
 $$ {#eq-2h3}
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-2H3}
-: Probability of {twins, singleton} for species A
+: Probability of {twins, single} for species A
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -3209,14 +3223,14 @@ $$ {#eq-2h3}
 twins_likelihood_A <-  0.1
 twins_likelihood_B <-  0.2
 
-## the likelihood to birth sinlgeton for species A and B
-singleton_likelihood_A <-  1 - twins_likelihood_A
-singleton_likelihood_B <-  1 - twins_likelihood_B
+## the likelihood to single birth for species A and B
+single_likelihood_A <-  1 - twins_likelihood_A
+single_likelihood_B <-  1 - twins_likelihood_B
 
 
-# likelihood for each species is Pr(twins) * Pr(singleton)
-likelihood_A <- twins_likelihood_A * singleton_likelihood_A
-likelihood_B <- twins_likelihood_B * singleton_likelihood_B
+# likelihood for each species is Pr(twins) * Pr(single)
+likelihood_A <- twins_likelihood_A * single_likelihood_A
+likelihood_B <- twins_likelihood_B * single_likelihood_B
 
 # posterior probabilities
 likelihood <- c(likelihood_A, likelihood_B)
@@ -3225,13 +3239,13 @@ posterior <- likelihood * prior
 posterior <- posterior / sum(posterior)
 
 # print result
-glue::glue('Posterior probability for singleton
+glue::glue('Posterior probability for single
 in second birth for species A = {posterior[1]}.')
 
 
 ```
 
-I had it wrong. Instead of multiplying $Pr(singleton \mid species)$ with the previous calculation of  $Pr(twins \mid species)$ I computed the $Pr(species \mid singleton)$ following the pattern of @eq-2h1.
+I had it wrong. Instead of multiplying $Pr(single \mid species)$ with the previous calculation of  $Pr(twins \mid species)$ I computed the $Pr(species \mid single)$ following the pattern of @eq-2h1.
 ::::
 :::::
 
@@ -3239,8 +3253,6 @@ I had it wrong. Instead of multiplying $Pr(singleton \mid species)$ with the pre
 
 ::::
 :::::
-
-## I STOPPED HERE!! SECOND PASS (2023-11-05) {.unnumbered}
 
 #### 2H4 {#sec-chap02-h4}
 
@@ -3261,7 +3273,65 @@ The vet administers the test to your panda and tells you that the test is positi
 
 **My Solution**
 
-Here comes the solution
+$$
+\begin{align*}
+Pr(A) = Pr(B) = 0.50 \\
+Pr(➕ \mid A) = 0.80\\
+Pr(➕ \mid B) = 0.65\\
+Pr(A \mid ➕) = \frac{Pr(➕ \mid A)Pr(A)}{Pr(➕)} \\
+Pr(➕) = Pr(➕ \mid A) \times Pr(A) + (1 - Pr(➕\mid B) \times Pr(B))\\
+Pr(➕) = (0.8 \times 0.5) + (0.35 \times 0.5) = 0.575\\
+Pr(A \mid ➕) = \frac{0.8 \times 0.5}{0.575} = 0.696 \\
+\\
+\\
+\text{include all birth data from previous exercise}\\
+Pr(A) = 0.36 \\
+Pr(B) = 1 - Pr(A) = 0.64 \\
+Pr(➕) = Pr(➕ \mid A) \times Pr(A) + (1 - Pr(➕\mid B) \times Pr(B))\\
+Pr(➕) = (0.8 \times 0.36) + (0.35 \times 0.64) = 0.512\\
+Pr(A \mid ➕) = \frac{Pr(➕ \mid A)Pr(A)}{Pr(➕)} \\
+Pr(A \mid ➕) = \frac{0.8 \times 0.36}{0.512} = 0.5625
+\end{align*}
+$$ {#eq-2h4}
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-2h4}
+: Probability with genetic test without and with birth data
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-2h4
+#| results: hold
+likelihood_test <- c(0.8, 0.35)
+prior <- c(1, 1)
+posterior_test <- prior * likelihood_test
+posterior_test <- posterior_test / sum(posterior_test)
+
+
+##### include all birth data from previous exercise
+
+# likelihood for each species is Pr(twins) * Pr(singleton)
+likelihood_A <- 0.1 * (1 - 0.1)
+likelihood_B <- 0.2 * (1 - 0.2)
+
+# compute posterior probabilities, using test result as prior
+likelihood <- c(likelihood_A, likelihood_B)
+prior <- c(posterior_test[1], posterior_test[2])
+posterior <- likelihood * prior
+posterior <- posterior / sum(posterior)
+
+# print result
+glue::glue('Posterior probability for 
+positive test result: {round(posterior_test[1], 4)}
+positive test and two births: {round(posterior[1], 4)}')
+```
+
+::::
+:::::
+
 
 ::::
 :::::
