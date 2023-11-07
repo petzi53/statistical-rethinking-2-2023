@@ -33,7 +33,7 @@ format:
      - glossary.css
     number-sections: true
     toc-depth: 5
-    toc-expand: 3
+    toc-expand: 4
     code-fold: true
     code-tools: true
     code-link: true

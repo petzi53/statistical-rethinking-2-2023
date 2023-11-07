@@ -1,38 +1,18 @@
 # Sampling the Imaginary {#sec-chap03}
 
-:::::{.my-objectives}
-:::{.my-objectives-header}
-Learning Objectives:
-:::
-::::{.my-objectives-container}
-
-This chapter teaches the basic skills for working with samples from the
-posterior distribution. We'll begin to use samples to summarize and
-simulate model output. The skills learned here will apply to every
-problem in the remainder of the book, even though the details of the
-models and how the samples are produced will vary.
-
-The chapter exploits the fact that people are better in counts than in
-probabilities. We will take the probability distributions from the
-previous chapter and sampling from them to produce counts.
-::::
-:::::
-
 ```{r}
 #| label: setup
 
 library(tidyverse)
 ```
 
-## Vampire Example {.unnumbered}
+## Vampire Examplen {.unnumbered}
 
 ### ORIGINAL {.unnumbered}
 
 :::::{.my-definition}
 :::{.my-definition-header}
-:::::: {#def-chap-03-1}
-: Probability Notation
-::::::
+Probability Notation
 :::
 ::::{.my-definition-container}
 As a repetition and to get a better understanding of the following formulae in this section I read a very [basic introduction into probability notation]((https://www.mathsisfun.com/data/probability-events-conditional.html))
@@ -89,55 +69,58 @@ $$
 
 #### a) Medical Test Scenario with Bayes theorem {.unnumbered}
 
-> “suppose there is a blood test that correctly detects vampirism 95% of the time. In more precise and mathematical notation, $Pr(\text{positive test result} \mid vampire) = 0.95$. It’s a very accurate test, nearly always catching real vampires. It also make mistakes, though, in the form of false positives. One percent of the time, it incorrectly diagnoses normal people as vampires, $Pr(\text{positive test result}|mortal) = 0.01$. The final bit of information we are told is that vampires are rather rare, being only $0.1\%$ of the population, implying $Pr(vampire) = 0.001$. Suppose now that someone tests positive for vampirism. What’s the probability that he or she is a bloodsucking immortal?” ([McElreath, 2020, p. 49](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=W9MU6VCZ))
+1.  Suppose there is a blood test that correctly detects vampirism 95%
+    of the time.$Pr(positivetest|vampire) = 0.95$.
+2.  It's a very accurate test, nearly always catching real vampires. It
+    also make mistakes, though, in the form of false positives. One
+    percent of the time, it incorrectly diagnoses normal people as
+    vampires, $Pr(positive test result| mortal) = 0.01$.
+3.  The final bit of information we are told is that vampires are rather
+    rare, being only 0.1% of the population, implying
+    $Pr(vampire) = 0.001$.
 
-> “The correct approach is just to use Bayes’ theorem to invert the probability, to compute $Pr(vampire|positive)$. The calculation can be presented as:
+Suppose now that someone tests positive for vampirism. What's the
+probability that he or she is a bloodsucking immortal?
+
+The correct approach is just to use Bayes' theorem to invert the
+probability, to compute $Pr(vampire | positive)$.
 
 $$
-\begin{align*}
-Pr(vampire\mid positive) = \frac{Pr(positive\mid vampire) Pr(vampire)}{Pr(positive)}\\
-\text{where Pr(positive) is the average probability of a positive test result, that is,}\\ Pr(positive) = Pr(positive \mid vampire) Pr(vampire) \\
-+ Pr(positive \mid mortal) 1 − Pr(vampire)
-\end{align*}
-$$ {#eq-vampire}
-” ([McElreath, 2020, p. 49](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=X4KD33AT))
+\Pr(\text{vampire}|\text{positive}) = \frac{\Pr(\text{positive}|\text{vampire})\Pr(\text{vampire})}{\Pr(\text{positive})}.
+$$
 
+where $Pr(positive)$ is the average probability of a positive test
+result, that is,
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-bayes-a}
-: Performing vampire calculation with `r glossary("Bayes’ theorem")` in Base R
-::::::
-:::
-::::{.my-r-code-container}
+$$
+Pr(positive) = Pr(positive|vampire)Pr(vampire) + Pr(positive|mortal)Pr(1-vampire)
+$$
 
 ```{r}
-#| label: vampire-bayes-a
+#| label: scenario-bayes-theorem-a
+#| attr-source: '#lst-bayes-scenario lst-cap="Calculated with the Bayes formula"'
 
-## R code 3.1a Vampire ##################
+## R code 3.1
 Pr_Positive_Vampire_a <- 0.95
 Pr_Positive_Mortal_a <- 0.01
 Pr_Vampire_a <- 0.001
 Pr_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a +
   Pr_Positive_Mortal_a * (1 - Pr_Vampire_a)
-
-( 
-  Pr_Vampire_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a / Pr_Positive_a
-)
-
+(Pr_Vampire_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a / Pr_Positive_a)
 ```
 
-::::
-:::::
+There is only an 8.7% chance that the suspect is actually a vampire.
 
-
-There is only an `r Pr_Vampire_Positive_a`% chance that the suspect is actually a vampire.
-
-> “Most people find this result counterintuitive. And it’s a very important result, because it mimics the structure of many realistic testing contexts, such as HIV and DNA testing, criminal profiling, and even statistical significance testing (see the Rethinking box at the end of this section). Whenever the condition of interest is very rare, having a test that finds all the true cases is still no guarantee that a positive result carries much information at all. The reason is that most positive results are false positives, even when all the true positives are detected correctly” ([McElreath, 2020, p. 49](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=CMMR49PQ))
+> Most people find this result counterintuitive. And it's a very
+> important result, because it mimics the structure of many realistic
+> testing contexts, such as HIV and DNA testing, criminal profiling, and
+> even statistical significance testing ... . Whenever the condition of
+> interest is very rare, having a test that finds all the true cases is
+> still no guarantee that a positive result carries much information at
+> all. The reason is that most positive results are false positives,
+> even when all the true positives are detected correctly.
 
 #### b) Medical test scenario with natural frequencies {.unnumbered}
-
-> “There is a way to present the same problem that does make it more intuitive” ([McElreath, 2020, p. 50](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=69&annotation=2DWF7729))
 
 ```         
 (1)  In a population of 100,000 people, 100 of them are vampires.
@@ -150,286 +133,232 @@ people only 95 / (999 + 95) = `r (95 / (999 + 95)) * 100` % are actually
 vampires.
 
 Or with a slightly different wording it is still easier to
-understand: 
-
-1. We can just count up the number of people who test positive: $95 + 999 = 1094$. 
-2. Out of these $1094$ positive tests, $95$ of them are real vampires, so that implies:
+understand: 1. We can just count up the number of people who test
+positive: $95 + 999 = 1094$. 2. Out of these $1094$ positive tests, $95$
+of them are real vampires, so that implies:
 
 $$
-Pr(positive \mid vampire) = \frac{95}{1094}
+PR(positive|vampire) = \frac{95}{1094}
 $$
 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-frequencies-a}
-: Performing vampire calculation with frequencies in Base R
-::::::
-:::
-::::{.my-r-code-container}
 ```{r}
-#| label: vampire-frequencies-a
+#| label: scenario-common-sense-a
+#| attr-source: '#lst-common-sense-scenario lst-cap="Calculated with natural figures instead propabilities"'
 
-
-pr_vampire_a2 <-  100 / 100000
-pr_positive_vampire_a2 <-  95 / 100
-pr_positive_mortal_a2  <-  999 / 99900
-pr_positive_a2 <-  95 + 999
-
-(
-  pr_vampire_positive_a2 <-  
-    pr_positive_vampire_a2 * 100 / pr_positive_a2
-)
-
+95/1094
 ```
 
-::::
-:::::
+The second presentation of the problem, using counts rather than
+probabilities, is often called the *frequency format* or *natural
+frequencies*. It is easier for people to understand because are
+confronted with count in everyday life. Nobody has ever seen a
+probability.
 
+::: callout-note
+###### Meta remark: Study guide
 
+This chapter teaches the basic skills for working with samples from the
+posterior distribution. We'll begin to use samples to summarize and
+simulate model output. The skills learned here will apply to every
+problem in the remainder of the book, even though the details of the
+models and how the samples are produced will vary.
 
-> “The second presentation of the problem, using counts rather than probabilities, is often called the frequency format or natural frequencies. Why a frequency format helps people intuit the correct approach remains contentious. Some people think that human psychology naturally works better when it receives information in the form a person in a natural environment would receive it. In the real world, we encounter counts only. No one has ever seen a probability, the thinking goes. But everyone sees counts (“frequencies”) in their daily lives.” ([McElreath, 2020, p. 50](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=69&annotation=G26ZTDUZ))
+The chapter exploits the fact that people are better in counts than in
+probabilities. We will take the probability distributions from the
+previous chapter and sampling from them to produce counts.
+:::
 
+> The posterior distribution is a probability distribution. And like all
+> probability distributions, we can imagine drawing *samples* from it.
+> The sampled events in this case are parameter values. Most parameters
+> have no exact empirical realization. The Bayesian formalism treats
+> parameter distributions as relative plausibility, not as any physical
+> random process. In any event, randomness is always a property of
+> information, never of the real world. But inside the computer,
+> parameters are just as empirical as the outcome of a coin flip or a
+> die toss or an agricultural experiment. The posterior defines the
+> expected frequency that different parameter values will appear, once
+> we start plucking parameters out of it.
 
-> “many scientists are uncomfortable with integral calculus, even though they have strong and valid intuitions about how to summarize data. Working with samples transforms a problem in calculus into a problem in data summary, into a frequency format problem. An integral in a typical Bayesian context is just the total probability in some interval. That can be a challenging calculus problem. But once you have samples from the probability distribution, it’s just a matter of counting values in the interval. An empirical attack on the posterior allows the scientist to ask and answer more questions about the model, without relying upon a captive mathematician. For this reason, it is easier and more intuitive to work with samples from the posterior, than to work with probabilities and integrals directly.” ([McElreath, 2020, p. 51](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=70&annotation=M7I2DV3C))
+There are two reasons more to use samples:
 
-### TIDYVERSE {.unnumbered}
+1.  First, many scientists are uncomfortable with integral calculus,
+    even though they have strong and valid intuitions about how to
+    summarize data. Working with samples transforms a problem in
+    calculus into a problem in data summary, into a frequency format
+    problem. An integral in a typical Bayesian context is just the total
+    probability in some interval.
+2.  Second, some of the most capable methods of computing the posterior
+    produce nothing but samples. Many of these methods are variants of
+    Markov chain Monte Carlo techniques (MCMC).
+
+Drawing samples from the very simple posterior distribution of the
+globe-tossing model might seem as overkill but using this technique from
+the start has educational impact: When you inevitably must fit a model
+to data using MCMC, you will already know how to make sense of the
+output.
+
+### Tidyverse {.unnumbered}
 
 #### a) Medical Test Scenario with Bayes theorem {.unnumbered}
 
+If you would like to know the probability someone is a vampire given
+they test positive to the blood-based vampire test, you compute
 
-:::::{.my-important}
-:::{.my-important-header}
-Vectors in Base R are tibble columns in tidyverse
-:::
-::::{.my-important-container}
-Whenever there is a calculation with vectors the pendant in tidyverse mode is to generate columns in a tibble with `tibble::tibble()` or if there is already a data frame with `dplyr::mutate()` and to do the appropriate calculation with these columns.
-
-The following @cnj-vampire-bayes-a transformed the Base R calculation @cnj-vampire-bayes-b into a computation using the tidyverse approach.
-::::
-:::::
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-bayes-b}
-: Performing the calculation using Bayes’ theorem with tidyverse approach in R
-::::::
-:::
-::::{.my-r-code-container}
+$$
+Pr(vampire|positive) = \frac{Pr(positive|vampire) \times Pr(vampire)} {Pr(positive)}
+$$ This is Bayes theorem.
 
 ```{r}
-#| label: vampire-bayes-b
+#| label: scenario-bayes-theorem-b
 
-## R code 3.1b Vampire ##########
-
-tibble::tibble(pr_positive_vampire_b = .95,
+tibble(pr_positive_vampire_b = .95,
        pr_positive_mortal_b  = .01,
-       pr_vampire_b          = .001) |> 
-  dplyr::mutate(pr_positive_b = pr_positive_vampire_b * pr_vampire_b
-         + pr_positive_mortal_b * (1 - pr_vampire_b)) |> 
-  dplyr::mutate(pr_vampire_positive_b = 
-           pr_positive_vampire_b * pr_vampire_b / pr_positive_b) |> 
-  dplyr::glimpse()
+       pr_vampire_b          = .001) %>% 
+  mutate(pr_positive_b = pr_positive_vampire_b * pr_vampire_b + pr_positive_mortal_b * (1 - pr_vampire_b)) %>% 
+  mutate(pr_vampire_positive_b = pr_positive_vampire_b * pr_vampire_b / pr_positive_b) %>% 
+  glimpse()
 ```
-
-::::
-:::::
-
 
 #### b) Medical test scenario with natural frequencies {.unnumbered}
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-frequencies-b}
-: Performing the calculation using frequencies with tidyverse approach in R
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
-#| label: vampire-frequencies-b
+#| label: scenario-natural-frequencies
 
-tibble::tibble(pr_vampire_b2          = 100 / 100000,
+tibble(pr_vampire_b2          = 100 / 100000,
        pr_positive_vampire_b2 = 95 / 100,
-       pr_positive_mortal_b2  = 999 / 99900)  |>  
-  dplyr::mutate(pr_positive_b2 = 95 + 999) |> 
-  dplyr::mutate(pr_vampire_positive_b2 = 
-                  pr_positive_vampire_b2 * 100 / pr_positive_b2) |> 
-  dplyr::glimpse()
+       pr_positive_mortal_b2  = 999 / 99900) %>% 
+  mutate(pr_positive_b2 = 95 + 999) %>% 
+  mutate(pr_vampire_positive_b2 = pr_positive_vampire_b2 * 100 / pr_positive_b2) %>% 
+  glimpse()
 
 ```
 
-::::
-:::::
+## Sampling from a grid-approximate posterior {#sec-sampling-from-a-grid-approximate-posterior}
 
+### Original
 
-## Sampling from a grid-approximate posterior {#sec-chap-03-sampling-grid}
-
-### ORIGINAL
+#### Grid approximation {#sec-grid-approximation-a}
 
 Before we are going to draw samples from the posterior distribution we
-need to compute the distribution similar as we had done in the globe tossing example.
-
-> “Here’s a reminder for how to compute the posterior for the globe tossing model, using grid approximation. Remember, the posterior here means the probability of p conditional on the data.” ([McElreath, 2020, p. 52](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=71&annotation=KKQLR3FL))
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-globe-tossing-a}
-: Generate the posterior distribution form the globe-tossing example (Base R)
-::::::
-:::
-::::{.my-r-code-container}
+need to compute the distribution. Again we are using grid approximation.
 
 ```{r}
-#| label: grid-globe-tossing-a
+#| label: grid-approx-a
+#| attr-source: '#lst-grid-approx-a lst-cap="Generate the posterior distribution form the globe-tossing example"' 
 
-### R code 3.2a Grid Globe ##########################
+### R code 3.2 ##########################
 # change prob_b to prior
 # change prob_data to likelihood
-# added variables: n_grid_a, n_success_a, n_trials_a
+# added variables: n, n_success, n_trials
 
-n_grid_a <- 1000L # number of grid points
-n_success_a <- 6L # observed water
-n_trials_a <-  9L # number of trials
+n_grid_a <- 1000L
+n_success_a <- 6L
+n_trials_a <-  9L
 
 
 p_grid_a <- seq(from = 0, to = 1, length.out = n_grid_a)
-prior_a <- rep(1, n_grid_a) # = prior, = uniform distribution, 1000 times 1
-likelihood_a <- 
-  dbinom(n_success_a, size = n_trials_a, prob = p_grid_a) # = likelihood
+prior_a <- rep(1, n_grid_a) # = prior, assumed as uniform distribution
+likelihood_a <- dbinom(n_success_a, size = n_trials_a, prob = p_grid_a) # = likelihood
 posterior_a <- likelihood_a * prior_a
 posterior_a <- posterior_a / sum(posterior_a)
 ```
 
-::::
-:::::
+> Now we wish to draw 10,000 samples from this posterior. Imagine the
+> posterior is a bucket full of parameter values, numbers such as 0.1,
+> 0.7, 0.5, 1, etc. Within the bucket, each value exists in proportion
+> to its posterior probability, such that values near the peak are much
+> more common than those in the tails. We're going to scoop out 10,000
+> values from the bucket. Provided the bucket is well mixed, the
+> resulting samples will have the same proportions as the exact
+> posterior density. Therefore the individual values of *p* will appear
+> in our samples in proportion to the posterior plausibility of each
+> value.
 
-> “Now we wish to draw 10,000 samples from this posterior. Imagine the posterior is a bucket full of parameter values, numbers such as $0.1, 0.7, 0.5, 1,$ etc. Within the bucket, each value exists in proportion to its posterior probability, such that values near the peak are much more common than those in the tails. We’re going to scoop out 10,000 values from the bucket. Provided the bucket is well mixed, the resulting samples will have the same proportions as the exact posterior density. Therefore the individual values of $p$ will appear in our samples in proportion to the posterior plausibility of each value.” ([McElreath, 2020, p. 52](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=71&annotation=GS5GCASA))
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-globe-tossing}
-: Draw 1000 samples from the posterior distribution (Base R)
-::::::
-:::
-::::{.my-r-code-container}
+#### Drawing samples
 
 ```{r}
-#| label: sample-globe-tossing-a
+#| label: draw-samples-a
+#| attr-source: '#lst-draw-samples-a lst-cap="Draw 1000 Samples from the posterior distribution, using `base::set.seed(3)`"'
+#| echo: fenced
 
 n_samples_a <- 1e4
 
-set.seed(3) # for reproducibility
+set.seed(3) # <1>
 
-## R code 3.3a Sample Globe ##########################################
-samples_a <- sample(p_grid_a, 
-                    prob = posterior_a, # from previous code chunk
-                    size = n_samples_a, replace = TRUE)
+## R code 3.3 ##########################################
+samples_a <- sample(p_grid_a, prob = posterior_a, 
+                    size = n_samples_a, replace = TRUE) # <2>
 ```
 
-::::
-:::::
+1.  I have included the `base::set.seed()` command myself to provide
+    reproducibility. With this code line you will get the same results
+    in your sampling process because it is not really a random procedure
+    but the outcome of a complex algorithm that can be configured by the
+    `set.seed()` function.
+2.  The workhorse here is `base::sample`, which randomly pulls values
+    from a vector. The vector in this case is `p_grid_a`, the grid of
+    1000 (1e3) parameter values. The probability of each value is given
+    by `posterior_a`, which we computed with @lst-grid-approx-a.
 
-The probability of each value is given by `posterior_a`, which we computed with @cnj-grid-globe-tossing-a.
-
-:::::{.my-note}
-:::{.my-note-header}
-:::::: {#cor-excursion-a}
-: Details for a better understanding and comparison with the tidyverse version
-::::::
-:::
-::::{.my-note-container}
-
-To compare with the tidyverse version, I collected the three vectors with `base::cbind()` into a matrix and displayed the first six lines with `utils::head()`. Additionally I
+To compare the calculated values with variant b (the tidyverse version),
+I bound the three vectors with `base::cbind()` together into a matrix
+and displayed the first six lines with `utils::head()`. Additionally I
 also displayed the first 10 values of `samples_a` vector.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-excursion-a}
-: Excursion for better comparison (Base R)
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
-#| label: excursion_a
+#| label: display-grid_result_a
 
 # display grid results to compare with variant b
 d_a <- cbind(p_grid_a, prior_a, likelihood_a, posterior_a) 
 head(d_a, 10)
+```
+
+Furthermore I also displayed the first 10 values of `samples_a` vector.
+
+```{r}
+#| label: display-samples_result_a
 
 # display sample results to compare with variant b
 head(samples_a, 10)
 ```
 
-
-::::
-:::::
-
-
-::::
-:::::
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-glossing-scatterplot-a}
-: Scatterplot of the drawn samples (Base R)
-::::::
-:::
-::::{.my-r-code-container}
+#### Plot samples distribution
 
 ```{r}
-#| label: fig-globe-tossing-scatterplot-a
-#| fig-cap: "Scatterplot of the drawn samples (Base R)"
+#| label: fig-scatterplot-samples-a
+#| fig-cap: "Scatterplot of the drawn samples (Version a)"
 
-## R code 3.4a Globe Scatterplot #############
+## R code 3.4 #########
 plot(samples_a)
 ```
 
-::::
-:::::
-
-
-> In fig-globe-glossing-plot-a “it’s as if you are flying over the posterior distribution, looking down on it. There are many more samples from the dense region near 0.6 and very few samples below 0.25. On the right, the plot shows the density estimate computed from these samples.” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=4WVLNZBT))
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-density-plot-a}
-: Density estimate of the drawn samples (Rethinking)
-::::::
-:::
-::::{.my-r-code-container}
+In @fig-scatterplot-samples-a, it is as if you are flying over the
+posterior distribution, looking down on it. There are many more samples
+from the dense region near 0.6 and very few samples below 0.25.
 
 ```{r}
-#| label: fig-globe-tossing-density-plot-a
-#| fig-cap: "Density estimate of the drawn samples (Rethinking)"
+#| label: fig-density-samples-a
+#| fig-cap: "Density estimate of the drawn samples (Version a)"
 
-## R code 3.5a Globe Density plot #############
+## R code 3.5 #############
 rethinking::dens(samples_a)
 ```
 
+Plot @fig-density-samples-a shows the density estimate computed from our
+sampling process. The estimated density is very similar to ideal
+posterior you computed via grid approximation. If you draw even more
+samples, maybe 1e5 or 1e6, the density estimate will get more and more
+similar to the ideal. This is shown in the tidyverse version
+@fig-density-samples-b2.
 
-::::
-:::::
+### Tidyverse
 
-
-### TIDYVERSE
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-globe-tossing-b}
-: Generate the posterior distribution form the globe-tossing example (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+#### Grid approximation {#sec-grid-approximation-b}
 
 ```{r}
-#| label: grid-globe-tossing-b
-
-
-## R code 3.2b Grid Globe #####################
+#| label: grid-approx-b
+#| attr-source: '#lst-grid-approx-b lst-cap="Grid aproximation: tidyverse"'
 
 # how many grid points would you like?
 n_grid_b <- 1000L
@@ -438,475 +367,370 @@ n_trials_b  <- 9L
 
 (
   d_b <-
-  tibble::tibble(p_grid_b = seq(from = 0, to = 1, length.out = n_grid_b),
-         prior_b  = 1) |>  # flat uniform prior, vector 1L recycling
-  dplyr::mutate(likelihood_b = 
-                  dbinom(n_success_b, size = n_trials_b, prob = p_grid_b)) |> 
-  dplyr::mutate(posterior_b = 
-                  (likelihood_b * prior_b) / sum(likelihood_b * prior_b))
+  tibble(p_grid_b = seq(from = 0, to = 1, length.out = n_grid_b),
+         # note we're still using a flat uniform prior
+         prior_b  = 1) %>% 
+  mutate(likelihood_b = dbinom(n_success_b, size = n_trials_b, prob = p_grid_b)) %>% 
+  mutate(posterior_b = (likelihood_b * prior_b) / sum(likelihood_b * prior_b))
 )
 
 ```
 
+#### Drawing samples
 
-::::
-:::::
+::: callout-caution
+###### Changing variable names
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-Variable names changed
+We've renamed McElreath's `prob_p` and `prob_data` as `prior_b` and
+`likelihood_b`, respectively. Now we'll use the `dplyr::slice_sample()`
+function to sample rows from `d_b`, saving them as `samples_b`.
+
+To get the same variable name of the sample results in version a and b I
+will change in the following code chunk `p_grid_b` to `samples_b`. So I
+can compare the vector `samples_a` with the column `samples_b`of the
+tibble with the same name (`samples_b`).
+
+Additionally: To see the difference between grid and samples I will add
+"\_sample" to all the other variable names. For reasons of consistence I
+will also change the name of "prior_b"
 :::
-::::{.my-watch-out-container}
-I have changed McElreath's variable name `prob_p` and `prob_data` as `prior_x` and
-`likelihood_x`, where `x` stands for `a` (Base R) or `b` (Tidyverse).
-
-To see the difference between grid and samples I will add "\_sample" to all the other variable names.
-::::
-:::::
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-globe-tossing-b}
-: Draw 1000 samples from the posterior distribution (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
 
 ```{r}
-#| label: sample-globe-tossing-b
+#| label: draw-samples-b
 
-
-## R code 3.3b Sample Globe #####################
 # how many samples would you like?
 n_samples_b <- 1e4
 
 # make it reproducible
 set.seed(3)
 
-df_samples_b <-
-  d_b |> 
-    dplyr::slice_sample(n = n_samples_b, weight_by = posterior_b, replace = T)
+samples_b <-
+  d_b %>% 
+    slice_sample(n = n_samples_b, weight_by = posterior_b, replace = T)
+
 
 ( 
-  df_samples_b <- df_samples_b |>
-      dplyr::rename(samples_b = p_grid_b,
-             likelihood_samples_b = likelihood_b,
-             prior_samples_b = prior_b,
-             posterior_samples_b = posterior_b)
+    samples_b <- samples_b |>
+        rename(samples_b = p_grid_b,
+               likelihood_samples_b = likelihood_b,
+               prior_samples_prior_b = prior_b,
+               posterior_samples_b = posterior_b)
 )
-
-
-identical(samples_a, df_samples_b$samples_b)
 ```
 
-
-::::
-:::::
-
-The column `samples_b` is identical with vector `samples_a`, because I have used in both sampling processes `set.seed(3)`, so that I (and you) could reproduce the data. 
-
-
-There are different possibilities to display data frames respectively tibbles:
-
-1. You can use the internal print facility of tibbles. It shows only the first ten rows and all columns that fit on the screen. You see an example in @cnj-sample-globe-tossing-b.
-2. With the `utils::str()` function you will get a result with shorter figures that is better adapted to a small screen.
-3. Another alternative is the tidyverse approach of `dplyr::glimpse()`.
-4. With `skimr::skim()` you will get a compact summary of all data.
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-excursion-b}
-: Excursion: Printing varieties for better comparison (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+The column `samples_b` of the tibble with the same name (watch out not
+to confuse these two objects) is identical with the vector `samples_a`.
+This `base::identical()` results in different sampling processes was the
+work of `set.seed(3)`.
 
 ```{r}
-#| label: excursion-b
-#| results: hold
+#| label: test-if-samples-identical
 
-glue::glue('USING THE str() FUNCTION:')
-utils::str(df_samples_b)
-glue::glue('#####################################################\n\n')
-glue::glue('USING THE dplyr::glimpse() FUNCTION:')
-dplyr::glimpse(df_samples_b)
-glue::glue('#####################################################\n\n')
-glue::glue('USING THE skimr::skim() FUNCTION:')
-skimr::skim(df_samples_b)
+identical(samples_a, samples_b$samples_b)
 ```
 
-::::
-:::::
-
-
-We can plot the left panel of Figure 3.1 from the book with `ggplot2::geom_point()`. But before we do, we'll need to add a variable numbering the samples. This is necessary as the x-parameter of the plot.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-scatterplot-b}
-: Scatterplot of the drawn samples (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+With the `utils::str()` function you will get a result with shorter
+figures that is better adapted to a small screen.
 
 ```{r}
-#| label: fig-globe-tossing-scatterplot-b
-#| fig-cap: "Scatterplot of the drawn samples (Tidyverse)"
+#| label: str-samples-b
 
+str(samples_b)
+```
 
-## R code 3.4b Globe Scatterplot ########################
-df_samples_b |> 
-  dplyr::mutate(sample_number = 1:dplyr::n()) |> 
+An alternative of the tidyverse approach is `dplyr::glimpse()`.
+
+```{r}
+#| label: glimpse-samples-b
+
+glimpse(samples_b)
+```
+
+Now we can plot the left panel of Figure 3.1 with
+`ggplot2::geom_point()`. But before we do, we'll need to add a variable
+numbering the samples.
+
+#### Plot samples distribution
+
+```{r}
+#| label: fig-scatterplot-samples-b
+#| fig-cap: "Scatterplot of the drawn samples (Version b)"
+
+samples_b %>% 
+  mutate(sample_number = 1:n()) %>% 
   
-  ggplot2::ggplot(ggplot2::aes(x = sample_number, y = samples_b)) +
-  ggplot2::geom_point(alpha = 1/10) +
-  ggplot2::scale_y_continuous("proportion of water (p)", limits = c(0, 1)) +
-  ggplot2::xlab("sample number") +
-  ggplot2::theme_bw()
+  ggplot(aes(x = sample_number, y = samples_b)) +
+  geom_point(alpha = 1/10) +
+  scale_y_continuous("proportion of water (p)", limits = c(0, 1)) +
+  xlab("sample number")
 
 ```
 
-
-::::
-:::::
-
-
-If you hover over this link from @fig-globe-tossing-scatterplot-a you can compare the Base R version with the tidyverse result.
-
-Instead of the `rethinking::dens()` we'll plot the density in the right panel of the books Figure 3.1 with `ggplot2::geom_density()`.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-densitiy-plot-b1}
-: Density estimate of the drawn samples with 1e4 grid points (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+We'll make the density in the right panel with
+`ggplot2::geom_density()`.
 
 ```{r}
-#| label: fig-globe-tossing-density-plot-b1
-#| fig-cap: "Density estimate of the drawn samples with 1e4 grid points (Tidyverse)"
+#| label: fig-density-samples-b
+#| fig-cap: "Density estimate of the drawn samples (Version b)"
 
-## R code 3.5b(1) Globe Density ###########################
-df_samples_b |> 
-  ggplot2::ggplot(ggplot2::aes(x = samples_b)) +
-  ggplot2::geom_density(fill = "grey") +
-  ggplot2::scale_x_continuous("proportion of water (p)", limits = c(0, 1)) +
-  ggplot2::theme_bw()
+samples_b %>% 
+  ggplot(aes(x = samples_b)) +
+  geom_density(fill = "grey") +
+  scale_x_continuous("proportion of water (p)", limits = c(0, 1))
 
 ```
 
-::::
-:::::
+Compare this somewhat smoother @fig-density-samples-b with
+@fig-density-samples-a.
 
-
-Compare this somewhat smoother tidyverse plot with @fig-globe-tossing-density-plot-a.
-
-> “You can see that the estimated density is very similar to ideal posterior you computed via grid approximation. If you draw even more samples, maybe 1e5 or 1e6, the density estimate will get more and more similar to the ideal.” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=EXBQWX2M))
- 
-Here's what it looks like with `1e6`.
- 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-ID-text}
-: Density estimate of the drawn samples with 1e6 grid points (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+If we keep increasing the number of samples we will get a better
+approximation to the ideal posterior distribution we have computed via
+grid approximation. Here's what it looks like with `1e6`.
 
 ```{r}
-#| label: fig-globe-tossing-density-plot-b2
-#| fig-cap: "Density estimate of the drawn samples with 1e6 grid points (Tidyverse)"
+#| label: fig-density-samples-b2
+#| fig-cap: "Density estimate of 1e6 drawn samples (Version b)"
 
 set.seed(3)
 
-## R code 3.5b(2) Globe Density ###########################
-d_b |> 
-  dplyr::slice_sample(n = 1e6, weight_by = posterior_b, replace = T) |>
-  
-  ggplot2::ggplot(ggplot2::aes(x = p_grid_b)) +
-  ggplot2::geom_density(fill = "grey") +
-  ggplot2::scale_x_continuous("proportion of water (p)", limits = c(0, 1)) +
-  ggplot2::theme_bw()
+d_b %>% 
+  slice_sample(n = 1e6, weight_by = posterior_b, replace = T) %>% 
+  ggplot(aes(x = p_grid_b)) +
+  geom_density(fill = "grey") +
+  scale_x_continuous("proportion of water (p)", limits = c(0, 1))
 
 ```
 
-
-::::
-:::::
-
 ## Sampling to Summarize {#sec-sampling-to-summarize}
+
+### Three questions asked {.unnumbered}
 
 All we have done so far is crudely replicate the posterior density we
 had already computed in the previous chapter. Now it is time to use
 these samples to describe and understand the posterior.
 
-The description to understand the posterior can be divided into three inquiries:
+The first step in understanding the posterior distribution is to
+summarize it. Exactly how it is summarized depends upon your purpose.
+But common questions include:
 
-1.  Questions about intervals of *defined boundaries*. See @sec-chap-03-defined-boundaries.
-2.  Questions about intervals of *defined probability mass*. See @sec-chap-03-probability-mass.
-3.  Questions about *point estimates*. See: @sec-chap-03-point-estimates.
+-   How much posterior probability lies below some parameter value?
+-   How much posterior probability lies between two parameter values?
+-   Which parameter value marks the lower 5% of the posterior
+    probability?
+-   Which range of parameter values contains 90% of the posterior
+    probability?
+-   Which parameter value has highest posterior probability?
 
-### Intervals of Defined Boundaries {#sec-chap-03-defined-boundaries}
+The above list of questions can be divided into three inquiries:
 
-#### ORIGINAL
+1.  Questions about intervals of defined boundaries.
+2.  Questions about intervals of defined probability mass.
+3.  Questions about point estimates.
 
-##### Grid-approximate Posterior
+### Intervals of Defined Boundaries
+
+#### Original
+
+##### Grid approach
 
 For instance: What is the probability that the proportion of water is
 less than 0.5?
 
-> “Using the grid-approximate posterior, you can just add up all of the probabilities, where the corresponding parameter value is less than 0.5:” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=Z7XSZ6WT))
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-posterior-a}
-: Define boundaries using the grid-approximate posterior (Base R)
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
-#| label: grid-posterior-a
+#| label: grid-boundaries-a
 
-## R code 3.6a Grid Posterior Boundary ##############################
+## R code 3.6 ##############################
 # add up posterior probability where p < 0.5
 sum(posterior_a[p_grid_a < 0.5])
 ```
 
-::::
-:::::
+About 17% of the posterior probability is below 0.5. Couldn't be easier.
 
+##### Sampling approach
 
-About 17% of the posterior probability is below 0.5. 
+But this easy calculation based on grid approximation is often no
+practical when there are more parameters. So let's try the sampling
+approach:
 
-##### Samples from the Posterior
-
-But this easy calculation based on grid approximation is often not
-practical when there are more parameters. In this case you can draw samples from the posterior. But this approach requires a different calculation:
-
-
-> “This approach does generalize to complex models with many parameters, and so you can use it everywhere. All you have to do is similarly add up all of the samples below 0.5, but also // divide the resulting count by the total number of samples. In other words, find the frequency of parameter values below 0.5” (McElreath, 2020, p. 53/54)” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=SMQ6B78K))
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-boundary-a}
-: Compute posterior probability below 0.5 using the sampling approach (Base R)
-::::::
-:::
-::::{.my-r-code-container}
+To use the samples from the posterior you have to add up all of the
+samples below 0.5, but also divide the resulting count by the total
+number of samples. In other words, find the frequency of parameter
+values below 0.5:
 
 ```{r}
-#| label: sample-boundary-a
+#| label: sample-boundaries-0.5-a
 
-## R code 3.7a Sample Boundary #############################
+## R code 3.7 #############################
 (p_boundary_a <- sum(samples_a < 0.5) / 1e4)
 ```
 
+::: callout-caution
+###### Attention: Different values
 
-::::
-:::::
+In comparison with the value in the original book (0.1726) our value of
+0.1629 is different. 17%.
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-Different values with samples from the posterior
-:::
-::::{.my-watch-out-container}
-In comparison with the value of the posterior probability below 0.5 in the book of 0.1726 the result in `r p_boundary_a` from @cnj-sampling-boundaries-a1 is quite different. 
-
-The reason for the difference is that you can't get the same values in a
+The reason for the difference is that you can't get the same values in
 sampling processes. This is the nature of randomness. And McElreath did
-not include the `set.seed()` function for (exact) reproducibility. 
-::::
-:::::
+not include the set.sedd() function for (exact) reproducibility. What
+additionally happened is that our `set.seed()`\` value of 3 results in a
+somewhat untypical sampling distribution. I will demonstrate this with
+additional three samples with different `set.seed()`\` values.
+:::
+
+##### Different sampling distributions
+
+```{r}
+#| label: different-sample-distributions
+
+# four examples with different seeds
+set.seed(42)
+samples_a2 <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+set.seed(123)
+samples_a3 <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+set.seed(1000)
+samples_a4 <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+set.seed(33)
+samples_a5 <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+
+(p_boundary_a2 <- sum(samples_a2 < 0.5) / 1e4)
+(p_boundary_a3 <- sum(samples_a3 < 0.5) / 1e4)
+(p_boundary_a4 <- sum(samples_a4 < 0.5) / 1e4)
+(p_boundary_a5 <- sum(samples_a5 < 0.5) / 1e4)
+
+# without setting a seed (not reproducible)
+set.seed(0)
+samples_a6 <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+samples_a7 <- sample(p_grid_a, prob = posterior_a, size = 1e4, replace = TRUE)
+(p_boundary_a6 <- sum(samples_a6 < 0.5) / 1e4)
+(p_boundary_a7 <- sum(samples_a7 < 0.5) / 1e4)
+```
+
+Although the second figure is near our "bad" result, all sampling
+procedures with the chosen different `base::set.seed() values` return
+better values (nearer the true value of 0.1718746) as our sampling
+procedure fixed with `base::set.seed(3)`. The last two values are done
+without setting a `set.seed()` value so my values should differ than
+yours.
 
 Using the same approach, you can ask how much posterior probability lies
 between 0.5 and 0.75:
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-interval-a}
-: Compute posterior probability between 0.5 and 0.75 using the sampling approach (Base R)
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
-#| label: sample-interval-a
-
-## R code 3.8a Sample Interval #############################
+#| label: sample-boundaries-0.5-0.75-a
+#| attr-source: '#sample-boundaries2-a lst-cap="Find the frequency of parameter values below 0.5 with `base::set.seed(3)`"'
+#| 
+## R code 3.8 #########################################
 (p_boundary_a8 <- sum(samples_a > 0.5 & samples_a < 0.75) / 1e4)
 ```
 
-::::
-:::::
+#### Tidyverse
 
-
-
-#### TIDYVERSE
-
-##### Grid-approximate Posterior
+##### Grid approach
 
 > To get the proportion of water less than some value of `p_grid_b`
 > within the {**tidyverse}**, you might first `filter()` by that value
-> and then take the `sum()` within `summarise()`. ([Kurz](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-boundaries.))
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-boundary-b}
-: Compute posterior probability below 0.5 using the grid approach (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+> and then take the `sum()` within `summarise()`.
 
 ```{r}
-#| label: grid-boundary-b
+#| label: grid-boundaries-b
 
-## R code 3.6b Grid Boundary ######################
 # add up posterior probability where p < 0.5
-d_b |> dplyr::filter(p_grid_b < 0.5) |> 
-    dplyr::summarize(sum = base::sum(posterior_b))
+d_b |> filter(p_grid_b < 0.5) |> 
+    summarize(sum = sum(posterior_b))
 
 ```
 
-::::
-:::::
+##### Sampling approach
 
+If what you want a frequency based on filtering by `samples_b`, then you
+might use `n()` within `summarise()`.
 
-##### Samples from the Posterior
-
-Kurz offers several methods to calculate the posterior probability below 0.5: 
-
-1. **Method**: `filter()` & `n()` within `summarize()`
-2. **Method**: `count()` followed by `mutate()`
-3. **Method**: Logical condition within `mean()`
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-boundary}
-: Compute posterior probability below 0.5 using the sampling approach with different methods (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
 ```{r}
-#| label: sample-boundary-b
-#| results: hold
+#| label: samples-boundaries-b
 
 # add up all posterior probabilities of samples under .5
-## R code 3.7b Sample Boundary #########################
+samples_b |> 
+    filter(samples_b < .5) |> 
+    summarize(sum = n() / n_samples_b)
+```
 
-###### Method (1) #######
-method_1 <- 
-  df_samples_b |> 
-      dplyr::filter(samples_b < .5) |> 
-      dplyr::summarize(sum = dplyr::n() / n_samples_b)
+A more explicit approach for the same computation is to follow up
+`count()` with `mutate()`.
 
-glue::glue('Method 1:\n')
-method_1
-glue::glue('##################################################\n\n')
+```{r}
+#| label: samples-boundaries-b2
 
-###### Method (2) #######
-method_2 <- 
-  df_samples_b |> 
-    dplyr::count(samples_b < .5) |> 
-    dplyr::mutate(probability = n_samples_b / base::sum(n_samples_b))
-
-glue::glue('Method 2:\n')
-method_2
-glue::glue('##################################################\n\n')
-
-###### Method (3) #######
-method_3 <- 
-  df_samples_b |> 
-      dplyr::summarize(sum = mean(samples_b < .5))
-
-glue::glue('Method 3:\n')
-method_3
-
+samples_b |> 
+    count(samples_b < .5) |> 
+    mutate(probability = n / sum(n))
 
 ```
 
-::::
-:::::
+An even trickier approach for the same is to insert the logical
+statement `p_grid < .5` within the `mean()` function.
 
+```{r}
+#| label: samples-boundaries-b3
+
+samples_b |> 
+    summarize(sum = mean(samples_b < .5))
+
+```
 
 To determine the posterior probability between 0.5 and 0.75, you can use
 `&` within `filter()`. Just multiply that result by 100 to get the value
 in percent.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-interval-b}
-: Compute posterior probability between 0.5 and 0.75 using the sampling approach (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
-#| label: sample-interval-b
+#| label: samples-boundaries-b4
 
-## R code 3.8b Sample Interval ##############
-df_samples_b |> 
-    dplyr::filter(samples_b > .5 & samples_b < .75) |> 
-    dplyr::summarize(sum = dplyr::n() / n_samples_b)
+samples_b |> 
+    filter(samples_b > .5 & samples_b < .75) |> 
+    summarize(sum = n() / n_samples_b)
 
 ```
 
+And, of course, you can do that with our `mean()` trick, too.
 
-::::
-:::::
+```{r}
+#| label: samples-boundaries-b5
 
-And, of course, you can do this calculation with the other methods as well.
+samples_b %>%
+  summarise(percent = 100 * mean(samples_b > .5 & samples_b < .75))
+```
 
-
+##### Plot interval of defined boundaries
 
 To produce Figure 3.2 of the book we apply following code lines:
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-upper-part-3-2}
-: Posterior distribution produced with {**tidyverse**} approach
-::::::
-:::
-::::{.my-r-code-container}
 
 ```{r}
 #| label: fig-upper-part-3.2
 #| fig-cap: "Upper part of SR2 Figure 3.2: Posterior distribution produced with {**tidyverse**} tools: Left: The blue area is the posterior probability below a parameter value of 0.5. Right: The posterior probability between 0.5 and 0.75."
 
-## R Code Fig 3.2 Upper Part #############
 # upper left panel
 p1 <-
-  df_samples_b  |>  
-  ggplot2::ggplot(ggplot2::aes(x = samples_b, y = posterior_samples_b)) +
-  ggplot2::geom_line() +
-  ggplot2::geom_area(data = df_samples_b  |>  
-         dplyr::filter(samples_b < .5), fill = "deepskyblue") +
-  ggplot2::labs(x = "proportion of water (p)", y = "density")  +
-  ggplot2::theme_bw()
+  samples_b  |>  
+  ggplot(aes(x = samples_b, y = posterior_samples_b)) +
+  geom_line() +
+  geom_area(data = samples_b  |>  filter(samples_b < .5), fill = "deepskyblue") +
+  labs(x = "proportion of water (p)",
+       y = "density")
 
 # upper right panel
 p2 <- 
-  df_samples_b  |>  
-  ggplot2::ggplot(ggplot2::aes(x = samples_b, y = posterior_samples_b)) +
-  ggplot2::geom_line() +
-  ggplot2::geom_area(data = df_samples_b  |>  
-         dplyr::filter(samples_b > .5 & samples_b < .75), fill = "deepskyblue") +
-  ggplot2::labs(x = "proportion of water (p)", y = "density") +
-  ggplot2::theme_bw()
+  samples_b  |>  
+  ggplot(aes(x = samples_b, y = posterior_samples_b)) +
+  geom_line() +
+  geom_area(data = samples_b  |>  filter(samples_b > .5 & samples_b < .75), fill = "deepskyblue") +
+  labs(x = "proportion of water (p)",
+       y = "density")
 
 library(patchwork)
 p1 + p2
 ```
 
-
-::::
-:::::
-
-## I STOPPED HERE 2nd PASS (2023-11-07)
-
-### Intervals of Defined Probability Mass {#sec-chap-03-probability-mass}
+### Intervals of Defined Probability Mass
 
 #### Original
 
@@ -1139,13 +963,13 @@ results in probability values.
 
 ##### Quantiles
 
-Since we saved our `samples_b` samples within the well-named `df_samples_b`
+Since we saved our `samples_b` samples within the well-named `samples_b`
 tibble, we'll have to index with `$` within `stats::quantile()`.
 
 ```{r}
 #| label: sample-quantile-b
 
-(q80 <- quantile(df_samples_b$samples_b, probs = .8))
+(q80 <- quantile(samples_b$samples_b, probs = .8))
 
 ```
 
@@ -1160,7 +984,7 @@ it into `stats::quantile()`.
 ```{r}
 #| label: sample-quantile-b2
 
-df_samples_b |> 
+samples_b |> 
     pull(samples_b) |> 
     quantile(probs = .8)
     
@@ -1172,7 +996,7 @@ We might also use `stats::quantile()` within `dplyr::summarise()`.
 ```{r}
 #| label: sample-quantile-b3
 
-df_samples_b |> 
+samples_b |> 
     summarize(q80_2 = quantile(samples_b, probs = .8))
 
 ```
@@ -1182,7 +1006,7 @@ Here's the `summarise()` approach with two probabilities.
 ```{r}
 #| label: sample-quantile-b4
 
-df_samples_b |> 
+samples_b |> 
     summarize(q10 = quantile(samples_b, probs = .1),
               q90 = quantile(samples_b, probs = .9))
     
@@ -1196,7 +1020,7 @@ deprecated:
 ```{r}
 #| label: sample-quantile-b5
 
-df_samples_b |> 
+samples_b |> 
     summarize(q10_90 = quantile(samples_b, probs = c(.1, .9)))
 
 ```
@@ -1204,7 +1028,7 @@ df_samples_b |>
 ```{r}
 #| label: sample-quantile-b6
 
-df_samples_b |> 
+samples_b |> 
     reframe(q10_90 = quantile(samples_b, probs = c(.1, .9)))
 ```
 
@@ -1247,7 +1071,7 @@ accordance with `tibble::enframe()` and `tibble::deframe()`:
 ```{r}
 #| label: sample-quantile-b7
 
-(q10_q90 = quantile(df_samples_b$samples_b, probs = c(.1, .9)))
+(q10_q90 = quantile(samples_b$samples_b, probs = c(.1, .9)))
 
 ```
 
@@ -1260,10 +1084,10 @@ Now we have our cutoff values saved as `q80`, respectively `q10` and
 #| label: figure-3-2-lower-part
 
 p1 <-
-  df_samples_b |> 
+  samples_b %>% 
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = df_samples_b |> filter(samples_b < q80), fill = "deepskyblue") +
+  geom_area(data = samples_b %>% filter(samples_b < q80), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "lower 80%") +
@@ -1272,10 +1096,10 @@ p1 <-
 
 # upper right panel
 p2 <- 
-  df_samples_b |> 
+  samples_b %>% 
   ggplot(aes(x = samples_b, y = posterior_samples_b)) +
   geom_line() +
-  geom_area(data = df_samples_b |> filter(samples_b > q10_q90[[1]] & samples_b < q10_q90[[2]]), fill = "deepskyblue") +
+  geom_area(data = samples_b %>% filter(samples_b > q10_q90[[1]] & samples_b < q10_q90[[2]]), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "middle 80%") +
@@ -1306,8 +1130,8 @@ n_trials_skewed_b  <- 3
 d_skewed_b <-
 tibble(p_grid_skewed_b = seq(from = 0, to = 1, length.out = n_samples_skewed_b),
      # note we're still using a flat uniform prior
-     prior_skewed_b  = 1) |> 
-mutate(likelihood_skewed_b = dbinom(n_success_skewed_b, size = n_trials_skewed_b, prob = p_grid_skewed_b)) |> 
+     prior_skewed_b  = 1) %>% 
+mutate(likelihood_skewed_b = dbinom(n_success_skewed_b, size = n_trials_skewed_b, prob = p_grid_skewed_b)) %>% 
 mutate(posterior_skewed_b = (likelihood_skewed_b * prior_skewed_b) / sum(likelihood_skewed_b * prior_skewed_b))
 
 # make the next part reproducible
@@ -1316,7 +1140,7 @@ set.seed(3)
 # here's our new samples tibble
 (
   samples_skewed_b <-
-    d_skewed_b |> 
+    d_skewed_b %>% 
     slice_sample(n = n_samples_skewed_b, weight_by = posterior_skewed_b, replace = T)
 )
 ```
@@ -1333,8 +1157,8 @@ n_trials_skewed_b  <- 3
 
 # update `d_b` to d_skewed_b
 d_skewed_b <-
-  d_b |> 
-  mutate(likelihood_skewed_b = dbinom(n_success_skewed_b, size = n_trials_skewed_b, prob = p_grid_b)) |> 
+  d_b %>% 
+  mutate(likelihood_skewed_b = dbinom(n_success_skewed_b, size = n_trials_skewed_b, prob = p_grid_b)) %>% 
   mutate(posterior_skewed_b  = (likelihood_skewed_b * prior_b) / sum(likelihood_skewed_b * prior_b))
 
 # make the next part reproducible
@@ -1343,14 +1167,14 @@ set.seed(3)
 # here's our new samples tibble
 (
     samples_skewed_b <- 
-        d_skewed_b |> 
+        d_skewed_b %>% 
         slice_sample(n = n_samples_skewed_b, weight_by = posterior_skewed_b, replace = T) |> 
         rename(p_skewed_b = p_grid_b,
                prior_skewed_b = prior_b)
 )
 
 # added to see the skewed distribution
-samples_skewed_b |> 
+samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
   geom_line()
 ```
@@ -1364,10 +1188,10 @@ Figure 3.2 lower part, I will draw the appropriate figure here myself.
 #| label: figure-3.2-skewed-lower-part
 
 p1 <-
-  samples_skewed_b |> 
+  samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
   geom_line() +
-  geom_area(data = samples_skewed_b |> filter(p_skewed_b < q80), fill = "deepskyblue") +
+  geom_area(data = samples_skewed_b %>% filter(p_skewed_b < q80), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "lower 80%") +
@@ -1376,10 +1200,10 @@ p1 <-
 
 # upper right panel
 p2 <- 
-  samples_skewed_b |> 
+  samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
   geom_line() +
-  geom_area(data = samples_skewed_b |> filter(p_skewed_b > q10_q90[[1]] & p_skewed_b < q10_q90[[2]]), fill = "deepskyblue") +
+  geom_area(data = samples_skewed_b %>% filter(p_skewed_b > q10_q90[[1]] & p_skewed_b < q10_q90[[2]]), fill = "deepskyblue") +
   annotate(geom = "text",
            x = .25, y = .0025,
            label = "middle 80%") +
@@ -1567,10 +1391,10 @@ skewed version. I do not know why this is the case. But if I used
 
 # left panel
 p1 <-
-  samples_skewed_b |> 
+  samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
   # check out our sweet `qi()` indexing
-  geom_area(data = samples_skewed_b |> 
+  geom_area(data = samples_skewed_b %>% 
               filter(p_skewed_b >
                 tidybayes::qi(samples_skewed_b$p_skewed_b, .width = .5)[1] & 
                      p_skewed_b <
@@ -1583,9 +1407,9 @@ p1 <-
 
 # right panel
 p2 <-
-  samples_skewed_b |> 
+  samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b, y = posterior_skewed_b)) +
-  geom_area(data = . %>% # must use %>% instead of |> 
+  geom_area(data = . %>% 
               filter(p_skewed_b > 
                  tidybayes::hdci(samples_skewed_b$p_skewed_b, .width = .5)[1] & 
                        p_skewed_b < 
@@ -1613,7 +1437,7 @@ Comparing the two panels of the plot you can see that in contrast to the
 
 > In the geom_area() line for the HPDI plot, did you notice how we
 > replaced `data = samples_skewed_b` with `data = .`? When using the
-> pipe (i.e., `|>`), you can use the `.` as a placeholder for the
+> pipe (i.e., `%>%`), you can use the `.` as a placeholder for the
 > original data object. It's an odd and handy trick to know about.
 
 (We could have made this change in both parts (p1 and p2) of the graph.
@@ -1628,7 +1452,7 @@ operator](https://stat.ethz.ch/R-manual/R-devel/library/base/html/pipeOp.html).
 The native pipe is available starting with R 4.1.0. It is constructed
 with `|` followed by `>` resulting in the symbol `|>` to differentiate
 it from the {**magrittr**} pipe (%\>%). To understand the details of the
-differences of `|>` and the native R pipe `|>` read this elaborated
+differences of `%>%` and the native R pipe `|>` read this elaborated
 [blog article by Isabella
 Velásquez](https://ivelasq.rbind.io/blog/understanding-the-r-pipe/index.html),
 an employee of [Posit](https://posit.co/) (formerly RStudio).
@@ -1656,11 +1480,11 @@ a)  Results rounded
 ```{r}
 #| label: intervals-6-9-not-skewed-rounded
 
-bind_rows(tidybayes::mean_hdci(df_samples_b$samples_b, .width = c(.8, .95)),
-          tidybayes::mean_hdi(df_samples_b$samples_b, .width = c(.8, .95)),
-          tidybayes::mean_qi(df_samples_b$samples_b,  .width = c(.8, .95))) |> 
-  select(.width, .interval, ymin:ymax) |> 
-  arrange(.width) |> 
+bind_rows(tidybayes::mean_hdci(samples_b$samples_b, .width = c(.8, .95)),
+          tidybayes::mean_hdi(samples_b$samples_b, .width = c(.8, .95)),
+          tidybayes::mean_qi(samples_b$samples_b,  .width = c(.8, .95))) %>% 
+  select(.width, .interval, ymin:ymax) %>% 
+  arrange(.width) %>% 
   mutate_if(is.double, round, digits = 2)
 ```
 
@@ -1681,10 +1505,10 @@ b)  Results not rounded
 ```{r}
 #| label: intervals-6-9-not-skewed-not-rounded
 
-bind_rows(tidybayes::mean_hdci(df_samples_b$samples_b, .width = c(.8, .95)),
-          tidybayes::mean_hdi(df_samples_b$samples_b, .width = c(.8, .95)),
-          tidybayes::mean_qi(df_samples_b$samples_b,  .width = c(.8, .95))) |> 
-  select(.width, .interval, ymin:ymax) |> 
+bind_rows(tidybayes::mean_hdci(samples_b$samples_b, .width = c(.8, .95)),
+          tidybayes::mean_hdi(samples_b$samples_b, .width = c(.8, .95)),
+          tidybayes::mean_qi(samples_b$samples_b,  .width = c(.8, .95))) %>% 
+  select(.width, .interval, ymin:ymax) %>% 
   arrange(.width)
 ```
 
@@ -1700,9 +1524,9 @@ difference is only 2 resp. 3 percent.
 #| label: intervals-3-9-skewed-version
 
 bind_rows(tidybayes::mean_hdci(samples_skewed_b$p_skewed_b, .width = c(.8, .95)),
-          tidybayes::mean_qi(samples_skewed_b$p_skewed_b,  .width = c(.8, .95))) |> 
-  select(.width, .interval, ymin:ymax) |> 
-  arrange(.width) |> 
+          tidybayes::mean_qi(samples_skewed_b$p_skewed_b,  .width = c(.8, .95))) %>% 
+  select(.width, .interval, ymin:ymax) %>% 
+  arrange(.width) %>% 
   mutate_if(is.double, round, digits = 2)
 ```
 
@@ -1714,7 +1538,7 @@ Because of the disadvantages of HPDI (more computationally intensive,
 greater simulation variance and harder to understand) we'll primarily
 stick to the PI-based intervals.
 
-### Point Estimates {#sec-chap-03-point-estimates}
+### Point Estimates
 
 #### Original
 
@@ -1883,7 +1707,7 @@ Then we will see the corresponding p_grid_b value for its MAP estimate.
 ```{r}
 #| label: calculate-skewed-MAP-grid-b
 
-samples_skewed_b |> 
+samples_skewed_b %>% 
   arrange(desc(posterior_skewed_b))
 ```
 
@@ -1893,7 +1717,7 @@ is the column `posterior_skewed_b`.
 ```{r}
 #| label: calculate-skewed-MAP-grid2-b
 
-samples_skewed_b |> 
+samples_skewed_b %>% 
   arrange(desc(posterior_skewed_b)) |> 
   slice(1)
 ```
@@ -1905,8 +1729,8 @@ We can get the mode with `mode_hdci()` or `mode_qi()`
 ```{r}
 #| label: tidybayes-mode-qi-and-hdci
 
-samples_skewed_b |> tidybayes::mode_qi(p_skewed_b)
-samples_skewed_b |> tidybayes::mode_hdci(p_skewed_b)
+samples_skewed_b %>% tidybayes::mode_qi(p_skewed_b)
+samples_skewed_b %>% tidybayes::mode_hdci(p_skewed_b)
 ```
 
 Those returned a lot of output in addition to the mode. If all you want
@@ -1923,7 +1747,7 @@ Medians and means are typical measures of central tendency, too.
 ```{r}
 #| label: tidybayes-mean-and-median
 
-samples_skewed_b |> 
+samples_skewed_b %>% 
   summarise(mean   = mean(p_skewed_b),
             median = median(p_skewed_b))
 ```
@@ -1937,10 +1761,10 @@ samples_skewed_b |>
 
 (
   point_estimates_b <-
-  bind_rows(samples_skewed_b |> tidybayes::mean_qi(p_skewed_b),
-            samples_skewed_b |> tidybayes::median_qi(p_skewed_b),
-            samples_skewed_b |> tidybayes::mode_qi(p_skewed_b)) |> 
-  select(p_skewed_b, .point) |> 
+  bind_rows(samples_skewed_b %>% tidybayes::mean_qi(p_skewed_b),
+            samples_skewed_b %>% tidybayes::median_qi(p_skewed_b),
+            samples_skewed_b %>% tidybayes::mode_qi(p_skewed_b)) %>% 
+  select(p_skewed_b, .point) %>% 
   # these last two columns will help us annotate  
   mutate(x = p_skewed_b + c(-.03, .03, -.03),
          y = c(.0005, .0012, .002))
@@ -1953,7 +1777,7 @@ Plotting the results:
 #| label: fig-skewed-point-estimates_b
 #| fig-cap: "Posterior distribution (blue) after observing 3 water in 3 tosses of the globe. Vertical lines show the locations of the mode, median, and mean. Each point implies a different loss function."
 
-samples_skewed_b |> 
+samples_skewed_b %>% 
   ggplot(aes(x = p_skewed_b)) +
   geom_area(aes(y = posterior_skewed_b),
             fill = "deepskyblue") +
@@ -1975,16 +1799,16 @@ In contrast the other distribution with 6 successes by 9 trials
 
 (
     point_estimates_b <-
-      bind_rows(df_samples_b |> tidybayes::mean_qi(samples_b),
-                df_samples_b |> tidybayes::median_qi(samples_b),
-                df_samples_b |> tidybayes::mode_qi(samples_b)) |> 
-      select(samples_b, .point) |> 
+      bind_rows(samples_b %>% tidybayes::mean_qi(samples_b),
+                samples_b %>% tidybayes::median_qi(samples_b),
+                samples_b %>% tidybayes::mode_qi(samples_b)) %>% 
+      select(samples_b, .point) %>% 
       # these last two columns will help us annotate  
       mutate(x = samples_b + c(-.03, .03, -.03),
              y = c(.0005, .0012, .002))
 )
 
-df_samples_b |> 
+samples_b %>% 
   ggplot(aes(x = samples_b)) +
   geom_area(aes(y = posterior_samples_b),
             fill = "deepskyblue") +
@@ -2032,17 +1856,17 @@ Calculate loss function
 #| label: loss-function-b
 
 make_loss_b <- function(our_d) {
-  d_skewed_b |> 
-    mutate(loss_b = posterior_skewed_b * abs(our_d - p_grid_b)) |> 
+  d_skewed_b %>% 
+    mutate(loss_b = posterior_skewed_b * abs(our_d - p_grid_b)) %>% 
     summarise(weighted_average_loss_b = sum(loss_b))
 }
 
 (
   l_b <-
-  d_skewed_b |> 
-  select(p_grid_b) |> 
-  rename(decision_b = p_grid_b) |> 
-  mutate(weighted_average_loss_b = purrr::map(decision_b, make_loss_b)) |> 
+  d_skewed_b %>% 
+  select(p_grid_b) %>% 
+  rename(decision_b = p_grid_b) %>% 
+  mutate(weighted_average_loss_b = purrr::map(decision_b, make_loss_b)) %>% 
   unnest(weighted_average_loss_b) 
 )
 ```
@@ -2055,8 +1879,8 @@ Calculate the minimum loss
 # this will help us find the x and y coordinates for the minimum value
 (
     min_loss_b <-
-      l_b |> 
-      filter(weighted_average_loss_b == min(weighted_average_loss_b)) |> 
+      l_b %>% 
+      filter(weighted_average_loss_b == min(weighted_average_loss_b)) %>% 
       as.numeric()
 )
 ```
@@ -2067,7 +1891,7 @@ Now we're ready for the right panel of Figure 3.4.
 #| label: fig-minimum-loss-b
 #| fig-cap: "Expected loss under the rule that loss is proportional to absolute distance of decision (horizontal axis) from the true value. The point marks the value of `p` that minimizes the expected loss, the posterior median."
 
-l_b |>   
+l_b %>%   
   ggplot(aes(x = decision_b, y = weighted_average_loss_b)) +
   geom_area(fill = "deepskyblue") +
   geom_vline(xintercept = min_loss_b[1], color = "black", linetype = 3) +
@@ -2083,7 +1907,7 @@ as depicted by our samples.
 ```{r}
 #| label: posterior-skewed-median_b
 
-samples_skewed_b |> 
+samples_skewed_b %>% 
   summarise(posterior_median_b = median(p_skewed_b))
 ```
 
@@ -2097,31 +1921,31 @@ Let's investigate.
 # amend our loss function
 
 make_loss2_b <- function(our_d2) {
-  d_skewed_b |> 
-    mutate(loss2_b = posterior_skewed_b * (our_d2 - p_grid_b)^2) |> 
+  d_skewed_b %>% 
+    mutate(loss2_b = posterior_skewed_b * (our_d2 - p_grid_b)^2) %>% 
     summarise(weighted_average_loss2_b = sum(loss2_b))
 }
 
 
 # remake our `l` data
 l2_b <-
-  d_skewed_b |> 
-  select(p_grid_b) |> 
-  rename(decision2_b = p_grid_b) |> 
-  mutate(weighted_average_loss2_b = purrr::map(decision2_b, make_loss2_b)) |> 
+  d_skewed_b %>% 
+  select(p_grid_b) %>% 
+  rename(decision2_b = p_grid_b) %>% 
+  mutate(weighted_average_loss2_b = purrr::map(decision2_b, make_loss2_b)) %>% 
   unnest(weighted_average_loss2_b)
 
 # update to the new minimum loss coordinates
 
 (
     min_loss2_b <-
-      l2_b |> 
-      filter(weighted_average_loss2_b == min(weighted_average_loss2_b)) |> 
+      l2_b %>% 
+      filter(weighted_average_loss2_b == min(weighted_average_loss2_b)) %>% 
       as.numeric()
 )
 
 # update the plot
-l2_b |>   
+l2_b %>%   
   ggplot(aes(x = decision2_b, y = weighted_average_loss2_b)) +
   geom_area(fill = "deepskyblue") +
   geom_vline(xintercept = min_loss2_b[1], color = "black", linetype = 3) +
@@ -2137,7 +1961,7 @@ our samples.
 ```{r}
 #| label: posterior-skewed-mean_b
 
-samples_skewed_b |> 
+samples_skewed_b %>% 
   summarise(posterior_mean_b = mean(p_skewed_b))
 ```
 
@@ -2349,7 +2173,7 @@ rethinking::simplehist(w2_a)
 ```
 
 The symbol `samples_a` above is the same list of random samples from the
-posterior distribution that we have calculated in @cnj-sample-globe-tossing
+posterior distribution that we have calculated in @lst-draw-samples-a
 and used in previous sections.
 
 > For each sampled value, a random binomial observation is generated.
@@ -2400,7 +2224,7 @@ Suppose $N = 2$, two tosses of the globe.
 
 tibble(n      = 2,
        `p(w)` = .7,
-       w      = 0:n) |> 
+       w      = 0:n) %>% 
   mutate(density = dbinom(w, size = n, prob = `p(w)`))
 ```
 
@@ -2500,11 +2324,11 @@ simulate_binom <- function(n, probability) {
 
 d9_b <-
   crossing(n9_b           = c(3, 6, 9),
-           probability9_b = c(.3, .6, .9)) |> 
-  mutate(draws9_b = map2(n9_b, probability9_b, simulate_binom)) |> 
-  ungroup() |> 
+           probability9_b = c(.3, .6, .9)) %>% 
+  mutate(draws9_b = map2(n9_b, probability9_b, simulate_binom)) %>% 
+  ungroup() %>% 
   mutate(n           = str_c("n = ", n9_b),
-         probability = str_c("p = ", probability9_b)) |> 
+         probability = str_c("p = ", probability9_b)) %>% 
   unnest(draws9_b)
 
 d9_b |> 
@@ -2530,7 +2354,7 @@ the data as just the first 6 rows.
 ```{r}
 #| label: fig-sim-plot-9-cond-b
 
-d9_b |> 
+d9_b %>% 
   ggplot(aes(x = draws9_b)) +
   geom_histogram(binwidth = 1, center = 0,
                  color = "deepskyblue", linewidth = 1/10) +
@@ -2577,19 +2401,19 @@ n_trials  <- 9L
   d2_b <-
   tibble(p_grid2_b = seq(from = 0, to = 1, length.out = n2_b),
          # note we're still using a flat uniform prior
-         prior2_b  = 1) |> 
-  mutate(likelihood2_b = dbinom(n_success, size = n_trials, prob = p_grid2_b)) |> 
+         prior2_b  = 1) %>% 
+  mutate(likelihood2_b = dbinom(n_success, size = n_trials, prob = p_grid2_b)) %>% 
   mutate(posterior2_b = (likelihood2_b * prior2_b) / sum(likelihood2_b * prior2_b))
 )
 
-d2_b |> 
+d2_b %>% 
   ggplot(aes(x = p_grid2_b, y = posterior2_b)) +
   geom_area(color = "deepskyblue", fill = "deepskyblue") +
-  geom_segment(data = . %>% # must use %>% instead of |>  
+  geom_segment(data = . %>% 
                  filter(p_grid2_b %in% c(seq(from = .1, to = .9, by = .1), 3 / 10)),
                aes(xend = p_grid2_b, yend = 0, linewidth = posterior2_b),
                color = "black", show.legend = F) +
-  geom_point(data = . %>% # must use %>% instead of |> 
+  geom_point(data = . %>%
                filter(p_grid2_b %in% c(seq(from = .1, to = .9, by = .1), 3 / 10))) +
   annotate(geom = "text", 
            x = .08, y = .0025,
@@ -2657,13 +2481,13 @@ n_trials  <- 9
   d_t <-
   tibble(p_grid_t = seq(from = 0, to = 1, length.out = n),
          # note we're still using a flat uniform prior
-         prior_t  = 1) |> 
-  mutate(likelihood_t = dbinom(n_success, size = n_trials, prob = p_grid_t)) |> 
+         prior_t  = 1) %>% 
+  mutate(likelihood_t = dbinom(n_success, size = n_trials, prob = p_grid_t)) %>% 
   mutate(posterior_t = (likelihood_t * prior_t) / sum(likelihood_t * prior_t))
 
 set.seed(3)
 samples_t <-
-  d_t |> 
+  d_t %>% 
     slice_sample(n = 1e4, weight_by = posterior_t, replace = T)
 ```
 
@@ -2739,8 +2563,8 @@ sum(samples_r > 0.5 & samples_r < 0.75) / 1e4
 #| attr-source: '#lst-define-boundary-from-grid-tidyverse-demo lst-cap="Define boundary by using the grid-approximate posterior with {tidyverse} functions"'
 
 ## add up posterior probability where p < 0.5
-d_t |> 
-  filter(p_grid_t < .5) |> 
+d_t %>% 
+  filter(p_grid_t < .5) %>% 
   summarise(sum = sum(posterior_t))
 ```
 
@@ -2751,14 +2575,14 @@ Using the samples from the posterior:
 #| attr-source: '#lst-define-boundary-from-samples-tidyverse-demo lst-cap="Define boundary by summing up the samples from the posterior with {tidyverse} function `filter()` and `summarize()`"'
 
 ## filter and summarize samples of posterior probability where p < 0.5
-samples_t |>
-  filter(p_grid_t < .5) |> 
+samples_t %>%
+  filter(p_grid_t < .5) %>% 
   summarise(sum = n() / 1e4)
 
 ## filter and summarize samples of posterior probability 
 ## where p lies between 0.5 and 0.75
-samples_t |> 
-  filter(p_grid_t > .5 & p_grid_t < .75) |> 
+samples_t %>% 
+  filter(p_grid_t > .5 & p_grid_t < .75) %>% 
   summarise(sum = n() / 1e4)
 ```
 
@@ -2771,14 +2595,14 @@ A more explicit approach for the same computation is to follow up
 #| eval: false
 
 ## count and sum samples of posterior probability where p < 0.5
-samples_t |> 
-  count(p_grid_t < .5) |> 
+samples_t %>% 
+  count(p_grid_t < .5) %>% 
   mutate(probability = n / sum(n))
 
 ## count and sum samples of posterior probability 
 ## where p lies between .5 and .75
-samples_t |> 
-  count(p_grid_t > .5 & p_grid_t < .75) |> 
+samples_t %>% 
+  count(p_grid_t > .5 & p_grid_t < .75) %>% 
   mutate(probability = n / sum(n))
 ```
 
@@ -2969,7 +2793,7 @@ Find loss with the decision $p = 0.5$.
 #| attr-source: '#lst-loss-0.5-tidyverse-demo lst-cap="Find loss for the decision 0.5: tidyverse version"'
 
 ## find loss with the decision of .5
-d_t |> 
+d_t %>% 
   summarise(`expected loss` = sum(posterior_t * abs(0.5 - p_grid_t)))
 ```
 
@@ -2982,21 +2806,21 @@ package, a member of the {**tidyverse}** packages.
 #| attr-source: '#lst-loss-minimum-tidyverse-demo lst-cap="Find decision for minimum loss: tidyverse version"'
 
 make_loss_t <- function(our_d) {
-  d_t |> 
-    mutate(loss_t = posterior_t * abs(our_d - p_grid_t)) |> 
+  d_t %>% 
+    mutate(loss_t = posterior_t * abs(our_d - p_grid_t)) %>% 
     summarise(weighted_average_loss_t = sum(loss_t))
 }
 
 loss_t <- 
-    d_t |> 
-        select(p_grid_t) |> 
-        rename(decision_t = p_grid_t) |> 
-            mutate(weighted_average_loss_t = purrr::map(decision_t, make_loss_t)) |>
+    d_t %>% 
+        select(p_grid_t) %>% 
+        rename(decision_t = p_grid_t) %>% 
+            mutate(weighted_average_loss_t = purrr::map(decision_t, make_loss_t)) %>%
         unnest(weighted_average_loss_t) 
   
 min_loss_t <-
-  loss_t |> 
-    filter(weighted_average_loss_t == min(weighted_average_loss_t)) |>
+  loss_t %>% 
+    filter(weighted_average_loss_t == min(weighted_average_loss_t)) %>%
     as.numeric()
 ```
 
@@ -3041,7 +2865,7 @@ set.seed(3)
 d2_t <- tibble(draws_t = rbinom(1e5, size = 9, prob = .7))
 
 # the histogram
-d2_t |> 
+d2_t %>% 
   ggplot(aes(x = draws_t)) +
   geom_histogram(binwidth = 1, center = 0,
                  fill = "deepskyblue", color = "black", linewidth = 1/10) +
@@ -3084,12 +2908,12 @@ hist(w_predicted_r)
 set.seed(3)
 
 samples2_t <-
-  d_t |> 
-  slice_sample(n = 1e4, weight_by = posterior_t, replace = T) |> 
+  d_t %>% 
+  slice_sample(n = 1e4, weight_by = posterior_t, replace = T) %>% 
   mutate(w_predicted_t = purrr::map_dbl(p_grid_t, rbinom, n = 1, size = 9))
 
 ## plot histogram
-samples2_t |> 
+samples2_t %>% 
   ggplot(aes(x = w_predicted_t)) +
   geom_histogram(binwidth = 1, center = 0, color = "black",
                  fill = "deepskyblue", linewidth = 1/10) +
@@ -3135,7 +2959,7 @@ here's the posterior summary for `b_Intercept`, the probability of a
 ```{r}
 #| label: posterior-summary-b
 
-brms::posterior_summary(b3.1)["b_Intercept", ] |> 
+brms::posterior_summary(b3.1)["b_Intercept", ] %>% 
   round(digits = 2)
 ```
 
@@ -3150,8 +2974,8 @@ repo](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the
 f <-
   brms:::fitted.brmsfit(b3.1, 
          summary = F,
-         scale = "linear") |> 
-  data.frame() |> 
+         scale = "linear") %>% 
+  data.frame() %>% 
   rlang::set_names("p")
 
 glimpse(f)
@@ -3161,7 +2985,7 @@ glimpse(f)
 #| label: fig-brms-model-density
 #| fig-cap: "Density plot of the fittet {brms} model"
 
-f |> 
+f %>% 
   ggplot(aes(x = p)) +
   geom_density(fill = "deepskyblue", color = "deepskyblue") +
   annotate(geom = "text", x = .08, y = 2.5,
@@ -3188,11 +3012,11 @@ important: I have a smaller apex and my curve is more irregular.)
 
 set.seed(3)
 f <-
-  f |> 
+  f %>% 
   mutate(w2 = rbinom(n(), size = 9,  prob = p))
 
 # the plot
-f |> 
+f %>% 
   ggplot(aes(x = w2)) +
   geom_histogram(binwidth = 1, center = 0, color = "black",
                  fill = "deepskyblue", linewidth = 1/10) +
