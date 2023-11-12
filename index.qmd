@@ -11,7 +11,7 @@ nameref:
 ::: {.callout-note style="color: blue;"}
 This is work in progress: I have finished in a first draft the first 4 chapters, e.g., $\approx 21\%$ of the book content.
 
-I am working on a second draft where I will shorten my notes but include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft will start with the third chapter, e.g. it has finished $\approx 8\%$ of the book content.
+I am working on a second draft where I will shorten my notes but include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft has stopped after chapter 2.2.1 e.g. it has finished $\approx 9\%$ of the book content.
 
 :::
 
