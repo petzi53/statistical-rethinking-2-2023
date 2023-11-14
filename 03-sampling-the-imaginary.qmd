@@ -18,12 +18,6 @@ previous chapter and sampling from them to produce counts.
 ::::
 :::::
 
-```{r}
-#| label: setup
-
-library(tidyverse)
-```
-
 ## Vampire Example {.unnumbered}
 
 ### ORIGINAL {.unnumbered}
@@ -320,7 +314,7 @@ a: Draw 1000 samples from the posterior distribution (Base R)
 
 n_samples_a <- 1e4
 
-set.seed(3) # for reproducibility
+base::set.seed(3) # for reproducibility
 
 ## R code 3.3a Sample Globe ##########################################
 samples_a <- sample(p_grid_a, 
@@ -441,7 +435,7 @@ n_trials_b  <- 9L
   tibble::tibble(p_grid_b = seq(from = 0, to = 1, length.out = n_grid_b),
          prior_b  = 1) |>  # flat uniform prior, vector 1L recycling
   dplyr::mutate(likelihood_b = 
-                  dbinom(n_success_b, size = n_trials_b, prob = p_grid_b)) |> 
+                  stats::dbinom(n_success_b, size = n_trials_b, prob = p_grid_b)) |> 
   dplyr::mutate(posterior_b = 
                   (likelihood_b * prior_b) / sum(likelihood_b * prior_b))
 )
@@ -481,7 +475,7 @@ b: Draw 1000 samples from the posterior distribution (Tidyverse)
 n_samples_b <- 1e4
 
 # make it reproducible
-set.seed(3)
+base::set.seed(3)
 
 df_samples_b <-
   d_b |> 
@@ -503,7 +497,7 @@ identical(samples_a, df_samples_b$samples_b)
 ::::
 :::::
 
-The column `samples_b` is identical with vector `samples_a`, because I have used in both sampling processes `set.seed(3)`, so that I (and you) could reproduce the data. 
+The column `samples_b` is identical with vector `samples_a`, because I have used in both sampling processes `base::set.seed(3)`, so that I (and you) could reproduce the data. 
 
 
 There are different possibilities to display data frames respectively tibbles:
@@ -619,7 +613,7 @@ b: Density estimate of the drawn samples with 1e6 grid points (Tidyverse)
 #| label: fig-globe-tossing-density-plot-b2
 #| fig-cap: "Density estimate of the drawn samples with 1e6 grid points (Tidyverse)"
 
-set.seed(3)
+base::set.seed(3)
 
 ## R code 3.5b(2) Globe Density ###########################
 d_b |> 
@@ -717,7 +711,7 @@ In comparison with the value of the posterior probability below 0.5 in the book 
 
 The reason for the difference is that you can't get the same values in a
 sampling processes. This is the nature of randomness. And McElreath did
-not include the `set.seed()` function for (exact) reproducibility. 
+not include the `base::set.seed()` function for (exact) reproducibility. 
 ::::
 :::::
 
@@ -988,7 +982,7 @@ likelihood_skewed_a <- dbinom(3, size = 3, prob = p_grid_skewed_a)
 posterior_skewed_a <- likelihood_skewed_a * prior_skewed_a
 posterior_skewed_a <- posterior_skewed_a / sum(posterior_skewed_a)
 
-set.seed(3) # added to make sampling distribution reproducible (pb)
+base::set.seed(3) # added to make sampling distribution reproducible (pb)
 samples_skewed_a <- sample(p_grid_skewed_a, 
              size = 1e4, replace = TRUE, prob = posterior_skewed_a)
 
@@ -1471,14 +1465,14 @@ n_trials_skewed_b  <- 3
 d_skewed_b <-
   d_b |> 
     dplyr::mutate(likelihood_skewed_b = 
-        dbinom(n_success_skewed_b,
+        stats::dbinom(n_success_skewed_b,
            size = n_trials_skewed_b, prob = p_grid_b)) |> 
     dplyr::mutate(posterior_skewed_b  = 
           (likelihood_skewed_b * prior_b) / 
           sum(likelihood_skewed_b * prior_b))
 
 # make the next part reproducible
-set.seed(3)
+base::set.seed(3)
 
 # here's our new samples tibble
 samples_skewed_b <- 
@@ -2046,7 +2040,7 @@ Results of mode calculation with several packages:
 
 The graphical representation as shown in Figure 3.4 will be calculated
 in the tidyverse version of this section. See: @fig-left-panel-3-4-skewed-b for
-the left panel and @fig-minimum-loss2-b for the right panel of Figure
+the left panel and @fig-prop-loss-b for the right panel of Figure
 3.4.
 
 ##### Loss function to support particular decisions
@@ -2510,984 +2504,739 @@ our samples (`r mean(samples_skewed_b$p_skewed_b)` versus `r loss_min_b2[[1]]`).
 ::::
 :::::
 
-## I STOPPED HERE (2nd PASS, 2023-11-12)
-
 ## Sampling to simulate prediction
 
-### Original
+### ORIGINAL
 
-To generate implied observations from a model is useful for at least
-five reasons:
+:::::{.my-procedure}
+:::{.my-procedure-header}
+:::::: {#prp-ease-sim}
+: Numbered Procedure Title
+::::::
+:::
+::::{.my-procedure-container}
+> “Another common job for samples is to ease **simulation** of the model’s implied observations. Generating implied observations from a model is useful for at least ~~four~~ five reasons.” ([McElreath, 2020, p. 61](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=80&annotation=N8SBHXFN))
 
-1.  **Model design**: We can sample not only from the posterior, but
-    also from the prior. Seeing what the model expects, before the data
-    arrive, is the best way to understand the implications of the prior.
-    We'll do a lot of this in later chapters, where there will be
-    multiple parameters and so their joint implications are not always
-    very clear.
-2.  **Model checking**: After a model is updated using data, it is worth
-    simulating implied observations, to check both whether the fit
-    worked correctly and to investigate model behavior.
-3.  **Software validation**: In order to be sure that our model fitting
-    software is working, it helps to simulate observations under a known
-    model and then attempt to recover the values of the parameters the
-    data were simulated under.
-4.  **Research design**: If you can simulate observations from your
-    hypothesis, then you can evaluate whether the research design can be
-    effective. In a narrow sense, this means doing power analysis, but
-    the possibilities are much broader.
-5.  **Forecasting**: Estimates can be used to simulate new predictions,
-    for new cases and future observations. These forecasts can be useful
-    as applied prediction, but also for model criticism and revision.
+1. Model desing
+2. Model checking
+3. Software validation
+4. Research design
+5. Forecasting
+
+> “We will call such simulated data **dummy data**, to indicate that it is a stand-in for actual data.” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=EG7YYPVK))
+::::
+:::::
+
 
 #### Dummy data
 
-> Now note that these assumptions not only allow us to infer the
-> plausibility of each possible value of *p*, after observation. That's
-> what you did in the previous chapter. These assumptions also allow us
-> to simulate the observations that the model implies. They allow this,
-> because likelihood functions work in both directions. Given a realized
-> observation, the likelihood function says how plausible the
-> observation is. And given only the parameters, the likelihood defines
-> a distribution of possible observations that we can sample from, to
-> simulate observation. In this way, Bayesian models are always
-> *generative*, capable of simulating predictions. Many non-Bayesian
-> models are also generative, but many are not.
->
-> We will call such simulated data **DUMMY DATA**, to indicate that it
-> is a stand-in for actual data.
+Likelihood functions work in both directions:
 
-##### Probability of each globe toss
+- They help to infer the plausibility of each possible value of *p*. > “With the globe tossing model, the `r glossary("dummy data")` arises from a binomial likelihood:” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=5PLAWZ8J))
+- They can be used to simulate the observations that the model implies. “You could use `base::sample()` to do this, but R provides convenient sampling functions for all the ordinary probability distributions, like the binomial.” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=W69A2SQI))
 
-> Suppose $N = 2$, two tosses of the globe. Then there are only three
-> possible observations: 0 water, 1 water, 2 water. You can quickly
-> compute the probability of each, for any given value of *p*. Let's use
-> $p = 0.7$, which is just about the true proportion of water on the
-> Earth:
+> “Given a realized observation, the likelihood function says how plausible the observation is. And given only the parameters, the likelihood defines a distribution of possible observations that we can sample from, to simulate observation.” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=PNGM8F8P))
 
-```{r}
-#| label: dummy-data-a
 
-## R code 3.20 #############################
-dbinom(0:2, size = 2, prob = 0.7)
-```
 
-##### Simulation of globe tosses
 
-> Now we're going to simulate observations, using these probabilities.
-> This is done by sampling from the distribution just described above.
-> You could use `sample()` to do this, but R provides convenient
-> sampling functions for all the ordinary probability distributions,
-> like the binomial.
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-two-tosses-a}
+a: Suppose $N = 2$, two tosses of the globe with $p = 0.7$
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+
+###### Probability
 
 ```{r}
-#| label: simulate-1-obs-a
+#| label: two-tosses-prob-a
+#| attr-source: '#lst-two-tosses-prob-a lst-cap="lst-title"'
 
-set.seed(3) # for reproducibility
 
-## R code 3.21 #############################
-rbinom(1, size = 2, prob = 0.7)
+
+## R code 3.20a #############################
+(
+  two_tosses_prob_a <- dbinom(0:2, size = 2, prob = 0.7)
+)
 ```
 
-(As the outcome results from a random process the above value differs
-from the SR2 version. But with `set.seed(3)`\` you will get the same
-value of $2$.)
+**Interpretation of the observed result of two tosses with a probability of $p = 0.7$**
 
-> That $1$ means "2 water in 2 tosses." The "`r`" in `rbinom` stands for
-> "random." It can also generate more than one simulation at a time. A
-> set of 10 simulations can be made by:
+With $N = 2$ there are only three possibilities: 0, 1 or 2 water. 
+
+- `r two_tosses_prob_a[[1]] * 100`% chance of observing 0 water.
+- `r two_tosses_prob_a[[2]] * 100`% chance of observing 1 water.
+- `r two_tosses_prob_a[[3]] * 100`% chance of observing 2 water.
+
+With different $p$ you will get a different result.
+
+###### Simulation
+
+
+```{r}
+#| label: two-tosses-sim-a
+
+base::set.seed(3) # for reproducibility
+
+## R code 3.21a #############################
+(
+  two_tosses_sim_a <- rbinom(1, size = 2, prob = 0.7)
+)
+```
+**Interpretation of the simulated result of two tosses with a probability of $p = 0.7$**
+
+One simulation (trial) consists with $N = 2$ of two simulated tosses:
+
+- In our simulation (trial) of two simulated tosses $N = 2$ we got `r two_tosses_sim_a` water.
+
+Without the `base::set.seed()` function the result will change. Try it.
+
+:::
+::::
+:::::
+
+With `rbinom()` you can also generate more than one simulation (trial) at a time.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-several-sims}
+a: Using `rbinom()` to simulate two tosses to generate 10 and 100,000 dummy observations
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+###### 10 trials
+
 
 ```{r}
 #| label: simulate-10-obs-a
 
-set.seed(3)
-## R code 3.22 #############################
+base::set.seed(3)
+## R code 3.22a #############################
 rbinom(10, size = 2, prob = 0.7)
 ```
 
-> Let's generate 100,000 dummy observations, just to verify that each
-> value (0, 1, or 2) appears in proportion to its likelihood:
+
+###### 1e5 trials
+
 
 ```{r}
 #| label: simulate-1e5-obs-a
 
-set.seed(3)
-## R code 3.23 #############################
+base::set.seed(3)
+## R code 3.23a #############################
 dummy_w_a <- rbinom(1e5, size = 2, prob = 0.7)
 table(dummy_w_a) / 1e5
 ```
 
-##### Plot simulation of globe tosses
 
-We could use either the base R `graphics::hist()` or --- as in the SR2
-book --- the `rethinking::simplehist()` function.
+:::
+
+
+
+::::
+:::::
+
+Now let's simulate the same amount of tosses (sample size = 9) as we have used previously. I will provide two kinds of R graphs: One for `rethinking::simplehist()` as in the book and one using base R with `graphics::hist()`.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-9-toss-fig-a}
+a: Distribution of simulated sample observations from 9 tosses of the globe
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+
+###### Base R       
 
 ```{r}
 #| label: fig-plot-hist-figure-3.5-a
 #| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. The plot uses the base R `hist()` function"
 
-set.seed(3)
+base::set.seed(3)
+## R code 3.24a with hist() ##############
 dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
 hist(dummy_w_a, xlab = "dummy water count")
 ```
 
+
+###### Rethinking
+
 ```{r}
 #| label: fig-plot-simplehist-figure-3.5-a
-#| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. the plot uses the rethinking::simplehist() function"
+#| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. the plot uses the `rethinking::simplehist()``` function"
 
-set.seed(3)
-## R code 3.24 #############################
-dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
+base::set.seed(3)
+## R code 3.24a with simplehist() #############################
+dummy_w_a <- stats::rbinom(1e5, size = 9, prob = 0.7)
 rethinking::simplehist(dummy_w_a, xlab = "dummy water count")
 ```
 
-> Notice that most of the time the expected observation does not contain
-> water in its true proportion, 0.7. That's the nature of observation:
-> There is a one-to-many relationship between data and data-generating
-> processes. You should experiment with sample size, the `size` input in
-> the code above, as well as the prob, to see how the distribution of
-> simulated samples changes shape and location.
 
-> Many readers will already have seen simulated observations. **SAMPLING
-> DISTRIBUTIONS** are the foundation of common non-Bayesian statistical
-> traditions. In those approaches, inference about parameters is made
-> through the sampling distribution. In this book, inference about
-> parameters is never done directly through a sampling distribution. The
-> posterior distribution is not sampled, but deduced logically. Then
-> samples can be drawn from the posterior, as earlier in this chapter,
-> to aid in inference. In neither case is "sampling" a physical act. In
-> both cases, it's just a mathematical device and produces only *small
-> world* (@sec-chap02) numbers.
+
+:::
+
+Note that in our example using `base::set.seed(3)` the simulation does not generate the water in its true proportion of $0.7$.
+
+> “That’s the nature of observation: There is a one-to-many relationship between data and data-generating processes. You should [delete the `base::set.seed()` line and] experiment with sample size, the `size` input in the code above, as well as the `prob`, to see how the distribution of simulated samples changes shape and location.” ([McElreath, 2020, p. 63](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=82&annotation=2NRZ2EV9))
+::::
+:::::
+
+
+:::::{.my-important}
+:::{.my-important-header}
+Sampling distributions versus Samples drawn from the posterior
+:::
+::::{.my-important-container}
+
+> “Many readers will already have seen simulated observations. `r glossary("Sampling distribution", "Sampling distributions")` are the foundation of common non-Bayesian statistical traditions. In those approaches, inference about parameters is made through the sampling distribution. In this book, inference about parameters is never done directly through a sampling distribution. The posterior distribution is not sampled, but deduced logically. Then samples can be drawn from the posterior, as earlier in this chapter, to aid in inference. In neither case is 'sampling' a physical act. In both cases, it’s just a mathematical device and produces only *small world* (@sec-chap02) numbers.” ([McElreath, 2020, p. 63](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=82&annotation=C7QLRFPI))
+
+::::
+:::::
+
 
 #### Model checking
 
-> MODEL CHECKING means (1) ensuring the model fitting worked correctly
-> and (2) evaluating the adequacy of a model for some purpose. Since
-> Bayesian models are always *generative*, able to simulate observations
-> as well as estimate parameters from observations, once you condition a
-> model on data, you can simulate to examine the model's empirical
-> expectations.
+Two main purposes:
 
-> We'd like to *propagate* the parameter uncertainty---carry it
-> forward---as we evaluate the implied predictions. All that is required
-> is averaging over the posterior density for `p`, while computing the
-> predictions. For each possible value of the parameter `p`, there is an
-> implied distribution of outcomes. So if you were to compute the
-> sampling distribution of outcomes at each value of `p`, then you could
-> average all of these prediction distributions together, using the
-> posterior probabilities of each value of `p`, to get a POSTERIOR
-> PREDICTIVE DISTRIBUTION.
+1. Checking if software is working correctly
+2. Evaluation the adequacy of the model
 
-The reproduction of FIGURE 3.6 that illustrates this averaging is shown
-in ref###.
+> “All that is required is averaging over the posterior density for $p$, while computing the predictions. For each possible value of the parameter $p$, there is an implied distribution of outcomes. So if you were to compute the sampling distribution of outcomes at each value of $p$, then you could average all of these prediction distributions together, using the posterior probabilities of each value of $p$, to get a `r glossary("posterior predictive distribution")`.” ([McElreath, 2020, p. 65](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=84&annotation=EZT523XH))
 
-> we need to learn how to combine sampling of simulated observations, as
-> in the previous section, with sampling parameters from the posterior
-> distribution. We expect to do better when we use the entire posterior
-> distribution, not just some point estimate derived from it.
 
-So how do you actually do the calculations?
+
+:::::{.my-procedure}
+:::{.my-procedure-header}
+:::::: {#prp-post-pred-sim-a}
+a: How to generate the `r glossary("posterior predictive distribution")`
+::::::
+:::
+::::{.my-procedure-container}
+
+1. Use `rbinom()` to generate random binomial samples.
+2. Use as `prob` value not a single value but samples from the posterior
+
+I will not reproduce Figure 3.6 in the upcoming section. The complex procedure to plot the graph does not add much understanding in Bayesian statistics. But the content of the picture itself is very important to understand how the posterior predictive distribution is generated.
+
+***
+
+![“Simulating predictions from the total posterior. Top: The familiar posterior distribution for the globe tossing data. Ten example parameter values are marked by the vertical lines. Values with greater posterior probability indicated by thicker lines. Middle row: Each of the ten parameter values implies a unique sampling distribution of predictions. Bottom: Combining simulated observation distributions for all parameter values (not just the ten shown), each weighted by its posterior probability, produces the posterior predictive distribution. This distribution propagates uncertainty about parameter to uncertainty about prediction.” ([McElreath, 2020, p. 65](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=84&annotation=ZBMIA85F))](img/SR2-fig3_6.png){#fig-3-6 
+fig-alt="Top panel shows the posterior probability, middle panel the sampling distribution and the bottom panel the posterior predictive distribution" fig-align="center" 
+width="90%"}
+
+::::
+:::::
+
+
+We will generates 10,000 (1e4) simulated predictions of 9 globe tosses (size = 9)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-post-pred-sim-a}
+a: Simulate predicted observations for a single value ($p = 0.6$) and with samples of the posterior
+::::::
+:::
+::::{.my-r-code-container}
+
+
+Generating 10,000 (1e4) simulated predictions of 9 globe tosses (size = 9).
+
+::: {.panel-tabset}
+
+
+###### p = single value of 0.6
+
 
 ```{r}
-#| label: sim-pred-values-a
+#| label: fig-post-pred-sim-a1
+#| fig-cap: "Simulate predicted observations for a single value p value of 0.6"
 
-set.seed(3)
-## R code 3.25 #############################
-w_a <- rbinom(1e4, size = 9, prob = 0.6)
-rethinking::simplehist(w_a)
+base::set.seed(3)
+## R code 3.25a #############################
+w_a1 <- rbinom(1e4, size = 9, prob = 0.6)
+rethinking::simplehist(w_a1)
 ```
 
-> This generates 10,000 (1e4) simulated predictions of 9 globe tosses
-> (size=9), assuming $p = 6$. The predictions are stored as counts of
-> water, so the theoretical minimum is zero and the theoretical maximum
-> is nine.
+The predictions are stored as counts of water, so the theoretical minimum is zero and the theoretical maximum is nine. Although our fix `prob` value = 0.6 the samples show 5 as the mode of the randomly generated distribution.
 
-We used `rethinking::`simplehist(w_a)\` to get a clean histogram of the
-simulated outcomes.
+###### p = posterior samples
 
-> All you need to propagate parameter uncertainty into these predictions
-> is replace the value 0.6 with samples from the posterior:
 
 ```{r}
-#| label: fig-sim-pred-samples-a
-#| fig-cap: "Random binomial samples to simulate predicted observations for $p = 0.6$"
-#| attr-source: '#lst-sim-pred-samples-a lst-cap="Generate 1e4 random binomial samples to simulate predicted observations for $p = 0.6$"'
+#| label: fig-post-pred-sim-a2
+#| fig-cap: "Simulate predicted observations with samples of the posterior"
 
-set.seed(3)
-## R code 3.26 #############################
-w2_a <- rbinom(1e4, size = 9, prob = samples_a)
-rethinking::simplehist(w2_a)
+base::set.seed(3)
+## R code 3.26a #############################
+w_a2 <- rbinom(1e4, size = 9, prob = samples_a)
+rethinking::simplehist(w_a2)
 ```
 
-The symbol `samples_a` above is the same list of random samples from the
+The code propagate parameter uncertainty into the predictions by replacing a fixed `prob` value by the vector `samples_a`. The symbol `samples_a` is the same list of random samples from the
 posterior distribution that we have calculated in @cnj-sample-globe-tossing
 and used in previous sections.
+:::
 
-> For each sampled value, a random binomial observation is generated.
-> Since the sampled values appear in proportion to their posterior
-> probabilities, the resulting simulated observations are averaged over
-> the posterior. You can manipulate these simulated observations just
-> like you manipulate samples from the posterior---you can compute
-> intervals and point statistics using the same procedures.
+::::
+:::::
 
-> The simulated model predictions are quite consistent with the observed
-> data in this case---the actual count of 6 lies right in the middle of
-> the simulated distribution. ... So far, we've only viewed the data
-> just as the model views it: Each toss of the globe is completely
-> independent of the others. This assumption is questionable.
+> “For each sampled value, a random binomial observation is generated. Since the sampled values appear in proportion to their posterior probabilities, the resulting simulated observations are averaged over the posterior. You can manipulate these simulated observations just like you manipulate samples from the posterior—you can compute intervals and point statistics using the same procedures.” ([McElreath, 2020, p. 66](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=85&annotation=BVUDPY9U))
 
-> So with the goal of seeking out aspects of prediction in which the
-> model fails, let's look at the data in two different ways. Recall that
-> the sequence of nine tosses was `W L W W W L W L W`. First, consider
-> the length of the longest run of either water or land. This will
-> provide a crude measure of correlation between tosses. So in the
-> observed data, the longest run is 3 W's. Second, consider the number
-> of times in the data that the sample switches from water to land or
-> from land to water. This is another measure of correlation between
-> samples. In the observed data, the number of switches is 6. There is
-> nothing special about these two new ways of describing the data. They
-> just serve to inspect the data in new ways. In your own modeling,
-> you'll have to imagine aspects of the data that are relevant in your
-> context, for your purposes.
+But @fig-post-pred-sim-a2 just predicts the posterior distribution as our model sees the data. To evaluate the adequacy of the model for certain purposes it is important to investigate it under different point of views. McElreath proposes two look at the data in additional two ways: 
 
-FIGURE 3.7 showing the simulated predictions, viewed in these two new
-ways, is reproduced in ref###. I have also postponed the interpretation
-of Figure 3.7 to ref###, because it is more understandable viewing the
-plots.
+1. Plot the distribution of the longest run of either water or land.
+2. Plot the distribution of the number of switches from water to land and reverse.
 
-### Tidyverse
+The calculation and reproduction of Figure 3.7 is demonstrated in the next tidyverse section.
+
+
+### TIDYVERSE
 
 #### Dummy data
 
-> Dummy data for the globe tossing model arise from the binomial
-> likelihood.
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-two-tosses-b}
+b: Suppose $N = 2$, two tosses of the globe with $p = 0.7$
+::::::
+:::
+::::{.my-r-code-container}
 
-##### Probability of each globe toss
+::: {.panel-tabset}
 
-Suppose $N = 2$, two tosses of the globe.
+###### Probability
 
 ```{r}
-#| label: dummy-data-b
+#| label: two-tosses-prob-b
 
-tibble(n      = 2,
+## R code 3.20b ######################
+tibble::tibble(n      = 2,
        `p(w)` = .7,
        w      = 0:n) |> 
-  mutate(density = dbinom(w, size = n, prob = `p(w)`))
+  dplyr::mutate(density = stats::dbinom(w, size = n, prob = `p(w)`))
 ```
 
-##### Simulation of globe tosses
-
-Simulate one globe toss:
+###### Simulation
 
 ```{r}
-#| label: simulate-1-obs-b
+#| label: two-tosses-sim-b
 
-set.seed(3)
-rbinom(1, size = 2, prob = .7)
+## R code 3.21b = 3.21a ######################
+base::set.seed(3)
+stats::rbinom(1, size = 2, prob = .7)
 ```
 
-Simulate 10 globe tosses.
+
+:::
+
+Compare the results with the calculation in @cnj-two-tosses-a, resp. @lst-two-tosses-prob-a.
+::::
+:::::
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-several-sims}
+b: Using `stats::rbinom()` to simulate two tosses to generate 10 and 100,000 dummy observations
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+###### 10 trials
+
 
 ```{r}
 #| label: simulate-10-obs-b
 
-set.seed(3)
-rbinom(10, size = 2, prob = .7)
+
+base::set.seed(3)
+## R code 3.22b = 3.22a #############################
+stats::rbinom(10, size = 2, prob = 0.7)
 ```
 
-Now generate 100,000 (i.e., 1e5) reproducible dummy observations.
+
+###### 1e5 trials
+
 
 ```{r}
 #| label: simulate-1e5-obs-b
 
-n_draws_b <- 1e5
 
-set.seed(3)
-dummy_w_b <- tibble(draws = rbinom(n_draws_b, size = 2, prob = .7)) 
-    
-    dummy_w_b |> 
-        count(draws) |> 
-        mutate(proportion = n / nrow(dummy_w_b))
+## R code 3.23b ########################
+n_draws_b <- 1e5
+base::set.seed(3)
+dummy_w_b <- tibble::tibble(draws = stats::rbinom(n_draws_b, size = 2, prob = .7)) 
+
+dummy_w_b |> 
+    dplyr::count(draws) |> 
+    dplyr::mutate(proportion = n / base::nrow(dummy_w_b))
 ```
 
-##### Plot simulation of globe tosses
+
+:::
+
+::::
+:::::
 
 The simulation updated to $n=9$ and plotting the tidyverse version of
 Figure 3.5.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-9-toss-fig-b}
+b: Distribution of simulated sample observations from 9 tosses of the globe
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
 #| label: fig-plot-ggplot2-figure-3.5-b
 #| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. The plot uses the {**ggplot2**} functions. The left panel is Kurz's original, the right one is my version slightly changed."
 
+## R code 3.24b with ggplot2 #########################
 n_draws_b <- 1e5
 
-set.seed(3)
-dummy_w2_b <- tibble(draws = rbinom(n_draws_b, size = 9, prob = .7))
+base::set.seed(3)
+dummy_w2_b <- tibble::tibble(draws = stats::rbinom(n_draws_b, size = 9, prob = .7))
 
 p1 <- dummy_w2_b |> 
-    ggplot(aes(x = draws)) + 
-    geom_histogram(binwidth = 1, center = 0,
+    ggplot2::ggplot(ggplot2::aes(x = draws)) + 
+    ggplot2::geom_histogram(binwidth = 1, center = 0,
                  fill = "deepskyblue", color = "black", 
                  linewidth = 1/10) +
     # breaks = 0:10 * 2 = equivalent in Kurz's versions:  breaks = 0:4 * 2
-    scale_x_continuous("dummy water count", breaks = 0:10 * 2) +
-    ylab("frequency") +
-    coord_cartesian(xlim = c(0, 9)) +
-    theme(panel.grid = ggplot2::element_blank())
+    ggplot2::scale_x_continuous("dummy water count", breaks = 0:10 * 2) +
+    ggplot2::ylab("frequency") +
+    ggplot2::coord_cartesian(xlim = c(0, 9)) +
+    ggplot2::theme(panel.grid = ggplot2::element_blank()) + 
+    ggplot2::theme_bw()
 
 p2 <- dummy_w2_b |> 
-    ggplot(aes(x = draws)) + 
-    geom_histogram(binwidth = 1, center = 0,
+    ggplot2::ggplot(ggplot2::aes(x = draws)) + 
+    ggplot2::geom_histogram(binwidth = 1, center = 0,
                  fill = "deepskyblue", color = "black", 
                  linewidth = 1/10) +
     ## breaks = 0:10 * 2 = equivalent in Kurz's versions:  breaks = 0:4 * 2
     ## I decided to set a break at each of the draws: breaks = 0:9 * 1
-    scale_x_continuous("dummy water count", breaks = 0:9 * 1) +
-    ylab("frequency") +
+    ggplot2::scale_x_continuous("dummy water count", breaks = 0:9 * 1) +
+    ggplot2::ylab("frequency") +
     ## I did not zoom into the graph because doesn't look so nice
-    ## for instance the last line is not visible
+    ## for instance the last line in Kurz’ version is not visible
     # coord_cartesian(xlim = c(0, 9)) +
-    theme(panel.grid = ggplot2::element_blank())
+    ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+    ggplot2::theme_bw()
 
 library(patchwork)
 p1 + p2
 ```
 
-##### Simulating and plotting 9 conditions
+::::
+:::::
 
-McElreath suggested we play around with different values of `size` and
-`prob`. The next block of code simulates nine conditions.
+
+
+
+McElreath suggested to play around with different values of `size` and
+`prob`. But instead of reproducing all codes block introduced by Kurz, I will just replicate the first chunk, because it has some interesting and (for me) unfamiliar functions.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-sim-9-cond}
+b: Simulated sample observations, using different sizes and probabilities 
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+
+###### Simulation
 
 ```{r}
-#| label: fig-simulate-9-conditions
+#| label: simulate-9-conditions
 #| fig-cap: "Distribution of 9 simulated sample observations, using different size (number of tosses: 3, 6, 9) and different probabilities (prob: 0.3, 0.6, 0.9)."
 
 n_draws <- 1e5
-
 simulate_binom <- function(n, probability) {
-  set.seed(3)
-  rbinom(n_draws, size = n, prob = probability) 
+  base::set.seed(3)
+  stats::rbinom(n_draws, size = n, prob = probability) 
 }
 
 d9_b <-
-  crossing(n9_b           = c(3, 6, 9),
+  tidyr::crossing(n9_b           = c(3, 6, 9),
            probability9_b = c(.3, .6, .9)) |> 
-  mutate(draws9_b = map2(n9_b, probability9_b, simulate_binom)) |> 
-  ungroup() |> 
-  mutate(n           = str_c("n = ", n9_b),
-         probability = str_c("p = ", probability9_b)) |> 
-  unnest(draws9_b)
+  dplyr::mutate(draws9_b = purrr::map2(n9_b, probability9_b, simulate_binom)) |> 
+  dplyr::ungroup() |> 
+  dplyr::mutate(n           = stringr::str_c("n = ", n9_b),
+         probability = stringr::str_c("p = ", probability9_b)) |> 
+  tidyr::unnest(draws9_b)
 
 d9_b |> 
-    slice_sample(n = 10) |> 
-    arrange(n9_b)
+    dplyr::slice_sample(n = 10) |> 
+    dplyr::arrange(n9_b)
 
 ```
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+Using `tidyr::crossing()` and `tidyr::unnest()`
+:::
+::::{.my-watch-out-container}
 
 I am still not very experienced with `tidyr::crossing()` and
 `tidyr::unnest()`:
 
--   **`crossing()`** is a wrapper around `expand_grid()` and therefore
+- **`tidyr::crossing()`** is a wrapper around `tidyr::expand_grid()` (not to confuse with `base::expand.grid()`) and therefore
     creates a tibble from all combination of inputs. In addition to
-    `expand_grid()` it de-duplicates and sorts its input.
--   **`unnest()`** expands a list-column containing data frames into row
-    and columns. In the above case `map2()` returns a list and stores
+    `tidyr::expand_grid()` it de-duplicates and sorts its input.
+- **`tidyr::unnest()`** expands a list-column containing data frames into row
+    and columns. In the above case `purrr::map2()` returns a list and stores
     the data in `draws9_b`.
 
-Instead of `head()` I used `dplyr::slice_sample()` and ordered the
+Instead of `utils::head()` I used `dplyr::slice_sample()` and ordered the
 result by the first column. I think this will get a better glimpse on
 the data as just the first 6 rows.
+
+::::
+:::::
+
+###### Plot
+
 
 ```{r}
 #| label: fig-sim-plot-9-cond-b
 
 d9_b |> 
-  ggplot(aes(x = draws9_b)) +
-  geom_histogram(binwidth = 1, center = 0,
-                 color = "deepskyblue", linewidth = 1/10) +
-  scale_x_continuous("dummy water count", breaks = 0:4 * 2) +
-  ylab("frequency") +
-  coord_cartesian(xlim = c(0, 9)) +
-  theme(panel.grid = ggplot2::element_blank()) +
-  facet_grid(n9_b ~ probability9_b)
+  ggplot2::ggplot(ggplot2::aes(x = draws9_b)) +
+  ggplot2::geom_histogram(binwidth = 1, center = 0,
+                 fill = "deepskyblue", color = "white", linewidth = 1/10) +
+  ggplot2::scale_x_continuous("dummy water count", breaks = 0:4 * 2) +
+  ggplot2::ylab("frequency") +
+  ggplot2::coord_cartesian(xlim = c(0, 9)) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_grid(n9_b ~ probability9_b)
 ```
+
+
+:::
+::::
+:::::
+
+
+
+
+
+
 
 #### Model checking
 
-On software checking Kurz refers to some material, that is too special
-for me. So I do not include it here. Maybe I will come later here again
-when I have more experiences with Bayesian statistics and the necessary
+:::::{.my-resource}
+:::{.my-resource-header}
+Checking if the software works correctly
+:::
+::::{.my-resource-container}
+
+On software checking Kurz refers to some material, that is too special at the moment
+for me. I will it include here, even if I had not read it. Maybe I will come later here again and pick up these resources when I have more experiences with Bayesian statistics and the necessary
 tools.
 
-##### Reproduction of Figure 3.6
+- [Esther Williams in the Harold Holt Memorial Swimming Pool](https://youtu.be/pKZLJPrZLhU?t=26285) by [Dan Simpson](https://twitter.com/dan_p_simpson)
+- [Visualisation in Bayesian workflow](https://www.youtube.com/watch?v=E8vdXoJId8M), YouTube video lecture at the Royal Statistics Society by Jonah Gabry & Daniel Simpson
+- [Maybe it’s time to let the old ways die; or We broke R-hat so now we have to fix it](https://statmodeling.stat.columbia.edu/2019/03/19/maybe-its-time-to-let-the-old-ways-die-or-we-broke-r-hat-so-now-we-have-to-fix-it/), blog post by Daniel Simpson
+- Vehtari, A., Gelman, A., Simpson, D., Carpenter, B., & Bürkner, P.-C. (2021). Rank-normalization, folding, and localization: An improved $\widehat{R}$ for assessing convergence of MCMC. Bayesian Analysis, 16(2). https://doi.org/10.1214/20-BA1221
 
-At first I thought I do not need to refresh the original grid
-approximation from @lst-grid-approx-b as I have it stored it with the
-unique name `d_b`. But it turned out that the above code with
-`n_grid_b = 1000L` does not work, because it draws no vertical lines by
-the posterior density. Instead one has to sample 1001 times.
+::::
+:::::
 
-Actually I do not know why this (small) difference is necessary, but I
-noticed that with most sample numbers the plot does not work correctly.
-It worked with 1071. The sequence 1011, 1021, 1031, 1041, 1051, 1061
-misses just one vertical line at .7 Ab exception is 1041, which misses
-.6.
+There are three computing steps to reproduce the three levels of Figure 3.6 copied here as @fig-3-6.
 
-So I have to crate the data with 1001 samples again before I produce the
-plot.
+1. Posterior probability (top level)
+2. Sampling distributions for nine values (0.1-0.9) (middle level)
+3. Posterior predictive distribution (bottom level)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-3-6-top}
+b: Posterior probability
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+
+###### Top
+
+**Posterior probability**
+
 
 ```{r}
 #| label: fig-repr-figure-3.6-top-b
 #| fig-cap: "Reproduction of the top part of figure 3.6"
+#| results: hold
 
+
+## data wrangling ####################
 n2_b <- 1001L
 n_success <- 6L
 n_trials  <- 9L
 
 (
   d2_b <-
-  tibble(p_grid2_b = seq(from = 0, to = 1, length.out = n2_b),
+  tibble::tibble(p_grid2_b = base::seq(from = 0, to = 1, length.out = n2_b),
          # note we're still using a flat uniform prior
          prior2_b  = 1) |> 
-  mutate(likelihood2_b = dbinom(n_success, size = n_trials, prob = p_grid2_b)) |> 
-  mutate(posterior2_b = (likelihood2_b * prior2_b) / sum(likelihood2_b * prior2_b))
+  dplyr::mutate(likelihood2_b = 
+                stats::dbinom(n_success, size = n_trials, prob = p_grid2_b)) |> 
+  dplyr::mutate(posterior2_b = 
+                (likelihood2_b * prior2_b) / sum(likelihood2_b * prior2_b))
 )
 
+
+## plot ##############################
 d2_b |> 
-  ggplot(aes(x = p_grid2_b, y = posterior2_b)) +
-  geom_area(color = "deepskyblue", fill = "deepskyblue") +
-  geom_segment(data = d2_b |>   # must use data explictly instead of %>% and dot (.) 
-                 filter(p_grid2_b %in% c(seq(from = .1, to = .9, by = .1), 3 / 10)),
-               aes(xend = p_grid2_b, yend = 0, linewidth = posterior2_b),
-               color = "black", show.legend = F) +
-  geom_point(data = d2_b |>     # must use data explictly instead of %>%  and dot (.)
-               filter(p_grid2_b %in% c(seq(from = .1, to = .9, by = .1), 3 / 10))) +
-  annotate(geom = "text", 
-           x = .08, y = .0025,
-           label = "Posterior probability") +
-  scale_linewidth_continuous(range = c(0, 1)) +
-  scale_x_continuous("probability of water", breaks = 0:10 / 10) +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme(panel.grid = ggplot2::element_blank())
+  ggplot2::ggplot(ggplot2::aes(x = p_grid2_b, y = posterior2_b)) +
+  ggplot2::geom_area(color = "deepskyblue", fill = "deepskyblue") +
+  ggplot2::geom_segment(data = d2_b |>   
+     dplyr::filter(p_grid2_b %in% 
+         c(base::seq(from = .1, to = .9, by = .1), 3 / 10)),
+     ## Note how we Wweight the widths of the vertical lines 
+     ## by the posterior density `posterior2_b`
+         ggplot2::aes(xend = p_grid2_b, yend = 0, linewidth = posterior2_b),
+         color = "black", show.legend = F) +
+  ggplot2::geom_point(data = d2_b |>  
+     dplyr::filter(p_grid2_b %in% 
+         c(base::seq(from = .1, to = .9, by = .1), 3 / 10))) +
+  ggplot2::annotate(geom = "text", 
+         x = .08, y = .0025,
+         label = "Posterior probability") +
+  ggplot2::scale_linewidth_continuous(range = c(0, 1)) +
+  ggplot2::scale_x_continuous("probability of water", breaks = 0:10 / 10) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme()
 ```
 
-We'll need to do a bit of wrangling before we're ready to make the plot
-in the middle panel of Figure 3.6.
+At first I thought I do not need to refresh the original grid
+approximation from @cnj-grid-globe-tossing-b as I have it stored it with the
+unique name `d_b`. But it turned out that the above code with
+`n_grid_b = 1000L` does not work, because it draws no vertical lines by
+the posterior density. Instead one has to sample 1001 times.
 
-GAP HERE! (2023-07-31) THERE IS A GAP BECAUSE THE FOLLOWING CODE CHUNKS
-OF CHAP 3.3 (MOSTLY DRAWINGS) ARE FOR MY PURPOSE (LEARNING BAYESIAN
-STATISTICS) NOT RELEVANT.
+I noticed that with most sample numbers the plot does not work correctly.
+It worked with 1071. The sequence 1011, 1021, 1031, 1041, 1051, 1061
+misses just one vertical line at $p = 0.7$ An exception is 1041, which misses
+$p = 0.6$. I do not know why this happens.
 
-## Synopsis
-
-The third chapter teaches the basic skills for working with samples from
-the posterior distribution. The posterior distribution is a probability
-distribution. And like all probability distributions, we can imagine
-drawing samples from it.
-
-### Sampling from a grid-approximate posterior
-
-Before beginning to work with samples, we need to generate them with
-@lst-grid-approx-base-demo respectively with
-@lst-grid-approx-tidyverse-demo. Then we can draw - for instance -
-10,000 samples from the posterior. To make the random draws reproducible
-we will use `base::set.seed()` with a see of 3.
-
-#### Base R
+###### Middle
 
 ```{r}
-#| label: draw-samples-base-demo
-#| attr-source: '#lst-draw-samples-base-demo lst-cap="Drawing 10,000 sample from the posterior using `base::sample()`"'
+#| label: fig-repr-figure-3.6-middle-b
+#| fig-cap: "Reproduction of the middle part of figure 3.6"
+#| results: hold
 
-## R code 3.2 ###########################
-## compute the posterior for the globe tossing model, using grid approximation
-p_grid_r <- seq(from = 0, to = 1, length.out = 1000)
-prob_p <- rep(1, 1000)
-prob_data <- dbinom(6, size = 9, prob = p_grid_r)
-posterior <- prob_data * prob_p
-posterior_r <- posterior / sum(posterior)
 
-set.seed(3)
+## data wrangling #####################
+n_draws_b <- 1e5
 
-## R code 3.3 ###########################
-## draw 10,000 samples from the posterior.
-samples_r <- sample(p_grid_r, prob = posterior_r, size = 1e4, replace = TRUE)
-```
-
-#### Tidyverse
-
-```{r}
-#| label: draw-samples-tidyverse-demo
-#| attr-source: '#lst-draw-samples-tidyverse-demo lst-cap="Drawing 10,000 sample from the posterior using `dplyr::slice_sample()`"'
-
-# how many grid points would you like?
-n <- 1000
-n_success <- 6
-n_trials  <- 9
-
-  d_t <-
-  tibble(p_grid_t = seq(from = 0, to = 1, length.out = n),
-         # note we're still using a flat uniform prior
-         prior_t  = 1) |> 
-  mutate(likelihood_t = dbinom(n_success, size = n_trials, prob = p_grid_t)) |> 
-  mutate(posterior_t = (likelihood_t * prior_t) / sum(likelihood_t * prior_t))
-
-set.seed(3)
-samples_t <-
-  d_t |> 
-    slice_sample(n = 1e4, weight_by = posterior_t, replace = T)
-```
-
-### Sampling to summarize
-
-The next step after sampling is to summarize and interpret the posterior
-distribution. The type of summary depends upon your purpose. But common
-questions include:
-
--   How much posterior probability lies below some parameter value?
--   How much posterior probability lies between two parameter values?
--   Which parameter value marks the lower 5% of the posterior
-    probability?
--   Which range of parameter values contains 90% of the posterior
-    probability?
--   Which parameter value has highest posterior probability?
-
-These questions can be divided into :
-
-1.  Questions about intervals of *defined boundaries*
-    (\@sec-intervals-of-defined-boundaries)
-2.  Qustions about Intervals of *defined probability mass*
-    (\@sec-intervals-of-defined-probability-mass) and
-3.  Questions about *point estimates* (\@sec-point-estimates)
-
-#### Intervals of defined boundaries {#sec-intervals-of-defined-boundaries}
-
-For instance I will ask for the posterior probability that the
-proportion of water is less than 0.5. We could use the grid-approximate
-posterior to just add up all all of the probabilities, where the
-corresponding parameter value is less than 0.5
-
-But since grid approximation isn't practical in general, it won't always
-be so easy. Once there is more than one parameter in the posterior
-distribution, even this simple sum is no longer very simple. So wee need
-to perform the same calculation, using samples from the posterior.
-
-##### Base R: Define boundary
-
-Using the grid-approximate posterior:
-
-```{r}
-#| label: define-boundary-from-grid-base-demo
-#| attr-source: '#lst-define-boundary-from-grid-base-demo lst-cap="Define boundary by using the grid-approximate posterior with base R functions"'
-
-## R code 3.6 #############################
-# add up posterior probability where p < 0.5
-sum(posterior_r[p_grid_r < 0.5])
-```
-
-Using the samples from the posterior:
-
-```{r}
-#| label: define-boundary-from-samples-base-demo
-#| attr-source: '#lst-define-boundary-from-samples-base-demo lst-cap="Define boundary by summing up the samples from the posterior with base R functions"'
-
-## R code 3.7 #############################
-## sum samples of posterior probability where p < 0.5
-sum(samples_r < 0.5) / 1e4
-
-
-## R code 3.8 #############################
-## find boundaries samples of posterior probability 
-## where p lies between 0.5 and 0.75
-sum(samples_r > 0.5 & samples_r < 0.75) / 1e4
-
-```
-
-##### Tidyverse: Define boundary
-
-```{r}
-#| label: define-boundary-from-grid-tidyverse-demo
-#| attr-source: '#lst-define-boundary-from-grid-tidyverse-demo lst-cap="Define boundary by using the grid-approximate posterior with {tidyverse} functions"'
-
-## add up posterior probability where p < 0.5
-d_t |> 
-  filter(p_grid_t < .5) |> 
-  summarise(sum = sum(posterior_t))
-```
-
-Using the samples from the posterior:
-
-```{r}
-#| label: define-boundary-from-samples-tidyverse-demo
-#| attr-source: '#lst-define-boundary-from-samples-tidyverse-demo lst-cap="Define boundary by summing up the samples from the posterior with {tidyverse} function `filter()` and `summarize()`"'
-
-## filter and summarize samples of posterior probability where p < 0.5
-samples_t |>
-  filter(p_grid_t < .5) |> 
-  summarise(sum = n() / 1e4)
-
-## filter and summarize samples of posterior probability 
-## where p lies between 0.5 and 0.75
-samples_t |> 
-  filter(p_grid_t > .5 & p_grid_t < .75) |> 
-  summarise(sum = n() / 1e4)
-```
-
-A more explicit approach for the same computation is to follow up
-`dplyr::count()` with `dplyr::mutate()`.
-
-```{r}
-#| label: define-boundary-from-samples-tidyverse2-demo
-#| attr-source: '#lst-define-boundary-from-samples-tidyverse2-demo lst-cap="Define boundary by summing up the samples from the posterior with {tidyverse} functions `count()` and `mutate()`"'
-#| eval: false
-
-## count and sum samples of posterior probability where p < 0.5
-samples_t |> 
-  count(p_grid_t < .5) |> 
-  mutate(probability = n / sum(n))
-
-## count and sum samples of posterior probability 
-## where p lies between .5 and .75
-samples_t |> 
-  count(p_grid_t > .5 & p_grid_t < .75) |> 
-  mutate(probability = n / sum(n))
-```
-
-#### Intervals of defined probability mass {#sec-intervals-of-defined-probability-mass}
-
-In scientific journals it is usual to report an interval of defined
-mass, usually known as a confidence interval. What the interval
-indicates is a range of parameter values compatible with the model and
-data. The model and data themselves may not inspire confidence, in which
-case the interval will not either. McElreath therefore call these areas
-compatibility intervals.
-
-These posterior intervals report two parameter values that contain
-between them a specified amount of posterior probability, a probability
-mass. For this type of interval, it is easier to find the answer by
-using samples from the posterior than by using a grid approximation.
-
-##### Base R: Define probability mass
-
-```{r}
-#| label: PI-base-demo
-#| attr-source: '#lst-PI-base-demo lst-cap="Boundaries of the lower 80% and middle 80% posterior probability: Base R version"'
-
-## R code 3.9 #######################
-## find boundaries of the lower 80% posterior probability
-quantile(samples_r, 0.8)
-
-## R code 3.10 ######################
-## find the interval of the middle 80% posterior probability
-quantile(samples_r, c(0.1, 0.9))
-```
-
-Intervals of this sort, which assign equal probability mass to each
-tail, are very common in the scientific literature. We'll call them
-**percentile intervals (PI)**. These intervals do a good job of
-communicating the shape of a distribution, as long as the distribution
-isn't too asymmetrical.
-
-But in highly skewed distribution they are --- in terms of supporting
-inferences about which parameters are consistent with the data --- not
-perfect. It could be the case that they do not include the most probable
-parameter variable (the mode or MAP, Maximum A Posterior). In this case
-you should use the **highest posterior density interval (HPDI)**.
-
-```{r}
-#| label: HPDI-base-demo
-#| attr-source: '#lst-HPDI-base-demo lst-cap="Boundaries of the lower 80% and middle 80% posterior probability: Base R version"'
-
-## R code 3.13 ##################################
-## find the narrowest region with 50% of the posterior probability
-rethinking::HPDI(samples_r, prob = 0.5)
-```
-
-##### Tidyverse: Define probability mass
-
-As in the base R version the tidyverse variant is also using the
-`quantile()`\` function. The only difference is the call of the correct
-vector. Since `p_grid` samples are saved in the `samples` tibble, we'll
-have to index with `$` within `quantile()`.
-
-```{r}
-#| label: PI-tidyverse-demo
-#| attr-source: '#lst-PI-tidyverse-demo lst-cap="Boundaries of the lower 80% and middle 80% posterior probability: tidyverse version"'
-
-## find boundaries of the lower 80% posterior probability
-quantile(samples_t$p_grid_t, prob = .8)
-
-## find the interval of the middle 80% posterior probability
-quantile(samples_t$p_grid_t, prob = c(.1, .9))
-```
-
-For calculating the HPDI we will use the {**tidybayes**} package. which
-offers an array of convenience functions for summarizing Bayesian
-models.
-
-```{r}
-#| label: HPDI-tidyverse-demo
-#| attr-source: '#lst-HPDI-tidyverse-demo lst-cap="Boundaries of the lower 80% and middle 80% posterior probability: Base R version"'
-
-## find the narrowest region with 50% of the posterior probability
-tidybayes::mode_hdci(samples_t$p_grid_t, .width = .5)
-```
-
-#### Point Estimates {#sec-point-estimates}
-
-Point estimates are of limited value: The Bayesian parameter estimate is
-precisely the entire posterior distribution, which is not a single
-number, but instead a function that maps each unique parameter value
-onto a plausibility value. So really the most important thing to note is
-that you don't have to choose a point estimate. It's hardly ever
-necessary and often harmful. It discards information.
-
-##### Base R
-
-###### Find the mode (MAP) from the grid approximation
-
-```{r}
-#| label: MAP-grid-base-demo
-#| attr-source: '#lst-MAP-grid-base-demo lst-cap="Find value with the highest posterior probability, also called maximum a posteriori (MAP) estimate, from the grid approximation: Base R version"'
-
-## R code 3.14 ######################
-## find highest posterior probability (MAP) from grid approx
-p_grid_r[which.max(posterior_r)]
-```
-
-###### Find the MAP (mode) from the samples from the posterior
-
-```{r}
-#| label: MAP-posterior-rethinking-demo
-#| attr-source: '#lst-MAP-posterior-rethinking-demo lst-cap="Find value with the highest posterior probability, also called maximum a posteriori (MAP) estimate, from the posterior: rethinking version"'
-
-## R code 3.15 ######################
-## find highest posterior probability (MAP) from the posterior
-rethinking::chainmode(samples_r, adj = 0.01)
-```
-
-###### Loss function
-
-But why is this point, the mode, interesting? Why not report the
-posterior mean or median? These are also point estimates, and they also
-summarize the posterior. But all three---the mode (MAP), mean, and
-median---are different in this case. How can we choose?
-
-One principled way to go beyond the both extremes (choosing just a point
-estimate or using the entire posterior as the estimate) is to choose a
-**loss function**. A loss function is a rule that tells you the cost
-associated with using any particular point estimate. 
-
-
-
-
-*Different loss
-functions imply different point estimates!*
-
-So suppose we decide $p = 0.5$ will be our decision:
-
-```{r}
-#| label: loss-0.5-base-demo
-#| attr-source: '#lst-loss-0.5-base-demo lst-cap="Find loss for the decision 0.5: base version"'
-
-## R code 3.17
-## loss with decision .05
-sum(posterior_r * abs(0.5 - p_grid_r))
-```
-
-Calculating the loss function is repeating the calculation of
-@lst-loss-0.5-base-demo for every possible decision. Then you can
-determine the value for the decision with minimum loss.
-
-```{r}
-#| label: loss-minimum-base-demo
-#| attr-source: '#lst-loss-minimum-base-demo lst-cap="Find decision for minimum loss: base version"'
-
-## R code 3.18
-loss_r <- sapply(p_grid_r, function(d) sum(posterior_r * abs(d - p_grid_r)))
-
-## R code 3.19
-p_grid_r[which.min(loss_r)]
-
-```
-
-And this is actually the posterior median, the parameter value that
-splits the posterior density such that half of the mass is above it and
-half below it.
-
-##### Tidyverse
-
-###### Find the mode (MAP) from the posterior samples
-
-Three different ways to find the mode (MAP) with {**tidybayes**}:
-
-```{r}
-#| label: MAP-tidyverse-demo
-#| attr-source: '#lst-MAP-tidyverse-demo lst-cap="Find value with the highest posterior probability, also called maximum a posteriori (MAP) estimate, with three different functions: tidybayes version"'
-#| eval: false
-
-samples_t |> 
-    tidybayes::mode_qi(p_grid_t)
-
-samples_t |> 
-    tidybayes::mode_hdci(p_grid_t)
-
-## just the mode
-tidybayes::Mode(samples_t$p_grid_t)
-```
-
-###### Loss function
-
-Find loss with the decision $p = 0.5$.
-
-```{r}
-#| label: loss-0.5-tidyverse-demo
-#| attr-source: '#lst-loss-0.5-tidyverse-demo lst-cap="Find loss for the decision 0.5: tidyverse version"'
-
-## find loss with the decision of .5
-d_t |> 
-  summarise(`expected loss` = sum(posterior_t * abs(0.5 - p_grid_t)))
-```
-
-Find minimum loss: The tidyverse version uses for the loop instead of
-`base::sapply()` the `purrr::map()` function from the {**purrr}**
-package, a member of the {**tidyverse}** packages.
-
-```{r}
-#| label: loss-minimum-tidyverse-demo
-#| attr-source: '#lst-loss-minimum-tidyverse-demo lst-cap="Find decision for minimum loss: tidyverse version"'
-
-make_loss_t <- function(our_d) {
-  d_t |> 
-    mutate(loss_t = posterior_t * abs(our_d - p_grid_t)) |> 
-    summarise(weighted_average_loss_t = sum(loss_t))
+simulate_binom <- function(probability) {
+  base::set.seed(3)
+  stats::rbinom(n_draws_b, size = 9, prob = probability) 
 }
 
-loss_t <- 
-    d_t |> 
-        select(p_grid_t) |> 
-        rename(decision_t = p_grid_t) |> 
-            mutate(weighted_average_loss_t = purrr::map(decision_t, make_loss_t)) |>
-        unnest(weighted_average_loss_t) 
-  
-min_loss_t <-
-  loss_t |> 
-    filter(weighted_average_loss_t == min(weighted_average_loss_t)) |>
-    as.numeric()
-```
+d_small_b <-
+  tibble::tibble(probability = base::seq(from = .1, to = .9, by = .1)) |> 
+  dplyr::mutate(draws = purrr::map(probability, simulate_binom)) |>  
+  tidyr::unnest(draws) |> 
+  dplyr::mutate(label = stringr::str_c("p = ", probability))
 
-### Sampling to simulate prediction
+utils::head(d_small_b)
 
-Another common job for samples is to ease simulation of the model's
-implied observations. This is useful for 1. Model design 2. Model
-checking 3. Software validation 4. Research design 5. Forecasting
-
-#### Dummy data
-
-Instead of using `dbinom()` to compute the probability of events, we
-will use `rbinom()` to generate dummy data to simulate observations.
-
-We will generate 100,000 dummy observations to verify that each value of
-the globe tossing model (6 Waters with 9 tosses) appears in proportion
-to its likelihood:
-
-##### Base R
-
-```{r}
-#| label: fig-generate-dummy-obs-base-demo
-#| fig-cap: "Dsitribution of 100,000 dummy observations of the globe tossing model resulting in 6 Water with 9 tosses: base R version" 
-#| attr-source: '#lst-generate-dummy-obs-base-demo lst-cap="Generating dummy observation to simulate the probability of each value of the globe tossing model: base R version"'
-
-set.seed(3)
-## R code 3.24 ###############################
-dummy_data_r <- rbinom(1e5, size = 9, prob = 0.7)
-## replace `rethinking::simplehist()` with base R `graphics::hist()`
-hist(dummy_data_r, xlab = "dummy water count") 
-
-```
-
-##### Tidyverse
-
-```{r}
-#| label: generate-dummy-obs-tidyverse-demo
-#| fig-cap: "Dsitribution of 100,000 dummy observations of the globe tossing model resulting in 6 Water with 9 tosses: tidyverse version" 
-#| attr-source: '#lst-generate-dummy-obs-tidyverse-demo lst-cap="Generating dummy observation to simulate the probability of each value of the globe tossing model: tidyverse version"'
-
-set.seed(3)
-d2_t <- tibble(draws_t = rbinom(1e5, size = 9, prob = .7))
-
-# the histogram
-d2_t |> 
-  ggplot(aes(x = draws_t)) +
-  geom_histogram(binwidth = 1, center = 0,
-                 fill = "deepskyblue", color = "black", linewidth = 1/10) +
-  scale_x_continuous("dummy water count", breaks = 0:4 * 2) +
-  ylab("frequency") +
-  theme(panel.grid = ggplot2::element_blank())
-```
-
-#### Model checking
-
-Since Bayesian models are always generative, able to simulate
-observations as well as estimate parameters from observations, once you
-condition a model on data, you can simulate to examine the model's
-empirical expectations.
-
-All that is required is averaging over the posterior density for `p`,
-while computing the predictions. For each possible value of the
-parameter `p`, there is an implied distribution of outcomes. So if you
-were to compute the sampling distribution of outcomes at each value of
-`p`, then you could average all of these prediction distributions
-together, using the posterior probabilities of each value of `p`, to get
-a **posterior predictive distribution**.
-
-```{r}
-#| label: post-pred-dist-r
-#| attr-source: '#lst-post-pred-dist-r lst-cap="Using the posterior probabilities of each value of p, to get a posterior predictive distribution: rethinking version"'
-
-set.seed(3)
-## R code 3.26 #############################
-w_predicted_r <- rbinom(1e4, size = 9, prob = samples_r)
-hist(w_predicted_r)
-```
-
-##### Tidyverse
-
-```{r}
-#| label: post-pred-dist-t
-#| attr-source: '#lst-post-pred-dist-t lst-cap="Using the posterior probabilities of each value of p, to get a posterior predictive distribution: tidyverse version"'
-
-set.seed(3)
-
-samples2_t <-
-  d_t |> 
-  slice_sample(n = 1e4, weight_by = posterior_t, replace = T) |> 
-  mutate(w_predicted_t = purrr::map_dbl(p_grid_t, rbinom, n = 1, size = 9))
-
-## plot histogram
-samples2_t |> 
-  ggplot(aes(x = w_predicted_t)) +
-  geom_histogram(binwidth = 1, center = 0, color = "black",
+## plot ###############################
+d_small_b |>
+  ggplot2::ggplot(ggplot2::aes(x = draws)) +
+  ggplot2::geom_histogram(binwidth = 1, center = 0, color = "black",
                  fill = "deepskyblue", linewidth = 1/10) +
-  scale_x_continuous("number of water samples",
-                     breaks = 0:3 * 3) +
-  scale_y_continuous("frequency") +
-  ggtitle("Posterior predictive distribution") +
-  coord_cartesian(ylim = c(0, 2000)) +
-  theme(panel.grid = ggplot2::element_blank())
+  ggplot2::scale_x_continuous(NULL, breaks = 0:3 * 3) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::labs(subtitle = "Sampling distributions") +
+  ggplot2::coord_cartesian(xlim = c(0, 9)) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ label, ncol = 9)
 ```
 
-## I STOPPED HERE! (2023-08-01) TO BE CONTINUED {.unnumbered}
 
-## Practice
+###### Bottom
 
-## Practice with brms
+```{r}
+#| label: fig-repr-figure-3.6-bottom-b
+#| fig-cap: "Reproduction of the bottom part of figure 3.6"
+#| results: hold
 
-### Tidyverse (and {brms})
+## data wrangling ########################################
+# how many samples would you like?
+n_samples_b <- 1e4
+
+# make it reproducible
+base::set.seed(3)
+
+samples <-
+  d2_b |> 
+  dplyr::slice_sample(n = n_samples_b, weight_by = posterior2_b, replace = T)  |>  
+  dplyr::mutate(w = purrr::map_dbl(p_grid2_b, stats::rbinom, n = 1, size = 9))
+
+dplyr::glimpse(samples)
+
+## plot ###################################
+samples |> 
+  ggplot2::ggplot(ggplot2::aes(x = w)) +
+  ggplot2::geom_histogram(binwidth = 1, center = 0, color = "black",
+                 fill = "deepskyblue", linewidth = 1/10) +
+  ggplot2::scale_x_continuous("number of water samples",
+                     breaks = 0:3 * 3) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::ggtitle("Posterior predictive distribution") +
+  ggplot2::coord_cartesian(xlim = c(0, 9),
+                  ylim = c(0, 3000)) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw()
+```
+
+:::
+::::
+:::::
+
+In Figure 3.7, McElreath checked the model with 
+
+(a) the longest sequence of the sample values and
+(b) number of switches between water and land.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-repl-fig-3.7}
+b: Replication of Figure 3.7
+::::::
+:::
+::::{.my-r-code-container}
+
+::::
+:::::
+
+## I STOPPED HERE (2nd PASS, 2023-11-14)
+
+#### Let's practice with {**brms**}
 
 With {**brms**}, we'll fit the primary model of $w=6$ and $n=9$.
 
-#### Fit model with the {brms} package
 
 ```{r}
 #| label: brms-model-fit-b
@@ -3515,7 +3264,6 @@ brms::posterior_summary(b3.1)["b_Intercept", ] |>
   round(digits = 2)
 ```
 
-#### Simulate probability values
 
 I had problems with the following code chunk. See [my postings at Kurz's
 repo](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse_2_ed/issues/49).
@@ -3530,7 +3278,7 @@ f <-
   data.frame() |> 
   rlang::set_names("p")
 
-glimpse(f)
+dplyr::glimpse(f)
 ```
 
 ```{r}
@@ -3538,15 +3286,16 @@ glimpse(f)
 #| fig-cap: "Density plot of the fittet {brms} model"
 
 f |> 
-  ggplot(aes(x = p)) +
-  geom_density(fill = "deepskyblue", color = "deepskyblue") +
-  annotate(geom = "text", x = .08, y = 2.5,
+  ggplot2::ggplot(ggplot2::aes(x = p)) +
+  ggplot2::geom_density(fill = "deepskyblue", color = "deepskyblue") +
+  ggplot2::annotate(geom = "text", x = .08, y = 2.5,
            label = "Posterior probability") +
-  scale_x_continuous("probability of water",
+  ggplot2::scale_x_continuous("probability of water",
                      breaks = c(0, .5, 1),
                      limits = 0:1) +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme(panel.grid = ggplot2::element_blank())
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw()
 ```
 
 The graphic should look like the top part of Figure 3.6, reproduced as
@@ -3562,27 +3311,33 @@ important: I have a smaller apex and my curve is more irregular.)
 #| label: fig-sim-pred-values-b
 #| fig-cap: "Simulation to predict posterior distribution" 
 
-set.seed(3)
+base::set.seed(3)
 f <-
   f |> 
-  mutate(w2 = rbinom(n(), size = 9,  prob = p))
+  dplyr::mutate(w2 = stats::rbinom(dplyr::n(), size = 9,  prob = p))
 
 # the plot
 f |> 
-  ggplot(aes(x = w2)) +
-  geom_histogram(binwidth = 1, center = 0, color = "black",
+  ggplot2::ggplot(ggplot2::aes(x = w2)) +
+  ggplot2::geom_histogram(binwidth = 1, center = 0, color = "black",
                  fill = "deepskyblue", linewidth = 1/10) +
-  scale_x_continuous("number of water samples", breaks = 0:3 * 3) +
-  scale_y_continuous(NULL, breaks = NULL, limits = c(0, 5000)) +
-  ggtitle("Posterior predictive distribution") +
-  coord_cartesian(xlim = c(0, 9)) +
-  theme(panel.grid = ggplot2::element_blank())
+  ggplot2::scale_x_continuous("number of water samples", breaks = 0:3 * 3) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL, limits = c(0, 5000)) +
+  ggplot2::ggtitle("Posterior predictive distribution") +
+  ggplot2::coord_cartesian(xlim = c(0, 9)) +
+  ggplot2::theme(panel.grid = ggplot2::element_blank()) +
+  ggplot2::theme_bw()
 ```
+
+
+
+
+## Practice
 
 ## Session info
 
 ```{r}
 #| label: session-info
 
-sessionInfo()
+utils::sessionInfo()
 ```
