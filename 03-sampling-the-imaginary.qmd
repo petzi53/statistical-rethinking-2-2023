@@ -1,11 +1,11 @@
 # Sampling the Imaginary {#sec-chap03}
 
-:::::{.my-objectives}
-:::{.my-objectives-header}
+::: my-objectives
+::: my-objectives-header
 Learning Objectives:
 :::
-::::{.my-objectives-container}
 
+::: my-objectives-container
 This chapter teaches the basic skills for working with samples from the
 posterior distribution. We'll begin to use samples to summarize and
 simulate model output. The skills learned here will apply to every
@@ -15,77 +15,100 @@ models and how the samples are produced will vary.
 The chapter exploits the fact that people are better in counts than in
 probabilities. We will take the probability distributions from the
 previous chapter and sampling from them to produce counts.
-::::
-:::::
+:::
+:::
 
 ## Vampire Example {.unnumbered}
 
 ### ORIGINAL {.unnumbered}
 
-:::::{.my-definition}
-:::{.my-definition-header}
-:::::: {#def-chap-03-1}
+::: my-definition
+::: my-definition-header
+::: {#def-chap-03-1}
 : Probability Notation
-::::::
 :::
-::::{.my-definition-container}
-As a repetition and to get a better understanding of the following formulae in this section I read a very [basic introduction into probability notation]((https://www.mathsisfun.com/data/probability-events-conditional.html))
+:::
+
+::: my-definition-container
+As a repetition and to get a better understanding of the following
+formulae in this section I read a very [basic introduction into
+probability
+notation]((https://www.mathsisfun.com/data/probability-events-conditional.html))
 
 $P(A)$ means "**Probability Of Event A**".
 
-:::::{.my-example}
-:::{.my-example-header}
+::: my-example
+::: my-example-header
 Probability of an Event
 :::
-::::{.my-example-container}
+
+::: my-example-container
 What is the probability of $2$ after throwing a dice?
 $$P(A) = \frac{1}{6}$$
-::::
-:::::
+:::
+:::
 
-$P(B \mid A)$ means "**Probability of Event B given A**". 
+$P(B \mid A)$ means "**Probability of Event B given A**".
 
-This is a conditional probability. After event $A$ has happened, what is the probability of $B$? If the events are independent from each other than the changes do not influence each other. 
+This is a conditional probability. After event $A$ has happened, what is
+the probability of $B$? If the events are independent from each other
+than the changes do not influence each other.
 
-:::::{.my-example}
-:::{.my-example-header}
+::: my-example
+::: my-example-header
 Independent Conditional Events
 :::
-::::{.my-example-container}
 
-The probability to throw $2$ in a second dice throw are still $P(B \mid A) = \frac{1}{6}$. If the events are dependent of each other then "Probability of event A and event B equals the probability of event A times the probability of event B given event A."
+::: my-example-container
+The probability to throw $2$ in a second dice throw are still
+$P(B \mid A) = \frac{1}{6}$. If the events are dependent of each other
+then "Probability of event A and event B equals the probability of event
+A times the probability of event B given event A."
 
 $$
 P(A \space and\space B) = P(A) \times P(B \mid A)
 $$
+:::
+:::
 
-
-::::
-:::::
-
-:::::{.my-example}
-:::{.my-example-header}
+::: my-example
+::: my-example-header
 Dependent Conditional Events
 :::
-::::{.my-example-container}
-    
-Typical example is removing marble from a bag without replacement. Let's take a red marble from a bag of $5$ red and $5$ blue marbles without replacement. Here the probability of a red marble (in the second draw) given the probability of a red marble (in the first draw) is
+
+::: my-example-container
+Typical example is removing marble from a bag without replacement. Let's
+take a red marble from a bag of $5$ red and $5$ blue marbles without
+replacement. Here the probability of a red marble (in the second draw)
+given the probability of a red marble (in the first draw) is
 
 $$
 \frac{5}{10} \times \frac{4}{9} = \frac{2}{9}
 $$
-
-::::
-:::::
-::::
-:::::
-
+:::
+:::
+:::
+:::
 
 #### a) Medical Test Scenario with Bayes theorem {.unnumbered}
 
-> “suppose there is a blood test that correctly detects vampirism 95% of the time. In more precise and mathematical notation, $Pr(\text{positive test result} \mid vampire) = 0.95$. It’s a very accurate test, nearly always catching real vampires. It also make mistakes, though, in the form of false positives. One percent of the time, it incorrectly diagnoses normal people as vampires, $Pr(\text{positive test result}|mortal) = 0.01$. The final bit of information we are told is that vampires are rather rare, being only $0.1\%$ of the population, implying $Pr(vampire) = 0.001$. Suppose now that someone tests positive for vampirism. What’s the probability that he or she is a bloodsucking immortal?” ([McElreath, 2020, p. 49](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=W9MU6VCZ))
+> "suppose there is a blood test that correctly detects vampirism 95% of
+> the time. In more precise and mathematical notation,
+> $Pr(\text{positive test result} \mid vampire) = 0.95$. It's a very
+> accurate test, nearly always catching real vampires. It also make
+> mistakes, though, in the form of false positives. One percent of the
+> time, it incorrectly diagnoses normal people as vampires,
+> $Pr(\text{positive test result}|mortal) = 0.01$. The final bit of
+> information we are told is that vampires are rather rare, being only
+> $0.1\%$ of the population, implying $Pr(vampire) = 0.001$. Suppose now
+> that someone tests positive for vampirism. What's the probability that
+> he or she is a bloodsucking immortal?" ([McElreath, 2020, p.
+> 49](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=W9MU6VCZ))
 
-> “The correct approach is just to use Bayes’ theorem to invert the probability, to compute $Pr(vampire|positive)$. The calculation can be presented as:
+> "The correct approach is just to use Bayes' theorem to invert the
+> probability, to compute $Pr(vampire|positive)$. The calculation can be
+> presented as:
 
 $$
 \begin{align*}
@@ -93,18 +116,19 @@ Pr(vampire\mid positive) = \frac{Pr(positive\mid vampire) Pr(vampire)}{Pr(positi
 \text{where Pr(positive) is the average probability of a positive test result, that is,}\\ Pr(positive) = Pr(positive \mid vampire) Pr(vampire) \\
 + Pr(positive \mid mortal) 1 − Pr(vampire)
 \end{align*}
-$$ {#eq-vampire}
-” ([McElreath, 2020, p. 49](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=X4KD33AT))
+$$ {#eq-vampire} " ([McElreath, 2020, p.
+49](zotero://select/groups/5243560/items/NFUEVASQ))
+([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=X4KD33AT))
 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-bayes-a}
-a: Performing vampire calculation with `r glossary("Bayes’ theorem")` in Base R
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-vampire-bayes-a}
+a: Performing vampire calculation with `r glossary("Bayes’ theorem")` in
+Base R
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: vampire-bayes-a
 
@@ -120,18 +144,30 @@ Pr_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a +
 )
 
 ```
+:::
+:::
 
-::::
-:::::
+There is only an `r Pr_Vampire_Positive_a`% chance that the suspect is
+actually a vampire.
 
-
-There is only an `r Pr_Vampire_Positive_a`% chance that the suspect is actually a vampire.
-
-> “Most people find this result counterintuitive. And it’s a very important result, because it mimics the structure of many realistic testing contexts, such as HIV and DNA testing, criminal profiling, and even statistical significance testing (see the Rethinking box at the end of this section). Whenever the condition of interest is very rare, having a test that finds all the true cases is still no guarantee that a positive result carries much information at all. The reason is that most positive results are false positives, even when all the true positives are detected correctly” ([McElreath, 2020, p. 49](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=CMMR49PQ))
+> "Most people find this result counterintuitive. And it's a very
+> important result, because it mimics the structure of many realistic
+> testing contexts, such as HIV and DNA testing, criminal profiling, and
+> even statistical significance testing (see the Rethinking box at the
+> end of this section). Whenever the condition of interest is very rare,
+> having a test that finds all the true cases is still no guarantee that
+> a positive result carries much information at all. The reason is that
+> most positive results are false positives, even when all the true
+> positives are detected correctly" ([McElreath, 2020, p.
+> 49](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=68&annotation=CMMR49PQ))
 
 #### b) Medical test scenario with natural frequencies {.unnumbered}
 
-> “There is a way to present the same problem that does make it more intuitive” ([McElreath, 2020, p. 50](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=69&annotation=2DWF7729))
+> "There is a way to present the same problem that does make it more
+> intuitive" ([McElreath, 2020, p.
+> 50](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=69&annotation=2DWF7729))
 
 ```         
 (1)  In a population of 100,000 people, 100 of them are vampires.
@@ -143,24 +179,25 @@ There are 999 + 95 = `r 999 + 95` people tested positive. But from these
 people only 95 / (999 + 95) = `r (95 / (999 + 95)) * 100` % are actually
 vampires.
 
-Or with a slightly different wording it is still easier to
-understand: 
+Or with a slightly different wording it is still easier to understand:
 
-1. We can just count up the number of people who test positive: $95 + 999 = 1094$. 
-2. Out of these $1094$ positive tests, $95$ of them are real vampires, so that implies:
+1.  We can just count up the number of people who test positive:
+    $95 + 999 = 1094$.
+2.  Out of these $1094$ positive tests, $95$ of them are real vampires,
+    so that implies:
 
 $$
 Pr(positive \mid vampire) = \frac{95}{1094}
 $$
 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-frequencies-a}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-vampire-frequencies-a}
 a: Performing vampire calculation with frequencies in Base R
-::::::
 :::
-::::{.my-r-code-container}
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: vampire-frequencies-a
 
@@ -176,41 +213,65 @@ pr_positive_a2 <-  95 + 999
 )
 
 ```
+:::
+:::
 
-::::
-:::::
+> "The second presentation of the problem, using counts rather than
+> probabilities, is often called the frequency format or natural
+> frequencies. Why a frequency format helps people intuit the correct
+> approach remains contentious. Some people think that human psychology
+> naturally works better when it receives information in the form a
+> person in a natural environment would receive it. In the real world,
+> we encounter counts only. No one has ever seen a probability, the
+> thinking goes. But everyone sees counts ("frequencies") in their daily
+> lives." ([McElreath, 2020, p.
+> 50](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=69&annotation=G26ZTDUZ))
 
-
-
-> “The second presentation of the problem, using counts rather than probabilities, is often called the frequency format or natural frequencies. Why a frequency format helps people intuit the correct approach remains contentious. Some people think that human psychology naturally works better when it receives information in the form a person in a natural environment would receive it. In the real world, we encounter counts only. No one has ever seen a probability, the thinking goes. But everyone sees counts (“frequencies”) in their daily lives.” ([McElreath, 2020, p. 50](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=69&annotation=G26ZTDUZ))
-
-
-> “many scientists are uncomfortable with integral calculus, even though they have strong and valid intuitions about how to summarize data. Working with samples transforms a problem in calculus into a problem in data summary, into a frequency format problem. An integral in a typical Bayesian context is just the total probability in some interval. That can be a challenging calculus problem. But once you have samples from the probability distribution, it’s just a matter of counting values in the interval. An empirical attack on the posterior allows the scientist to ask and answer more questions about the model, without relying upon a captive mathematician. For this reason, it is easier and more intuitive to work with samples from the posterior, than to work with probabilities and integrals directly.” ([McElreath, 2020, p. 51](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=70&annotation=M7I2DV3C))
+> "many scientists are uncomfortable with integral calculus, even though
+> they have strong and valid intuitions about how to summarize data.
+> Working with samples transforms a problem in calculus into a problem
+> in data summary, into a frequency format problem. An integral in a
+> typical Bayesian context is just the total probability in some
+> interval. That can be a challenging calculus problem. But once you
+> have samples from the probability distribution, it's just a matter of
+> counting values in the interval. An empirical attack on the posterior
+> allows the scientist to ask and answer more questions about the model,
+> without relying upon a captive mathematician. For this reason, it is
+> easier and more intuitive to work with samples from the posterior,
+> than to work with probabilities and integrals directly." ([McElreath,
+> 2020, p. 51](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=70&annotation=M7I2DV3C))
 
 ### TIDYVERSE {.unnumbered}
 
 #### a) Medical Test Scenario with Bayes theorem {.unnumbered}
 
-
-:::::{.my-important}
-:::{.my-important-header}
+::: my-important
+::: my-important-header
 Vectors in Base R are tibble columns in tidyverse
 :::
-::::{.my-important-container}
-Whenever there is a calculation with vectors the pendant in tidyverse mode is to generate columns in a tibble with `tibble::tibble()` or if there is already a data frame with `dplyr::mutate()` and to do the appropriate calculation with these columns.
 
-The following @cnj-vampire-bayes-a transformed the Base R calculation @cnj-vampire-bayes-b into a computation using the tidyverse approach.
-::::
-:::::
+::: my-important-container
+Whenever there is a calculation with vectors the pendant in tidyverse
+mode is to generate columns in a tibble with `tibble::tibble()` or if
+there is already a data frame with `dplyr::mutate()` and to do the
+appropriate calculation with these columns.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-bayes-b}
-b: Performing the calculation using Bayes’ theorem with tidyverse approach in R
-::::::
+The following @cnj-vampire-bayes-a transformed the Base R calculation
+@cnj-vampire-bayes-b into a computation using the tidyverse approach.
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-vampire-bayes-b}
+b: Performing the calculation using Bayes' theorem with tidyverse
+approach in R
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: vampire-bayes-b
 
@@ -225,21 +286,20 @@ tibble::tibble(pr_positive_vampire_b = .95,
            pr_positive_vampire_b * pr_vampire_b / pr_positive_b) |> 
   dplyr::glimpse()
 ```
-
-::::
-:::::
-
+:::
+:::
 
 #### b) Medical test scenario with natural frequencies {.unnumbered}
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-vampire-frequencies-b}
-b: Performing the calculation using frequencies with tidyverse approach in R
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-vampire-frequencies-b}
+b: Performing the calculation using frequencies with tidyverse approach
+in R
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: vampire-frequencies-b
 
@@ -252,28 +312,32 @@ tibble::tibble(pr_vampire_b2          = 100 / 100000,
   dplyr::glimpse()
 
 ```
-
-::::
-:::::
-
+:::
+:::
 
 ## Sampling from a grid-approximate posterior {#sec-chap-03-sampling-grid}
 
 ### ORIGINAL
 
 Before we are going to draw samples from the posterior distribution we
-need to compute the distribution similar as we had done in the globe tossing example.
+need to compute the distribution similar as we had done in the globe
+tossing example.
 
-> “Here’s a reminder for how to compute the posterior for the globe tossing model, using grid approximation. Remember, the posterior here means the probability of p conditional on the data.” ([McElreath, 2020, p. 52](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=71&annotation=KKQLR3FL))
+> "Here's a reminder for how to compute the posterior for the globe
+> tossing model, using grid approximation. Remember, the posterior here
+> means the probability of p conditional on the data." ([McElreath,
+> 2020, p. 52](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=71&annotation=KKQLR3FL))
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-globe-tossing-a}
-a: Generate the posterior distribution form the globe-tossing example (Base R)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-grid-globe-tossing-a}
+a: Generate the posterior distribution form the globe-tossing example
+(Base R)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: grid-globe-tossing-a
 
@@ -294,21 +358,30 @@ likelihood_a <-
 posterior_a <- likelihood_a * prior_a
 posterior_a <- posterior_a / sum(posterior_a)
 ```
-
-::::
-:::::
-
-> “Now we wish to draw 10,000 samples from this posterior. Imagine the posterior is a bucket full of parameter values, numbers such as $0.1, 0.7, 0.5, 1,$ etc. Within the bucket, each value exists in proportion to its posterior probability, such that values near the peak are much more common than those in the tails. We’re going to scoop out 10,000 values from the bucket. Provided the bucket is well mixed, the resulting samples will have the same proportions as the exact posterior density. Therefore the individual values of $p$ will appear in our samples in proportion to the posterior plausibility of each value.” ([McElreath, 2020, p. 52](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=71&annotation=GS5GCASA))
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-globe-tossing}
-a: Draw 1000 samples from the posterior distribution (Base R)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+> "Now we wish to draw 10,000 samples from this posterior. Imagine the
+> posterior is a bucket full of parameter values, numbers such as
+> $0.1, 0.7, 0.5, 1,$ etc. Within the bucket, each value exists in
+> proportion to its posterior probability, such that values near the
+> peak are much more common than those in the tails. We're going to
+> scoop out 10,000 values from the bucket. Provided the bucket is well
+> mixed, the resulting samples will have the same proportions as the
+> exact posterior density. Therefore the individual values of $p$ will
+> appear in our samples in proportion to the posterior plausibility of
+> each value." ([McElreath, 2020, p.
+> 52](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=71&annotation=GS5GCASA))
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sample-globe-tossing}
+a: Draw 1000 samples from the posterior distribution (Base R)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: sample-globe-tossing-a
 
@@ -321,31 +394,34 @@ samples_a <- sample(p_grid_a,
                     prob = posterior_a, # from previous code chunk
                     size = n_samples_a, replace = TRUE)
 ```
-
-::::
-:::::
-
-The probability of each value is given by `posterior_a`, which we computed with @cnj-grid-globe-tossing-a.
-
-:::::{.my-note}
-:::{.my-note-header}
-:::::: {#cor-excursion-a}
-: Details for a better understanding and comparison with the tidyverse version
-::::::
 :::
-::::{.my-note-container}
+:::
 
-To compare with the tidyverse version, I collected the three vectors with `base::cbind()` into a matrix and displayed the first six lines with `utils::head()`. Additionally I
-also displayed the first 10 values of `samples_a` vector.
+The probability of each value is given by `posterior_a`, which we
+computed with @cnj-grid-globe-tossing-a.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-excursion-a}
+::: my-note
+::: my-note-header
+::: {#cor-excursion-a}
+: Details for a better understanding and comparison with the tidyverse
+version
+:::
+:::
+
+::: my-note-container
+To compare with the tidyverse version, I collected the three vectors
+with `base::cbind()` into a matrix and displayed the first six lines
+with `utils::head()`. Additionally I also displayed the first 10 values
+of `samples_a` vector.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-excursion-a}
 a: Excursion for better comparison (Base R)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: excursion_a
 
@@ -356,23 +432,19 @@ head(d_a, 10)
 # display sample results to compare with variant b
 head(samples_a, 10)
 ```
-
-
-::::
-:::::
-
-
-::::
-:::::
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-glossing-scatterplot-a}
-a: Scatterplot of the drawn samples (Base R)
-::::::
 :::
-::::{.my-r-code-container}
+:::
+:::
+:::
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-glossing-scatterplot-a}
+a: Scatterplot of the drawn samples (Base R)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-globe-tossing-scatterplot-a
 #| fig-cap: "Scatterplot of the drawn samples (Base R)"
@@ -380,22 +452,25 @@ a: Scatterplot of the drawn samples (Base R)
 ## R code 3.4a Globe Scatterplot #############
 plot(samples_a)
 ```
-
-::::
-:::::
-
-
-> In fig-globe-glossing-plot-a “it’s as if you are flying over the posterior distribution, looking down on it. There are many more samples from the dense region near 0.6 and very few samples below 0.25. On the right, the plot shows the density estimate computed from these samples.” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=4WVLNZBT))
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-density-plot-a}
-a: Density estimate of the drawn samples (Rethinking)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+> In fig-globe-glossing-plot-a "it's as if you are flying over the
+> posterior distribution, looking down on it. There are many more
+> samples from the dense region near 0.6 and very few samples below
+> 0.25. On the right, the plot shows the density estimate computed from
+> these samples." ([McElreath, 2020, p.
+> 53](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=4WVLNZBT))
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-density-plot-a}
+a: Density estimate of the drawn samples (Rethinking)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-globe-tossing-density-plot-a
 #| fig-cap: "Density estimate of the drawn samples (Rethinking)"
@@ -403,22 +478,20 @@ a: Density estimate of the drawn samples (Rethinking)
 ## R code 3.5a Globe Density plot #############
 rethinking::dens(samples_a)
 ```
-
-
-::::
-:::::
-
+:::
+:::
 
 ### TIDYVERSE
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-globe-tossing-b}
-b: Generate the posterior distribution form the globe-tossing example (Tidyverse)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-grid-globe-tossing-b}
+b: Generate the posterior distribution form the globe-tossing example
+(Tidyverse)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: grid-globe-tossing-b
 
@@ -441,31 +514,32 @@ n_trials_b  <- 9L
 )
 
 ```
+:::
+:::
 
-
-::::
-:::::
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 Variable names changed
 :::
-::::{.my-watch-out-container}
-I have changed McElreath's variable name `prob_p` and `prob_data` as `prior_x` and
-`likelihood_x`, where `x` stands for `a` (Base R) or `b` (Tidyverse).
 
-To see the difference between grid and samples I will add "\_sample" to all the other variable names.
-::::
-:::::
+::: my-watch-out-container
+I have changed McElreath's variable name `prob_p` and `prob_data` as
+`prior_x` and `likelihood_x`, where `x` stands for `a` (Base R) or `b`
+(Tidyverse).
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-globe-tossing-b}
-b: Draw 1000 samples from the posterior distribution (Tidyverse)
-::::::
+To see the difference between grid and samples I will add "\_sample" to
+all the other variable names.
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sample-globe-tossing-b}
+b: Draw 1000 samples from the posterior distribution (Tidyverse)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: sample-globe-tossing-b
 
@@ -492,30 +566,32 @@ df_samples_b <-
 
 identical(samples_a, df_samples_b$samples_b)
 ```
-
-
-::::
-:::::
-
-The column `samples_b` is identical with vector `samples_a`, because I have used in both sampling processes `base::set.seed(3)`, so that I (and you) could reproduce the data. 
-
-
-There are different possibilities to display data frames respectively tibbles:
-
-1. You can use the internal print facility of tibbles. It shows only the first ten rows and all columns that fit on the screen. You see an example in @cnj-sample-globe-tossing-b.
-2. With the `utils::str()` function you will get a result with shorter figures that is better adapted to a small screen.
-3. Another alternative is the tidyverse approach of `dplyr::glimpse()`.
-4. With `skimr::skim()` you will get a compact summary of all data.
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-excursion-b}
-b: Excursion: Printing varieties for better comparison (Tidyverse)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+The column `samples_b` is identical with vector `samples_a`, because I
+have used in both sampling processes `base::set.seed(3)`, so that I (and
+you) could reproduce the data.
+
+There are different possibilities to display data frames respectively
+tibbles:
+
+1.  You can use the internal print facility of tibbles. It shows only
+    the first ten rows and all columns that fit on the screen. You see
+    an example in @cnj-sample-globe-tossing-b.
+2.  With the `utils::str()` function you will get a result with shorter
+    figures that is better adapted to a small screen.
+3.  Another alternative is the tidyverse approach of `dplyr::glimpse()`.
+4.  With `skimr::skim()` you will get a compact summary of all data.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-excursion-b}
+b: Excursion: Printing varieties for better comparison (Tidyverse)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: excursion-b
 #| results: hold
@@ -529,21 +605,21 @@ glue::glue('#####################################################\n\n')
 glue::glue('USING THE skimr::skim() FUNCTION:')
 skimr::skim(df_samples_b)
 ```
-
-::::
-:::::
-
-
-We can plot the left panel of Figure 3.1 from the book with `ggplot2::geom_point()`. But before we do, we'll need to add a variable numbering the samples. This is necessary as the x-parameter of the plot.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-scatterplot-b}
-b: Scatterplot of the drawn samples (Tidyverse)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+We can plot the left panel of Figure 3.1 from the book with
+`ggplot2::geom_point()`. But before we do, we'll need to add a variable
+numbering the samples. This is necessary as the x-parameter of the plot.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-scatterplot-b}
+b: Scatterplot of the drawn samples (Tidyverse)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-globe-tossing-scatterplot-b
 #| fig-cap: "Scatterplot of the drawn samples (Tidyverse)"
@@ -560,24 +636,24 @@ df_samples_b |>
   ggplot2::theme_bw()
 
 ```
-
-
-::::
-:::::
-
-
-If you hover over this link from @fig-globe-tossing-scatterplot-a you can compare the Base R version with the tidyverse result.
-
-Instead of the `rethinking::dens()` we'll plot the density in the right panel of the books Figure 3.1 with `ggplot2::geom_density()`.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-globe-tossing-densitiy-plot-b1}
-b: Density estimate of the drawn samples with 1e4 grid points (Tidyverse)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+If you hover over this link from @fig-globe-tossing-scatterplot-a you
+can compare the Base R version with the tidyverse result.
+
+Instead of the `rethinking::dens()` we'll plot the density in the right
+panel of the books Figure 3.1 with `ggplot2::geom_density()`.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-globe-tossing-densitiy-plot-b1}
+b: Density estimate of the drawn samples with 1e4 grid points
+(Tidyverse)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-globe-tossing-density-plot-b1
 #| fig-cap: "Density estimate of the drawn samples with 1e4 grid points (Tidyverse)"
@@ -590,25 +666,30 @@ df_samples_b |>
   ggplot2::theme_bw()
 
 ```
-
-::::
-:::::
-
-
-Compare this somewhat smoother tidyverse plot with @fig-globe-tossing-density-plot-a.
-
-> “You can see that the estimated density is very similar to ideal posterior you computed via grid approximation. If you draw even more samples, maybe 1e5 or 1e6, the density estimate will get more and more similar to the ideal.” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=EXBQWX2M))
- 
-Here's what it looks like with `1e6`.
- 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-ID-text}
-b: Density estimate of the drawn samples with 1e6 grid points (Tidyverse)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+Compare this somewhat smoother tidyverse plot with
+@fig-globe-tossing-density-plot-a.
+
+> "You can see that the estimated density is very similar to ideal
+> posterior you computed via grid approximation. If you draw even more
+> samples, maybe 1e5 or 1e6, the density estimate will get more and more
+> similar to the ideal." ([McElreath, 2020, p.
+> 53](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=EXBQWX2M))
+
+Here's what it looks like with `1e6`.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-ID-text}
+b: Density estimate of the drawn samples with 1e6 grid points
+(Tidyverse)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-globe-tossing-density-plot-b2
 #| fig-cap: "Density estimate of the drawn samples with 1e6 grid points (Tidyverse)"
@@ -625,10 +706,8 @@ d_b |>
   ggplot2::theme_bw()
 
 ```
-
-
-::::
-:::::
+:::
+:::
 
 ## Sampling to Summarize {#sec-sampling-to-summarize}
 
@@ -636,11 +715,15 @@ All we have done so far is crudely replicate the posterior density we
 had already computed in the previous chapter. Now it is time to use
 these samples to describe and understand the posterior.
 
-The description to understand the posterior can be divided into three inquiries:
+The description to understand the posterior can be divided into three
+inquiries:
 
-1.  Questions about intervals of *defined boundaries*. See @sec-chap-03-defined-boundaries.
-2.  Questions about intervals of *defined probability mass*. See @sec-chap-03-probability-mass.
-3.  Questions about *point estimates*. See: @sec-chap-03-point-estimates.
+1.  Questions about intervals of *defined boundaries*. See
+    @sec-chap-03-defined-boundaries.
+2.  Questions about intervals of *defined probability mass*. See
+    @sec-chap-03-probability-mass.
+3.  Questions about *point estimates*. See:
+    @sec-chap-03-point-estimates.
 
 ### Intervals of Defined Boundaries {#sec-chap-03-defined-boundaries}
 
@@ -651,16 +734,20 @@ The description to understand the posterior can be divided into three inquiries:
 For instance: What is the probability that the proportion of water is
 less than 0.5?
 
-> “Using the grid-approximate posterior, you can just add up all of the probabilities, where the corresponding parameter value is less than 0.5:” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=Z7XSZ6WT))
+> "Using the grid-approximate posterior, you can just add up all of the
+> probabilities, where the corresponding parameter value is less than
+> 0.5:" ([McElreath, 2020, p.
+> 53](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=Z7XSZ6WT))
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-posterior-a}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-grid-posterior-a}
 a: Define boundaries using the grid-approximate posterior (Base R)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: grid-posterior-a
 
@@ -668,75 +755,81 @@ a: Define boundaries using the grid-approximate posterior (Base R)
 # add up posterior probability where p < 0.5
 sum(posterior_a[p_grid_a < 0.5])
 ```
+:::
+:::
 
-::::
-:::::
-
-
-About 17% of the posterior probability is below 0.5. 
+About 17% of the posterior probability is below 0.5.
 
 ##### Samples from the Posterior
 
 But this easy calculation based on grid approximation is often not
-practical when there are more parameters. In this case you can draw samples from the posterior. But this approach requires a different calculation:
+practical when there are more parameters. In this case you can draw
+samples from the posterior. But this approach requires a different
+calculation:
 
+> "This approach does generalize to complex models with many parameters,
+> and so you can use it everywhere. All you have to do is similarly add
+> up all of the samples below 0.5, but also // divide the resulting
+> count by the total number of samples. In other words, find the
+> frequency of parameter values below 0.5" (McElreath, 2020, p. 53/54)"
+> ([McElreath, 2020, p.
+> 53](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=SMQ6B78K))
 
-> “This approach does generalize to complex models with many parameters, and so you can use it everywhere. All you have to do is similarly add up all of the samples below 0.5, but also // divide the resulting count by the total number of samples. In other words, find the frequency of parameter values below 0.5” (McElreath, 2020, p. 53/54)” ([McElreath, 2020, p. 53](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=72&annotation=SMQ6B78K))
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-boundary-a}
-a: Compute posterior probability below 0.5 using the sampling approach (Base R)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sample-boundary-a}
+a: Compute posterior probability below 0.5 using the sampling approach
+(Base R)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: sample-boundary-a
 
 ## R code 3.7a Sample Boundary #############################
 (p_boundary_a <- sum(samples_a < 0.5) / 1e4)
 ```
+:::
+:::
 
-
-::::
-:::::
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 Different values with samples from the posterior
 :::
-::::{.my-watch-out-container}
-In comparison with the value of the posterior probability below 0.5 in the book of 0.1726 the result in `r p_boundary_a` from @cnj-sample-boundary-a is quite different. 
+
+::: my-watch-out-container
+In comparison with the value of the posterior probability below 0.5 in
+the book of 0.1726 the result in `r p_boundary_a` from
+@cnj-sample-boundary-a is quite different.
 
 The reason for the difference is that you can't get the same values in a
 sampling processes. This is the nature of randomness. And McElreath did
-not include the `base::set.seed()` function for (exact) reproducibility. 
-::::
-:::::
+not include the `base::set.seed()` function for (exact) reproducibility.
+:::
+:::
 
 Using the same approach, you can ask how much posterior probability lies
 between 0.5 and 0.75:
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-interval-a}
-a: Compute posterior probability between 0.5 and 0.75 using the sampling approach (Base R)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sample-interval-a}
+a: Compute posterior probability between 0.5 and 0.75 using the sampling
+approach (Base R)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: sample-interval-a
 
 ## R code 3.8a Sample Interval #############################
 (p_boundary_a8 <- sum(samples_a > 0.5 & samples_a < 0.75) / 1e4)
 ```
-
-::::
-:::::
-
-
+:::
+:::
 
 #### TIDYVERSE
 
@@ -744,16 +837,18 @@ a: Compute posterior probability between 0.5 and 0.75 using the sampling approac
 
 > To get the proportion of water less than some value of `p_grid_b`
 > within the {**tidyverse}**, you might first `filter()` by that value
-> and then take the `sum()` within `summarise()`. ([Kurz](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-boundaries.))
+> and then take the `sum()` within `summarise()`.
+> ([Kurz](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-boundaries.))
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-grid-boundary-b}
-b: Compute posterior probability below 0.5 using the grid approach (Tidyverse)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-grid-boundary-b}
+b: Compute posterior probability below 0.5 using the grid approach
+(Tidyverse)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: grid-boundary-b
 
@@ -763,26 +858,27 @@ d_b |> dplyr::filter(p_grid_b < 0.5) |>
     dplyr::summarize(sum = base::sum(posterior_b))
 
 ```
-
-::::
-:::::
-
+:::
+:::
 
 ##### Samples from the Posterior
 
-Kurz offers several methods to calculate the posterior probability below 0.5: 
+Kurz offers several methods to calculate the posterior probability below
+0.5:
 
-1. **Method**: `filter()` & `n()` within `summarize()`
-2. **Method**: `count()` followed by `mutate()`
-3. **Method**: Logical condition within `mean()`
+1.  **Method**: `filter()` & `n()` within `summarize()`
+2.  **Method**: `count()` followed by `mutate()`
+3.  **Method**: Logical condition within `mean()`
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-boundary}
-b: Compute posterior probability below 0.5 using the sampling approach with different methods (Tidyverse)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sample-boundary}
+b: Compute posterior probability below 0.5 using the sampling approach
+with different methods (Tidyverse)
 :::
-::::{.my-r-code-container}
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: sample-boundary-b
 #| results: hold
@@ -820,23 +916,22 @@ method_3
 
 
 ```
-
-::::
-:::::
-
+:::
+:::
 
 To determine the posterior probability between 0.5 and 0.75, you can use
 `&` within `filter()`. Just multiply that result by 100 to get the value
 in percent.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sample-interval-b}
-b: Compute posterior probability between 0.5 and 0.75 using the sampling approach (Tidyverse)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sample-interval-b}
+b: Compute posterior probability between 0.5 and 0.75 using the sampling
+approach (Tidyverse)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: sample-interval-b
 
@@ -846,25 +941,23 @@ df_samples_b |>
     dplyr::summarize(sum = dplyr::n() / n_samples_b)
 
 ```
-
-
-::::
-:::::
-
-And, of course, you can do this calculation with the other methods as well.
-
-
-
-To produce the top part of Figure 3.2 of the book we apply following code lines:
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-upper-part-3-2}
-b: Posterior distribution produced with {**tidyverse**} approach
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+And, of course, you can do this calculation with the other methods as
+well.
+
+To produce the top part of Figure 3.2 of the book we apply following
+code lines:
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-upper-part-3-2}
+b: Posterior distribution produced with {**tidyverse**} approach
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-upper-part-3.2-b
 #| fig-cap: "Upper part of SR2 Figure 3.2: Intervals of defined boundaries produced with {**tidyverse**} tools: Left: The blue area is the posterior probability below a parameter value of 0.5. Right: The posterior probability between 0.5 and 0.75."
@@ -893,10 +986,8 @@ p2 <-
 library(patchwork)
 p1 + p2
 ```
-
-
-::::
-:::::
+:::
+:::
 
 ### Intervals of Defined Probability Mass {#sec-chap-03-probability-mass}
 
@@ -904,41 +995,54 @@ p1 + p2
 
 ##### Quantiles
 
-:::::{.my-definition}
-:::{.my-definition-header}
-:::::: {#def-probability-mass-intervals}
+::: my-definition
+::: my-definition-header
+::: {#def-probability-mass-intervals}
 : Several Terms for Intervals of Defined Probability Mass
-::::::
 :::
-::::{.my-definition-container}
-- `r glossary("Confidence Interval")`: Term chiefly used in frequentist statistics.
-- `r glossary("Credible Interval")`: Term chiefly in Bayesian statistics.
-- `r glossary("Compatibility Interval")`: Term preferably used by Richard McElreath.
-
-The abbreviation for all three versions of probability mass intervals is "CI".
-
-McElreath tries to avoid the semantic of "confidence" or "credibility" because
-
-> “What the interval indicates is a range of parameter values compatible with the model and data. The model and data themselves may not inspire confidence, in which case the interval will not either.” ([McElreath, 2020, p. 54](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=73&annotation=BHMW5CJ4))
-
-
-
-::::
-:::::
-
-The values of these intervals can be found easier with by using samples from the posterior than by using a grid approximation.
-
-> “Suppose for example you want to know the boundaries of the lower $80\%$ posterior probability. You know this interval starts at $p = 0$. To find out where it stops, think of the samples as data and ask where the $80th$ percentile lies:” ([McElreath, 2020, p. 54](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=73&annotation=3SA8YJWX))
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-quantiles-a}
-a: Compute posterior probability intervals lower $80\%$ and from 10th to 90th percentile
-::::::
 :::
-::::{.my-r-code-container}
 
+::: my-definition-container
+-   `r glossary("Confidence Interval")`: Term chiefly used in
+    frequentist statistics.
+-   `r glossary("Credible Interval")`: Term chiefly in Bayesian
+    statistics.
+-   `r glossary("Compatibility Interval")`: Term preferably used by
+    Richard McElreath.
+
+The abbreviation for all three versions of probability mass intervals is
+"CI".
+
+McElreath tries to avoid the semantic of "confidence" or "credibility"
+because
+
+> "What the interval indicates is a range of parameter values compatible
+> with the model and data. The model and data themselves may not inspire
+> confidence, in which case the interval will not either." ([McElreath,
+> 2020, p. 54](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=73&annotation=BHMW5CJ4))
+:::
+:::
+
+The values of these intervals can be found easier with by using samples
+from the posterior than by using a grid approximation.
+
+> "Suppose for example you want to know the boundaries of the lower
+> $80\%$ posterior probability. You know this interval starts at
+> $p = 0$. To find out where it stops, think of the samples as data and
+> ask where the $80th$ percentile lies:" ([McElreath, 2020, p.
+> 54](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=73&annotation=3SA8YJWX))
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-quantiles-a}
+a: Compute posterior probability intervals lower $80\%$ and from 10th to
+90th percentile
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: quantiles-a
 
@@ -950,27 +1054,38 @@ q1_9 <- quantile(samples_a, c(0.1, 0.9))
 
 ```
 
-- Lower $80\%$ = `r q8`
-- Between $10\%$ = `r q1_9[1]` and $90\%$ = `r q1_9[2]`
-::::
-:::::
+-   Lower $80\%$ = `r q8`
+-   Between $10\%$ = `r q1_9[1]` and $90\%$ = `r q1_9[2]`
+:::
+:::
 
 ##### Percentile Interval (PI)
 
 The second calculation returns the middle 80% of the distribution
 
-> “Intervals of this sort, which assign equal probability mass to each tail, are very common in the scientific literature. We’ll call them `r glossary("percentile", "percentile intervals")`  (PI). These intervals do a good job of communicating the shape of a distribution, as long as the distribution isn’t too asymmetrical. But in terms of supporting inferences about which parameters are consistent with the data, they are not perfect.” ([McElreath, 2020, p. 55](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=74&annotation=5GPNVTUH))
+> "Intervals of this sort, which assign equal probability mass to each
+> tail, are very common in the scientific literature. We'll call them
+> `r glossary("percentile", "percentile intervals")` (PI). These
+> intervals do a good job of communicating the shape of a distribution,
+> as long as the distribution isn't too asymmetrical. But in terms of
+> supporting inferences about which parameters are consistent with the
+> data, they are not perfect." ([McElreath, 2020, p.
+> 55](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=74&annotation=5GPNVTUH))
 
-But they do not work well with highly skewed data. See @fig-skewed-dist-a where the posterior is consistent with observing three waters in three tosses and a uniform (flat) prior.
+But they do not work well with highly skewed data. See
+@fig-skewed-dist-a where the posterior is consistent with observing
+three waters in three tosses and a uniform (flat) prior.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-skewed-dist-a}
-a: Skewed posterior distribution observing three waters in three tosses and a uniform (flat) prior (Base R)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-skewed-dist-a}
+a: Skewed posterior distribution observing three waters in three tosses
+and a uniform (flat) prior (Base R)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-skewed-dist-a
 #| fig-cap: "Skewed posterior distribution observing three waters in three tosses and a uniform (flat) prior. It is highly skewed, having its maximum value at the boundary where p equals 1."
@@ -989,59 +1104,71 @@ samples_skewed_a <- sample(p_grid_skewed_a,
 # added to show the skewed posterior distribution (pb)
 rethinking::dens(samples_skewed_a)
 ```
-
-::::
-:::::
-
-
-> “[The `r glossary("percentile", "percentile interval")`] assigns 25% of the probability mass above and below the interval. So it provides the central 50% probability. But in this example, it ends up excluding the most probable parameter values, near p = 1. So in terms of describing the shape of the posterior distribution—which is really all these intervals are asked to do—the percentile interval can be misleading.” ([McElreath, 2020, p. 56](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=75&annotation=96JZPRGW))
-
-`rethinking::PI()` is just a shorthand for the base R `stats::quantile()` function.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-pi-a1}
-a: Computing the Percentile Interval (PI)
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+> "\[The `r glossary("percentile", "percentile interval")`\] assigns 25%
+> of the probability mass above and below the interval. So it provides
+> the central 50% probability. But in this example, it ends up excluding
+> the most probable parameter values, near p = 1. So in terms of
+> describing the shape of the posterior distribution---which is really
+> all these intervals are asked to do---the percentile interval can be
+> misleading." ([McElreath, 2020, p.
+> 56](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=75&annotation=96JZPRGW))
+
+`rethinking::PI()` is just a shorthand for the base R
+`stats::quantile()` function.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-pi-a1}
+a: Computing the Percentile Interval (PI)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: pi-a1
 
 ## R code 3.12a(1) PI ############################
 rethinking::PI(samples_skewed_a, prob = 0.5)
 ```
-
-::::
-:::::
-
-:::::{.my-procedure}
-:::{.my-procedure-header}
-:::::: {#prp-pi-a1}
-: Probability mass (PI) `prob = 0.6` equals the interval between $20-80\%$
-::::::
 :::
-::::{.my-procedure-container}
+:::
 
-`rethinking::PI()` is just a shorthand for the base R `stats::quantile()` function. Instead of providing the interval explicitly (for instance $20-80\%$) we just say that we want the central $60\%$ = PI of `prob = 0.6`. 
+::: my-procedure
+::: my-procedure-header
+::: {#prp-pi-a1}
+: Probability mass (PI) `prob = 0.6` equals the interval between
+$20-80\%$
+:::
+:::
+
+::: my-procedure-container
+`rethinking::PI()` is just a shorthand for the base R
+`stats::quantile()` function. Instead of providing the interval
+explicitly (for instance $20-80\%$) we just say that we want the central
+$60\%$ = PI of `prob = 0.6`.
 
 `rethinking::PI()` simplifies the following three steps:
 
-1. We divide always the percentage assigned to the `prob` value by 2: 60% / 2 = 30$ 
-2. We subtract, respectively add this value to 50: 50% - 30% = 20% and 50% + 30% = 80% 
-3. The result is the probability mass between 20-80%.
-::::
-:::::
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-pi-a2}
-a: Compute PI between $20-80\%$ (Rethinking and Base R)
-::::::
+1.  We divide always the percentage assigned to the `prob` value by 2:
+    60% / 2 = 30\$
+2.  We subtract, respectively add this value to 50: 50% - 30% = 20% and
+    50% + 30% = 80%
+3.  The result is the probability mass between 20-80%.
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-pi-a2}
+a: Compute PI between $20-80\%$ (Rethinking and Base R)
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: pi-a2
 #| results: hold
@@ -1054,72 +1181,94 @@ glue::glue('########################################################\n\n')
 glue::glue('Central Propbability Mass calculated with stats::quantile()\n')
 quantile(samples_skewed_a, prob = c(.20, .80))
 ```
-
-::::
-:::::
+:::
+:::
 
 ##### Highest Posterior Density Interval (HPDI)
 
-To include the most probable parameter value, the modus or `r glossary("MAP")` we should calculate the `r glossary("HPDI")`:
+To include the most probable parameter value, the modus or
+`r glossary("MAP")` we should calculate the `r glossary("HPDI")`:
 
-> “The HPDI is the narrowest interval containing the specified probability mass. If you think about it, there must be an infinite number of posterior intervals // with the same mass. But if you want an interval that best represents the parameter values most consistent with the data, then you want the densest of these intervals. That’s what the HPDI is.” (McElreath, 2020, p. 56/57)
+> "The HPDI is the narrowest interval containing the specified
+> probability mass. If you think about it, there must be an infinite
+> number of posterior intervals // with the same mass. But if you want
+> an interval that best represents the parameter values most consistent
+> with the data, then you want the densest of these intervals. That's
+> what the HPDI is." (McElreath, 2020, p. 56/57)
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-hpdi-a}
-a: Compute Highest Posterior Density Interval (HPDI) (Rethinking / Base R)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-hpdi-a}
+a: Compute Highest Posterior Density Interval (HPDI) (Rethinking / Base
+R)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: rethinking-HPDI-a
 
 ## R code 3.13a HPDI ###############################
 rethinking::HPDI(samples_skewed_a, prob = 0.5)
 ```
-
-
-::::
-:::::
-
-:::::{.my-note}
-:::{.my-note-header}
-:::::: {#cor-pi-hpdo}
-: HPDI versus PI
-::::::
 :::
-::::{.my-note-container}
+:::
+
+::: my-note
+::: my-note-header
+::: {#cor-pi-hpdo}
+: HPDI versus PI
+:::
+:::
+
+::: my-note-container
 **Advantages of HPDI**
 
-1. HPDI captures the parameters with highest posterior probability
-2. HPDI is noticeably narrower than PI. In our example `r round(rethinking::HPDI(samples_skewed_a, prob = 0.5)[[2]] - rethinking::HPDI(samples_skewed_a, prob = 0.5)[[1]], 3)` versus `r `round(rethinking::PI(samples_skewed_a, prob = 0.5)[[2]] - rethinking::PI(samples_skewed_a, prob = 0.5)[[1]], 3)`.
+1.  HPDI captures the parameters with highest posterior probability
+2.  HPDI is noticeably narrower than PI. In our example
+    `r round(rethinking::HPDI(samples_skewed_a, prob = 0.5)[[2]] - rethinking::HPDI(samples_skewed_a, prob = 0.5)[[1]], 3)`
+    versus `r`round(rethinking::PI(samples_skewed_a, prob =
+    0.5)\[\[2\]\] - rethinking::PI(samples_skewed_a, prob =
+    0.5)\[\[1\]\], 3)\`.
 
-But this is only valid if we have a very skewed distribution. 
+But this is only valid if we have a very skewed distribution.
 
 **Disadvantages of HPDI**
 
-1. HPDI is more computationally intensive than PI
-2. HPDI is sensitive of the number of samples drawn (= greater simulation variance)
-3. HPDI is more difficult to understand
+1.  HPDI is more computationally intensive than PI
+2.  HPDI is sensitive of the number of samples drawn (= greater
+    simulation variance)
+3.  HPDI is more difficult to understand
 
 **Remember, the entire posterior distribution is the Bayesian estimate**
 
-> “Overall, if the choice of interval type makes a big difference, then you shouldn’t be using intervals to summarize the posterior. Remember, the entire posterior distribution is the Bayesian 'estimate.' It summarizes the relative plausibilities of each possible value of the parameter. Intervals of the distribution are just helpful for summarizing it. If choice of interval leads to different inferences, then you’d be better off just plotting the entire posterior distribution.” ([McElreath, 2020, p. 58](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=77&annotation=XGHNSWCG))
-
-::::
-:::::
-
-“[I]n most cases, these two types of interval are very similar.58 They only look so different in this case because the posterior distribution is highly skewed.” ([McElreath, 2020, p. 57](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=76&annotation=FQPNEVHV))n 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-pi-hpdi-symmetric-dist-a}
-a: Compare PI and HPDI of symmetric distributions: Six 'Water', 9 tosses
-::::::
+> "Overall, if the choice of interval type makes a big difference, then
+> you shouldn't be using intervals to summarize the posterior. Remember,
+> the entire posterior distribution is the Bayesian 'estimate.' It
+> summarizes the relative plausibilities of each possible value of the
+> parameter. Intervals of the distribution are just helpful for
+> summarizing it. If choice of interval leads to different inferences,
+> then you'd be better off just plotting the entire posterior
+> distribution." ([McElreath, 2020, p.
+> 58](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=77&annotation=XGHNSWCG))
 :::
-::::{.my-r-code-container}
+:::
 
+"\[I\]n most cases, these two types of interval are very similar.58 They
+only look so different in this case because the posterior distribution
+is highly skewed." ([McElreath, 2020, p.
+57](zotero://select/groups/5243560/items/NFUEVASQ))
+([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=76&annotation=FQPNEVHV))n
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-pi-hpdi-symmetric-dist-a}
+a: Compare PI and HPDI of symmetric distributions: Six 'Water', 9 tosses
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: pi-hpdi-symmetric-dist-a
 
@@ -1130,74 +1279,92 @@ pi95a <- rethinking::PI(samples_a, prob = 0.95)
 hpdi95a <- rethinking::HPDI(samples_a, prob = 0.95)
 ```
 
-- PI 80% = `r pi8a` versus HPDI 80% = `r hpdi8a`.
-- PI 95% = `r pi95a` versus HPDI 95% = `r hpdi95a`.
-
-::::
-:::::
-
-The 95% interval in frequentist statistics is just a convention, there are no analytical reasons why you should choose exactly this interval. But convenience is not a serious
-criterion. So what to do instead?
-
-
-:::::{.my-tip}
-:::{.my-tip-header}
-Instead of 95% intervals use the widest interval that excludes the value you want to report or provide a series of nested intervals
+-   PI 80% = `r pi8a` versus HPDI 80% = `r hpdi8a`.
+-   PI 95% = `r pi95a` versus HPDI 95% = `r hpdi95a`.
 :::
-::::{.my-tip-container}
+:::
 
-> “If you are trying to say that an interval doesn’t include some value, then you might use the widest interval that excludes the value. Often, all compatibility intervals do is communicate the shape of a distribution. In that case, a series of nested intervals may be more useful than any one interval. For example, why not present 67%, 89%, and 97% intervals, along with the median? Why these values? No reason. They are prime numbers, which makes them easy to remember. But all that matters is they be spaced enough to illustrate the shape of the posterior. And these values avoid 95%, since conventional 95% intervals encourage many readers to conduct unconscious hypothesis tests.” ([McElreath, 2020, p. 56](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=75&annotation=TG2LCZAG))
+The 95% interval in frequentist statistics is just a convention, there
+are no analytical reasons why you should choose exactly this interval.
+But convenience is not a serious criterion. So what to do instead?
 
-::::
-:::::
+::: my-tip
+::: my-tip-header
+Instead of 95% intervals use the widest interval that excludes the value
+you want to report or provide a series of nested intervals
+:::
 
-:::::{.my-note}
-:::{.my-note-header}
+::: my-tip-container
+> "If you are trying to say that an interval doesn't include some value,
+> then you might use the widest interval that excludes the value. Often,
+> all compatibility intervals do is communicate the shape of a
+> distribution. In that case, a series of nested intervals may be more
+> useful than any one interval. For example, why not present 67%, 89%,
+> and 97% intervals, along with the median? Why these values? No reason.
+> They are prime numbers, which makes them easy to remember. But all
+> that matters is they be spaced enough to illustrate the shape of the
+> posterior. And these values avoid 95%, since conventional 95%
+> intervals encourage many readers to conduct unconscious hypothesis
+> tests." ([McElreath, 2020, p.
+> 56](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=75&annotation=TG2LCZAG))
+:::
+:::
+
+::: my-note
+::: my-note-header
 Boundaries versus Probability Mass Intervals
 :::
-::::{.my-note-container}
 
-**Boundaries**: 
+::: my-note-container
+**Boundaries**:
 
-- We ask for a **probability of frequencies**.
-- Result is a **percentage of probability**.
-- Boundaries are grounded on the **probability (`prob`) values ($0-1$)**.
+-   We ask for a **probability of frequencies**.
+-   Result is a **percentage of probability**.
+-   Boundaries are grounded on the **probability (`prob`) values
+    (**$0-1$).
 
-**Probability Mass**: 
+**Probability Mass**:
 
-- We ask for a specified **amount of posterior probability**.
-- Result is the probability value of the **percentage of frequencies** we looked for.
-- Probability Mass is grounded on the **percentage of probabilities ($0-100\%$)**.
-
-::::
-:::::
+-   We ask for a specified **amount of posterior probability**.
+-   Result is the probability value of the **percentage of frequencies**
+    we looked for.
+-   Probability Mass is grounded on the **percentage of probabilities
+    (**$0-100\%$).
+:::
+:::
 
 #### TIDYVERSE
 
 ##### Quantiles
 
-Kurz offers again different methods --- this time to calculate probability mass:
+Kurz offers again different methods --- this time to calculate
+probability mass:
 
-1. **Method**: Since we saved our `samples_b` samples within the `df_samples_b`
-tibble, we'll have to index with `$` within `stats::quantile()`.
-2. **Method**: For an alternative approach, we could `dplyr::select()` the `samples_b`
-vector, extract it from the tibble with `dplyr::pull()`, and then pump
-it into `stats::quantile()`.
+1.  **Method**: Since we saved our `samples_b` samples within the
+    `df_samples_b` tibble, we'll have to index with `$` within
+    `stats::quantile()`.
+2.  **Method**: For an alternative approach, we could `dplyr::select()`
+    the `samples_b` vector, extract it from the tibble with
+    `dplyr::pull()`, and then pump it into `stats::quantile()`.
 
-  > `pull()` is similar to `$`. It's mostly useful because it looks a
-  > little nicer in pipes, it also works with remote data frames, and it
-  > can optionally name the output. ([`dplyr::pull()` help file "Extract a single column"](https://dplyr.tidyverse.org/reference/pull.html))
+> `pull()` is similar to `$`. It's mostly useful because it looks a
+> little nicer in pipes, it also works with remote data frames, and it
+> can optionally name the output. ([`dplyr::pull()` help file "Extract a
+> single column"](https://dplyr.tidyverse.org/reference/pull.html))
 
-3. **Method**: We might also use `stats::quantile()` within `dplyr::summarize()`.
+3.  **Method**: We might also use `stats::quantile()` within
+    `dplyr::summarize()`.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-quantiles-b1}
-b: Compute posterior probability mass intervals of $80\%$ with different methods
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-quantiles-b1}
+b: Compute posterior probability mass intervals of $80\%$ with different
+methods
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: quantiles-b1
 #| results: hold
@@ -1231,25 +1398,22 @@ glue::glue('Method 3:\n')
 method_3
 
 ```
-
-
-::::
-:::::
-
-
+:::
+:::
 
 ##### Percentile Interval (PI)
 
-Here's the `summarize()` approach with two probabilities returning the `r glossary("percentile", "percentile interval")`  (PI).
+Here's the `summarize()` approach with two probabilities returning the
+`r glossary("percentile", "percentile interval")` (PI).
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-pi-b1}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-pi-b1}
 b: Compute probability mass of 80% with summarize method
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: pi-b1
 
@@ -1260,38 +1424,44 @@ df_samples_b |>
     
 
 ```
-::::
-:::::
+:::
+:::
 
+Kurz refers also to a now deprecated calculation using the vector
+feature of R to summarize different quantiles with one line.
 
-Kurz refers also to a now deprecated calculation using the vector feature of R to summarize different quantiles with one line. 
+------------------------------------------------------------------------
 
-***
-```
+```         
 samples_b |> dplyr::summarize(q10_90 = quantile(samples_b, probs = c(.1, .9)))
 ```
-***
+
+------------------------------------------------------------------------
 
 This produces nowadays the following warning message:
 
-::: {.callout-warning}
-Warning: Returning more (or less) than 1 row per `summarise()` group was deprecated in dplyr 1.1.0.
+::: callout-warning
+Warning: Returning more (or less) than 1 row per `summarise()` group was
+deprecated in dplyr 1.1.0.
 
 Please use `reframe()` instead.
 
-When switching from `summarise()` to `reframe()`, remember that `reframe()` always returns an ungrouped data frame and adjust accordingly.
+When switching from `summarise()` to `reframe()`, remember that
+`reframe()` always returns an ungrouped data frame and adjust
+accordingly.
 :::
 
-Therefore I am going to change `dplyr::summarize()` to `dplyr::reframe()`.
+Therefore I am going to change `dplyr::summarize()` to
+`dplyr::reframe()`.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-reframe}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-reframe}
 b: Using `dplyr::reframe()` to compute probability mass intervals of 80%
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: quantile-reframe
 
@@ -1300,13 +1470,14 @@ df_samples_b |>
     dplyr::reframe(q10_90 = quantile(samples_b, probs = c(.1, .9)))
 ```
 
-:::::{.my-note}
-:::{.my-note-header}
-:::::: {#cor-reframe}
+::: my-note
+::: my-note-header
+::: {#cor-reframe}
 : Excursion: Using `dplyr::reframe()` and friends
-::::::
 :::
-::::{.my-note-container}
+:::
+
+::: my-note-container
 From the help file of `dplyr::reframe()`:
 
 > While `summarise()` requires that each argument returns a single
@@ -1337,28 +1508,26 @@ accordance with `tibble::enframe()` and `tibble::deframe()`:
 -   `enframe()`: Takes a vector, returns a data frame
 -   `deframe()`: Takes a data frame, returns a vector
 -   `reframe()`: Takes a data frame, returns a data frame
-
-::::
-:::::
-
-::::
-:::::
-
-
+:::
+:::
+:::
+:::
 
 > The functions of the tidyverse approach typically returns a data
 > frame. But sometimes you just want your values in a numeric vector for
 > the sake of quick indexing. In that case, base R `stats::quantile()`
-> shines: (Kurz in the section: [Intervals of defined mass](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-mass.))
+> shines: (Kurz in the section: [Intervals of defined
+> mass](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-mass.))
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-pi-b2}
-b: Using `stats::quantile()` to get a vector of a probability mass calculation
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-pi-b2}
+b: Using `stats::quantile()` to get a vector of a probability mass
+calculation
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: pi-b2
 
@@ -1366,23 +1535,23 @@ b: Using `stats::quantile()` to get a vector of a probability mass calculation
 (q10_q90 = quantile(df_samples_b$samples_b, probs = c(.1, .9)))
 
 ```
-This is the same method as in R base with the difference that we are working with tibbles and need therefore to use the `$` operator.
 
-
-::::
-:::::
-
-
-To produce the bottom part of Figure 3.2 of the book we apply following code lines.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-lower-part-3-2b}
-b: Plots of defined mass intervals lower of 80% and the middle 80%
-::::::
+This is the same method as in R base with the difference that we are
+working with tibbles and need therefore to use the `$` operator.
 :::
-::::{.my-r-code-container}
+:::
 
+To produce the bottom part of Figure 3.2 of the book we apply following
+code lines.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-lower-part-3-2b}
+b: Plots of defined mass intervals lower of 80% and the middle 80%
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-lower-part-3-2b
 #| fig-cap: "Lower part of SR2 Figure 3.2: Intervals of defined mass produced with {**tidyverse**} tools: Left: Lower 80% posterior probability exists below a parameter value of about 0.75. Right: Middle 80% posterior probability lies between the 10% and 90% quantiles."
@@ -1420,13 +1589,12 @@ library(patchwork)
 p1 + p2
 
 ```
+:::
+:::
 
-
-::::
-:::::
-
-
-Again we will demonstrate the misleading character of `r glossary("Percentile", "Percentile Intervals")` (PIs) with a very skewed distribution.
+Again we will demonstrate the misleading character of
+`r glossary("Percentile", "Percentile Intervals")` (PIs) with a very
+skewed distribution.
 
 We've already defined `p_grid_b` and `prior_b` within `d_b`, above. Here
 we'll reuse them and create a new tibble by updating all the columns
@@ -1435,14 +1603,15 @@ with the skewed parameters of three 'Water' in three tosses.
 To see the difference how the skewed distribution is different to the
 Figure 3.2 lower part, I will draw the appropriate figure here myself.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-skewed-dist-b}
-b: Skewed posterior distribution observing three waters in three tosses and a uniform (flat) prior (Tidyverse)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-skewed-dist-b}
+b: Skewed posterior distribution observing three waters in three tosses
+and a uniform (flat) prior (Tidyverse)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-skewed-dist-b
 #| fig-cap: "Skewed posterior distribution observing three waters in three tosses and a uniform (flat) prior. The distribution is highly skewed, having its maximum value where p equals 1."
@@ -1489,19 +1658,21 @@ samples_skewed_b |>
   ggplot2::geom_line() +
   ggplot2::theme_bw()
 ```
-::::
-:::::
-
-To see how the skewed distribution is different to the book’s
-Figure 3.2 lower part, I will draw the appropriate figure here.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-prob-mass-skewed-dist}
-b: Lower 80% and middle 80% of probability mass intervals in the skewed distribution 
-::::::
 :::
-::::{.my-r-code-container}
+:::
+
+To see how the skewed distribution is different to the book's Figure 3.2
+lower part, I will draw the appropriate figure here.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-prob-mass-skewed-dist}
+b: Lower 80% and middle 80% of probability mass intervals in the skewed
+distribution
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: fig-prob-mass-skewed-dist
 #| fig-cap: "Probability mass intervals in a skewed distribution. Left: Lower 80%. right: Middle 80% = 80% Percentile Interval (PI)"
@@ -1540,20 +1711,20 @@ p2 <-
 library(patchwork)
 p1 + p2
 ```
-
-
-::::
-:::::
-
+:::
+:::
 
 ##### Introducing tidybayes {.unnumbered}
 
-:::::{.my-resource}
-:::{.my-resource-header}
+::: my-resource
+::: my-resource-header
 Introducing the {**tidybayes**} package by Matthew Kay
 :::
-::::{.my-resource-container}
-The [{**tidybayes**}](https://mjskay.github.io/tidybayes/) package by [Matthew Kay](https://www.mjskay.com/) offers an array of convenience functions for summarizing Bayesian models. 
+
+::: my-resource-container
+The [{**tidybayes**}](https://mjskay.github.io/tidybayes/) package by
+[Matthew Kay](https://www.mjskay.com/) offers an array of convenience
+functions for summarizing Bayesian models.
 
 > {**tidybayes**} is an R package that aims to make it easy to integrate
 > popular Bayesian modeling methods into a tidy data + ggplot workflow.
@@ -1561,13 +1732,24 @@ The [{**tidybayes**}](https://mjskay.github.io/tidybayes/) package by [Matthew K
 > uncertainty from its sister package,
 > [{**ggdist**}](https://mjskay.github.io/ggdist/).
 
-- For an introduction using {**tidybayes**} with {**brms**} see
-[Extracting and visualizing tidy draws from {**brms**}
-models](https://mjskay.github.io/tidybayes/articles/tidy-brms.html). 
+-   For an introduction using {**tidybayes**} with {**brms**} see
+    [Extracting and visualizing tidy draws from {**brms**}
+    models](https://mjskay.github.io/tidybayes/articles/tidy-brms.html).
 
-- For a general introduction (not confined to {**brms**}) see [Using tidy data with Bayesian models](https://mjskay.github.io/tidybayes/articles/tidybayes.html) but read also the start page [tidybayes: Bayesian analysis + tidy data + geoms](https://mjskay.github.io/tidybayes/) of the package documentation.
+-   For a general introduction (not confined to {**brms**}) see [Using
+    tidy data with Bayesian
+    models](https://mjskay.github.io/tidybayes/articles/tidybayes.html)
+    but read also the start page [tidybayes: Bayesian analysis + tidy
+    data + geoms](https://mjskay.github.io/tidybayes/) of the package
+    documentation.
 
-- Besides supporting many types of models there is an additional {**tidybayes.rethinking**} package [available on GitHub](https://mjskay.github.io/tidybayes.rethinking/) that extends {**tidybayes**} to work with the {**rethinking**} package. I think this package is a new development because Kurz didn't mention it. (As far as I know, because at the moment I have read his [version 0.40](https://bookdown.org/content/4857/) only until chapter 4.)
+-   Besides supporting many types of models there is an additional
+    {**tidybayes.rethinking**} package [available on
+    GitHub](https://mjskay.github.io/tidybayes.rethinking/) that extends
+    {**tidybayes**} to work with the {**rethinking**} package. I think
+    this package is a new development because Kurz didn't mention it.
+    (As far as I know, because at the moment I have read his [version
+    0.40](https://bookdown.org/content/4857/) only until chapter 4.)
 
 For the following parts the section on [Point Summaries and
 Intervals](https://mjskay.github.io/tidybayes/articles/tidy-brms.html#point-summaries-and-intervals)
@@ -1576,17 +1758,19 @@ of draws from
 distributions](https://mjskay.github.io/ggdist/reference/point_interval.html)
 are especially important.
 
-The mentioned vignettes above are long articles I haven't read yet. I plan to do this in the next future but for now I am concentrating and trusting on Kurz’ text to apply and explain the most important function parallel to McElreath book chapters.
+The mentioned vignettes above are long articles I haven't read yet. I
+plan to do this in the next future but for now I am concentrating and
+trusting on Kurz' text to apply and explain the most important function
+parallel to McElreath book chapters.
+:::
+:::
 
-::::
-:::::
-
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 Many function names used by Kurz do not apply anymore
 :::
-::::{.my-watch-out-container}
+
+::: my-watch-out-container
 I had difficulties to use Kurz's functions because there was an
 [overhaul in the naming
 scheme](https://mjskay.github.io/tidybayes/reference/tidybayes-deprecated.html)
@@ -1595,84 +1779,109 @@ geoms and stats in {**tidybayes**} 2.1. Because {**tidybayes**}
 integrates function of the sister package {**ggdist**} the [function
 descriptions and references of
 {**ggdist**}](https://mjskay.github.io/ggdist/reference/index.html) are
-also important to consult. For instance all the function on [point and interval summaries](https://mjskay.github.io/ggdist/reference/point_interval.html) are now documented in {**ggdist**}.
+also important to consult. For instance all the function on [point and
+interval
+summaries](https://mjskay.github.io/ggdist/reference/point_interval.html)
+are now documented in {**ggdist**}.
 
-There is a systematic change of the function names: The `h` (for 'horizontal') in parameter name of the point estimate was removed. For instance: Instead of median_qih, median_hdih and median_hdcih it is now `tidybayes::median_qi()`, `tidybayes::median_hdi()` and `tidybayes::median_hdci()`. Similar with point_inverhalh, mean_* and mode_*.
+There is a systematic change of the function names: The `h` (for
+'horizontal') in parameter name of the point estimate was removed. For
+instance: Instead of median_qih, median_hdih and median_hdcih it is now
+`tidybayes::median_qi()`, `tidybayes::median_hdi()` and
+`tidybayes::median_hdci()`. Similar with point_inverhalh, mean\_\* and
+mode\_\*.
 
-***
+------------------------------------------------------------------------
 
-There is another adaption compared to the Kurz’ version: I can't reproduce the codes with his  `samples` (my `samples_b`) data frame, because the data has changed values recently to the skewed sampling version. To get the same results as Kurz I have to use
-in my naming scheme the `skewed` version.
-::::
-:::::
-
+There is another adaption compared to the Kurz' version: I can't
+reproduce the codes with his `samples` (my `samples_b`) data frame,
+because the data has changed values recently to the skewed sampling
+version. To get the same results as Kurz I have to use in my naming
+scheme the `skewed` version.
+:::
+:::
 
 > The {**tidybayes**} package contains a [family of
-functions](https://mjskay.github.io/tidybayes/articles/tidy-brms.html#point-summaries-and-intervals)
-that make it easy to summarize a distribution with a measure of central
-tendency accompanied by intervals. With `tidybayes::median_qi()`, we
-will ask for the median and quantile-based intervals --- just like we've
-been doing with `stats::quantile()`. ([Kurz](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-mass.))
+> functions](https://mjskay.github.io/tidybayes/articles/tidy-brms.html#point-summaries-and-intervals)
+> that make it easy to summarize a distribution with a measure of
+> central tendency accompanied by intervals. With
+> `tidybayes::median_qi()`, we will ask for the median and
+> quantile-based intervals --- just like we've been doing with
+> `stats::quantile()`.
+> ([Kurz](https://bookdown.org/content/4857/sampling-the-imaginary.html#intervals-of-defined-mass.))
 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-median-qi}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-median-qi}
 : Computing the median quantile interval with {**tidybayes**}
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: median-quantile-interval
 
 tidybayes::median_qi(samples_skewed_b$p_skewed_b, .width = .5)
 ```
 
-
 > Note how the `.width` argument within `tidybayes::median_qi()` worked
-the same way the `prob` argument did within `rethinking::PI()`. With
-`.width = .5`, we indicated we wanted a quantile-based 50% interval,
-which was returned in the `ymin` and `ymax` columns.
-
-::::
-:::::
-
-
-:::::{.my-note}
-:::{.my-note-header}
-:::::: {#cor-point-interval-summaries}
-: Point and interval summaries for tidy data frames of draws from distributions
-::::::
+> the same way the `prob` argument did within `rethinking::PI()`. With
+> `.width = .5`, we indicated we wanted a quantile-based 50% interval,
+> which was returned in the `ymin` and `ymax` columns.
 :::
-::::{.my-note-container}
+:::
 
-The `qi` in `tidybayes::median_qi()` stands for "quantile interval". The explanation of this function family (`median_qi()`, `mean_qi()` and `mode_qi()`) is now documented in the {**ggdist**} package. 
+::: my-note
+::: my-note-header
+::: {#cor-point-interval-summaries}
+: Point and interval summaries for tidy data frames of draws from
+distributions
+:::
+:::
 
-> The `qi`-variants is the short form of the function family of `tidybayes::point_interval(..., .point = median, .interval = qi)`. 
+::: my-note-container
+The `qi` in `tidybayes::median_qi()` stands for "quantile interval". The
+explanation of this function family (`median_qi()`, `mean_qi()` and
+`mode_qi()`) is now documented in the {**ggdist**} package.
+
+> The `qi`-variants is the short form of the function family of
+> `tidybayes::point_interval(..., .point = median, .interval = qi)`.
 >
-> There are several point intervals that {**tidybayes**} respectively {**ggdist**} computes: 
-> 
-> - **qi** yields the quantile interval (also known as the percentile interval or equi-tailed interval) as a 1x2 matrix.
-> - **hdi** yields the highest-density interval(s) (also known as the highest posterior density interval). Note: If the distribution is multimodal, hdi may return multiple intervals for each probability level (these will be spread over rows). You may wish to use hdci (below) instead if you want a single highest-density interval, with the caveat that when the distribution is multimodal hdci is not a highest-density interval.
-> - **hdci** yields the highest-density continuous interval, also known as the shortest probability interval. Note: If the distribution is multimodal, this may not actually be the highest-density interval (there may be a higher-density discontinuous interval, which can be found using hdi).
-> - **ll and ul** yield lower limits and upper limits, respectively (where the opposite limit is set to either Inf or -Inf). ([ggdist reference](https://mjskay.github.io/ggdist/reference/point_interval.html))
-::::
-:::::
-
-
-> The {**tidybayes**} framework makes it easy to request multiple types of
-intervals. In the following code chunk we'll request 50%, 80%, and 99%
-intervals.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-multiple-intervals-b}
-b: Requesting multiple type of intervals with {**tidybayes**}
-::::::
+> There are several point intervals that {**tidybayes**} respectively
+> {**ggdist**} computes:
+>
+> -   **qi** yields the quantile interval (also known as the percentile
+>     interval or equi-tailed interval) as a 1x2 matrix.
+> -   **hdi** yields the highest-density interval(s) (also known as the
+>     highest posterior density interval). Note: If the distribution is
+>     multimodal, hdi may return multiple intervals for each probability
+>     level (these will be spread over rows). You may wish to use hdci
+>     (below) instead if you want a single highest-density interval,
+>     with the caveat that when the distribution is multimodal hdci is
+>     not a highest-density interval.
+> -   **hdci** yields the highest-density continuous interval, also
+>     known as the shortest probability interval. Note: If the
+>     distribution is multimodal, this may not actually be the
+>     highest-density interval (there may be a higher-density
+>     discontinuous interval, which can be found using hdi).
+> -   **ll and ul** yield lower limits and upper limits, respectively
+>     (where the opposite limit is set to either Inf or -Inf). ([ggdist
+>     reference](https://mjskay.github.io/ggdist/reference/point_interval.html))
 :::
-::::{.my-r-code-container}
+:::
 
+> The {**tidybayes**} framework makes it easy to request multiple types
+> of intervals. In the following code chunk we'll request 50%, 80%, and
+> 99% intervals.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-multiple-intervals-b}
+b: Requesting multiple type of intervals with {**tidybayes**}
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: multiple-intervals-b
 
@@ -1681,74 +1890,74 @@ tidybayes::median_qi(samples_skewed_b$p_skewed_b, .width = c(.5, .8, .99))
 
 ```
 
-
 > The .width column in the output indexed which line presented which
 > interval. The value in the y column remained constant across rows.
 > That's because that column listed the measure of central tendency, the
 > median in this case.
-::::
-:::::
+:::
+:::
 
 ##### Highest Posterior Density Interval (HPDI)
 
 > Now let's use the `rethinking::HPDI()` function to return 50% highest
 > posterior density intervals (HPDIs).
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-rethinking-hpdi-b}
-b: Compute Highest Posterior Density Interval (HPDI) (Rethinking / Tidyverse)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-rethinking-hpdi-b}
+b: Compute Highest Posterior Density Interval (HPDI) (Rethinking /
+Tidyverse)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: rethinking-HPDI-b
 
 ## R code 3.13b(1) HPDI ###############################
 rethinking::HPDI(samples_skewed_b$p_skewed_b, prob = .5)
 ```
-
-
-::::
-:::::
-
+:::
+:::
 
 > The reason I introduce {**tidybayes**} now is that the functions of
 > the {**brms**} package only support percentile-based intervals of the
 > type we computed with `quantile()` and `median_qi()`. But
 > {**tidybayes**} also supports HPDIs.
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 : Two Version for Highest Density Intervals
 :::
-::::{.my-watch-out-container}
-As already mentioned in @cor-point-interval-summaries there is `hdi`and `hcdi`. Both functions produce the same result in unimodal distributions. 
 
-But in the case of an extreme skewed distribution like our data frame with the observation of 3 'Water' with 3 tosses the `tidybayes::hdi()` functions generates an error.
+::: my-watch-out-container
+As already mentioned in @cor-point-interval-summaries there is `hdi`and
+`hcdi`. Both functions produce the same result in unimodal
+distributions.
 
-> Error in quantile.default(dist_y, probs = 1 - .width) :  
+But in the case of an extreme skewed distribution like our data frame
+with the observation of 3 'Water' with 3 tosses the `tidybayes::hdi()`
+functions generates an error.
+
+> Error in quantile.default(dist_y, probs = 1 - .width) :\
 > missing values and NaN's not allowed if 'na.rm' is FALSE
 
-My error message with `hdi``` is in contrast to Kurz’ version where this function seems to work. BTW: I got the same error message providing the vector `samples_skewed_a` from the Base R version.
-
-::::
-:::::
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-tidyverse-HPDI-b}
-: High Density Intervals with {**tidybayes**}
-::::::
+My error message with
+```` hdi``` is in contrast to Kurz’ version where this function seems to work. BTW: I got the same error message providing the vector ````samples_skewed_a\`
+from the Base R version.
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-tidyverse-HPDI-b}
+: High Density Intervals with {**tidybayes**}
+:::
+:::
 
+::: my-r-code-container
+::: panel-tabset
 ###### 6 W, n=9
-
 
 ```{r}
 #| label: tidyverse-HPDI-b1
@@ -1759,7 +1968,6 @@ tidybayes::mode_hdi(df_samples_b$samples_b, .width = .5)
 tidybayes::mode_hdci(df_samples_b$samples_b, .width = .5)
 ```
 
-
 ###### 3 W, n=3
 
 ```{r}
@@ -1769,15 +1977,12 @@ tidybayes::mode_hdci(df_samples_b$samples_b, .width = .5)
 # tidybayes::mode_hdi(samples_skewed_b$p_skewed_b, .width = .5) # generates error
 tidybayes::mode_hdci(samples_skewed_b$p_skewed_b, .width = .5)
 ```
-
+:::
+:::
 :::
 
-
-::::
-:::::
-
-
-In contrast to @cnj-multiple-intervals-b and @cnj-rethinking-hpdi-b we used this time the mode as the measure of central tendency. With this
+In contrast to @cnj-multiple-intervals-b and @cnj-rethinking-hpdi-b we
+used this time the mode as the measure of central tendency. With this
 family of {**tidybayes**} functions, you specify the measure of central
 tendency in the prefix (i.e., mean, median, or mode) and then the type
 of interval you'd like (i.e., `qi()` or `hdci()`).
@@ -1786,17 +1991,17 @@ If all you want are the intervals without the measure of central
 tendency or all that other technical information, {**tidybayes**} also
 offers the handy `qi()` and `hdi()` functions.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-pi-4}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-pi-4}
 : Numbered R Code Title
-::::::
 :::
-::::{.my-r-code-container}
-Here include code lines
-::::
-:::::
+:::
 
+::: my-r-code-container
+Here include code lines
+:::
+:::
 
 ```{r}
 #| label: pi-4
@@ -1805,17 +2010,17 @@ Here include code lines
 tidybayes::qi(samples_skewed_b$p_skewed_b, .width = .5)
 ```
 
+We have now all necessary skills to plot book's Figure 3.3:
 
-We have now all necessary skills to plot book’s Figure 3.3:
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-pi-hpdi}
-b: Plot the difference between percentile interval (PI) and highest posterior density  intervals (HPDI)
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-pi-hpdi}
+b: Plot the difference between percentile interval (PI) and highest
+posterior density intervals (HPDI)
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-pi-hpdi
 #| fig-cap: "Reproduction of Figure 3.3 (p.57): The difference between percentile and highest posterior density compatibility intervals. The posterior density here corresponds to a flat prior and observing three water samples in three total tosses of the globe. Left: 50% percentile interval. This interval assigns equal mass (25%) to both the left and right tail. As a result, it omits the most probable parameter value, where p equals 1. Right: 50% highest posterior density interval, HPDI. This interval finds the narrowest region with 50% of the posterior probability. Such a region always includes the most probable parameter value."
@@ -1859,30 +2064,33 @@ p2 <-
 library(patchwork)
 p1 | p2
 ```
-
-
-::::
-:::::
+:::
+:::
 
 Comparing the two panels of the plot you can see that in contrast to the
 50% HPDI the 50% of PI does not include the highest probability value.
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 {**magrittr**} and native R pipe
 :::
-::::{.my-watch-out-container}
-Kurz uses the {**magrittr**} paipe whereas I am using the native R pipe. These two pipes are not in every aspect equivalent. One difference is the dot (`.`) syntax, "since the dot syntax is a feature of {**magrittr**} and not of base R." ([Understanding the native R pipe](https://ivelasq.rbind.io/blog/understanding-the-r-pipe/#how-the-native-r-pipe-works)).
+
+::: my-watch-out-container
+Kurz uses the {**magrittr**} paipe whereas I am using the native R pipe.
+These two pipes are not in every aspect equivalent. One difference is
+the dot (`.`) syntax, "since the dot syntax is a feature of
+{**magrittr**} and not of base R." ([Understanding the native R
+pipe](https://ivelasq.rbind.io/blog/understanding-the-r-pipe/#how-the-native-r-pipe-works)).
 
 The native pipe is available starting with R 4.1.0. It is constructed
 with `|` followed by `>` resulting in the symbol `|>` to differentiate
-it from the {**magrittr**} pipe (`%>%`). To understand the details of the
-differences of `|>` and the native R pipe `|>` read this elaborated
+it from the {**magrittr**} pipe (`%>%`). To understand the details of
+the differences of `|>` and the native R pipe `|>` read this elaborated
 [blog article by Isabella
 Velásquez](https://ivelasq.rbind.io/blog/understanding-the-r-pipe/index.html),
 an employee of [Posit](https://posit.co/) (formerly RStudio).
 
-So the following trick does not work with the native R pipe: 
+So the following trick does not work with the native R pipe:
 
 > In the geom_area() line for the HPDI plot, did you notice how we
 > replaced `data = samples_skewed_b` with `data = .`? When using the
@@ -1895,29 +2103,26 @@ Learn more of the [pipe function `%>%` of the {**magrittr**}
 package](https://magrittr.tidyverse.org/reference/pipe.html) and about
 the [base R native forward pipe
 operator](https://stat.ethz.ch/R-manual/R-devel/library/base/html/pipeOp.html).
-
-::::
-:::::
-
-
-
-PI and HPDI are only different if you have a very skewed
-distribution. This means that in unimodal somewhat normal distribution `hdi` and `hdci` are exactly the same and pretty similar to `qi` calculation. In skewed distribution they differ.
-assertion:
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-tidyverse-HPDI-b}
-b: High Density Intervals with {**tidybayes**}
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+PI and HPDI are only different if you have a very skewed distribution.
+This means that in unimodal somewhat normal distribution `hdi` and
+`hdci` are exactly the same and pretty similar to `qi` calculation. In
+skewed distribution they differ. assertion:
 
+::: my-r-code
+::: my-r-code-header
+<div>
+
+b: High Density Intervals with {**tidybayes**}
+
+</div>
+:::
+
+::: my-r-code-container
+::: panel-tabset
 ###### 6 W, n=9
-
 
 ```{r}
 #| label: tidyverse-PI-HPDI-b1
@@ -1928,7 +2133,6 @@ tidybayes::mode_hdi(df_samples_b$samples_b, .width = .5)
 tidybayes::mode_hdci(df_samples_b$samples_b, .width = .5)
 tidybayes::mode_qi(df_samples_b$samples_b, .width = .5)
 ```
-
 
 ###### 3 W, n=3
 
@@ -1941,39 +2145,51 @@ tidybayes::mode_qi(df_samples_b$samples_b, .width = .5)
 tidybayes::mode_hdci(samples_skewed_b$p_skewed_b, .width = .5)
 tidybayes::mode_qi(samples_skewed_b$p_skewed_b, .width = .5)
 ```
-
+:::
+:::
 :::
 
-
-::::
-:::::
-
-
-Because of the disadvantages of `r glossary("HPDI")` (more computationally intensive,
-greater simulation variance and harder to understand)  Kurz will primarily
-stick to the PI-based intervals. And he will not use the 5.5% and 94.5% `r glossary("quantile", "quantiles")` that are `r glossary("percentile", "percentile intervals")` boundaries, corresponding to an 89% `r glossary("compatibility interval")` but stick to the 95% standard (frequentist) `r glossary("confidence interval")`. 
+Because of the disadvantages of `r glossary("HPDI")` (more
+computationally intensive, greater simulation variance and harder to
+understand) Kurz will primarily stick to the PI-based intervals. And he
+will not use the 5.5% and 94.5% `r glossary("quantile", "quantiles")`
+that are `r glossary("percentile", "percentile intervals")` boundaries,
+corresponding to an 89% `r glossary("compatibility interval")` but stick
+to the 95% standard (frequentist) `r glossary("confidence interval")`.
 
 ### Point Estimates {#sec-chap-03-point-estimates}
 
 #### ORIGINAL
 
-
 ##### Measures of Central Tendency
 
-> “Given the entire posterior distribution, what value should you report? This seems like an innocent question, but it is difficult to answer. The Bayesian parameter estimate is precisely the entire posterior distribution, which is not a single number, but instead a function that maps each unique parameter value onto a plausibility value. So really the most important thing to note is that you don’t have to choose a point estimate. It’s hardly ever necessary and often harmful. It discards information.” ([McElreath, 2020, p. 58](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=77&annotation=EVCFUS3F))
+> "Given the entire posterior distribution, what value should you
+> report? This seems like an innocent question, but it is difficult to
+> answer. The Bayesian parameter estimate is precisely the entire
+> posterior distribution, which is not a single number, but instead a
+> function that maps each unique parameter value onto a plausibility
+> value. So really the most important thing to note is that you don't
+> have to choose a point estimate. It's hardly ever necessary and often
+> harmful. It discards information." ([McElreath, 2020, p.
+> 58](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=77&annotation=EVCFUS3F))
 
+But whenever you have to do it, you must choose between mean, median and
+MAP (= the parameter value with highest posterior probability, a
+*maximum a posteriori*, essentially the "peak" or mode of the posterior
+distribution.
 
-But whenever you have to do it, you must choose between mean, median and MAP (= the parameter value with highest posterior probability, a *maximum a posteriori*, essentially the "peak" or mode of the posterior distribution. 
+In the very skewed globe tossing example where we observed 3 waters out
+of 3 tosses they are all different.
 
-In the very skewed globe tossing example where we observed 3 waters out of 3 tosses they are all different.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-point-estimates-a}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-point-estimates-a}
 a: Compute MAP, median and mean
-::::::
 :::
-::::{.my-r-code-container}
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: point-estimates-a
 
@@ -1991,32 +2207,42 @@ median_skewed_a <- median(samples_skewed_a)
 
 **Results:**
 
-- MAP with `which.max()` = `r map_skewed_a_1`
-- MAP with `rethinking::chainmode()` = `r map_skewed_a_2`
-- Mean: `r mean_skewed_a`
-- Median: `r median_skewed_a`
+-   MAP with `which.max()` = `r map_skewed_a_1`
+-   MAP with `rethinking::chainmode()` = `r map_skewed_a_2`
+-   Mean: `r mean_skewed_a`
+-   Median: `r median_skewed_a`
+:::
+:::
 
-::::
-:::::
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 Difference between MAP and mode calculation?
 :::
-::::{.my-watch-out-container}
-I have observed small differences between the MAP calculation in @cnj-point-estimates-a and the mode calculation of other packages. I wonder why all these other methods give  0.95/0.96 whereas the MAP calculation results in 0.99/1.0.
 
-One explanation I could think is that the mode is defined by the *maximum frequency* of observations, whereas the MAP is calculated from the *maximum of the weighted probability frequency *.
+::: my-watch-out-container
+I have observed small differences between the MAP calculation in
+@cnj-point-estimates-a and the mode calculation of other packages. I
+wonder why all these other methods give 0.95/0.96 whereas the MAP
+calculation results in 0.99/1.0.
 
-But I am not sure. One thing I can say with some certainty is that MAP seems [a complicated theoretical construct](https://web.stanford.edu/class/archive/cs/cs109/cs109.1216/lectures/22_map.pdf) and a [difficult computational procedure](https://machinelearningmastery.com/maximum-a-posteriori-estimation/).
+One explanation I could think is that the mode is defined by the
+*maximum frequency* of observations, whereas the MAP is calculated from
+the *maximum of the weighted probability frequency* .
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-map-mode}
+But I am not sure. One thing I can say with some certainty is that MAP
+seems [a complicated theoretical
+construct](https://web.stanford.edu/class/archive/cs/cs109/cs109.1216/lectures/22_map.pdf)
+and a [difficult computational
+procedure](https://machinelearningmastery.com/maximum-a-posteriori-estimation/).
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-map-mode}
 a: Compare MAP and mode calculation of different packages
-::::::
 :::
-::::{.my-r-code-container}
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: different-modes
 #| warning: false
@@ -2028,46 +2254,68 @@ m_skewed_3 <- bayestestR::map_estimate(samples_skewed_a)
 
 Results of mode calculation with several packages:
 
-- `modeest::mlv()`: `r m_skewed_1`
-- `DescTools::Mode()`: `r m_skewed_2`
-- `bayestestR::map_estimate()`: `r m_skewed_3`
-::::
-:::::
-
-
-::::
-:::::
+-   `modeest::mlv()`: `r m_skewed_1`
+-   `DescTools::Mode()`: `r m_skewed_2`
+-   `bayestestR::map_estimate()`: `r m_skewed_3`
+:::
+:::
+:::
+:::
 
 The graphical representation as shown in Figure 3.4 will be calculated
-in the tidyverse version of this section. See: @fig-left-panel-3-4-skewed-b for
-the left panel and @fig-prop-loss-b for the right panel of Figure
-3.4.
+in the tidyverse version of this section. See:
+@fig-left-panel-3-4-skewed-b for the left panel and @fig-prop-loss-b for
+the right panel of Figure 3.4.
 
 ##### Loss function to support particular decisions
 
-“One principled way to go beyond using the entire posterior as the estimate is to choose a `r glossary("loss function")`.” ([McElreath, 2020, p. 59](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=78&annotation=42KE9FFZ))
+"One principled way to go beyond using the entire posterior as the
+estimate is to choose a `r glossary("loss function")`." ([McElreath,
+2020, p. 59](zotero://select/groups/5243560/items/NFUEVASQ))
+([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=78&annotation=42KE9FFZ))
 
-:::::{.my-important}
-:::{.my-important-header}
-Different loss functions imply different point estimates. ([McElreath, 2020, p. 59](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=78&annotation=3X2FI82B))
+::: my-important
+::: my-important-header
+Different loss functions imply different point estimates. ([McElreath,
+2020, p. 59](zotero://select/groups/5243560/items/NFUEVASQ))
+([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=78&annotation=3X2FI82B))
+:::
 :::
 
-:::::
+> "Here's an example to help us work through the procedure. Suppose I
+> offer you a bet. Tell me which value of p, the proportion of water on
+> the Earth, you think is correct. I will pay you $\$100$, if you get it
+> exactly right. But I will subtract money from your gain, proportional
+> to the distance of your decision from the correct value. Precisely,
+> your loss is proportional to the absolute value of $d − p$, where $d$
+> is your decision and $p$ is the correct answer. We could change the
+> precise dollar values involved, without changing the important aspects
+> of this // problem. What matters is that the loss is proportional to
+> the distance of your decision from the true value. Now once you have
+> the posterior distribution in hand, how should you use it to maximize
+> your expected winnings? It turns out that the parameter value that
+> maximizes expected winnings (minimizes expected loss) is the median of
+> the posterior distribution." ([McElreath, 2020, p.
+> 59/60](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=79&annotation=59IS3PFL))
 
-> “Here’s an example to help us work through the procedure. Suppose I offer you a bet. Tell me which value of p, the proportion of water on the Earth, you think is correct. I will pay you $\$100$, if you get it exactly right. But I will subtract money from your gain, proportional to the distance of your decision from the correct value. Precisely, your loss is proportional to the absolute value of $d − p$, where $d$ is your decision and $p$ is the correct answer. We could change the precise dollar values involved, without changing the important aspects of this // problem. What matters is that the loss is proportional to the distance of your decision from the true value. Now once you have the posterior distribution in hand, how should you use it to maximize your expected winnings? It turns out that the parameter value that maximizes expected winnings (minimizes expected loss) is the median of the posterior distribution.” ([McElreath, 2020, p. 59/60](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=79&annotation=59IS3PFL))
+> "Calculating expected loss for any given decision means using the
+> posterior to average over our uncertainty in the true value. Of course
+> we don't know the true value, in most cases. But if we are going to
+> use our model's information about the parameter, that means using the
+> entire posterior distribution. So suppose we decide $p = 0.5$ will be
+> our decision." ([McElreath, 2020, p.
+> 60](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=79&annotation=UTEYE7VX)).
 
-
-> “Calculating expected loss for any given decision means using the posterior to average over our uncertainty in the true value. Of course we don’t know the true value, in most cases. But if we are going to use our model’s information about the parameter, that means using the entire posterior distribution. So suppose we decide $p = 0.5$ will be our decision.” ([McElreath, 2020, p. 60](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=79&annotation=UTEYE7VX)).
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-expected-loss-a}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-expected-loss-a}
 a: Calculated expected loss for $p = 0.5$
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: expected-loss-a
 
@@ -2084,39 +2332,70 @@ loss_min_a <- p_grid_skewed_a[which.min(loss_a)]
 
 **Results:**
 
-- Weighted average loss value = `r loss_avg_a`.
-- parameter value that minimizes the loss = `r loss_min_a`. This is the posterior median that we already have calculated in @cnj-point-estimates-a. Because of sampling variation it is not identical but pretty close (`r median_skewed_a` versus `r loss_min_a`).
+-   Weighted average loss value = `r loss_avg_a`.
+-   parameter value that minimizes the loss = `r loss_min_a`. This is
+    the posterior median that we already have calculated in
+    @cnj-point-estimates-a. Because of sampling variation it is not
+    identical but pretty close (`r median_skewed_a` versus
+    `r loss_min_a`).
+:::
+:::
 
-::::
-:::::
-
-:::::{.my-important}
-:::{.my-important-header}
+::: my-important
+::: my-important-header
 Learnings: Point estimates
 :::
-::::{.my-important-container}
 
-> “In order to decide upon a *point estimate*, a single-value summary of the posterior distribution, we need to pick a loss function. Different loss functions nominate different point estimates. The two most common examples are the absolute loss as above, which leads to the median as the point estimate, and the quadratic loss $(d − p)^{2}$, which leads to the posterior mean (`mean(samples_a)`) as the point estimate. When the posterior distribution is symmetrical and normal-looking, then the median and mean converge to the same point, which relaxes some anxiety we might have about choosing a loss function. For the original globe tossing data (6 waters in 9 tosses), for example, the mean and median are barely different.” ([McElreath, 2020, p. 60](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=79&annotation=JHGI3FVY))
+::: my-important-container
+> "In order to decide upon a *point estimate*, a single-value summary of
+> the posterior distribution, we need to pick a loss function. Different
+> loss functions nominate different point estimates. The two most common
+> examples are the absolute loss as above, which leads to the median as
+> the point estimate, and the quadratic loss $(d − p)^{2}$, which leads
+> to the posterior mean (`mean(samples_a)`) as the point estimate. When
+> the posterior distribution is symmetrical and normal-looking, then the
+> median and mean converge to the same point, which relaxes some anxiety
+> we might have about choosing a loss function. For the original globe
+> tossing data (6 waters in 9 tosses), for example, the mean and median
+> are barely different." ([McElreath, 2020, p.
+> 60](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=79&annotation=JHGI3FVY))
 
-> “Usually, research scientists don’t think about loss functions. And so any point estimate like the mean or MAP that they may report isn’t intended to support any particular decision, but rather to describe the shape of the posterior. You might argue that the decision to make is whether or not to accept an hypothesis. But the challenge then is to say what the relevant costs and benefits would be, in terms of the knowledge gained or lost. Usually it’s better to communicate as much as you can about the posterior distribution, as well as the data and the model itself, so that others can build upon your work. Premature decisions to accept or reject hypotheses can cost lives.” ([McElreath, 2020, p. 61](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=80&annotation=6GVPUF4Z))
-::::
-:::::
-
+> "Usually, research scientists don't think about loss functions. And so
+> any point estimate like the mean or MAP that they may report isn't
+> intended to support any particular decision, but rather to describe
+> the shape of the posterior. You might argue that the decision to make
+> is whether or not to accept an hypothesis. But the challenge then is
+> to say what the relevant costs and benefits would be, in terms of the
+> knowledge gained or lost. Usually it's better to communicate as much
+> as you can about the posterior distribution, as well as the data and
+> the model itself, so that others can build upon your work. Premature
+> decisions to accept or reject hypotheses can cost lives." ([McElreath,
+> 2020, p. 61](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=80&annotation=6GVPUF4Z))
+:::
+:::
 
 #### TIDYVERSE
 
 ##### Measures of Central Tendency
 
-If we sort the posterior values of `d_skewed_b` (three tosses with three `W`) from highest to lowest values then the first row (= the maximum value of `posterior_skewed_b`) will give us the MAP as the corresponding `p_grid_b` value. Additionally the {**tidybayes**} has other options to compute the MAP. To calculate mean and median we will use the Base R functions. In the following code chunk I have collected all these different calculations.
+If we sort the posterior values of `d_skewed_b` (three tosses with three
+`W`) from highest to lowest values then the first row (= the maximum
+value of `posterior_skewed_b`) will give us the MAP as the corresponding
+`p_grid_b` value. Additionally the {**tidybayes**} has other options to
+compute the MAP. To calculate mean and median we will use the Base R
+functions. In the following code chunk I have collected all these
+different calculations.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-point-estimates-b}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-point-estimates-b}
 b: Compute MAP, median and mean
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: point-estimates-b
 #| results: hold
@@ -2148,21 +2427,23 @@ samples_skewed_b |>
   dplyr::summarize(mean   = mean(p_skewed_b),
             median = median(p_skewed_b))
 ```
-::::
-:::::
-
-We can now plot a graph to reproduce the left panel of the books Figure 3.4 where we will see the three different measures of central tendency. I will compare the skewed (three 'W', three tosses) with the somewhat normal version (six 'W', nine tosses).
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-left-panel-3-4-b}
-: Posterior density for skewed and symmetric distribution
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+We can now plot a graph to reproduce the left panel of the books Figure
+3.4 where we will see the three different measures of central tendency.
+I will compare the skewed (three 'W', three tosses) with the somewhat
+normal version (six 'W', nine tosses).
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-left-panel-3-4-b}
+: Posterior density for skewed and symmetric distribution
+:::
+:::
+
+::: my-r-code-container
+::: panel-tabset
 ###### 3W, n=3
 
 ```{r}
@@ -2194,8 +2475,8 @@ samples_skewed_b |>
   ggplot2::theme(panel.grid = ggplot2::element_blank()) +
   ggplot2::theme_bw()
 ```
-###### 6W, n=9
 
+###### 6W, n=9
 
 ```{r}
 #| label: fig-left-panel-3-4-sym-b
@@ -2245,7 +2526,6 @@ df_samples_b |>
                  yend = point_estimates_b2$y_line[[1]]),
     arrow = grid::arrow(length = grid::unit(0.5, "cm")))
 ```
-
 
 ```{r}
 #| label: fig-left-panel-3-4-sym-b2
@@ -2300,40 +2580,46 @@ df_samples_b |>
 )
 ```
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-MAP (mode) is not the highest point in the more symmetric version (6 'W', n=9)
+::: my-watch-out
+::: my-watch-out-header
+MAP (mode) is not the highest point in the more symmetric version (6
+'W', n=9)
 :::
-::::{.my-watch-out-container}
-I wounder if the calculation of the MAP of the somewhat symmetrical version is correct, because the MAP or mode is not the highest value in the distribution. In addition to calculate the mode with {**tidybayes**}, I have also used R code 3.14b from @cnj-point-estimates-b to compute MAP with `dplyr::arrange(dplyr::desc())`.
 
-It turns out that there is difference: In contrast to  {**tidybayes**} arranging the data frame results in a MAP value (`mode2`) which is indeed the highest point of the distribution. I don't know how to interpret this disparity.
-::::
-:::::
+::: my-watch-out-container
+I wounder if the calculation of the MAP of the somewhat symmetrical
+version is correct, because the MAP or mode is not the highest value in
+the distribution. In addition to calculate the mode with
+{**tidybayes**}, I have also used R code 3.14b from
+@cnj-point-estimates-b to compute MAP with
+`dplyr::arrange(dplyr::desc())`.
 
-
+It turns out that there is difference: In contrast to {**tidybayes**}
+arranging the data frame results in a MAP value (`mode2`) which is
+indeed the highest point of the distribution. I don't know how to
+interpret this disparity.
 :::
-::::
-:::::
+:::
+:::
+:::
+:::
 
 ##### Loss function to support particular decisions
 
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-expected-loss-b}
-b: Calculated expected loss for $p = 0.5$ with proportional and quadratic loss function
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-expected-loss-b}
+b: Calculated expected loss for $p = 0.5$ with proportional and
+quadratic loss function
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
-
-
+::: my-r-code-container
+::: panel-tabset
 ###### $d-p$
 
-The absolute proportional loss $d-p$ for the decision $p = 0.5$ results into the median.
+The absolute proportional loss $d-p$ for the decision $p = 0.5$ results
+into the median.
 
 ```{r}
 #| label: expected-prop-loss-b
@@ -2374,12 +2660,17 @@ loss_min_b <-
 
 **Results:**
 
-- Weighted average loss value = `r loss_avg_b`.
-- Parameter value that minimizes the loss = `r loss_min_b[[1]]`. This is the posterior median that we already have calculated in @cnj-point-estimates-b. Because of sampling variation it is not identical but pretty close (`r median(samples_skewed_b$p_skewed_b)` versus `r loss_min_b[[1]]`).
+-   Weighted average loss value = `r loss_avg_b`.
+-   Parameter value that minimizes the loss = `r loss_min_b[[1]]`. This
+    is the posterior median that we already have calculated in
+    @cnj-point-estimates-b. Because of sampling variation it is not
+    identical but pretty close (`r median(samples_skewed_b$p_skewed_b)`
+    versus `r loss_min_b[[1]]`).
 
 ###### $(d−p)^{2}$
 
-The quadratic loss $(d−p)^{2}$ for the decision $p = 0.5$ suggests we should use the mean.
+The quadratic loss $(d−p)^{2}$ for the decision $p = 0.5$ suggests we
+should use the mean.
 
 ```{r}
 #| label: expected-quad-loss-b
@@ -2423,33 +2714,34 @@ loss_min_b2 <-
 
 **Results:**
 
-- Weighted average loss value = `r loss_avg_b2`.
-- Parameter value that minimizes the loss = `r loss_min_b2[[1]]`. This is the posterior mean that we already have calculated in @cnj-point-estimates-b. Because of sampling variation it is not identical but pretty close (`r mean(samples_skewed_b$p_skewed_b)` versus `r loss_min_b2[[1]]`).
-
-
+-   Weighted average loss value = `r loss_avg_b2`.
+-   Parameter value that minimizes the loss = `r loss_min_b2[[1]]`. This
+    is the posterior mean that we already have calculated in
+    @cnj-point-estimates-b. Because of sampling variation it is not
+    identical but pretty close (`r mean(samples_skewed_b$p_skewed_b)`
+    versus `r loss_min_b2[[1]]`).
 :::
-::::
-:::::
-
-
-
-Now we're ready to reproduce the right panel of Figure 3.4., e.g., displaying the the loss function and computing the minimum loss value. Remember: Different loss functions imply different point estimates.
-
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-prop-loss-b}
-b: Plot expected loss for $p = 0.5$ with proportional and quadratic loss function
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+Now we're ready to reproduce the right panel of Figure 3.4., e.g.,
+displaying the the loss function and computing the minimum loss value.
+Remember: Different loss functions imply different point estimates.
 
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-prop-loss-b}
+b: Plot expected loss for $p = 0.5$ with proportional and quadratic loss
+function
+:::
+:::
+
+::: my-r-code-container
+::: panel-tabset
 ###### $d-p$
 
-The absolute proportional loss $d-p$ for the decision $p = 0.5$ results into the median.
+The absolute proportional loss $d-p$ for the decision $p = 0.5$ results
+into the median.
 
 ```{r}
 #| label: fig-prop-loss-b
@@ -2469,14 +2761,13 @@ l_b |>
 
 We saved the exact minimum value as `loss_min_b[1]`, which is
 `r loss_min_b[1]`. Within sampling error, this is the posterior median
-as depicted by our samples (`r median(samples_skewed_b$p_skewed_b)` versus `r loss_min_b[[1]]`).
-
-
+as depicted by our samples (`r median(samples_skewed_b$p_skewed_b)`
+versus `r loss_min_b[[1]]`).
 
 ###### $(d−p)^{2}$
 
-The quadratic loss $(d−p)^{2}$ for the decision $p = 0.5$ suggests we should use the mean.
-
+The quadratic loss $(d−p)^{2}$ for the decision $p = 0.5$ suggests we
+should use the mean.
 
 ```{r}
 #| label: fig-quad-loss-b
@@ -2497,59 +2788,75 @@ l2_b |>
 
 Based on quadratic loss $(d−p)^{2}$, the exact minimum value is
 `r loss_min_b2[1]`. Within sampling error, this is the posterior mean of
-our samples (`r mean(samples_skewed_b$p_skewed_b)` versus `r loss_min_b2[[1]]`).
-
+our samples (`r mean(samples_skewed_b$p_skewed_b)` versus
+`r loss_min_b2[[1]]`).
 :::
-
-::::
-:::::
+:::
+:::
 
 ## Sampling to simulate prediction
 
 ### ORIGINAL
 
-:::::{.my-procedure}
-:::{.my-procedure-header}
-:::::: {#prp-ease-sim}
+::: my-procedure
+::: my-procedure-header
+::: {#prp-ease-sim}
 : Numbered Procedure Title
-::::::
 :::
-::::{.my-procedure-container}
-> “Another common job for samples is to ease **simulation** of the model’s implied observations. Generating implied observations from a model is useful for at least ~~four~~ five reasons.” ([McElreath, 2020, p. 61](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=80&annotation=N8SBHXFN))
+:::
 
-1. Model desing
-2. Model checking
-3. Software validation
-4. Research design
-5. Forecasting
+::: my-procedure-container
+> "Another common job for samples is to ease **simulation** of the
+> model's implied observations. Generating implied observations from a
+> model is useful for at least ~~four~~ five reasons." ([McElreath,
+> 2020, p. 61](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=80&annotation=N8SBHXFN))
 
-> “We will call such simulated data **dummy data**, to indicate that it is a stand-in for actual data.” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=EG7YYPVK))
-::::
-:::::
+1.  Model desing
+2.  Model checking
+3.  Software validation
+4.  Research design
+5.  Forecasting
 
+> "We will call such simulated data **dummy data**, to indicate that it
+> is a stand-in for actual data." ([McElreath, 2020, p.
+> 62](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=EG7YYPVK))
+:::
+:::
 
 #### Dummy data
 
 Likelihood functions work in both directions:
 
-- They help to infer the plausibility of each possible value of *p*. > “With the globe tossing model, the `r glossary("dummy data")` arises from a binomial likelihood:” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=5PLAWZ8J))
-- They can be used to simulate the observations that the model implies. “You could use `base::sample()` to do this, but R provides convenient sampling functions for all the ordinary probability distributions, like the binomial.” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=W69A2SQI))
+-   They help to infer the plausibility of each possible value of *p*.
+    \> "With the globe tossing model, the `r glossary("dummy data")`
+    arises from a binomial likelihood:" ([McElreath, 2020, p.
+    62](zotero://select/groups/5243560/items/NFUEVASQ))
+    ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=5PLAWZ8J))
+-   They can be used to simulate the observations that the model
+    implies. "You could use `base::sample()` to do this, but R provides
+    convenient sampling functions for all the ordinary probability
+    distributions, like the binomial." ([McElreath, 2020, p.
+    62](zotero://select/groups/5243560/items/NFUEVASQ))
+    ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=W69A2SQI))
 
-> “Given a realized observation, the likelihood function says how plausible the observation is. And given only the parameters, the likelihood defines a distribution of possible observations that we can sample from, to simulate observation.” ([McElreath, 2020, p. 62](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=PNGM8F8P))
+> "Given a realized observation, the likelihood function says how
+> plausible the observation is. And given only the parameters, the
+> likelihood defines a distribution of possible observations that we can
+> sample from, to simulate observation." ([McElreath, 2020, p.
+> 62](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=PNGM8F8P))
 
-
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-two-tosses-a}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-two-tosses-a}
 a: Suppose $N = 2$, two tosses of the globe with $p = 0.7$
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
-
+::: my-r-code-container
+::: panel-tabset
 ###### Probability
 
 ```{r}
@@ -2564,18 +2871,18 @@ a: Suppose $N = 2$, two tosses of the globe with $p = 0.7$
 )
 ```
 
-**Interpretation of the observed result of two tosses with a probability of $p = 0.7$**
+**Interpretation of the observed result of two tosses with a probability
+of** $p = 0.7$
 
-With $N = 2$ there are only three possibilities: 0, 1 or 2 water. 
+With $N = 2$ there are only three possibilities: 0, 1 or 2 water.
 
-- `r two_tosses_prob_a[[1]] * 100`% chance of observing 0 water.
-- `r two_tosses_prob_a[[2]] * 100`% chance of observing 1 water.
-- `r two_tosses_prob_a[[3]] * 100`% chance of observing 2 water.
+-   `r two_tosses_prob_a[[1]] * 100`% chance of observing 0 water.
+-   `r two_tosses_prob_a[[2]] * 100`% chance of observing 1 water.
+-   `r two_tosses_prob_a[[3]] * 100`% chance of observing 2 water.
 
 With different $p$ you will get a different result.
 
 ###### Simulation
-
 
 ```{r}
 #| label: two-tosses-sim-a
@@ -2587,31 +2894,34 @@ base::set.seed(3) # for reproducibility
   two_tosses_sim_a <- rbinom(1, size = 2, prob = 0.7)
 )
 ```
-**Interpretation of the simulated result of two tosses with a probability of $p = 0.7$**
+
+**Interpretation of the simulated result of two tosses with a
+probability of** $p = 0.7$
 
 One simulation (trial) consists with $N = 2$ of two simulated tosses:
 
-- In our simulation (trial) of two simulated tosses $N = 2$ we got `r two_tosses_sim_a` water.
+-   In our simulation (trial) of two simulated tosses $N = 2$ we got
+    `r two_tosses_sim_a` water.
 
 Without the `base::set.seed()` function the result will change. Try it.
-
 :::
-::::
-:::::
-
-With `rbinom()` you can also generate more than one simulation (trial) at a time.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-several-sims}
-a: Using `rbinom()` to simulate two tosses to generate 10 and 100,000 dummy observations
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+With `rbinom()` you can also generate more than one simulation (trial)
+at a time.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-several-sims}
+a: Using `rbinom()` to simulate two tosses to generate 10 and 100,000
+dummy observations
+:::
+:::
+
+::: my-r-code-container
+::: panel-tabset
 ###### 10 trials
-
 
 ```{r}
 #| label: simulate-10-obs-a
@@ -2621,9 +2931,7 @@ base::set.seed(3)
 rbinom(10, size = 2, prob = 0.7)
 ```
 
-
 ###### 1e5 trials
-
 
 ```{r}
 #| label: simulate-1e5-obs-a
@@ -2633,28 +2941,26 @@ base::set.seed(3)
 dummy_w_a <- rbinom(1e5, size = 2, prob = 0.7)
 table(dummy_w_a) / 1e5
 ```
-
-
+:::
+:::
 :::
 
+Now let's simulate the same amount of tosses (sample size = 9) as we
+have used previously. I will provide two kinds of R graphs: One for
+`rethinking::simplehist()` as in the book and one using base R with
+`graphics::hist()`.
 
-
-::::
-:::::
-
-Now let's simulate the same amount of tosses (sample size = 9) as we have used previously. I will provide two kinds of R graphs: One for `rethinking::simplehist()` as in the book and one using base R with `graphics::hist()`.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-9-toss-fig-a}
-a: Distribution of simulated sample observations from 9 tosses of the globe
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-9-toss-fig-a}
+a: Distribution of simulated sample observations from 9 tosses of the
+globe
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
-
-###### Base R       
+::: my-r-code-container
+::: panel-tabset
+###### Base R
 
 ```{r}
 #| label: fig-plot-hist-figure-3.5-a
@@ -2665,7 +2971,6 @@ base::set.seed(3)
 dummy_w_a <- rbinom(1e5, size = 9, prob = 0.7)
 hist(dummy_w_a, xlab = "dummy water count")
 ```
-
 
 ###### Rethinking
 
@@ -2678,82 +2983,114 @@ base::set.seed(3)
 dummy_w_a <- stats::rbinom(1e5, size = 9, prob = 0.7)
 rethinking::simplehist(dummy_w_a, xlab = "dummy water count")
 ```
-
-
-
 :::
 
-Note that in our example using `base::set.seed(3)` the simulation does not generate the water in its true proportion of $0.7$.
+Note that in our example using `base::set.seed(3)` the simulation does
+not generate the water in its true proportion of $0.7$.
 
-> “That’s the nature of observation: There is a one-to-many relationship between data and data-generating processes. You should [delete the `base::set.seed()` line and] experiment with sample size, the `size` input in the code above, as well as the `prob`, to see how the distribution of simulated samples changes shape and location.” ([McElreath, 2020, p. 63](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=82&annotation=2NRZ2EV9))
-::::
-:::::
+> "That's the nature of observation: There is a one-to-many relationship
+> between data and data-generating processes. You should \[delete the
+> `base::set.seed()` line and\] experiment with sample size, the `size`
+> input in the code above, as well as the `prob`, to see how the
+> distribution of simulated samples changes shape and location."
+> ([McElreath, 2020, p.
+> 63](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=82&annotation=2NRZ2EV9))
+:::
+:::
 
-
-:::::{.my-important}
-:::{.my-important-header}
+::: my-important
+::: my-important-header
 Sampling distributions versus Samples drawn from the posterior
 :::
-::::{.my-important-container}
 
-> “Many readers will already have seen simulated observations. `r glossary("Sampling distribution", "Sampling distributions")` are the foundation of common non-Bayesian statistical traditions. In those approaches, inference about parameters is made through the sampling distribution. In this book, inference about parameters is never done directly through a sampling distribution. The posterior distribution is not sampled, but deduced logically. Then samples can be drawn from the posterior, as earlier in this chapter, to aid in inference. In neither case is 'sampling' a physical act. In both cases, it’s just a mathematical device and produces only *small world* (@sec-chap02) numbers.” ([McElreath, 2020, p. 63](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=82&annotation=C7QLRFPI))
-
-::::
-:::::
-
+::: my-important-container
+> "Many readers will already have seen simulated observations.
+> `r glossary("Sampling distribution", "Sampling distributions")` are
+> the foundation of common non-Bayesian statistical traditions. In those
+> approaches, inference about parameters is made through the sampling
+> distribution. In this book, inference about parameters is never done
+> directly through a sampling distribution. The posterior distribution
+> is not sampled, but deduced logically. Then samples can be drawn from
+> the posterior, as earlier in this chapter, to aid in inference. In
+> neither case is 'sampling' a physical act. In both cases, it's just a
+> mathematical device and produces only *small world* (@sec-chap02)
+> numbers." ([McElreath, 2020, p.
+> 63](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=82&annotation=C7QLRFPI))
+:::
+:::
 
 #### Model checking
 
 Two main purposes:
 
-1. Checking if software is working correctly
-2. Evaluation the adequacy of the model
+1.  Checking if software is working correctly
+2.  Evaluation the adequacy of the model
 
-> “All that is required is averaging over the posterior density for $p$, while computing the predictions. For each possible value of the parameter $p$, there is an implied distribution of outcomes. So if you were to compute the sampling distribution of outcomes at each value of $p$, then you could average all of these prediction distributions together, using the posterior probabilities of each value of $p$, to get a `r glossary("posterior predictive distribution")`.” ([McElreath, 2020, p. 65](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=84&annotation=EZT523XH))
+> "All that is required is averaging over the posterior density for $p$,
+> while computing the predictions. For each possible value of the
+> parameter $p$, there is an implied distribution of outcomes. So if you
+> were to compute the sampling distribution of outcomes at each value of
+> $p$, then you could average all of these prediction distributions
+> together, using the posterior probabilities of each value of $p$, to
+> get a `r glossary("posterior predictive distribution")`." ([McElreath,
+> 2020, p. 65](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=84&annotation=EZT523XH))
 
-
-
-:::::{.my-procedure}
-:::{.my-procedure-header}
-:::::: {#prp-post-pred-sim-a}
+::: my-procedure
+::: my-procedure-header
+::: {#prp-post-pred-sim-a}
 a: How to generate the `r glossary("posterior predictive distribution")`
-::::::
 :::
-::::{.my-procedure-container}
-
-1. Use `rbinom()` to generate random binomial samples.
-2. Use as `prob` value not a single value but samples from the posterior
-
-I will not reproduce Figure 3.6 in the upcoming section. The complex procedure to plot the graph does not add much understanding in Bayesian statistics. But the content of the picture itself is very important to understand how the posterior predictive distribution is generated.
-
-***
-
-![“Simulating predictions from the total posterior. Top: The familiar posterior distribution for the globe tossing data. Ten example parameter values are marked by the vertical lines. Values with greater posterior probability indicated by thicker lines. Middle row: Each of the ten parameter values implies a unique sampling distribution of predictions. Bottom: Combining simulated observation distributions for all parameter values (not just the ten shown), each weighted by its posterior probability, produces the posterior predictive distribution. This distribution propagates uncertainty about parameter to uncertainty about prediction.” ([McElreath, 2020, p. 65](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=84&annotation=ZBMIA85F))](img/SR2-fig3_6.png){#fig-3-6 
-fig-alt="Top panel shows the posterior probability, middle panel the sampling distribution and the bottom panel the posterior predictive distribution" fig-align="center" 
-width="90%"}
-
-::::
-:::::
-
-
-We will generates 10,000 (1e4) simulated predictions of 9 globe tosses (size = 9)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-post-pred-sim-a}
-a: Simulate predicted observations for a single value ($p = 0.6$) and with samples of the posterior
-::::::
 :::
-::::{.my-r-code-container}
 
+::: my-procedure-container
+1.  Use `rbinom()` to generate random binomial samples.
+2.  Use as `prob` value not a single value but samples from the
+    posterior
 
-Generating 10,000 (1e4) simulated predictions of 9 globe tosses (size = 9).
+I will not reproduce Figure 3.6 in the upcoming section. The complex
+procedure to plot the graph does not add much understanding in Bayesian
+statistics. But the content of the picture itself is very important to
+understand how the posterior predictive distribution is generated.
 
-::: {.panel-tabset}
+------------------------------------------------------------------------
 
+!["Simulating predictions from the total posterior. Top: The familiar
+posterior distribution for the globe tossing data. Ten example parameter
+values are marked by the vertical lines. Values with greater posterior
+probability indicated by thicker lines. Middle row: Each of the ten
+parameter values implies a unique sampling distribution of predictions.
+Bottom: Combining simulated observation distributions for all parameter
+values (not just the ten shown), each weighted by its posterior
+probability, produces the posterior predictive distribution. This
+distribution propagates uncertainty about parameter to uncertainty about
+prediction." ([McElreath, 2020, p.
+65](zotero://select/groups/5243560/items/NFUEVASQ))
+([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=84&annotation=ZBMIA85F))](img/SR2-fig3_6.png){#fig-3-6
+fig-alt="Top panel shows the posterior probability, middle panel the sampling distribution and the bottom panel the posterior predictive distribution"
+fig-align="center" width="90%"}
+:::
+:::
 
+We will generates 10,000 (1e4) simulated predictions of 9 globe tosses
+(size = 9)
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-post-pred-sim-a}
+a: Simulate predicted observations for a single value ($p = 0.6$) and
+with samples of the posterior
+:::
+:::
+
+::: my-r-code-container
+Generating 10,000 (1e4) simulated predictions of 9 globe tosses (size =
+9).
+
+::: panel-tabset
 ###### p = single value of 0.6
-
 
 ```{r}
 #| label: fig-post-pred-sim-a1
@@ -2765,10 +3102,12 @@ w_a1 <- rbinom(1e4, size = 9, prob = 0.6)
 rethinking::simplehist(w_a1)
 ```
 
-The predictions are stored as counts of water, so the theoretical minimum is zero and the theoretical maximum is nine. Although our fix `prob` value = 0.6 the samples show 5 as the mode of the randomly generated distribution.
+The predictions are stored as counts of water, so the theoretical
+minimum is zero and the theoretical maximum is nine. Although our fix
+`prob` value = 0.6 the samples show 5 as the mode of the randomly
+generated distribution.
 
 ###### p = posterior samples
-
 
 ```{r}
 #| label: fig-post-pred-sim-a2
@@ -2780,38 +3119,51 @@ w_a2 <- rbinom(1e4, size = 9, prob = samples_a)
 rethinking::simplehist(w_a2)
 ```
 
-The code propagate parameter uncertainty into the predictions by replacing a fixed `prob` value by the vector `samples_a`. The symbol `samples_a` is the same list of random samples from the
-posterior distribution that we have calculated in @cnj-sample-globe-tossing
-and used in previous sections.
+The code propagate parameter uncertainty into the predictions by
+replacing a fixed `prob` value by the vector `samples_a`. The symbol
+`samples_a` is the same list of random samples from the posterior
+distribution that we have calculated in @cnj-sample-globe-tossing and
+used in previous sections.
+:::
+:::
 :::
 
-::::
-:::::
+> "For each sampled value, a random binomial observation is generated.
+> Since the sampled values appear in proportion to their posterior
+> probabilities, the resulting simulated observations are averaged over
+> the posterior. You can manipulate these simulated observations just
+> like you manipulate samples from the posterior---you can compute
+> intervals and point statistics using the same procedures."
+> ([McElreath, 2020, p.
+> 66](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=85&annotation=BVUDPY9U))
 
-> “For each sampled value, a random binomial observation is generated. Since the sampled values appear in proportion to their posterior probabilities, the resulting simulated observations are averaged over the posterior. You can manipulate these simulated observations just like you manipulate samples from the posterior—you can compute intervals and point statistics using the same procedures.” ([McElreath, 2020, p. 66](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=85&annotation=BVUDPY9U))
+But @fig-post-pred-sim-a2 just predicts the posterior distribution as
+our model sees the data. To evaluate the adequacy of the model for
+certain purposes it is important to investigate it under different point
+of views. McElreath proposes two look at the data in additional two
+ways:
 
-But @fig-post-pred-sim-a2 just predicts the posterior distribution as our model sees the data. To evaluate the adequacy of the model for certain purposes it is important to investigate it under different point of views. McElreath proposes two look at the data in additional two ways: 
+1.  Plot the distribution of the longest run of either water or land.
+2.  Plot the distribution of the number of switches from water to land
+    and reverse.
 
-1. Plot the distribution of the longest run of either water or land.
-2. Plot the distribution of the number of switches from water to land and reverse.
-
-The calculation and reproduction of Figure 3.7 is demonstrated in the next tidyverse section.
-
+The calculation and reproduction of Figure 3.7 is demonstrated in the
+next tidyverse section.
 
 ### TIDYVERSE
 
 #### Dummy data
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-two-tosses-b}
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-two-tosses-b}
 b: Suppose $N = 2$, two tosses of the globe with $p = 0.7$
-::::::
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
-
+::: my-r-code-container
+::: panel-tabset
 ###### Probability
 
 ```{r}
@@ -2833,26 +3185,26 @@ tibble::tibble(n      = 2,
 base::set.seed(3)
 stats::rbinom(1, size = 2, prob = .7)
 ```
-
-
 :::
 
-Compare the results with the calculation in @cnj-two-tosses-a, resp. @lst-two-tosses-prob-a.
-::::
-:::::
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-several-sims}
-b: Using `stats::rbinom()` to simulate two tosses to generate 10 and 100,000 dummy observations
-::::::
+Compare the results with the calculation in @cnj-two-tosses-a, resp.
+@lst-two-tosses-prob-a.
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+::: my-r-code
+::: my-r-code-header
+<div>
+
+b: Using `stats::rbinom()` to simulate two tosses to generate 10 and
+100,000 dummy observations
+
+</div>
+:::
+
+::: my-r-code-container
+::: panel-tabset
 ###### 10 trials
-
 
 ```{r}
 #| label: simulate-10-obs-b
@@ -2863,9 +3215,7 @@ base::set.seed(3)
 stats::rbinom(10, size = 2, prob = 0.7)
 ```
 
-
 ###### 1e5 trials
-
 
 ```{r}
 #| label: simulate-1e5-obs-b
@@ -2880,24 +3230,22 @@ dummy_w_b |>
     dplyr::count(draws) |> 
     dplyr::mutate(proportion = n / base::nrow(dummy_w_b))
 ```
-
-
 :::
-
-::::
-:::::
+:::
+:::
 
 The simulation updated to $n=9$ and plotting the tidyverse version of
 Figure 3.5.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-9-toss-fig-b}
-b: Distribution of simulated sample observations from 9 tosses of the globe
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-9-toss-fig-b}
+b: Distribution of simulated sample observations from 9 tosses of the
+globe
 :::
-::::{.my-r-code-container}
+:::
 
+::: my-r-code-container
 ```{r}
 #| label: fig-plot-ggplot2-figure-3.5-b
 #| fig-cap: "Distribution of simulated sample observations from 9 tosses of the globe. These samples assume the proportion of water is 0.7. The plot uses the {**ggplot2**} functions. The left panel is Kurz's original, the right one is my version slightly changed."
@@ -2938,26 +3286,24 @@ p2 <- dummy_w2_b |>
 library(patchwork)
 p1 + p2
 ```
-
-::::
-:::::
-
-
-
+:::
+:::
 
 McElreath suggested to play around with different values of `size` and
-`prob`. But instead of reproducing all codes block introduced by Kurz, I will just replicate the first chunk, because it has some interesting and (for me) unfamiliar functions.
+`prob`. But instead of reproducing all codes block introduced by Kurz, I
+will just replicate the first chunk, because it has some interesting and
+(for me) unfamiliar functions.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-sim-9-cond}
-b: Simulated sample observations, using different sizes and probabilities 
-::::::
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-sim-9-cond}
+b: Simulated sample observations, using different sizes and
+probabilities
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
-
+::: my-r-code-container
+::: panel-tabset
 ###### Simulation
 
 ```{r}
@@ -2985,31 +3331,30 @@ d9_b |>
 
 ```
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
+::: my-watch-out
+::: my-watch-out-header
 Using `tidyr::crossing()` and `tidyr::unnest()`
 :::
-::::{.my-watch-out-container}
 
+::: my-watch-out-container
 I am still not very experienced with `tidyr::crossing()` and
 `tidyr::unnest()`:
 
-- **`tidyr::crossing()`** is a wrapper around `tidyr::expand_grid()` (not to confuse with `base::expand.grid()`) and therefore
-    creates a tibble from all combination of inputs. In addition to
+-   **`tidyr::crossing()`** is a wrapper around `tidyr::expand_grid()`
+    (not to confuse with `base::expand.grid()`) and therefore creates a
+    tibble from all combination of inputs. In addition to
     `tidyr::expand_grid()` it de-duplicates and sorts its input.
-- **`tidyr::unnest()`** expands a list-column containing data frames into row
-    and columns. In the above case `purrr::map2()` returns a list and stores
-    the data in `draws9_b`.
+-   **`tidyr::unnest()`** expands a list-column containing data frames
+    into row and columns. In the above case `purrr::map2()` returns a
+    list and stores the data in `draws9_b`.
 
-Instead of `utils::head()` I used `dplyr::slice_sample()` and ordered the
-result by the first column. I think this will get a better glimpse on
-the data as just the first 6 rows.
-
-::::
-:::::
+Instead of `utils::head()` I used `dplyr::slice_sample()` and ordered
+the result by the first column. I think this will get a better glimpse
+on the data as just the first 6 rows.
+:::
+:::
 
 ###### Plot
-
 
 ```{r}
 #| label: fig-sim-plot-9-cond-b
@@ -3025,58 +3370,60 @@ d9_b |>
   ggplot2::theme_bw() +
   ggplot2::facet_grid(n9_b ~ probability9_b)
 ```
-
-
 :::
-::::
-:::::
-
-
-
-
-
-
+:::
+:::
 
 #### Model checking
 
-:::::{.my-resource}
-:::{.my-resource-header}
+::: my-resource
+::: my-resource-header
 Checking if the software works correctly
 :::
-::::{.my-resource-container}
 
-On software checking Kurz refers to some material, that is too special at the moment
-for me. I will it include here, even if I had not read it. Maybe I will come later here again and pick up these resources when I have more experiences with Bayesian statistics and the necessary
-tools.
+::: my-resource-container
+On software checking Kurz refers to some material, that is too special
+at the moment for me. I will it include here, even if I had not read it.
+Maybe I will come later here again and pick up these resources when I
+have more experiences with Bayesian statistics and the necessary tools.
 
-- [Esther Williams in the Harold Holt Memorial Swimming Pool](https://youtu.be/pKZLJPrZLhU?t=26285) by [Dan Simpson](https://twitter.com/dan_p_simpson)
-- [Visualisation in Bayesian workflow](https://www.youtube.com/watch?v=E8vdXoJId8M), YouTube video lecture at the Royal Statistics Society by Jonah Gabry & Daniel Simpson
-- [Maybe it’s time to let the old ways die; or We broke R-hat so now we have to fix it](https://statmodeling.stat.columbia.edu/2019/03/19/maybe-its-time-to-let-the-old-ways-die-or-we-broke-r-hat-so-now-we-have-to-fix-it/), blog post by Daniel Simpson
-- Vehtari, A., Gelman, A., Simpson, D., Carpenter, B., & Bürkner, P.-C. (2021). Rank-normalization, folding, and localization: An improved $\widehat{R}$ for assessing convergence of MCMC. Bayesian Analysis, 16(2). https://doi.org/10.1214/20-BA1221
-
-::::
-:::::
-
-There are three computing steps to reproduce the three levels of Figure 3.6 copied here as @fig-3-6.
-
-1. Posterior probability (top level)
-2. Sampling distributions for nine values (0.1-0.9) (middle level)
-3. Posterior predictive distribution (bottom level)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-3-6-top}
-b: Posterior probability
-::::::
+-   [Esther Williams in the Harold Holt Memorial Swimming
+    Pool](https://youtu.be/pKZLJPrZLhU?t=26285) by [Dan
+    Simpson](https://twitter.com/dan_p_simpson)
+-   [Visualisation in Bayesian
+    workflow](https://www.youtube.com/watch?v=E8vdXoJId8M), YouTube
+    video lecture at the Royal Statistics Society by Jonah Gabry &
+    Daniel Simpson
+-   [Maybe it's time to let the old ways die; or We broke R-hat so now
+    we have to fix
+    it](https://statmodeling.stat.columbia.edu/2019/03/19/maybe-its-time-to-let-the-old-ways-die-or-we-broke-r-hat-so-now-we-have-to-fix-it/),
+    blog post by Daniel Simpson
+-   Vehtari, A., Gelman, A., Simpson, D., Carpenter, B., & Bürkner,
+    P.-C. (2021). Rank-normalization, folding, and localization: An
+    improved $\widehat{R}$ for assessing convergence of MCMC. Bayesian
+    Analysis, 16(2). https://doi.org/10.1214/20-BA1221
 :::
-::::{.my-r-code-container}
+:::
 
-::: {.panel-tabset}
+There are three computing steps to reproduce the three levels of Figure
+3.6 copied here as @fig-3-6.
 
+1.  Posterior probability (top level)
+2.  Sampling distributions for nine values (0.1-0.9) (middle level)
+3.  Posterior predictive distribution (bottom level)
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-fig-3-6-top}
+b: Posterior probability
+:::
+:::
+
+::: my-r-code-container
+::: panel-tabset
 ###### Top
 
 **Posterior probability**
-
 
 ```{r}
 #| label: fig-repr-figure-3.6-top-b
@@ -3126,15 +3473,15 @@ d2_b |>
 ```
 
 At first I thought I do not need to refresh the original grid
-approximation from @cnj-grid-globe-tossing-b as I have it stored it with the
-unique name `d_b`. But it turned out that the above code with
+approximation from @cnj-grid-globe-tossing-b as I have it stored it with
+the unique name `d_b`. But it turned out that the above code with
 `n_grid_b = 1000L` does not work, because it draws no vertical lines by
 the posterior density. Instead one has to sample 1001 times.
 
-I noticed that with most sample numbers the plot does not work correctly.
-It worked with 1071. The sequence 1011, 1021, 1031, 1041, 1051, 1061
-misses just one vertical line at $p = 0.7$ An exception is 1041, which misses
-$p = 0.6$. I do not know why this happens.
+I noticed that with most sample numbers the plot does not work
+correctly. It worked with 1071. The sequence 1011, 1021, 1031, 1041,
+1051, 1061 misses just one vertical line at $p = 0.7$ An exception is
+1041, which misses $p = 0.6$. I do not know why this happens.
 
 ###### Middle
 
@@ -3174,7 +3521,6 @@ d_small_b |>
   ggplot2::facet_wrap(~ label, ncol = 9)
 ```
 
-
 ###### Bottom
 
 ```{r}
@@ -3189,15 +3535,15 @@ n_samples_b <- 1e4
 # make it reproducible
 base::set.seed(3)
 
-samples <-
+d2_samples_b <-
   d2_b |> 
   dplyr::slice_sample(n = n_samples_b, weight_by = posterior2_b, replace = T)  |>  
   dplyr::mutate(w = purrr::map_dbl(p_grid2_b, stats::rbinom, n = 1, size = 9))
 
-dplyr::glimpse(samples)
+dplyr::glimpse(d2_samples_b)
 
 ## plot ###################################
-samples |> 
+d2_samples_b |> 
   ggplot2::ggplot(ggplot2::aes(x = w)) +
   ggplot2::geom_histogram(binwidth = 1, center = 0, color = "black",
                  fill = "deepskyblue", linewidth = 1/10) +
@@ -3210,34 +3556,246 @@ samples |>
   ggplot2::theme(panel.grid = ggplot2::element_blank()) +
   ggplot2::theme_bw()
 ```
-
 :::
-::::
-:::::
+:::
+:::
 
-In Figure 3.7, McElreath checked the model with 
+In Figure 3.7, McElreath checked the adequacy of the model with
 
 (a) the longest sequence of the sample values and
 (b) number of switches between water and land.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-repl-fig-3.7}
-b: Replication of Figure 3.7
-::::::
+But he didn't show who to calculate and produce his Figure 3.7. To
+compute these alternative views and replicate the graph Kurz used the
+(for me until now unknown) `base::rle()` function in a brilliant manner.
+Before we replicate his computation let's look more into the details of
+`base::rle()`
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-rle-function}
+b: How the `base::rle()` function works for checking our model
 :::
-::::{.my-r-code-container}
+:::
 
-::::
-:::::
+::: my-r-code-container
+```{r}
+#| label: rle-function
+#| results: hold
 
-## I STOPPED HERE (2nd PASS, 2023-11-14)
+
+tosses <- c("w", "l", "w", "w", "w", "l", "w", "l", "w")
+base::rle(tosses)
+
+## In the left panel of Figure 3.7 we are interested in maximal length
+rle(tosses)$lengths  |>  max()
+
+## In the right panel of Figure 3.7 we are interested in maximal switches
+rle(tosses)$lengths |>  length() - 1
+```
+
+The observed events in our globe tossing example are:
+`w,l,w,w,w,l,w,l,w`. The maximal length of consecutive water events is:
+`rle(tosses)$lengths  |>  max()` = `r rle(tosses)$lengths  |>  max()`.
+
+Because `rle()` aggregated the consecutive length of water and land we
+can use this result as the maximum length of switches between water and
+land: `rle(tosses)$lengths |>  length() - 1` =
+`r rle(tosses)$lengths |>  length() - 1`
+
+::: my-typo
+::: my-typo-header
+Different observations versus switches
+:::
+
+::: my-typo-container
+I think there is a small miscalculation in Kurz' text: The number of
+switches is the length of different observation minus one. There are 7
+different observation but only 6 switches. This also conforms to the
+book.
+:::
+:::
+:::
+:::
+
+Now we will follow Kurz' procedure of calculating and plotting Figure
+3.7.
+
+::: my-procedure
+::: my-procedure-header
+::: {#prp-rle-function}
+: How the `base::rle()` function works
+:::
+:::
+
+::: my-procedure-container
+He reasoned:
+
+1.  We've been using `stats::rbinom()` with the size parameter set to 9
+    for our simulations for a certain number of observation, e.g., 10
+    experiments á la 9 tosses each. This gives us the aggregated results
+    of the number of water events: `rbinom(10, size = 9, prob = .6)` =
+    `r rbinom(10, size = 9, prob = .6)`
+2.  But what we need is to simulate nine *individual* trials many times
+    over: `rbinom(9, size = 1, prob = .6)` =
+    `r rbinom(9, size = 1, prob = .6)`
+3.  We simulate the result of individual trials many times and add their
+    outcomes into a tibble `d2_samples_b`.
+
+```{r}
+#| label: sim-indiv-trials
+
+set.seed(3)
+
+d2_samples_b <-
+  d2_samples_b |> 
+  dplyr::mutate(iter  = 1:dplyr::n(),
+         draws = purrr::map(p_grid2_b, rbinom, n = 9, size = 1)) |> 
+  tidyr::unnest(draws)
+
+dplyr::glimpse(d2_samples_b)
+```
+
+4.  Now we can use the `base:rle()`function to compute consecutive
+    length and number of switches:
+
+::: panel-tabset
+###### Length
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-repl-fig-3.7-left}
+b: Replication of left panel of Figure 3.7
+:::
+:::
+
+::: my-r-code-container
+```{r}
+#| label: fig-left-panel-3-7
+#| fig-cap: "The length of the maximum run of water or land"
+
+d2_samples_b |>
+  dplyr::group_by(iter) |> 
+  dplyr::summarize(longest_run_length = base::rle(draws)$lengths |> 
+              base::max()) |>
+  
+  ggplot2::ggplot(ggplot2::aes(x = longest_run_length)) +
+  ggplot2::geom_histogram(ggplot2::aes(fill = longest_run_length == 3),
+                 binwidth = 0.2, center = 0,
+                 color = "white", linewidth = 1/10) +
+  ggplot2::scale_fill_viridis_d(option = "C", end = .9) +
+  ggplot2::scale_x_continuous("longest run length", breaks = 0:3 * 3) +
+  ggplot2::ylab("frequency") +
+  ggplot2::coord_cartesian(xlim = c(0, 9)) +
+  ggplot2::theme_bw() +
+  ggplot2::theme(legend.position = "none",
+        panel.grid = ggplot2::element_blank()) 
+```
+:::
+:::
+
+###### Switches
+
+::: my-r-code
+::: my-r-code-header
+<div>
+
+b: Replication of right panel of Figure 3.7
+
+</div>
+:::
+
+::: my-r-code-container
+```{r}
+#| label: fig-right-panel-3-7
+#| fig-cap: "The number of switches between water and land samples"
+
+
+d2_samples_b |>
+  dplyr::group_by(iter) |>
+  dplyr::summarize(number_of_switches = base::rle(draws)$lengths |>
+                     base::length()) |>
+  
+  ggplot2::ggplot(ggplot2::aes(x = number_of_switches)) +
+  ggplot2::geom_histogram(ggplot2::aes(fill = number_of_switches == 6),
+                 binwidth = 0.2, center = 0,
+                 color = "white", linewidth = 1/10) +
+  ggplot2::scale_fill_viridis_d(option = "C", end = .9) +
+  ggplot2::scale_x_continuous("number of switches", breaks = 0:3 * 3) +
+  ggplot2::ylab("frequency") +
+  ggplot2::coord_cartesian(xlim = c(0, 9)) +
+  ggplot2::theme_bw() +
+  ggplot2::theme(legend.position = "none",
+        panel.grid = ggplot2::element_blank())
+```
+:::
+:::
+:::
+:::
+:::
+
+::: my-important
+::: my-important-header
+Check model adequacy with alternative views of the same posterior
+predictive distribution
+:::
+
+::: my-important-container
+For me there are two conclusion to draw from the section on model
+checking:
+
+1.  It is possible and also important to look at the data generated by
+    the model from different angels.
+
+> "Instead of considering the data as the model saw it, as a sum of
+> water samples, now we view the data as both the length of the maximum
+> run of water or land (left) and the number of switches between water
+> and land samples (right)." ([McElreath, 2020, p.
+> 67](zotero://select/groups/5243560/items/NFUEVASQ))
+> ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=86&annotation=W7II5H76))
+
+2.  To generate alternative views at the requires some ingenuity and an
+    evaluation if the model is adequate. For instance: 6 switches in 9
+    tosses in not consistent with the distribution of the longest runs.
+    There should be fewer switches.
+:::
+:::
+
+
 
 #### Let's practice with {**brms**}
 
-With {**brms**}, we'll fit the primary model of $w=6$ and $n=9$.
+The content of this section is more or less copied from Kurz without
+much knowledge of {**brms**}. The following code chunks are therefore my
+first acquaintance with the {**brms**} package and my reassurance that
+the package installation did work and to test if I get the same results
+as Kurz.
 
+::: my-resource
+::: my-resource-header
+How to use `r glossary("brms")`
+:::
 
+::: my-resource-container
+I still have to read [How to use
+{**brms**}](https://github.com/paul-buerkner/brms#how-to-use-brms) and
+the many [packages vignettes](https://paul-buerkner.github.io/brms/) in
+the help file or at the website.
+:::
+:::
+
+> With {**brms**}, we'll fit the primary model of $w=6$ and $n=9$ much
+> like we did at the end of @sec-chap02.
+
+::: my-r-code
+::: my-r-code-header
+::: {#cnj-b3.1}
+b: Fit model and compute posterior summary for `b_Intercept`, the
+probability of a "w"
+:::
+:::
+
+::: my-r-code-container
 ```{r}
 #| label: brms-model-fit-b
  
@@ -3251,25 +3809,51 @@ b3.1 <-
       iter = 5000, warmup = 1000,
       seed = 3,
       file = "fits/b03.01")
-```
-
-We'll learn more about the beta distribution in Chapter 12. But for now,
-here's the posterior summary for `b_Intercept`, the probability of a
-"w".
-
-```{r}
-#| label: posterior-summary-b
 
 brms::posterior_summary(b3.1)["b_Intercept", ] |> 
   round(digits = 2)
 ```
 
+**Explication of the result**
 
-I had problems with the following code chunk. See [my postings at Kurz's
-repo](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse_2_ed/issues/49).
+-   `Estimate` is the posterior mean,
+-   the two `Q` columns are the quantile-based 95% intervals,
+-   the `Est.Error` is the posterior standard deviation.
+
+:::
+:::
+
+::: callout-note
+I have already some experience with the beta distribution from my study
+of [Bayesian Statistics the Fun Way: Understanding Statistics and
+Probability With Star Wars, LEGO, and Rubber
+Ducks](https://nostarch.com/learnbayes) by Will Kurt [@kurt2019]. See
+also my [Quarto book
+notes](https://bookdown.org/pbaumgartner/bayesian-fun/). There is more
+about the beta distribution in @sec-chap12.
+
+But I will still have to learn about the syntax of the first three
+lines. The rest of the model description is more or less
+self-explanatory.
+:::
+
+> Much like the way we used the `dplyr::slice_sample()` function to
+> simulate probability values, above, we can do so with the
+> `brms::fitted()` function. But we will have to specify
+> `scale = "linear"` in order to return results in the probability
+> metric. By default, `brms::fitted()` will return summary information.
+> Since we want actual simulation draws, we'll specify `summary = F`.
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-brms-sim-b}
+b: Simulation of probability values 
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: sim-prob-values
+#| label: sim-prob-values-b
 
 f <-
   brms:::fitted.brmsfit(b3.1, 
@@ -3281,8 +3865,37 @@ f <-
 dplyr::glimpse(f)
 ```
 
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+How to use [S3 methods](https://adv-r.hadley.nz/s3.html) without
+attached package?
+:::
+::::{.my-watch-out-container}
+I had problems with the following code chunk. See [my postings at Kurz's
+repo](https://github.com/ASKurz/Statistical_Rethinking_with_brms_ggplot2_and_the_tidyverse_2_ed/issues/49).
+
+::::
+:::::
+
+::::
+:::::
+
+
+Now we can display the density and the posterior predictive distribution
+
+::: {.panel-tabset}
+###### Density
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-brms-3-6-top-b}
+b: Model b3.1: Density and posterior predictive distribution
+::::::
+:::
+::::{.my-r-code-container}
+
 ```{r}
-#| label: fig-brms-model-density
+#| label: fig-brms-3-6-top-b
 #| fig-cap: "Density plot of the fittet {brms} model"
 
 f |> 
@@ -3298,17 +3911,24 @@ f |>
   ggplot2::theme_bw()
 ```
 
-The graphic should look like the top part of Figure 3.6, reproduced as
-@fig-repr-figure-3.6-top-b. (I am not sure if the differences are
-important: I have a smaller apex and my curve is more irregular.)
+The graphic should look like the top part of @fig-3-6.
+::::
+:::::
 
-> Much like we did with samples, we can use this distribution of
-> probabilities to predict histograms of $w$ counts. With those in hand,
-> we can make an analogue to the histogram in the bottom panel of Figure
-> 3.6.
+
+
+###### Predictive
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-brms-3-6-bottom-b}
+b: Posterior predictive distribution for model b3.1
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: fig-sim-pred-values-b
+#| label: fig-brms-3-6-bottom-b
 #| fig-cap: "Simulation to predict posterior distribution" 
 
 base::set.seed(3)
@@ -3324,13 +3944,27 @@ f |>
   ggplot2::scale_x_continuous("number of water samples", breaks = 0:3 * 3) +
   ggplot2::scale_y_continuous(NULL, breaks = NULL, limits = c(0, 5000)) +
   ggplot2::ggtitle("Posterior predictive distribution") +
-  ggplot2::coord_cartesian(xlim = c(0, 9)) +
+#  ggplot2::coord_cartesian(xlim = c(0, 9)) +
   ggplot2::theme(panel.grid = ggplot2::element_blank()) +
   ggplot2::theme_bw()
 ```
 
 
+> Much like we did with samples, we can use this distribution of
+> probabilities to predict histograms of $w$ counts. With those in hand,
+> we can make an analogue to the histogram in the bottom panel of Figure
+> 3.6 (copied here into the text as @fig-3-6)
 
+::::
+:::::
+
+
+:::
+
+
+
+
+## I STOPPED HERE (2nd PASS, 2023-11-15)
 
 ## Practice
 

@@ -11,11 +11,25 @@ nameref:
 ::: {.callout-note style="color: blue;"}
 This is work in progress: I have finished in a first draft the first 4 chapters, e.g., $\approx 21\%$ of the book content.
 
-I am working on a second draft where I will shorten my notes but include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft has stopped after chapter 2.2.1 e.g. it has finished $\approx 9\%$ of the book content.
+I am working on a second draft where I will shorten my notes but include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft has stopped before chapter 3.5 (Practice) e.g. it has finished $\approx 11\%$ of the book content.
+
+
 
 :::
 
 ## Content and Goals of this Book {.unnumbered}
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+Rules of second draft not yet explained in the following passages
+:::
+::::{.my-watch-out-container}
+
+In the second draft I have used a different organization. The following text does not yet reflect these new callout boxes and the rules that now apply. I have postponed to adapt the explications until I have more experiences about their usefulness. I think this will be the case after I have finished to reformat the end of chapter 4 with the rules of the second draft.
+::::
+:::::
+
+
 
 ### Text Passages {.unnumbered}
 

@@ -417,8 +417,8 @@
 
 .my-typo {
   margin: 1em 0;
-  border: 2px solid black;
-  border-left: 10px solid #8B7D6B;
+  border: 2px solid #458B74;
+  border-left: 10px solid #458B74;
   border-radius: 10px;
 }
 
@@ -428,7 +428,7 @@
   padding-top:  5px;
   padding-bottom: 0.1em;
   color: black;
-  background-color: bisque;
+  background-color: aquamarine;
   border-top-right-radius: 10px;
   font-size: 1em;
   font-weight: bold;
