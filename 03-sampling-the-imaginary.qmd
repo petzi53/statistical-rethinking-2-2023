@@ -1,4 +1,11 @@
+---
+format: html
+execute: 
+  cache: true
+---
+
 # Sampling the Imaginary {#sec-chap03}
+
 
 ::: my-objectives
 ::: my-objectives-header
@@ -133,21 +140,21 @@ Base R
 #| label: vampire-bayes-a
 
 ## R code 3.1a Vampire ##################
-Pr_Positive_Vampire_a <- 0.95
-Pr_Positive_Mortal_a <- 0.01
-Pr_Vampire_a <- 0.001
-Pr_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a +
-  Pr_Positive_Mortal_a * (1 - Pr_Vampire_a)
+pr_positive_vampire_a <- 0.95
+pr_positive_mortal_a <- 0.01
+pr_vampire_a <- 0.001
+pr_positive_a <- pr_positive_vampire_a * pr_vampire_a +
+  pr_positive_mortal_a * (1 - pr_vampire_a)
 
 ( 
-  Pr_Vampire_Positive_a <- Pr_Positive_Vampire_a * Pr_Vampire_a / Pr_Positive_a
+  pr_vampire_positive_a <- pr_positive_vampire_a * pr_vampire_a / pr_positive_a
 )
 
 ```
 :::
 :::
 
-There is only an `r Pr_Vampire_Positive_a`% chance that the suspect is
+There is only an `r pr_vampire_positive_a`% chance that the suspect is
 actually a vampire.
 
 > "Most people find this result counterintuitive. And it's a very
@@ -503,16 +510,15 @@ n_grid_b <- 1000L
 n_success_b <- 6L
 n_trials_b  <- 9L
 
-(
-  d_b <-
+d_b <-
   tibble::tibble(p_grid_b = seq(from = 0, to = 1, length.out = n_grid_b),
          prior_b  = 1) |>  # flat uniform prior, vector 1L recycling
   dplyr::mutate(likelihood_b = 
                   stats::dbinom(n_success_b, size = n_trials_b, prob = p_grid_b)) |> 
   dplyr::mutate(posterior_b = 
                   (likelihood_b * prior_b) / sum(likelihood_b * prior_b))
-)
 
+head(d_b)
 ```
 :::
 :::
@@ -555,23 +561,28 @@ df_samples_b <-
   d_b |> 
     dplyr::slice_sample(n = n_samples_b, weight_by = posterior_b, replace = T)
 
-( 
-  df_samples_b <- df_samples_b |>
-      dplyr::rename(samples_b = p_grid_b,
-             likelihood_samples_b = likelihood_b,
-             prior_samples_b = prior_b,
-             posterior_samples_b = posterior_b)
-)
+df_samples_b <- df_samples_b |>
+    dplyr::rename(samples_b = p_grid_b,
+           likelihood_samples_b = likelihood_b,
+           prior_samples_b = prior_b,
+           posterior_samples_b = posterior_b)
+head(df_samples_b)
 
 
-identical(samples_a, df_samples_b$samples_b)
 ```
-:::
-:::
+
+***
+
+`identical(samples_a, df_samples_b$samples_b)` = `r identical(samples_a, df_samples_b$samples_b)`.
 
 The column `samples_b` is identical with vector `samples_a`, because I
 have used in both sampling processes `base::set.seed(3)`, so that I (and
 you) could reproduce the data.
+
+:::
+:::
+
+
 
 There are different possibilities to display data frames respectively
 tibbles:
@@ -718,12 +729,9 @@ these samples to describe and understand the posterior.
 The description to understand the posterior can be divided into three
 inquiries:
 
-1.  Questions about intervals of *defined boundaries*. See
-    @sec-chap-03-defined-boundaries.
-2.  Questions about intervals of *defined probability mass*. See
-    @sec-chap-03-probability-mass.
-3.  Questions about *point estimates*. See:
-    @sec-chap-03-point-estimates.
+1.  Questions about intervals of *defined boundaries*. See @sec-chap-03-defined-boundaries.
+2.  Questions about intervals of *defined probability mass*. See @sec-chap-03-probability-mass.
+3.  Questions about *point estimates*. See: @sec-chap-03-point-estimates.
 
 ### Intervals of Defined Boundaries {#sec-chap-03-defined-boundaries}
 
@@ -1005,7 +1013,7 @@ p1 + p2
 ::: my-definition-container
 -   `r glossary("Confidence Interval")`: Term chiefly used in
     frequentist statistics.
--   `r glossary("Credible Interval")`: Term chiefly in Bayesian
+-   `r glossary("Credible Interval")`: Term predominantly used in Bayesian
     statistics.
 -   `r glossary("Compatibility Interval")`: Term preferably used by
     Richard McElreath.
@@ -1024,7 +1032,7 @@ because
 :::
 :::
 
-The values of these intervals can be found easier with by using samples
+The values of these intervals can be found easier by using samples
 from the posterior than by using a grid approximation.
 
 > "Suppose for example you want to know the boundaries of the lower
@@ -1154,7 +1162,7 @@ $60\%$ = PI of `prob = 0.6`.
 `rethinking::PI()` simplifies the following three steps:
 
 1.  We divide always the percentage assigned to the `prob` value by 2:
-    60% / 2 = 30\$
+    60% / 2 = 30\%$
 2.  We subtract, respectively add this value to 50: 50% - 30% = 20% and
     50% + 30% = 80%
 3.  The result is the probability mass between 20-80%.
@@ -1786,10 +1794,10 @@ are now documented in {**ggdist**}.
 
 There is a systematic change of the function names: The `h` (for
 'horizontal') in parameter name of the point estimate was removed. For
-instance: Instead of median_qih, median_hdih and median_hdcih it is now
+instance: Instead of `median_qih()`, `median_hdih()` and `median_hdcih()` it is now
 `tidybayes::median_qi()`, `tidybayes::median_hdi()` and
-`tidybayes::median_hdci()`. Similar with point_inverhalh, mean\_\* and
-mode\_\*.
+`tidybayes::median_hdci()`. Similar with `point_inverhalh()`, `mean\_\*` and
+`mode\_\*`.
 
 ------------------------------------------------------------------------
 
@@ -1942,8 +1950,7 @@ functions generates an error.
 > Error in quantile.default(dist_y, probs = 1 - .width) :\
 > missing values and NaN's not allowed if 'na.rm' is FALSE
 
-My error message with
-```` hdi``` is in contrast to Kurz’ version where this function seems to work. BTW: I got the same error message providing the vector ````samples_skewed_a\`
+My error message with `hdi` is in contrast to Kurz’ version where this function seems to work. BTW: I got the same error message providing the vector `samples_skewed_a`.
 from the Base R version.
 :::
 :::
@@ -1999,9 +2006,6 @@ offers the handy `qi()` and `hdi()` functions.
 :::
 
 ::: my-r-code-container
-Here include code lines
-:::
-:::
 
 ```{r}
 #| label: pi-4
@@ -2009,6 +2013,9 @@ Here include code lines
 ## R code 3.12b4 PI 0.5 ##############################
 tidybayes::qi(samples_skewed_b$p_skewed_b, .width = .5)
 ```
+
+:::
+:::
 
 We have now all necessary skills to plot book's Figure 3.3:
 
@@ -2333,10 +2340,8 @@ loss_min_a <- p_grid_skewed_a[which.min(loss_a)]
 **Results:**
 
 -   Weighted average loss value = `r loss_avg_a`.
--   parameter value that minimizes the loss = `r loss_min_a`. This is
-    the posterior median that we already have calculated in
-    @cnj-point-estimates-a. Because of sampling variation it is not
-    identical but pretty close (`r median_skewed_a` versus
+-   Parameter value that minimizes the loss = `r loss_min_a`. This is
+    the posterior median that we already have calculated in @cnj-point-estimates-a. Because of sampling variation it is not identical but pretty close (`r median_skewed_a` versus
     `r loss_min_a`).
 :::
 :::
@@ -2641,14 +2646,14 @@ make_loss_b <- function(our_d) {
 
 ## calculate loss for all possible values 
 glue::glue("Every possible loss values for decision 0.5 with proportional loss function\n")
-(
-  l_b <-
+
+l_b <-
   d_skewed_b |> 
   dplyr::select(p_grid_b) |> 
   dplyr::rename(decision_b = p_grid_b) |> 
   dplyr::mutate(weighted_average_loss_b = purrr::map(decision_b, make_loss_b)) |> 
   tidyr::unnest(weighted_average_loss_b) 
-)
+head(l_b)
 
 ## R code 3.19b minimized loss value #############################
 # this will help us find the x and y coordinates for the minimum value
@@ -2660,12 +2665,8 @@ loss_min_b <-
 
 **Results:**
 
--   Weighted average loss value = `r loss_avg_b`.
--   Parameter value that minimizes the loss = `r loss_min_b[[1]]`. This
-    is the posterior median that we already have calculated in
-    @cnj-point-estimates-b. Because of sampling variation it is not
-    identical but pretty close (`r median(samples_skewed_b$p_skewed_b)`
-    versus `r loss_min_b[[1]]`).
+- Weighted average loss value = `r loss_avg_b`.
+- Parameter value that minimizes the loss = `r loss_min_b[[1]]`. This is the posterior median that we already have calculated in @cnj-point-estimates-b. Because of sampling variation it is not identical but pretty close (`r median(samples_skewed_b$p_skewed_b)` versus `r loss_min_b[[1]]`).
 
 ###### $(d−p)^{2}$
 
@@ -2693,14 +2694,14 @@ make_loss2_b <- function(our_d2) {
 
 # remake our `l` data
 glue::glue("Every possible loss values for decision 0.5 with quadratic loss function\n")
-(
-  l2_b <-
+
+l2_b <-
     d_skewed_b |> 
     dplyr::select(p_grid_b) |> 
     dplyr::rename(decision2_b = p_grid_b) |> 
     dplyr::mutate(weighted_average_loss2_b = purrr::map(decision2_b, make_loss2_b)) |> 
     tidyr::unnest(weighted_average_loss2_b)
-)
+head(l2_b)
 
 ## R code 3.19b minimized loss value #############################
 # update to the new minimum loss coordinates
@@ -2714,12 +2715,8 @@ loss_min_b2 <-
 
 **Results:**
 
--   Weighted average loss value = `r loss_avg_b2`.
--   Parameter value that minimizes the loss = `r loss_min_b2[[1]]`. This
-    is the posterior mean that we already have calculated in
-    @cnj-point-estimates-b. Because of sampling variation it is not
-    identical but pretty close (`r mean(samples_skewed_b$p_skewed_b)`
-    versus `r loss_min_b2[[1]]`).
+- Weighted average loss value = `r loss_avg_b2`.
+- Parameter value that minimizes the loss = `r loss_min_b2[[1]]`. This is the posterior mean that we already have calculated in @cnj-point-estimates-b. Because of sampling variation it is not identical but pretty close (`r mean(samples_skewed_b$p_skewed_b)` versus `r loss_min_b2[[1]]`).
 :::
 :::
 :::
@@ -2801,7 +2798,7 @@ our samples (`r mean(samples_skewed_b$p_skewed_b)` versus
 ::: my-procedure
 ::: my-procedure-header
 ::: {#prp-ease-sim}
-: Numbered Procedure Title
+: 5 Reasons to simulate implied observations
 :::
 :::
 
@@ -2812,7 +2809,7 @@ our samples (`r mean(samples_skewed_b$p_skewed_b)` versus
 > 2020, p. 61](zotero://select/groups/5243560/items/NFUEVASQ))
 > ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=80&annotation=N8SBHXFN))
 
-1.  Model desing
+1.  Model design
 2.  Model checking
 3.  Software validation
 4.  Research design
@@ -2830,7 +2827,7 @@ our samples (`r mean(samples_skewed_b$p_skewed_b)` versus
 Likelihood functions work in both directions:
 
 -   They help to infer the plausibility of each possible value of *p*.
-    \> "With the globe tossing model, the `r glossary("dummy data")`
+    "With the globe tossing model, the `r glossary("dummy data")`
     arises from a binomial likelihood:" ([McElreath, 2020, p.
     62](zotero://select/groups/5243560/items/NFUEVASQ))
     ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=81&annotation=5PLAWZ8J))
@@ -2861,8 +2858,6 @@ a: Suppose $N = 2$, two tosses of the globe with $p = 0.7$
 
 ```{r}
 #| label: two-tosses-prob-a
-#| attr-source: '#lst-two-tosses-prob-a lst-cap="lst-title"'
-
 
 
 ## R code 3.20a #############################
@@ -3187,8 +3182,7 @@ stats::rbinom(1, size = 2, prob = .7)
 ```
 :::
 
-Compare the results with the calculation in @cnj-two-tosses-a, resp.
-@lst-two-tosses-prob-a.
+Compare the results with the calculation in @cnj-two-tosses-a.
 :::
 :::
 
@@ -3436,8 +3430,7 @@ n2_b <- 1001L
 n_success <- 6L
 n_trials  <- 9L
 
-(
-  d2_b <-
+d2_b <-
   tibble::tibble(p_grid2_b = base::seq(from = 0, to = 1, length.out = n2_b),
          # note we're still using a flat uniform prior
          prior2_b  = 1) |> 
@@ -3445,7 +3438,7 @@ n_trials  <- 9L
                 stats::dbinom(n_success, size = n_trials, prob = p_grid2_b)) |> 
   dplyr::mutate(posterior2_b = 
                 (likelihood2_b * prior2_b) / sum(likelihood2_b * prior2_b))
-)
+head(d2_b)
 
 
 ## plot ##############################
@@ -3962,11 +3955,1839 @@ f |>
 :::
 
 
-
-
-## I STOPPED HERE (2nd PASS, 2023-11-15)
-
 ## Practice
+
+### Easy
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-exercise-data-3.27}
+: Posterior distribution for the globe tossing example exercises
+::::::
+:::
+::::{.my-r-code-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+
+
+
+```{r}
+#| label: exercise-data-3.27a
+
+## R code 3.27a for exercises  #######################
+
+p_grid_3ea <- seq(from = 0, to = 1, length.out = 1000)
+prior_3ea <- rep(1, 1000)
+likelihood_3ea <- dbinom(6, size = 9, prob = p_grid_3ea)
+posterior_3ea <- likelihood_3ea * prior_3ea
+posterior_3ea <- posterior_3ea / sum(posterior_3ea)
+set.seed(100)
+samples_3ea <- sample(p_grid_3ea, prob = posterior_3ea, size = 1e4, replace = TRUE)
+hist(samples_3ea,
+     xlab = "Probability",
+     ylab = "Frequency",
+     main = "Posterior distribution for the globe tossing example")
+```
+
+
+###### Tidyverse
+
+```{r}
+#| label: exercise-data-3.27b
+
+## R code 3.27b for exercises  #######################
+
+df_3eb <- tibble::tibble(p_grid_3eb = base::seq(from = 0, to = 1, length.out = 1000),
+               prior_3eb = base::rep(1, 1000),
+               likelihood_3eb = stats::dbinom(6, size = 9, prob = p_grid_3eb),
+               posterior_3eb = likelihood_3eb * prior_3eb,
+               posterior_std_3eb = posterior_3eb / sum(posterior_3eb))
+
+base::set.seed(100)
+samples_3eb <- df_3eb |> 
+  dplyr::slice_sample(n = 1e4, 
+                      weight_by = posterior_std_3eb, replace = TRUE) |> 
+  dplyr::rename(p_samples_3eb = p_grid_3eb)
+
+samples_3eb |> 
+  ggplot2::ggplot(ggplot2::aes(x = p_samples_3eb)) +
+  ggplot2::geom_histogram(bins = 20, fill = "grey", color = "black") +
+  ggplot2::theme_bw() +
+  ggplot2::labs(x = "Propability",
+                y = "Frequency",
+                title = "Posterior distribution for the globe tossing example")
+
+```
+
+
+
+:::
+
+**Original**: 
+`r head(samples_3ea, 5)`, …
+
+**Tidyerse**: 
+`r head(samples_3eb$p_samples_3eb, 5)`, …
+
+::::
+:::::
+
+
+#### Exercises 3E1 - 3E7
+
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercises 3E1 - 3E7
+
+- **3E1.** How much posterior probability lies below $p = 0.2$? 
+- **3E2.** How much posterior probability lies above $p = 0.8$? 
+- **3E3.** How much posterior probability lies between $p = 0.2$ and $p = 0.8$? 
+- **3E4.** $20\%$ of the posterior probability lies below which value of $p$? 
+- **3E5.** $20\%$ of the posterior probability lies above which value of $p$? 
+- **3E6.** Which values of $p$ contain the narrowest interval equal to $66\%$ of the posterior probability? 
+- **3E7.** Which values of $p$ contain $66\%$ of the posterior probability, assuming equal posterior probability both below and above the interval?
+:::
+::::{.my-exercise-container}
+
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-easy-03a}
+a: Exercises 3E1 - 3E7 (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-3ea
+#| results: hold
+
+
+## exercises 3E1a - 3E7a ####################
+
+sum(samples_3ea < 0.2) / 1e4                            ## 3.7a
+sum(samples_3ea > 0.8) / 1e4                            ## 3.7a
+sum(samples_3ea > 0.2 & samples_3ea < 0.8) / 1e4        ## 3.8a
+quantile(samples_3ea, 0.2)                       ## 3.9a
+quantile(samples_3ea, 0.8)                       ## 3.10a
+rethinking::HPDI(samples_3ea, prob = 0.66)              ## 3.13a
+rethinking::PI(samples_3ea, prob = 0.66)                ## 3.12a1
+
+## same as above
+## quantile(samples_3ea, prob = c(.1667, .8333))    ## 3.12a2
+
+```
+
+***
+
+- **3E1.** `r (sum(samples_3ea < 0.2) / 1e4) * 100`% of the posterior probability lies below $p = 0.2$. 
+- **3E2.** `r (sum(samples_3ea > 0.8) / 1e4) * 100`% of the posterior probability lies above $p = 0.8$. 
+- **3E3.** `r (sum(samples_3ea > 0.2 & samples_3ea < 0.8) / 1e4) * 100`% posterior probability lies between $p = 0.2$ and $p = 0.8$.
+- **3E4.** $20\%$ of the posterior probability lies below $p =$ `r round(quantile(samples_3ea, 0.2), 3)`. 
+- **3E5.** $20\%$ of the posterior probability lies above $p =$ `r round(quantile(samples_3ea, 0.8), 3)`. 
+- **3E6.** $66\%$ of the narrowest interval lies between `r round(rethinking::HPDI(samples_3ea, prob = 0.66)[1], 3)` and `r round(rethinking::HPDI(samples_3ea, prob = 0.66)[2], 3)`.
+- **3E7.** The interval between `r round(rethinking::PI(samples_3ea, prob = 0.66)[1], 3)` and `r round(rethinking::PI(samples_3ea, prob = 0.66)[2], 3)` contains $66\%$ of the posterior probability, assuming equal posterior probability both below and above the interval.
+
+::::
+:::::
+
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-easy-03b}
+b: Exercises 3E1 - 3E7 (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-3eb
+#| results: hold
+
+## exercises 3E1b - 3E7b ####################
+
+
+(e3b1 <- samples_3eb |> 
+  dplyr::filter(p_samples_3eb < 0.2) |> 
+  dplyr::summarize(sum = dplyr::n() / 1e4) |>
+  dplyr::pull())  
+                                                        ## 3.7b
+(e3b2 <- samples_3eb |> 
+  dplyr::filter(p_samples_3eb > 0.8) |> 
+  dplyr::summarize(sum = dplyr::n() / 1e4) |>            ## 3.7b
+  dplyr::pull())
+
+(e3b3 <- samples_3eb |> 
+  dplyr::filter(p_samples_3eb > 0.2 & p_samples_3eb < 0.8) |> 
+  dplyr::summarize(sum = dplyr::n() / 1e4) |>            ## 3.8b
+  dplyr::pull())
+
+(e3b4 <- stats::quantile(samples_3eb$p_samples_3eb, probs = .2))
+
+(e3b5 <- stats::quantile(samples_3eb$p_samples_3eb, probs = .8))
+
+(e3b6 <- tidybayes::mode_hdci(samples_3eb$p_samples_3eb, .width = .66))
+
+## tidybayes::mean_hdci(samples_3eb$p_samples_3eb, .width = .66)
+
+## same as above
+(e3b7 <- tidybayes::qi(samples_3eb$p_samples_3eb, .width = .66))
+
+
+### R Code 3.7b with alternative methods #########
+
+#base::sum(samples_3eb$p_samples_3eb < 0.2) / 1e4           ## 3.7b
+#
+# samples_3eb |> 
+#   dplyr::summarize(sum = mean(p_samples_3eb > .8))       ## 3.7b
+# 
+# samples_3eb |> 
+#     dplyr::count(p_samples_3eb > .8) |> 
+#     dplyr::mutate(probability = 1e4 / base::sum(1e4))   ## 3.7b
+
+```
+
+***
+
+- **3E1.** `r e3b1 * 100`% of the posterior probability lies below $p = 0.2$. 
+- **3E2.** `r e3b2 * 100`% of the posterior probability lies above $p = 0.8$. 
+- **3E3.** `r e3b3 * 100`% posterior probability lies between $p = 0.2$ and $p = 0.8$.
+- **3E4.** $20\%$ of the posterior probability lies below $p =$ `r round(e3b4, 3)`. 
+- **3E5.** $20\%$ of the posterior probability lies above $p =$ `r round(e3b5, 3)`. 
+- **3E6.** $66\%$ of the narrowest interval lies between `r round(e3b6$ymin, 3)` and `r round(e3b6$ymax, 3)`.
+- **3E7.** The interval between `r round(e3b7[1], 3)` and `r round(e3b7[2], 3)` contains $66\%$ of the posterior probability, assuming equal posterior probability both below and above the interval.
+
+
+:::::{.my-note}
+:::{.my-note-header}
+:::::: {#cor-3e3b}
+: Using `dplyr::between()`
+::::::
+:::
+::::{.my-note-container}
+I learned from Jake Thompson that I could have used `dplyr::between()` for the exercise 3E3: `mean(dplyr::between(p_samples_3eb$samples_3eb, 0.2, 0.8))` = `r mean(dplyr::between(samples_3eb$p_samples_3eb, 0.2, 0.8))`
+::::
+:::::
+
+
+
+::::
+:::::
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+Difference between `rethinking::HPDI()` and `tidybayes::mode_hdci()`
+:::
+::::{.my-watch-out-container}
+There is a small difference between `rethinking::HPDI()` (`r rethinking::HPDI(samples_3ea, prob = 0.66)[1]` resp. `r rethinking::HPDI(samples_3ea, prob = 0.66)[2]`) and `tidybayes::mode_hdci()` (`r e3b6$ymin` and `r e3b6$ymax`). 
+::::
+:::::
+
+
+
+
+
+
+
+:::
+
+
+::::
+:::::
+
+### Middle
+
+#### 3M1 {#sec-e3m1}
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3M1: Suppose the globe tossing data had turned out to be 8 water in 15 tosses. Construct the posterior distribution, using grid approximation. Use the same flat prior as before.
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m1a}
+: Exercise 3M1a (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r fig.height=7}
+#| label: fig-exercise-3m1a
+#| fig-height: 7
+#| fig-cap: "Posterior distribution for 8 'W' in 15 tosses (Original)"
+
+p_grid_3m1a <- seq(from = 0, to = 1, length.out = 1000)
+prior_3m1a <- rep(1, 1000)
+likelihood_3m1a <- stats::dbinom(8, size = 15, prob = p_grid_3m1a)
+posterior_3m1a <-  likelihood_3m1a * prior_3m1a
+posterior_std_3m1a <-  posterior_3m1a / sum(posterior_3m1a) 
+plot(p_grid_3m1a, posterior_std_3m1a, type = "l", 
+     xlab = "Proportion of water (p)",
+     ylab = "Posterior density")
+grid(lty = 1)
+
+map_3m1a <- p_grid_3m1a[which.max(posterior_std_3m1a)]
+```
+
+The modus (`r glossary("MAP")`) is at p = `r round(map_3m1a, 3)` with a posterior density of `r round(max(posterior_std_3m1a), 5)`.
+
+::::
+:::::
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m1a}
+: Exercise 3M1b (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: fig-exercise-3m1b
+#| fig-cap: "Posterior distribution for 8 'W' in 15 tosses (Tidyverse)"
+
+df_3m1b <- tibble::tibble(
+  p_grid_3m1b = base::seq(from = 0, to = 1, length.out = 1000),
+  prior_3m1b = base::rep(1, 1000),
+  likelihood_3m1b = stats::dbinom(x = 8, size = 15, prob = p_grid_3m1b),
+  posterior_3m1b =  likelihood_3m1b * prior_3m1b,
+  posterior_std_3m1b = posterior_3m1b / sum(posterior_3m1b)
+  ) 
+
+df_3m1b |> 
+  ggplot2::ggplot(ggplot2::aes(x = p_grid_3m1b, y = posterior_std_3m1b)) +
+  ggplot2::geom_line() +
+  ggplot2::labs(x = "Proportion of water (p)",
+                y = "Posterior density") +
+  ggplot2::theme_bw()
+
+map_3m1b <- df_3m1b |> 
+  dplyr::arrange(dplyr::desc(posterior_std_3m1b)) |> 
+  dplyr::summarize(dplyr::first(p_grid_3m1b)) |> 
+  dplyr::pull(1)
+
+
+  
+```
+The modus (`r glossary("MAP")`) is at p = `r map_3m1b` with a posterior density of `r max(df_3m1b$posterior_std_3m1b)`.
+
+
+::::
+:::::
+
+
+
+:::
+
+::::
+:::::
+
+***
+
+#### 3M2
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3M2: Draw $10,000$ samples from the grid approximation from above. Then use the samples to calculate the $90\%$ and $99\%$ HPDI for $p$.
+:::
+::::{.my-exercise-container}
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m2a}
+a: Exercise 3M2 (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3m2a
+#| fig-cap: "10,000 samples from the grid approximation 8 water with 15 tosses (Original)"
+#| results: hold
+
+## 1e4 samples #############
+set.seed(42)
+samples_3m2a <-  sample(x = p_grid_3m1a,
+                       prob = posterior_std_3m1a, 
+                       size = 1e4,
+                       replace = TRUE)
+
+## Density with rethinking::dens() ########
+rethinking::dens(samples_3m2a, adj = 1)
+
+## Parameters #########
+(pi_3m2a_1 <- rethinking::PI(samples_3m2a, prob = .9))
+(pi_3m2a_2 <- rethinking::PI(samples_3m2a, prob = .99))
+(hpdi_3m2a_1 <- rethinking::HPDI(samples_3m2a, prob = .9))
+(hpdi_3m2a_2 <- rethinking::HPDI(samples_3m2a, prob = .99))
+(mean_3m2a <- mean(samples_3m2a))
+(median_3m2a <- median(samples_3m2a))
+```
+
+- **Mean**:   `r round(mean_3m2a, 3)`
+- **Median**: `r round(median_3m2a, 3)`
+
+| Prior = 1   | Low                  | High                 | Diff                                    |
+|----------|----------------------|----------------------|-----------------------------------------|
+| PI .90   | `r pi_3m2a_1[[1]]`   | `r pi_3m2a_1[[2]]`   | `r pi_3m2a_1[[2]] - pi_3m2a_1[[1]]`     |
+| PI .99   | `r pi_3m2a_2[[1]]`   | `r pi_3m2a_2[[2]]`   | `r pi_3m2a_1[[2]] - pi_3m2a_1[[1]]`     |
+| HPDI .90 | `r hpdi_3m2a_1[[1]]` | `r hpdi_3m2a_1[[2]]` | `r hpdi_3m2a_1[[2]] - hpdi_3m2a_1[[1]]` |
+| HPDI .99 | `r hpdi_3m2a_2[[1]]` | `r hpdi_3m2a_2[[2]]` | `r hpdi_3m2a_2[[2]] - hpdi_3m2a_2[[1]]` |
+
+::::
+:::::
+
+
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m2b}
+b: Exercise 3M2 (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3m2b
+#| fig-cap: "10,000 samples from the grid approximation 8 water with 15 tosses (Tidyverse)"
+#| results: hold
+
+## 1e4 samples ##########
+base::set.seed(42)
+samples_3m2b <- df_3m1b |> 
+  dplyr::slice_sample(n = 1e4, 
+                      weight_by = posterior_std_3m1b, 
+                      replace = TRUE) |> 
+  dplyr::rename(p_samples_3m2b = p_grid_3m1b)  
+
+## Density with ggplot2
+samples_3m2b |> 
+  ggplot2::ggplot(ggplot2::aes(x = p_samples_3m2b)) +
+  ggplot2::geom_density(adjust = 1.0) + # 1.0 = default value
+  ggplot2::labs(x = "N = 10000, Bandwith = 1.0",
+                y = "Density") +
+  ggplot2::theme_bw()
+
+
+## Parameters ########
+(
+  param_3m2b <-  dplyr::bind_rows(
+    ggdist::mean_qi(samples_3m2b$p_samples_3m2b, .width = c(0.9, 0.99)),
+    ggdist::median_qi(samples_3m2b$p_samples_3m2b, .width = c(0.9, 0.99)),
+    ggdist::mode_qi(samples_3m2b$p_samples_3m2b, .width = c(0.9, 0.99)),
+    ggdist::mode_hdci(samples_3m2b$p_samples_3m2b, .width = c(0.9, 0.99)),
+    ggdist::mode_hdi(samples_3m2b$p_samples_3m2b, .width = c(0.9, 0.99))
+  )
+)
+
+```
+
+
+::::
+:::::
+
+
+:::
+::::
+:::::
+
+***
+
+#### 3M3
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+
+Exercise 3M3: Construct a posterior predictive check for this model and data. This means simulate the distribution of samples, averaging over the posterior uncertainty in $p$. What is the probability of observing 8 water in 15 tosses?
+
+:::
+::::{.my-exercise-container}
+
+In the following set of tabs "Original" is abbreviated with "O" and Tidyverse with "T".
+
+::: {.panel-tabset}
+###### Data (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m3a-data}
+a: Exercise 3M3 -- Data (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: exercise-data-3m3a
+
+base::set.seed(42)
+
+## R code 3.23a #############################
+dummy_3m3a <- stats::rbinom(1e4, size = 15, prob = samples_3m2a)
+as.data.frame(table(dummy_3m3a))
+```
+::::
+:::::
+
+###### Plot (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m3a-plot}
+a: Exercise 3M3 -- Histogram (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-plot-3m3a
+
+rethinking::simplehist(dummy_3m3a, xlab = "Dummy water count")
+```
+
+::::
+:::::
+
+###### Result (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m3a-result}
+a: Exercise 3M3 -- Result (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-result-3m3a
+
+(
+  mean_dummy_3m3a <- mean(dummy_3m3a == 8)
+)
+```
+::::
+:::::
+
+
+The probability of observing 8 water in 15 tosses = `r mean_dummy_3m3a * 100`%.
+
+
+###### Data (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m3b-data}
+b: Exercise 3M3 -- Data (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: exercise-data-3m3b
+
+base::set.seed(42)
+
+## R code 3.23b #############################
+
+samples_3m2b <- samples_3m2b |> 
+  dplyr::mutate(dummy_3m3b = stats::rbinom(1e4, size = 15, prob = p_samples_3m2b))
+  
+samples_3m2b |> 
+  dplyr::group_by(dummy_3m3b) |> 
+  dplyr::summarize(dummy_cnt = dplyr::n())
+  
+```
+::::
+:::::
+
+###### Plot (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m3b-plot}
+b: Exercise 3M3 -- Histogram (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-plot-3m3b
+#| fig-cap: "Posterior predictive check for 8 water with 15 tosses"
+
+samples_3m2b |> 
+  ggplot2::ggplot(ggplot2::aes(x = dummy_3m3b)) +
+  ggplot2::geom_histogram(bins = 16, fill = "grey", color = "black") +
+  ggplot2::theme_bw() +
+  ggplot2::labs(x = "Dummy water count",
+                y = "Frequnecy")
+```
+
+::::
+:::::
+
+###### Result (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m3b-result}
+b: Exercise 3M3 -- Result (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-result-3m3b
+
+(
+  mean_dummy_3m3b <- samples_3m2b |> 
+  dplyr::summarize(mean(dummy_3m3b == 8)) |> 
+  pull()
+)
+```
+
+The probability of observing 8 water in 15 tosses = `r mean_dummy_3m3b * 100`%.
+
+
+::::
+:::::
+
+
+:::
+
+::::
+:::::
+
+***
+
+#### 3M4
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3M4: Using the posterior distribution constructed from the new (8/15) data, now calculate the probability of observing 6 water in 9 tosses.
+:::
+::::{.my-exercise-container}
+
+There are two possible approaches for the solution:
+
+- **S1**: Random generation of the binomial distribution with the probability of the sampling distribution.
+- **S2**: Computing the density for 6/9 but with the posterior distribution from 8/15 as prior.
+
+::: {.panel-tabset}
+
+###### Original S1
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m4a1}
+a: Exercise 3M4 (Original: Method S1)
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-3m4a1
+
+set.seed(100)
+samples_3m4a <- rbinom(1e4, size = 9, prob = samples_3m2a)
+mean(samples_3m4a == 6)
+```
+
+
+
+::::
+:::::
+
+###### Original S2 
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m4a2}
+a: Exercise 3M4 (Original: Method S2)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#|label: exercise-3m4a2
+
+likelihood_6of9_3m4a <-  stats::dbinom(6, size = 9, prob = p_grid_3m1a)
+prior_6of9_3m4a <-  posterior_std_3m1a
+(
+  posterior_6of9_3m4a <- sum(likelihood_6of9_3m4a * prior_6of9_3m4a)
+)
+```
+
+
+::::
+:::::
+
+
+
+###### Tidyverse S1
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m4b}
+b: Exercise 3M4 (Tidyverse: Method S1)
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-3m41b
+
+set.seed(100)
+samples_3m2b |> 
+  dplyr::mutate(
+    p_6of9_3m4b = stats::rbinom(1e4, size = 9, prob = p_samples_3m2b)
+    ) |> 
+  dplyr::summarize(sum = base::mean(p_6of9_3m4b == 6)) |> 
+  dplyr::pull()
+
+```
+
+
+
+::::
+:::::
+
+###### Tidyverse M2
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m4b}
+b: Exercise 3M4 (Tidyverse Method S2)
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-3m42b
+
+df_3m1b |> 
+  dplyr::mutate(
+    likelihood_6of9_3m4b = stats::dbinom(6, size = 9, prob = p_grid_3m1b),
+    prior_6of9_3m4b = posterior_std_3m1b) |> 
+  dplyr::summarize(sum = base::sum(likelihood_6of9_3m4b * prior_6of9_3m4b)) |> 
+  dplyr::pull()
+
+```
+
+
+
+::::
+:::::
+
+
+:::
+
+::::
+:::::
+
+***
+
+#### 3M5
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3M5: Start over at Exercise 3M1 (@sec-e3m1), but now use a prior that is zero below $p = 0.5$ and a constant above $p = 0.5$. This corresponds to prior information that a majority of the Earth’s surface is water. Repeat each problem above and compare the inferences. What difference does the better prior make? If it helps, compare inferences (using both priors) to the true value $p = 0.7$.
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+
+###### 3M5.1a
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m5a-1}
+a: Exercise 3M5: Posterior Distribution (~ 3M1: Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3m5a-1
+#| fig-cap: "Posterior distribution for 8 'W' in 15 tosses with prior < 0.5 = 0 otherwise prior = 1 (Original)"
+
+## repr 3M1a ###########
+p_grid_3m5a <- seq(from = 0, to = 1, length.out = 1000)
+prior_3m5a <- ifelse(p_grid_3m5a < 0.5, 0, 1)
+likelihood_3m5a <- stats::dbinom(8, size = 15, prob = p_grid_3m5a)
+posterior_3m5a <-  likelihood_3m5a * prior_3m5a
+posterior_std_3m5a <-  posterior_3m5a / sum(posterior_3m5a) 
+plot(p_grid_3m5a, posterior_std_3m5a, type = "l", lty = "dashed",
+     xlab = "Proportion of water (p)",
+     ylab = "Posterior density")
+lines(p_grid_3m1a, posterior_std_3m1a)
+abline(v = .7, col = "red")
+grid(lty = 1)
+
+```
+
+Compared with the true value of $0.7$ the new prior ($0$ under $p = 0.5$, otherwise $p = 1$) is better, but there is still a big difference between the true value and the mode of the probability density.
+
+::::
+:::::
+
+###### 3M5.2a
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m5a-2}
+a: Exercise 3M5.2: HPDI of 90% from 1e4 samples (~3M2: Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-3m5a-2
+
+## repr 3M2a #############
+set.seed(42)
+samples_3m5a <- sample(x = p_grid_3m5a, 
+                      size = 1e4, 
+                      replace = TRUE, 
+                      prob = posterior_std_3m5a
+                      )
+hpdi_3m5a <- rethinking::HPDI(samples_3m5a, .9)
+
+max_3m2a <- max(posterior_std_3m1a)
+max_3m5a <- max(posterior_std_3m5a)
+```
+
+| Prior | Low                | High               | Diff                                | Max Density  |
+|-------|--------------------|--------------------|-------------------------------------|--------------|
+| 1     | `r hpdi_3m2a_1[[1]]` | `r hpdi_3m2a_1[[2]]` | `r hpdi_3m2a_1[[2]] - hpdi_3m2a_1[[1]]` | `r max_3m2a` |
+| 0/1   | `r hpdi_3m5a[[1]]` | `r hpdi_3m5a[[2]]` | `r hpdi_3m5a[[2]] - hpdi_3m5a[[1]]` | `r max_3m5a` |
+
+The HPDI interval is smaller with the the new prior $p < .5 = 0 \operatorname{and} p >= .5 = 1$ than with a constant prior of $1$. The new prior is better as it gives more precise information.
+
+The maximum posterior density of the new prior $0/1$ is higher than the maximum with the prior of $1$. Values of $p < 0.5$ are no longer taking up posterior density because they are $0$. This can also be seen in @fig-exercise-3m5a-1.
+::::
+:::::
+
+###### 3M5.3a
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m5a-3}
+a: Exercise 3M5.3: Posterior predictive check (~3M3: Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-3m5a-3-4
+
+## repr 3M3a ##############
+set.seed(42)
+dummy_3m5a_1 <- rbinom(1e4, 15, samples_3m5a)
+mean_3m5a_1 <- mean(dummy_3m5a_1 == 8)
+
+## repr 3M4a ##############
+set.seed(42)
+dummy_3m5a_2 <- rbinom(1e4, 9, samples_3m5a)
+mean_3m5a_2 <- mean(dummy_3m5a_2 == 6)
+
+## compare with p = 0.7 ##############
+set.seed(42)
+dummy_3m5a_3 <- rbinom(1e4, 15, 0.7)
+mean_3m5a_3 <- mean(dummy_3m5a_3 == 8)
+
+set.seed(42)
+dummy_3m5a_4 <- rbinom(1e4, 9, 0.7)
+mean_3m5a_4 <- mean(dummy_3m5a_4 == 6)
+
+```
+
+| Name      | Mean of 15/08   | Mean of 09/06   |
+|-----------|-----------------|-----------------|
+| Samples   | `r mean_3m5a_1` | `r mean_3m5a_2` |
+| Value 0.7 | `r mean_3m5a_3` | `r mean_3m5a_4` |
+
+The mean of the samples of 6 water observations with 9 tosses are higher than 8 water with 15 tosses. This represents the fact that the real value of 0.7 is nearer with 6/9 = `r round(6 / 9, 3)` than with 8/15 = `r round(8 / 15, 3)`. Also note that a predictive check with the real value of $0.7$ shows a very small mean value with 15/8 but a much higher mean with 9/6.
+
+::::
+:::::
+
+###### 3M5.1b
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m5b-1}
+b: Exercise 3M5: Posterior Distribution (~ 3M1: Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: fig-exercise-3m5b-1
+#| fig-cap: "Posterior distribution for 8 'W' in 15 tosses with prior < 0.5 = 0 otherwise prior = 1 (Tidyverse)"
+
+## repr 3M1b ##############
+df_3m5b <- tibble::tibble(
+  p_grid_3m5b = base::seq(from = 0, to = 1, length.out = 1000),
+  prior_3m5b = base::ifelse(p_grid_3m5b < 0.5, 0, 1),
+  likelihood_3m5b = stats::dbinom(x = 8, size = 15, prob = p_grid_3m5b),
+  posterior_3m5b =  likelihood_3m5b * prior_3m5b,
+  posterior_std_3m5b = posterior_3m5b / sum(posterior_3m5b)
+  )
+
+ggplot2::ggplot() +
+ggplot2::geom_line(data = df_3m5b,
+                mapping = ggplot2::aes(x = p_grid_3m5b, y = posterior_std_3m5b,
+                                       linetype = "ifelse(p < 0.5, 0, 1)")) +
+ggplot2::geom_line(data = df_3m1b,
+                mapping = ggplot2::aes(x = p_grid_3m1b, y = posterior_std_3m1b,
+                                       linetype = "1")) +
+ggplot2::scale_linetype_manual("Prior:", 
+                        values = c("solid", "dashed")) +
+ggplot2::geom_vline(xintercept = .7, color = "red") +
+ggplot2::labs(x = "Proportion of water (p)",
+              y = "Posterior density") +
+ggplot2::theme_bw()
+```
+
+
+Compared with the true value of $0.7$ the new prior ($0$ under $p = 0.5$, otherwise $p = 1$) is better, but there is still a big difference between the true value and the mode of the probability density.
+::::
+:::::
+
+###### 3M5.2b
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m5b-2}
+b: Exercise 3M5.2: HPDI of 90% from 1e4 samples (~3M2: Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: exercise-3m5b-2
+
+## repr 3M2b ##############
+set.seed(42)
+samples_3m5b <- df_3m5b |> 
+  dplyr::slice_sample(n = 1e4,
+                      weight_by = posterior_std_3m5b,
+                      replace = TRUE) |> 
+  dplyr::rename(p_samples_3m5b = p_grid_3m5b)
+
+
+hpdi_3m2b <- rethinking::HPDI(samples_3m2b$p_samples_3m2b, .9)
+hpdi_3m5b <- rethinking::HPDI(samples_3m5b$p_samples_3m5b, .9)
+
+max_3m2b <- max(df_3m1b$posterior_std_3m1b)
+max_3m5b <- max(df_3m5b$posterior_std_3m5b)
+```
+
+| Prior | Low                | High               | Diff                                | Max Density  |
+|-------|--------------------|--------------------|-------------------------------------|--------------|
+| 1     | `r hpdi_3m2b[[1]]` | `r hpdi_3m2b[[2]]` | `r hpdi_3m2b[[2]] - hpdi_3m2b[[1]]` | `r max_3m2b` |
+| 0/1   | `r hpdi_3m5b[[1]]` | `r hpdi_3m5b[[2]]` | `r hpdi_3m5b[[2]] - hpdi_3m5b[[1]]` | `r max_3m5b` |
+
+The HPDI interval is smaller with the the new prior $p < .5 = 0 \operatorname{and} p >= .5 = 1$ than with a constant prior of $1$. The new prior is better as it gives more precise information.
+
+The maximum posterior density of the new prior $0/1$ is higher than the maximum with the prior of $1$. Values of $p < 0.5$ are no longer taking up posterior density because they are $0$. This can also be seen in @fig-exercise-3m5b-1.
+
+
+
+::::
+:::::
+
+###### 3M5.3b
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m5b-3}
+b: Exercise 3M5.3: Posterior predictive check (~3M3: Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: exercise-3m5b-3-4
+
+## repr 3M3b ##############
+set.seed(42)
+dummy_3m5b_1 <- rbinom(1e4, 15, samples_3m5b$p_samples_3m5b)
+mean_3m5b_1 <- mean(dummy_3m5b_1 == 8)
+
+## repr 3M4b ##############
+set.seed(42)
+dummy_3m5b_2 <- rbinom(1e4, 9, samples_3m5b$p_samples_3m5b)
+mean_3m5b_2 <- mean(dummy_3m5b_2 == 6)
+
+## compare with p = 0.7 ##############
+set.seed(42)
+dummy_3m5b_3 <- rbinom(1e4, 15, 0.7)
+mean_3m5b_3 <- mean(dummy_3m5b_3 == 8)
+
+set.seed(42)
+dummy_3m5b_4 <- rbinom(1e4, 9, 0.7)
+mean_3m5b_4 <- mean(dummy_3m5b_4 == 6)
+
+```
+
+| Name      | Mean of 15/08   | Mean of 09/06   |
+|-----------|-----------------|-----------------|
+| Samples   | `r mean_3m5b_1` | `r mean_3m5b_2` |
+| Value 0.7 | `r mean_3m5b_3` | `r mean_3m5b_4` |
+
+The mean of the samples of 6 water observations with 9 tosses are higher than 8 water with 15 tosses. This represents the fact that the real value of 0.7 is nearer with 6/9 = `r round(6 / 9, 3)` than with 8/15 = `r round(8 / 15, 3)`. Also note that a predictive check with the real value of $0.7$ shows a very small mean value with 15/8 but a much higher mean with 9/6.
+
+::::
+:::::
+
+
+:::
+
+
+
+::::
+:::::
+
+***
+
+#### 3M6
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3M6: Suppose you want to estimate the Earth’s proportion of water very precisely. Specifically, you want the 99% percentile interval of the posterior distribution of $p$ to be only $0.05$ wide. This means the distance between the upper and lower bound of the interval should be $0.05$. 
+
+- **N tosses**: How many times will you have to toss the globe to do this?
+- **Width**: How influences the sample size the difference between samples?
+
+
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+###### N tosses (O)
+
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m6a-1}
+a: Exercise 3M6-1: How many times will you have to toss the globe to get a $0.05$ wide interval with $PI = .99$?  (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+Although McElreath states explicitly that he won't require an exact answer but rather wants to see the chosen approach ([Winter 2019 Homework](https://github.com/rmcelreath/statrethinking_winter2019/blob/master/homework/week01.pdf)) I was curious about the figure and how to program this process. It turned out that the chosen `set.seed()` number has effects how many times one has to toss the globe.
+
+
+
+
+```{r}
+#| label: exercise-3m6a-1
+#| results: hold
+#| cache: true
+
+pi99_3m6a <- function(N, seed) {
+  set.seed(seed)
+  p_true <-  0.7
+  W <- rbinom(1, size = N, prob = p_true)
+  p_grid_3m6a <- seq(from = 0, to = 1, length.out = 1000)
+  prior_3m6a <- rep(1, 1000)
+  likelihood_3m6a <- dbinom(W, size = N, prob = p_grid_3m6a)
+  posterior_3m6a <- likelihood_3m6a * prior_3m6a
+  posterior_std_3m6a <-  posterior_3m6a / sum(posterior_3m6a)
+  
+  samples_3m6a <-
+    sample(p_grid_3m6a,
+           prob = posterior_std_3m6a,
+           size = 1e4,
+           replace = TRUE)
+  rethinking::PI(samples_3m6a, 0.99)
+}
+
+
+tictoc::tic()
+N = 1
+my_seed = c(3, 42, 100, 150)
+s = ''
+
+for (i in 1:length(my_seed)) {
+  PI99 <- pi99_3m6a(N, my_seed[i])
+  while (as.numeric(PI99[2] - PI99[1] > 0.05)) {
+    N <- N + 1
+    PI99 <- pi99_3m6a(N, my_seed[i])
+  }
+  s[i] <- glue::glue('With set.seed({my_seed[i]}) we need to toss the globe {N} times.\n')
+  N = 1
+}
+s
+tictoc::toc()
+```
+
+
+::::
+:::::
+
+###### Width (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m6a-2}
+a: Exercise 3M6-2: Demonstrate the variation of the interval width with different number of simulations (Original)
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-3m6a-2
+#| cache: true
+
+
+f_3m6a <- function(N) {
+  p_true <-  0.7
+  W <- rbinom(1, size = N, prob = p_true)
+  p_grid_3m6a <- seq(from = 0, to = 1, length.out = 1000)
+  prior_3m6a <- rep(1, 1000)
+  likelihood_3m6a <- dbinom(W, size = N, prob = p_grid_3m6a)
+  posterior_3m6a <- likelihood_3m6a * prior_3m6a
+  posterior_std_3m6a <-  posterior_3m6a / sum(posterior_3m6a)
+  
+  samples_3m6a <-
+    sample(p_grid_3m6a,
+           prob = posterior_std_3m6a,
+           size = 1e4,
+           replace = TRUE)
+  pi_99_3m6a <-  rethinking::PI(samples_3m6a, 0.99)
+  as.numeric(pi_99_3m6a[2] - pi_99_3m6a[1])
+}
+
+
+Nlist <- c(20, 50, 100, 200, 500, 1000, 2000) 
+Nlist <- rep(Nlist, each = 100) 
+width <- sapply(Nlist, f_3m6a) 
+plot(Nlist, width) 
+abline(h = 0.05, col = "red")
+```
+
+The difference between samples shrinks as the sample size increases.
+
+> What are we looking at in this plot? The horizontal is sample size. The points are individual interval widths, one for each simulation. The red line is drawn at a width of $0.05$. Looks like we need more than $2000$ tosses of the globe to get the interval to be that precise.
+>
+> The above is a general feature of learning from data: The greatest returns on learning come early on. Each additional observation contributes less and less. So it takes very much effort to progressively reduce our uncertainty. So if your application requires a very precise estimate, be prepared to collect a lot of data. Or to change your approach. ([Solution, Week-01, Winter 2019](https://github.com/rmcelreath/statrethinking_winter2019/blob/master/homework/week01_solutions.pdf))
+
+::::
+:::::
+
+###### N tosses (T)
+
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m6b-1}
+b: Exercise 3M6-1: How many times will you have to toss the globe to get a $0.05$ wide interval with $PI = .99$?  (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+Because of the slow performance of manipulating whole data frame, I am going to use here just one `set.seed()` function. This is only to show that we get the same result as in the first loop of @cnj-3m6a-1.
+
+
+```{r}
+#| label: exercise-3m6b-1
+#| results: hold
+#| cache: true
+
+pi99_3m6b <- function(N, seed) {
+  base::set.seed(seed)
+  p_true <-  0.7
+  W <- stats::rbinom(1, size = N, prob = p_true)
+  df_3m6b <-  tibble::tibble(p_grid_3m6b = 
+                            base::seq(from = 0, to = 1, length.out = 1000)) |> 
+    dplyr::mutate(prior_3m6b = base::rep(1, 1000),
+           likelihood_3m6b = stats::dbinom(W, size = N, prob = p_grid_3m6b),
+           posterior_3m6b = likelihood_3m6b * prior_3m6b,
+           posterior_std_3m6b = posterior_3m6b / sum(posterior_3m6b))
+  
+  samples_3m6b <- df_3m6b |> 
+    dplyr::slice_sample(n = 1e4,
+                        weight_by = posterior_std_3m6b,
+                        replace = TRUE)
+  
+  rethinking::PI(samples_3m6b$p_grid_3m6b, 0.99)
+}
+
+tictoc::tic()
+N = 1
+my_seed = 3 ## just one loop!
+s = ''
+
+for (i in 1:length(my_seed)) {
+  PI99_3m6b <- pi99_3m6b(N, my_seed[i])
+  while (as.numeric(PI99_3m6b[2] - PI99_3m6b[1] > 0.05)) {
+    N <- N + 1
+    PI99_3m6b <- pi99_3m6b(N, my_seed[i])
+  }
+  s[i] <- glue::glue('With set.seed({my_seed[i]}) we need to toss the globe {N} times.\n')
+  N = 1
+}
+s
+tictoc::toc()
+```
+Compare the execution time of just one set.seed() calculation with four in @cnj-3m6a-1. Using data frames turns out about 16(!) times slower the computation with vectors. (Already just one set.seed() computation with tibbles is 4 times slower than the processing time of 4 set.seed() loops with base R vectors.)
+
+::::
+:::::
+
+###### Width (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3m6b-2}
+b: Exercise 3M6-2: Demonstrate the variation of the interval width with different number of simulations (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-3m6b-2
+#| cache: true
+
+f_3m6b <- function(N) {
+  p_true <-  0.7
+  W <- stats::rbinom(1, size = N, prob = p_true)
+  df_3m6b <-  tibble::tibble(p_grid_3m6b = 
+                            base::seq(from = 0, to = 1, length.out = 1000)) |> 
+    dplyr::mutate(prior_3m6b = base::rep(1, 1000),
+           likelihood_3m6b = stats::dbinom(W, size = N, prob = p_grid_3m6b),
+           posterior_3m6b = likelihood_3m6b * prior_3m6b,
+           posterior_std_3m6b = posterior_3m6b / sum(posterior_3m6b))
+  
+  samples_3m6b <- df_3m6b |> 
+    dplyr::slice_sample(n = 1e4,
+                        weight_by = posterior_std_3m6b,
+                        replace = TRUE)
+  pi_99_3m6b <-  rethinking::PI(samples_3m6b$p_grid_3m6b, 0.99)
+  as.numeric(pi_99_3m6b[2] - pi_99_3m6b[1])
+}
+
+
+Nlist_3m6b <- c(20, 50, 100, 200, 500, 1000, 2000) 
+
+
+df_3m6b_2 <- 
+  tibble::tibble(Nlist_3m6b = base::rep(Nlist_3m6b, each = 100)) |> 
+  mutate(width_3m6b = purrr::map_dbl(Nlist_3m6b, f_3m6b))
+
+df_3m6b_2 |> 
+  ggplot2::ggplot(ggplot2::aes(x = Nlist_3m6b,
+                             y = width_3m6b)) +
+  ggplot2::geom_point(alpha = 1/10) +
+  ggplot2::labs(x = "Number of samples",
+                y = "Width of PI = 0.99") +
+  ggplot2::geom_hline(yintercept = .05, color = "red") +
+  ggplot2::theme_bw()
+```
+
+The difference between samples shrinks as the sample size increases.
+
+> What are we looking at in this plot? The horizontal is sample size. The points are individual interval widths, one for each simulation. The red line is drawn at a width of $0.05$. Looks like we need more than $2000$ tosses of the globe to get the interval to be that precise.
+>
+> The above is a general feature of learning from data: The greatest returns on learning come early on. Each additional observation contributes less and less. So it takes very much effort to progressively reduce our uncertainty. So if your application requires a very precise estimate, be prepared to collect a lot of data. Or to change your approach. ([Solution, Week-01, Winter 2019](https://github.com/rmcelreath/statrethinking_winter2019/blob/master/homework/week01_solutions.pdf))
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+***
+
+
+### Hard
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h1-5}
+: Reported first and second born children in 100 two-child families
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: exercise-3h1-5 
+
+## R code 3.28 ###############
+birth1 <- c(
+  1, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1,
+  1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+  0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0,
+  1, 0, 1, 1, 1, 0, 1, 1, 1, 1
+)
+
+birth2 <- c(
+  0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0,
+  1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1,
+  0, 0, 0, 1, 1, 1, 0, 0, 0, 0
+)
+
+
+## R code 3.30 ###############
+n_boys <- sum(birth1) + sum(birth2)
+```
+200 Births of these are boys:
+
+- 1st born: `r sum(birth1)`
+- 2nd born: `r sum(birth2)`, 
+- total: `r n_boys`
+::::
+:::::
+
+#### 3H1
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3H1: Using grid approximation, compute the posterior distribution for the probability of a birth being a boy. Assume a uniform prior probability. Which parameter value maximizes the posterior probability?
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+###### Boys (Original)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3H1a}
+a: Posterior distribution for the probability of a birth being a boy (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3h1a
+#| fig-cap: "Posterior distribution of boys rate probability (Original)"
+#| results: hold
+
+p_grid_3h1a <- seq(from = 0,
+                   to = 1,
+                   length.out = 1e3)
+prior_3h1a <- rep(0.5, 1e3)
+likelihood_3h1a <- dbinom(x = sum(birth1) + sum(birth2),
+                          size = 200,
+                          prob = p_grid_3h1a)
+posterior_3h1a <-  prior_3h1a * likelihood_3h1a
+posterior_std_3h1a <- posterior_3h1a / sum(posterior_3h1a)
+plot(p_grid_3h1a, posterior_std_3h1a, type = "l")
+map_3h1a <- p_grid_3h1a[which.max(posterior_std_3h1a)]
+
+```
+
+The mode or `r glossary("MAP")` is at `r round(map_3h1a,3)`, e.g. the birth ratio for boys is `r round(map_3h1a,3) * 100`%.
+
+::::
+:::::
+
+###### Boys (Tidyverse)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h1b}
+b: Posterior distribution for the probability of a birth being a boy (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3h1b
+#| fig-cap: "Posterior distribution of boys rate probability (Tidyverse)" 
+#| results: hold
+
+df_3h1b <- tibble::tibble(p_grid_3h1b = base::seq(
+                   from = 0,
+                   to = 1,
+                   length.out = 1e3)) |> 
+    dplyr::mutate(prior_3h1b = base::rep(0.5, 1e3),
+           likelihood_3h1b = stats::dbinom(
+                          x = base::sum(birth1) + base::sum(birth2),
+                          size = 200,
+                          prob = p_grid_3h1b),
+           posterior_3h1b = prior_3h1b * likelihood_3h1b,
+           posterior_std_3h1b = posterior_3h1b / sum(posterior_3h1b))
+
+map_3h1b <- df_3h1b |> 
+  dplyr::arrange(dplyr::desc(posterior_std_3h1b)) |> 
+  dplyr::summarize(dplyr::first(p_grid_3h1b)) |> 
+  dplyr::pull(1)
+
+df_3h1b |> 
+  ggplot2::ggplot(ggplot2::aes(x = p_grid_3h1b,
+                               y = posterior_std_3h1b)) +
+  ggplot2::geom_line() +
+  ggplot2::geom_vline(xintercept = map_3h1b, color = "red") +
+  ggplot2::labs(x = "Ratio of boy births",
+                y = "Posterior distribution") +
+  ggplot2::theme_bw()
+  
+```
+
+The mode or `r glossary("MAP")` is at `r round(map_3h1b,3)`, e.g. the birth ratio for boys is `r round(map_3h1b,3) * 100`%.
+
+:::::{.my-note}
+:::{.my-note-header}
+Note: {*tidybayes*} point intervals needs samples
+:::
+::::{.my-note-container}
+
+I computed the mode by arranging the data frame with the highest value at the top. This is exactly the same value as in the book version. Another Base R solution would be `df_3h1b$p_grid_3h1b[which.max(df_3h1b$posterior_std_3h1b)]` = `r df_3h1b$p_grid_3h1b[which.max(df_3h1b$posterior_std_3h1b)] * 100`%.
+
+I tried to calculate the mode also with the {**tidybayes**} package. But all mode values from this package (`mode_qi()`, `mode_hdci()`, `mode_hdi()` and `Mode())` result in smaller values, for instance `tidybayes::Mode(samples_3m2b$p_samples_3m2b)` = `r round(tidybayes::Mode(samples_3m2b$p_samples_3m2b), 3) * 100`%. 
+
+After many trials and exerpiments I came to the conclusion that above mentioned functions of the {**tidybayes**} package work only with generated samples. Therefore I do not have to address two columns as with the `which.max()` (one outside and one inside the square brackets) and I have to supply vectors with the above mentioned family of function form the {**tidybayes**} package.
+
+Furthermore I noticed that all point_intervals without `mode_`, `median_` and `mean_` in front of the `qi`, `ll`, `ul`, `hdi`, `hdci` is not in {**tidybayes**} but in the accompanying package {**ggdist**} and need therefore as prefix `ggdist::`. Furthermore these functions needs numerical vectors and can't therfore used with the pipe.
+
+::::
+:::::
+
+
+
+
+
+
+::::
+:::::
+
+
+
+
+:::
+
+
+
+
+::::
+:::::
+
+***
+
+
+
+#### 3H2
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3H2: Using the `sample()` function, draw $10,000$ random parameter values from the posterior distribution you calculated above. Use these samples to estimate the $50\%$, $89\%$, and $97\%$ highest posterior density intervals.
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+###### Sample (Original)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h2a}
+a: Draw $10,000$ random parameter values from the posterior distribution you calculated above (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3h2a
+#| fig-cap: "10.000 samples from the posterior distribution of the birth data (Original)"
+#| results: hold
+
+set.seed(100)
+samples_3h2a <- sample(x = p_grid_3h1a,
+                       size = 1e4,
+                       replace = TRUE,
+                       prob = posterior_std_3h1a)
+rethinking::HPDI(samples_3h2a, c(.5, .89, .97))
+
+map_3h2a <- rethinking::chainmode(samples_3h2a, adj = 1)
+
+rethinking::dens(samples_3h2a, adj = 1)
+abline(v = map_3h2a, col = "red")
+```
+
+The red line is the density mode (`r round(map_3h2a, 3)`) calculated with `rethinking::chainmode()`.
+
+::::
+:::::
+
+###### Sample (Tidyverse)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h2b}
+b: Draw $10,000$ random parameter values from the posterior distribution you calculated above (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: fig-exercise-3h2b
+#| fig-cap: "10.000 samples from the posterior distribution of the birth data (Tidyverse)"
+#| results: hold
+
+set.seed(100)
+samples_3h2b <-  df_3h1b |> 
+  dplyr::slice_sample(n = 1e4,
+                      replace = TRUE,
+                      weight_by = posterior_std_3h1b)
+(
+  map_3h2b <- samples_3h2b |> 
+    tidybayes::mode_hdi(p_grid_3h1b, .width = c(.5, .89, .97)) 
+)
+
+samples_3h2b |> 
+  ggplot2::ggplot(ggplot2::aes(x = p_grid_3h1b)) +
+  ggplot2::geom_density() +
+  ggplot2::geom_vline(xintercept = map_3h2b[[1, 1]], color = "red") +
+  ggplot2::labs(x = "Ratio of boy births",
+                y = "Samples from the posterior distribution") +
+  ggplot2::theme_bw()
+  
+
+```
+
+The red line is the density mode (`r round(map_3h2b[[1, 1]], 3)`) calculated with `tidybayes::mode_hdi()` and also displayed in the column `p_grid_3h1b`.
+
+::::
+:::::
+
+
+
+
+
+:::
+
+::::
+:::::
+
+
+
+
+***
+
+#### 3H3
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3H3: Use `rbinom()` to simulate $10,000$ replicates of $200$ births. You should end up with $10,000$ numbers, each one a count of boys out of $200$ births. Compare the distribution of predicted numbers of boys to the actual count in the data ($111$ boys out of $200$ births). There are many good ways to visualize the simulations, but the `dens()`  command (part of the {**rethinking**} package) is probably the easiest way in this case. Does it look like the model fits the data well? That is, does the distribution of predictions include the actual observation as a central, likely outcome?
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+###### 3H3a 
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h3a}
+a: Posterior predictive distribution with 10,000 replicates of 200 births (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: fig-exercise-3h3a
+#| fig-cap: "Create posterior predictive distribution with 10,000 replicates of 200 births (Original)"
+#| results: hold
+
+set.seed(100)
+dummy_data_3h3a <-  rbinom(n = 1e4,
+                           size = 200,
+                           prob = samples_3h2a)
+head(dummy_data_3h3a, 10)
+
+rethinking::dens(dummy_data_3h3a, 
+                 adj = 1)
+abline(v = sum(birth1 + birth2), col = "red")
+```
+
+The model appears to fit well, because the observed value of 111 boys is in the middle of the `r glossary("posterior predictive distribution")` which has a mean of `r mean(dummy_data_3h3a)` and a median of `r median(dummy_data_3h3a)`.
+
+::::
+:::::
+
+
+###### 3H3b
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h3b}
+b: Posterior predictive distribution with 10,000 replicates of 200 births (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3h3b
+#| fig-cap: "Create posterior predictive distribution with 10,000 replicates of 200 births (Tidyverse)"
+#| results: hold
+
+set.seed(100)
+dummy_data_3h3b <-  stats::rbinom(n = 1e4,
+                           size = 200,
+                           prob = samples_3h2b$p_grid_3h1b
+                           )
+utils::head(dummy_data_3h3b, 10)
+
+ggplot2::ggplot() +
+  ggdist::stat_slabinterval(ggplot2::aes(x = dummy_data_3h3b),
+                            .width = c(0.66, 0.89), color = "red",
+                            slab_fill = "grey", slab_color = "black",
+                            density = "bounded") +
+  ggplot2::geom_vline(
+    ggplot2::aes(xintercept = n_boys), linetype = "dashed", color = "red") +
+  ggplot2::labs(x = "Number of Boys", y = "Density") +
+  ggplot2::theme_bw()
+```
+
+I have used the graphic function from the {**ggdist**}
+ resp. {**tidybayes**} package. I learned about this familiy of functions from the [solution by Jake Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-3). 
+ 
+The model appears to fit well, because the observed value of 111 boys is in the middle of the `r glossary("posterior predictive distribution")` which has a mean of `r mean(dummy_data_3h3b)` and a median of `r median(dummy_data_3h3b)`.
+
+::::
+:::::
+
+:::
+
+
+::::
+:::::
+
+***
+
+#### 3H4
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3H4: Now compare $10,000$ counts of boys from $100$ simulated first borns only to the number of boys in the first births, `birth1`. How does the model look in this light?
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+
+###### 3H4a
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h4a}
+a: Compare $10,000$ counts of boys from $100$ simulated first borns (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3h4a
+#| fig-cap: "Compare 10,000 counts of boys from 100 simulated first borns (Original)"
+#| results: hold
+
+set.seed(100)
+dummy_data_3h4a <-  rbinom(n = 1e4,
+                           size = 100,
+                           prob = samples_3h2a)
+
+utils::head(dummy_data_3h4a, 10)
+map_3h4a <- rethinking::chainmode(dummy_data_3h4a, adj = 1)
+
+rethinking::dens(dummy_data_3h4a, adj = 0.7)
+abline(v = sum(birth1), col = "blue")
+abline(v = map_3h4a, col = "red")
+
+
+```
+
+Observed first born boys: `r sum(birth1)`
+
+Simulation of first born boys:
+
+- Mean: `r mean(dummy_data_3h4a)`
+- Median: `r median(dummy_data_3h4a)`
+- Mode: `r round(map_3h4a, 3)`
+
+With the `r glossary("posterior predictive distribution")` for the first born boys the model does not appears to fit well, because the observed value of `r sum(birth1)` boys (blue line) is not in the middle of the distribution.
+
+::::
+:::::
+
+
+###### 3H4b
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-3h4b}
+b: Compare $10,000$ counts of boys from $100$ simulated first borns (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-3h4b
+#| fig-cap: "Compare 10,000 counts of boys from 100 simulated first borns (Tidyverse)"
+#| results: hold
+
+
+set.seed(100)
+dummy_data_3h4b <-  stats::rbinom(n = 1e4,
+                           size = 100,
+                           prob = samples_3h2b$p_grid_3h1b
+                           )
+utils::head(dummy_data_3h4b, 10)
+
+map_3h4b <- tidybayes::Mode(dummy_data_3h4b)
+
+ggplot2::ggplot() +
+  ggdist::stat_slabinterval(ggplot2::aes(x = dummy_data_3h4b),
+                            .width = c(0.66, 0.89), color = "red",
+                            slab_fill = "grey", slab_color = "black",
+                            density = "bounded") +
+  ggplot2::geom_vline(
+    ggplot2::aes(xintercept = sum(birth1)), linetype = "dashed", color = "blue") +
+  ggplot2::geom_vline(
+    ggplot2::aes(xintercept = map_3h4b), linetype = "dashed", color = "red") +
+  ggplot2::labs(x = "Number of 1st born boys", y = "Density") +
+  ggplot2::theme_bw()
+
+```
+
+Observed first born boys: `r sum(birth1)`
+
+Simulation of first born boys:
+
+- Mean: `r mean(dummy_data_3h4b)`
+- Median: `r median(dummy_data_3h4b)`
+- Mode: `r round(map_3h4b, 3)`
+
+With the `r glossary("posterior predictive distribution")` for the first born boys the model does not appears so well as for all boys in @cnj-3h3b, because the observed value of `r sum(birth1)` boys (blue line) is not in the middle of the distribution. However, it does not appear to be a large discrepancy, as the observed value is still within the middle 66% interval.
+
+
+::::
+:::::
+
+
+:::
+
+
+::::
+:::::
+
+***
+
+#### 3H5
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 3H5: The model assumes that sex of first and second births are independent. To check this assumption, focus now on second births that followed female first borns. Compare 10,000 simulated counts of boys to only those second births that followed girls. To do this correctly, you need to count the number of first borns who were girls and simulate that many births, 10,000 times. Compare the counts of boys in your simulations to the actual observed count of boys following girls. How does the model look in this light? Any guesses what is going on in these data?
+:::
+::::{.my-exercise-container}
+
+::: {.panel-tabset}
+###### 3H5a
+
+
+
+
+```{r}
+#| label: fig-exercise-3h5a
+#| fig-cap: "Second births of boys that followed female first borns (Original)"
+#| results: hold
+
+
+df_birth_3h5a <- as.data.frame(cbind(birth1, birth2))
+df_birth_3h5a <- subset(df_birth_3h5a, birth1 == 0)
+
+n_1st_girls_3h5a <- 100 - sum(birth1)
+n_2nd_boys_3h5a <- sum(df_birth_3h5a$birth1) + sum(df_birth_3h5a$birth2)
+
+p_grid_3h5a <- seq(from = 0,
+                   to = 1,
+                   length.out = 1e3)
+prior_3h5a <- rep(0.5, 1e3)
+likelihood_3h5a <- dbinom(x = n_2nd_boys_3h5a,
+                              size = n_1st_girls_3h5a,
+                              prob = p_grid_3h5a)
+posterior_3h5a <-  prior_3h5a * likelihood_3h5a
+posterior_std_3h5a <- posterior_3h5a / sum(posterior_3h5a)
+
+set.seed(100)
+dummy_data_3h5a <-  rbinom(n = 1e4,
+                           size = n_1st_girls_3h5a,
+                           prob = samples_3h2a)
+rethinking::dens(dummy_data_3h5a, 
+                 adj = 1,
+                 xlab = "Number of 2nd born boys that follow a 1st born girl")
+abline(v = n_2nd_boys_3h5a, col = "blue")
+
+
+```
+The model predicts `r round(mean(dummy_data_3h5a), 0)` 2nd born boys that follow a 1st born girl. But we have observed `r n_2nd_boys_3h5a` boys. Our model underestimates the number of 2nd born boys so that our assumption that births are independent must be challenged.
+
+###### 3H5b
+
+```{r}
+#| label: fig-exercise-3h5b
+#| fig-cap: "Second births of boys that followed female first borns (Tidyverse)"
+#| results: hold
+
+n_1st_girls_3h5b <- 100 - sum(birth1)
+n_2nd_boys_3h5b <- sum(birth2[which(birth1 == 0)])
+
+
+set.seed(100)
+dummy_data_3h5b <- rbinom(1e4, size = n_1st_girls_3h5b, 
+            prob = samples_3h2b$p_grid_3h1b)
+
+map_3h5b <-  tidybayes::Mode(dummy_data_3h5b)
+
+ggplot2::ggplot() +
+  ggdist::stat_slabinterval(ggplot2::aes(x = dummy_data_3h5b),
+                            .width = c(0.66, 0.89), color = "red",
+                            slab_fill = "grey", slab_color = "black",
+                            density = "bounded") +
+  ggplot2::geom_vline(
+    ggplot2::aes(xintercept = n_2nd_boys_3h5b), linetype = "dashed", color = "blue") +
+  ggplot2::geom_vline(
+    ggplot2::aes(xintercept = map_3h5b), linetype = "dashed", color = "red") +
+  labs(x = "Number of 2nd born boys that follow a 1st born girl", 
+       y = "Density") +
+  ggplot2::theme_bw()
+```
+
+The model predicts `r round(mean(dummy_data_3h5b), 0)` 2nd born boys that follow a 1st born girl. But we have observed `r n_2nd_boys_3h5b` boys. Our model underestimates the number of 2nd born boys so that our assumption that births are independent appears to be violated. We have generally more 2nd born boys (`r sum(birth2)`% versus `r sum(birth1)`%) but especially more 2nd born boys when the first born was a girl (`r round((n_2nd_boys_3h5b / n_1st_girls_3h5b * 100), 2)`%).
+
+
+:::
+
+
+::::
+:::::
 
 ## Session info
 

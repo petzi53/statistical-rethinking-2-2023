@@ -1,3 +1,10 @@
+---
+format: html
+execute: 
+  cache: true
+---
+
+
 # Geocentric Models {#sec-chap04}
 
 ## File setup {.unnumbered}

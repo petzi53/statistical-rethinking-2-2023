@@ -9,9 +9,9 @@ nameref:
 # Preface {.unnumbered}
 
 ::: {.callout-note style="color: blue;"}
-This is work in progress: I have finished in a first draft the first 4 chapters, e.g., $\approx 21\%$ of the book content.
+This is work in progress: I have finished in a first draft the first 4 chapters, e.g., $\approx 23\%$ of the book content.
 
-I am working on a second draft where I will shorten my notes but include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft has stopped before chapter 3.5 (Practice) e.g. it has finished $\approx 11\%$ of the book content.
+I am working on a second draft where I will use [Quarto tabset panels](https://quarto.org/docs/interactive/layout.html#tabset-panel) and include the exercises under the practice section. I will also reformat the text by including different special callout boxes linked by numbered and named references. This second draft has stopped with @sec-chap04 e.g. it has finished $\approx 14\%$ of the book content.
 
 
 
@@ -112,6 +112,8 @@ following suffix to the end of the name:
 -   suffix `b` for the {**tidyverse**} / {**brms**} version in the main
     text
 -   suffix `c` for the {**rstan**} version in the main text (not used)
+-   suffix `ea`for the book version (R Base / {**rethinking**}) of the exercises
+-   suffix `eb`for the {**tidyverse**} / {**brms**} version of the exercises
 -   suffix `r` for the {**rethinking**} version in the synopsis
 -   suffix `s` for the Stan {**rstan**} version in the synopsis
 -   suffix `t` for the {**tidyverse**} / {**brms**} version in the

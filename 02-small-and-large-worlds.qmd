@@ -1,4 +1,7 @@
 ---
+format: html
+execute: 
+  cache: true
 filters: 
   - quarto
   - nameref
@@ -2505,7 +2508,7 @@ Non-Bayesian inference (`r glossary("frequentist statistics")` or
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
-Exercise 2E1: Which of the expressions below correspond to the statement: *the probability of rain on Monday*? {#chap-02-e1}
+Exercise 2E1: Which of the expressions below correspond to the statement: *the probability of rain on Monday*?
 :::
 ::::{.my-exercise-container}
 
@@ -2570,7 +2573,7 @@ Exercise 2E2: Which of the following statements corresponds to the expression: $
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
-Exercise 2E3: Which of the expressions below correspond to the statement: *the probability that it is Monday, given that it is raining*? {#chap-02-e3}
+Exercise 2E3: Which of the expressions below correspond to the statement: *the probability that it is Monday, given that it is raining*?
 :::
 ::::{.my-exercise-container}
 
