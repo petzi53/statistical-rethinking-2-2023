@@ -4566,7 +4566,7 @@ b: Exercise 3M3 -- Result (Tidyverse)
 (
   mean_dummy_3m3b <- samples_3m2b |> 
   dplyr::summarize(mean(dummy_3m3b == 8)) |> 
-  pull()
+  dplyr::pull()
 )
 ```
 
@@ -5200,7 +5200,7 @@ Nlist_3m6b <- c(20, 50, 100, 200, 500, 1000, 2000)
 
 df_3m6b_2 <- 
   tibble::tibble(Nlist_3m6b = base::rep(Nlist_3m6b, each = 100)) |> 
-  mutate(width_3m6b = purrr::map_dbl(Nlist_3m6b, f_3m6b))
+  dplyr::mutate(width_3m6b = purrr::map_dbl(Nlist_3m6b, f_3m6b))
 
 df_3m6b_2 |> 
   ggplot2::ggplot(ggplot2::aes(x = Nlist_3m6b,
@@ -5775,7 +5775,7 @@ ggplot2::ggplot() +
     ggplot2::aes(xintercept = n_2nd_boys_3h5b), linetype = "dashed", color = "blue") +
   ggplot2::geom_vline(
     ggplot2::aes(xintercept = map_3h5b), linetype = "dashed", color = "red") +
-  labs(x = "Number of 2nd born boys that follow a 1st born girl", 
+  ggplot2::labs(x = "Number of 2nd born boys that follow a 1st born girl", 
        y = "Density") +
   ggplot2::theme_bw()
 ```

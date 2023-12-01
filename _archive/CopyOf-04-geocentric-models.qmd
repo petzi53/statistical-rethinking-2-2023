@@ -7,63 +7,61 @@ execute:
 
 # Geocentric Models {#sec-chap04}
 
-:::::{.my-objectives}
-:::{.my-objectives-header}
-Learning Objectives:
-:::
-::::{.my-objectives-container}
-> “This chapter introduces `r glossary("linear regression")` as a Bayesian procedure. Under a probability interpretation, which is necessary for Bayesian work, linear regression uses a Gaussian (normal) distribution to describe our `r glossary("golem")`’s uncertainty about some measurement of interest.” ([McElreath, 2020, p. 71](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=90&annotation=PHU5R9MI))
-::::
-:::::
-
 ## File setup {.unnumbered}
 
 ```{r}
 #| label: setup
-#| results: hold
 
 library(tidyverse)
 library(patchwork)
 ```
 
-## ORIGINAL
+## `ORIGINAL`
 
 ### Why normal distributions? {#sec-why-normal-dist-a}
 
-Why are there so many distribution approximately normal,
+Why are there so many distribution approximately [normal]{.smallcaps},
 resulting in a Gaussian curve? Because there will be more combinations
 of outcomes that sum up to a "central" value, rather than to some
 extreme value.
 
-:::::{.my-important}
-:::{.my-important-header}
-Why are normal distributions normal?
+****
+:::: {#prp-why-normal}
+Why are normal distribution normal?
+
+::: callout-important
+Any process that adds together random values from the same distribution
+converges to a normal.
 :::
-::::{.my-important-container}
-> “Any process that adds together random values from the same distribution converges to a normal.” ([McElreath, 2020, p. 73](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=92&annotation=F8VYZH4I))
+
 ::::
-:::::
+***
+
 
 #### Normal by addition
 
- > “Whatever the average value of the source distribution, each sample from it can be thought of as a fluctuation from that average value. When we begin to add these fluctuations together, they also begin to cancel one another out. A large positive fluctuation will cancel a large negative one. The more terms in the sum, the more chances for each fluctuation to be canceled by another, or by a series of smaller ones in the opposite direction. So eventually the most likely sum, in the sense that there are the most ways to realize it, will be a sum in which every fluctuation is canceled by another, a sum of zero (relative to the mean).” ([McElreath, 2020, p. 73](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=92&annotation=PIK9MN9I))
- 
-> “It doesn’t matter what shape the underlying distribution possesses. It could be uniform, like in our example above, or it could be (nearly) anything else. Depending upon the underlying distribution, the convergence might be slow, but it will be inevitable. Often, as in this example, convergence is rapid.” ([McElreath, 2020, p. 74](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=93&annotation=GLCXRF8V))
+Whatever the average value of the source distribution, each sample from
+it can be thought of as a fluctuation from that average value. When we
+begin to add these fluctuations together, they also begin to cancel one
+another out. A large positive fluctuation will cancel a large negative
+one. The more terms in the sum, the more chances for each fluctuation to
+be canceled by another, or by a series of smaller ones in the opposite
+direction. So eventually the most likely sum, in the sense that there
+are the most ways to realize it, will be a sum in which every
+fluctuation is canceled by another, a sum of zero (relative to the
+mean).
 
-:::::{.my-resource}
-:::{.my-resource-header}
-Resources: Why normal distributions?
-:::
-::::{.my-resource-container}
+It doesn't matter what shape the underlying distribution possesses. It
+could be uniform, like in our example above, or it could be (nearly)
+anything else. Depending upon the underlying distribution, the
+convergence might be slow, but it will be inevitable.
+
 See the excellent article [Why is normal distribution so
 ubiquitous?](https://ekamperi.github.io/mathematics/2021/01/29/why-is-normal-distribution-so-ubiquitous.html)
 which also explains the example of random walks from SR2. See also the
 scientific paper [Why are normal distribution
 normal?](https://www.journals.uchicago.edu/doi/pdf/10.1093/bjps/axs046)
 of the The British Journal for the Philosophy of Science.
-::::
-:::::
-
 
 #### Normal by multiplication
 
@@ -80,84 +78,114 @@ distributions on the log scale.
 The justifications for using the Gaussian distribution fall into two
 broad categories:
 
-1. **Ontological justification**: The Gaussian
-    distributions is a widespread pattern, appearing again and again at different scales and in
-    different domains. 
-2.  **Epistemological justification**: When all we know is the mean and variance of a distribution then the Gaussian distribution arises as the most consistent with these assumptions. 
+1.  **Ontological justification**: The world is full of Gaussian
+    distributions, approximately. We're never going to experience a
+    perfect Gaussian distribution. But it is a widespread pattern,
+    appearing again and again at different scales and in different
+    domains. Measurement errors, variations in growth, and the
+    velocities of molecules all tend towards Gaussian distributions.
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-WATCH OUT! Many processes have heavier tails than the Gaussian distribution
+There are many other patterns in nature, so make no mistake in assuming
+that the Gaussian pattern is universal. In later chapters, we'll see how
+other useful and common patterns, like the exponential and gamma and
+Poisson, also arise from natural processes. The Gaussian is a member of
+a family of fundamental natural distributions known as the **Exponential
+family**. All of the members of this family are important for working
+science, because they populate our world.
+
+2.  **Epistemological justification**: The Gaussian represents a
+    particular state of ignorance. When all we know or are willing to
+    say about a distribution of measures (measures are continuous values
+    on the real number line) is their mean and variance, then the
+    Gaussian distribution arises as the most consistent with our
+    assumptions. It is the least surprising and least informative
+    assumption to make. --- If you don't think the distribution should
+    be Gaussian, then that implies that you know something else that you
+    should tell your golem about, something that would improve
+    inference.
+
+::: callout-caution
+Although the Gaussian distribution is common in nature and has some nice
+properties, there are some risks in using it as a default data model.
+The Gaussian distribution has some very thin tails---there is very
+little probability in them. Instead most of the mass in the Gaussian
+lies within one standard deviation of the mean. Many natural (and
+unnatural) processes have much heavier tails.
 :::
-::::{.my-watch-out-container}
 
-> “… the Gaussian distribution has some very thin tails—there is very little probability in them. Instead most of the mass in the Gaussian lies within one standard deviation of the mean. Many natural (and unnatural) processes have much heavier tails.” ([McElreath, 2020, p. 76](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=95&annotation=LFRDF45M))
-::::
-:::::
-
-:::::{.my-definition}
-:::{.my-definition-header}
-:::::: {#def-mass-density}
-: Probability mass and probability density
-::::::
-:::
-::::{.my-definition-container}
-
-- Probability distributions with only
-discrete outcomes, like the binomial, are called `r glossary("probability mass function")`s and denoted `Pr`.
-
-- Continuous ones like the Gaussian are called
-`r glossary("probability density function")`s, denoted with $p$ or just plain old
-$f$, depending upon author and tradition.
-
-> “Probability *density* is the rate of change in cumulative probability. So where cumulative probability is increasing rapidly, density can easily exceed 1. But if we calculate the area under the density function, it will never exceed 1. Such areas are also called *probability mass*.” ([McElreath, 2020, p. 76](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=95&annotation=577IRETG))
-
-For example `dnorm(0,0,0.1)` which is the way to make R calculate $p(0 \mid 0, 0.1)$ results to `r dnorm(0,0,0.1)`.
-
-::::
-:::::
-
-> “The Gaussian distribution is routinely seen without σ but with another parameter, $\tau$ . The parameter $\tau$ in this context is usually called *precision* and defined as $\tau = 1/σ^2$. When $\sigma$ is large, $\tau$ is small.” ([McElreath, 2020, p. 76](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=95&annotation=4UW673GU))
-
-> “This form is common in Bayesian data analysis, and Bayesian model fitting software, such as `r glossary("BUGS")` or `r glossary("JAGS")`, sometimes requires using $\tau$ rather than $\sigma$.” ([McElreath, 2020, p. 76](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=95&annotation=9VQCJW2G))
-
-
+The Gaussian is a continuous distribution, unlike the discrete
+distributions of earlier chapters. Probability distributions with only
+discrete outcomes, like the binomial, are called *probability mass*
+functions and denoted `Pr`. Continuous ones like the Gaussian are called
+*probability density* functions, denoted with *`p`* or just plain old
+*`f`*, depending upon author and tradition. For mathematical reasons,
+probability densities can be greater than 1. Try `dnorm(0,0,0.1)`", for
+example, which is the way to make R calculate *`p`*`(0|0, 0.1)`. The
+answer, about 4, is no mistake. Probability *density* is the rate of
+change in cumulative probability. So where cumulative probability is
+increasing rapidly, density can easily exceed 1. But if we calculate the
+area under the density function, it will never exceed 1. Such areas are
+also called *probability mass*.
 
 ### Model describing language
 
-:::::{.my-procedure}
-:::{.my-procedure-header}
-:::::: {#prp-model-language}
-: General recept for describing models
-::::::
-:::
-::::{.my-procedure-container}
-1. First, we recognize a set of variables to work with. Some of these variables are observable. We call these data. Others are unobservable things like rates and averages. We call these parameters. 
-2. We define each variable either in terms of the other variables or in terms of a probability distribution. 
-3. The combination of variables and their probability distributions defines a joint generative model that can be” ([McElreath, 2020, p. 77](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=96&annotation=IC4KGA5D))
-::::
-:::::
+1.  First, we recognize a set of variables to work with. Some of these
+    variables are observable. We call these *data.* Others are
+    unobservable things like rates and averages. We call these
+    *parameters*.
+2.  We define each variable either in terms of the other variables or in
+    terms of a *probability distribution*.
+3.  The combination of variables and their probability distributions
+    defines a *joint generative model* that can be used both to simulate
+    hypothetical observations as well as analyze real ones.
 
-:::::{.my-definition}
-:::{.my-definition-header}
-:::::: {#def-model}
-: What are statistical models?
-::::::
+This outline applies to models in every field, from astronomy to art
+history. The biggest difficulty usually lies in the subject
+matter---which variables matter and how does theory tell us to connect
+them?---not in the mathematics.
+
+The mathy way to summarize models will be something like: (taken from
+Kurz's version as it defines the general approach more clearly.)
+
+------------------------------------------------------------------------
+
+::: {#def-summarize-a-model}
+How to summarize a model mathematically?
+
+$$
+\begin{align*}
+\text{criterion}_i & \sim \operatorname{Normal}(\mu_i, \sigma) \\
+\mu_i  & = \beta \times \text{predictor}_i \\
+\beta &  \sim \operatorname{Normal}(0, 10) \\
+\sigma & \sim \operatorname{Exponential}(1) \\
+x_i   &  \sim \operatorname{Normal}(0, 1).
+\end{align*}
+$$ {#eq-summarize-a-model}
 :::
-::::{.my-definition-container}
-`r glossary("Statistical Model", "Models")` are “mappings of one set of variables through a probability distribution onto another set of variables.” ([McElreath, 2020, p. 77](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=96&annotation=NSVA3R2F))
-::::
-:::::
+
+------------------------------------------------------------------------
+
+::: callout-tip
+The ampersand sign `&` in the code of Kurz' version is used for
+horizontal alignment of different parts for case statements. It wouldn't
+be necessary in @eq-summarize-a-model because there is no conditional
+statement.
+:::
+
+`r glossary("Statistical Model", "Models")` are mappings of one set of
+variables through a probability distribution onto another set of
+variables. Fundamentally, these models define the ways values of some
+variables can arise, given values of other variables.
 
 #### Re-describing the globe tossing model
 
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-formula-glob-tossing-model}
-: Describe the globe tossing model from @sec-chap03
-::::::
-:::
-::::{.my-example-container}
+Recall the proportion of the water problem from previous chapters. The
+model in that case was always:
+
+------------------------------------------------------------------------
+
+::: {#def-glob-tossing-model}
+Describe the globe tossing model from @sec-chap03
 
 $$
 \begin{align*}
@@ -170,17 +198,20 @@ $$ {#eq-globe-tossing-model}
 -   `N`: total number of tosses
 -   `p`: proportion of water on the globe
 
-The first line in these kind of models always defines the likelihood
-function used in `r glossary("Bayes’ theorem")`. The other lines define priors.
-
 Read the above statement as:
 
 1.  **First line**: The count W is distributed binomially with sample
     size `N` and probability `p`.
 2.  **Second line**: The prior for `p` is assumed to be uniform between
     zero and one.
+:::
 
 ------------------------------------------------------------------------
+
+::: callout-important
+The first line in these kind of models always defines the likelihood
+function used in `r glossary("Bayes’ theorem")`. The other lines define priors.
+:::
 
 Both of the lines in the model of @eq-globe-tossing-model are
 `r glossary("stochastic")`, as indicated by the `~` symbol. A stochastic
@@ -190,58 +221,80 @@ variable on the left is known with certainty. Instead, the mapping is
 probabilistic: Some values are more plausible than others, but very many
 different values are plausible under any model. Later, we'll have models
 with deterministic definitions in them.
-::::
-:::::
 
+##### From model definition to Bayes’ theorem
+
+To relate the mathematical format of @eq-globe-tossing-model to `r glossary("Bayes’ theorem")`, you could use the model definition to define the posterior
+distribution:
+
+------------------------------------------------------------------------
+
+::: {#def-from-model-to-bayes-theorem}
+From model definition to Bayes’ theorem
+
+$$
+Pr(p|w,n) = \frac{\operatorname{Binomial(w|n,p)}\operatorname{Uniform(p|0,1)}}{\int\operatorname{Binomial(w|n,p)}\operatorname{Uniform(p|0,1)}dp}
+$$ {#eq-from-model-to-bayes-theorem}
+:::
+
+------------------------------------------------------------------------
+
+That monstrous denominator is just the average likelihood again. It
+standardizes the posterior to sum to 1. The action is in the numerator,
+where the posterior probability of any particular value of `p` is seen
+again to be proportional to the product of the likelihood and prior. In
+R code form, this is the same grid approximation calculation you've been
+using all along.
+
+We will write it in a form that is compatible and therefore better
+recognizable with the expression in @eq-from-model-to-bayes-theorem:
+
+```{r}
+#| label: model-bayes-theorem-a
+#| attr-source: '#lst-model-bayes-theorem-a lst-cap="Calculate the posterior distribution in a way that is regognizable with the Bayes theorem"'
+
+## R code 4.6 ##############
+w <- 6
+n <- 9
+p_grid_a <- seq(from = 0, to = 1, length.out = 100)
+posterior_num <- dbinom(w, n, p_grid_a) * dunif(p_grid_a, 0, 1)
+posterior_a <- posterior_num / sum(posterior_num)
+
+```
+
+Compare to the calculations in earlier chapters, for example with
+@lst-grid-approx-a.
 
 ### Gaussian model of height {#sec-gaussian-model-of-height-a}
 
 In this section we want a single measurement variable to model as a Gaussian distribution. It is a preparation for the linear regression model in @sec-linear-prediction-a  where we will construct and add a predictor variable to the model. 
 
-> “There will be two parameters describing the distribution’s shape, the `r glossary("arithmetic mean", "mean")` `μ` and the `r glossary("standard deviation")` `σ`. `r glossary("Bayesian updating")` will allow us to consider every possible combination of values for μ and σ and to score each combination by its relativ // plausibility, in light of the data. These relative plausibilities are the `r glossary("posterior probability", "posterior probabilities")` of each combination of values μ, σ.” ([McElreath, 2020, p. 78/79](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=98&annotation=RAYXZIGU))
+For the moment, we want just a single measurement variable to model as a Gaussian distribution. There will be two parameters describing the distribution’s shape, the `r glossary("arithmetic mean", "mean")` `μ` and the `r glossary("standard deviation")` `σ`. `r glossary("Bayesian updating")` will allow us to consider every possible combination of values for `μ` and `σ` and to score each combination by its relative plausibility, in light of the data. These relative plausibilities are the `r glossary("posterior probability", "posterior probabilities")` of each combination of values `μ`, `σ`.
 
+There are an infinite number of possible Gaussian distributions. Some
+have small means. Others have large means. Some are wide, with a large
+`σ`. Others are narrow. We want our Bayesian machine to consider every
+possible distribution, each defined by a combination of `μ` and `σ`, and
+rank them by posterior plausibility. Posterior plausibility provides a
+measure of the logical compatibility of each possible distribution with
+the data and model.
 
+Keep in mind that the “estimate” here will be the entire posterior distribution, not any point within it. And as a result, the posterior distribution will be a distribution of Gaussian distributions. Yes, a distribution of distributions. 
 
 #### The data
 
-:::::{.my-resource}
-:::{.my-resource-header}
-Resource: Nancy Howell data
-:::
-::::{.my-resource-container}
-- Howell, N. (2001). Demography of the Dobe! Kung (2nd ed.). Routledge.
-- Howell, N. (2010). Life Histories of the Dobe !kung: Food, Fatness, and Well-being over the Life Span: Food, Fatness, and Well-Being Over the Life-Span Volume 4. University of California Press.
-
 The data contained in `data(Howell1)` are partial census data for the
 Dobe area !Kung San, compiled from interviews conducted by Nancy Howell
-in the late 1960s.
+in the late 1960s. Much more raw data is available for download from
+https://tspace.library.utoronto.ca/handle/1807/10395.
 
-Much more raw data is available for download from the [University of Toronto Library](https://tspace.library.utoronto.ca/simple-search?query=nancy+howell&filter_field_1=author&filter_type_1=equals&filter_value_1=Howell%2C+Nancy&sort_by=score&order=desc&rpp=10&etal=0&start=0)
+For the non-anthropologists reading along, the !Kung San are the most
+famous foraging population of the twentieth century, largely because of
+detailed quantitative studies by people like Howell.
 
-> “For the non-anthropologists reading along, the !Kung San are the most famous foraging population of the twentieth century, largely because of detailed quantitative studies by people like Howell.” ([McElreath, 2020, p. 79](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=98&annotation=XUZLTB86))
-
-::::
-:::::
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-WATCH OUT! Loading data without attaching the package with `library()`
-:::
-::::{.my-watch-out-container}
-
-::: {.panel-tabset}
-###### Standard
-
-Loading data from a package with the `data()` function is only possible if you have
-already loaded the package. 
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-standard-data-loading}
-: Data loading from a package -- Standard procedure
-::::::
-:::
-::::{.my-r-code-container}
+::: callout-caution
+Loading data from a package with `data()` is only possible if you have
+already loaded the package. In our example:
 
 ```{r}
 #| label: loading-data-from-package1_a
@@ -254,336 +307,79 @@ data(Howell1)
 d_a <- Howell1
 ```
 
-::::
-:::::
-
-###### Unusual (Original)
-
 Because of many function name conflicts with {**brms**} I do not want to
 load {**rethinking**} and will call the function of these conflicted
 packages with `<package name>::<function name>()` Therefore I have to
-use another, not so usual loading strategy of the data set.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-unusual-data-loading-a}
-a: Data loading from a package -- Unusual procedure (Original)
-::::::
-:::
-::::{.my-r-code-container}
+use another, not so usual loading strategy of the data set:
 
 ```{r}
 #| label: loading-data-from-package2_a
+#| attr-source: '#lst-loading-data-from-package2_a lst-cap="Load data `Howell1` from the {**rethinking**} package without loading the package and assign the data to an object. Rethinking"'
 
 data(package = "rethinking", list = "Howell1")
 d_a <- Howell1
 ```
 
-::::
-:::::
-
-The advantage of this unusual strategy is that I have not always to detach the
+The advantage of this strategy is that I have not always to detach the
 {**rethinking**} package and to make sure {**rethinking**} is detached
 before using {**brms**} as it is necessary in the Kurz's {**tidyverse**}
 / {**brms**} version.
-
-
-###### Unusual (Tidyverse)
-
-Because of many function name conflicts with {**brms**} I do not want to
-load {**rethinking**} and will call the function of these conflicted
-packages with `<package name>::<function name>()` Therefore I have to
-use another, not so usual loading strategy of the data set.
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-unusual-data-loading-b}
-b: Data loading from a package -- Unusual procedure (Tidyverse)
-::::::
 :::
-::::{.my-r-code-container}
-
-```{r}
-#| label: loading-data-from-package_2b
-
-
-data(package = "rethinking", list = "Howell1")
-d_b <- Howell1
-```
-
-::::
-:::::
-
-The advantage of this unusual strategy is that I have not always to detach the
-{**rethinking**} package and to make sure {**rethinking**} is detached
-before using {**brms**} as it is necessary in the Kurz's {**tidyverse**}
-/ {**brms**} version.
-
-:::
-
-::::
-:::::
-
 
 ##### Show the data
 
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-show-data}
-: Show and inspect the data
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-###### str()
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-show-data-str-a}
-a: Compactly Display the Structure of an Arbitrary R Object (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-
 ```{r}
-#| label: show-howell-data-str-a
-#| results: hold
+#| label: show-howell-data-a
+#| attr-source: '#lst-show-howell-data-a lst-cap="Show and inspect the data: rethinking"'
 
 ## R code 4.8 ####################
 str(d_a)
-```
-
-`utils::str()` displays compactly the internal **str**ucture of any reasonable R object. 
-
-Our Howell1 data contains four columns. Each column has 544 entries, so
-there are 544 individuals in these data. Each individual has a recorded
-height (centimeters), weight (kilograms), age (years), and "maleness" (0
-indicating female and 1 indicating male).
-::::
-:::::
-
-###### precis()
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-show-data-precis-a}
-a: Displays concise parameter estimate information for an existing model fit (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: show-howell-data-precis-a
-#| results: hold
 
 ## R code 4.9 ###################
 rethinking::precis(d_a)
 ```
 
-`rethinking::precis()` creates a table of estimates and standard errors, with optional confidence intervals and parameter correlations. 
-
-In this case we see the mean, the standard deviation, the width of a 89% posterior interval and a small histogram of four variables: height (centimeters), weight (kilograms), age (years), and "maleness" (0
-indicating female and 1 indicating male).
-
-Additionally there is also a console output. In our case: `'data.frame': 544 obs. of 4 variables:`
-.
-::::
-:::::
-
-
-
-###### glimpse()
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-show-data-glimpse-b}
-b: Get a glimpse of your data (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: show-howell-data-glimpse-b
-
-d_b |>
-    dplyr::glimpse()
-```
-
-`pillar::glimpse()` is re-exported by {**dplyr**} and is the tidyverse analogue for `str()`. It works like a transposed version of `print()`: columns run down the page, and data runs across.
-
-`dplyr::glimpse()` shows that the Howell1 data contains four columns. Each column has 544 entries, so
+This data frame contains four columns. Each column has 544 entries, so
 there are 544 individuals in these data. Each individual has a recorded
 height (centimeters), weight (kilograms), age (years), and "maleness" (0
 indicating female and 1 indicating male).
 
-::::
-:::::
-
-###### summary()
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-show-data-summary-b}
-: Object summaries (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: show-howell-data-summary-b
-
-d_b |> 
-    base::summary()
-```
-
-Kurz tells us that the {**brms**} package does not have a function that
-works like `rethinking::precis()` for providing numeric and graphical
-summaries of variables, as seen in @cnj-show-data-precis-a 
-Kurz suggests therefore to use `base::summary()` to get some of
-the information from `rethinking::precis()`.
-
-::::
-:::::
-
-###### skim()
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-show-data-skim-b}
-b: Skim a data frame, getting useful summary statistics
-::::::
-:::
-::::{.my-r-code-container}
-
-I think `skimr::skim()` is a better option as an alternative to
-`rethinking::precis()` as `base::summary()` because it also has a
-graphical summary of the variables. {**skimr**} has many other useful
-functions and is very adaptable. I propose to install and to try it out.
-
-```{r}
-#| label: show-howell-data-skim-b
-
-d_b |>            
-    skimr::skim() 
-```
-
-
-
-
-::::
-:::::
-
-
-:::
-
-::::
-:::::
-
-
-
-
 ##### Select the height data of adults
 
-> “All we want for now are heights of adults in the sample. The reason to filter out nonadults for now is that height is strongly correlated with age, before adulthood.” ([McElreath, 2020, p. 80](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=99&annotation=VCYRP6W4))
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-adult-data}
-: Select the height data of adults (individuals older or equal than 18 years)
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-###### Original
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-adult-data-a}
-a: Select individuals older or equal than 18 years (Original)
-::::::
-:::
-::::{.my-r-code-container}
+We're going to work with just the height column, for the moment. All we
+want for now are heights of adults in the sample. The reason to filter
+out non-adults for now is that height is strongly correlated with age,
+before adulthood.
 
 ```{r}
 #| label: select-height-adults-a
+#| attr-source: '#lst-select-height-adults-a lst-cap="Select the height data of adults (individuals older or equal than 18 years): base R version"'
 
+## R code 4.10 ###################
+head(d_a$height)
+ 
 ## R code 4.11 ###################
 d2_a <- d_a[d_a$age >= 18, ]
-str(d2_a)
+
 ```
 
-::::
-:::::
-
-
-###### Tidyverse
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-adult-data-b}
-b: Select individuals older or equal than 18 years (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: select-height-adults-b
-
-d2_b <- 
-  d_b |> 
-  dplyr::filter(age >= 18) 
-
-dplyr::glimpse(d2_b)
-```
-
-::::
-:::::
-
-:::
-
-::::
-:::::
-
+We'll be working with the data frame d2 now. It should have 352 rows
+(individuals) in it. We will check this with `nrow(d2_a)` =
+`r nrow(d2_a)`.
 
 #### The model
 
-Our goal is to model the data using a Gaussian distribution.
+Our goal is to model the data in `d2_a` using a Gaussian distribution.
 
 ##### Plot the distribution of heights
 
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-plot-height-dist}
-: Plotting the distribution of height
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### Original
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-plot-height-dist-a}
-a: Plot the distribution of the heights of adults, overlaid by an ideal Gaussian distribution (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
 #| label: fig-dist-heights-a
-#| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution (Original)"
+#| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution: rethinking version"
+#| attr-source: '#lst-fig-dist-heights-a lst-cap="Plot the distribution of the heights of adults, overlaid by an ideal Gaussian distribution: rethinking version"'
 
-rethinking::dens(d2_a$height, adj= 1, norm.comp = TRUE)
+rethinking::dens(d2_a$height, norm.comp = TRUE)
 ```
-
-::::
-:::::
 
 With the option `norm.comp = TRUE` I have overlaid a Gaussian
 distribution to see the differences to the actual data. There are some
@@ -591,287 +387,115 @@ differences locally, especially on the peak of the distribution. But the
 tails looks nice and we can say that the overall impression of the curve
 is Gaussian.
 
+::: callout-caution
+###### Decisions how to model the data
 
-
-###### Tidyverse
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-plot-height-dist-b}
-b: Plot the distribution of the heights of adults, overlaid by an ideal Gaussian distribution (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: fig-dist-heights-b
-#| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution: tidyverse version"
-
-d2_b |> 
-    ggplot2::ggplot(ggplot2::aes(height)) +
-    ggplot2::geom_density() +
-
-    ggplot2::stat_function(
-        fun = dnorm,
-        args = with(d2_b, c(mean = mean(height), sd = sd(height)))
-        ) +
-    ggplot2::labs(
-      x = "Height in cm",
-      y = "Density"
-    ) +
-    ggplot2::theme_bw()
-  
-```
-
-::::
-:::::
-
-The plot of the heights distribution compared with the standard Gaussian
-distribution is missing in Kurz's version. I added this plot after an internet research by using
-the last example of [How to Plot a Normal Distribution in
-R](https://www.statology.org/plot-normal-distribution-r/). It uses the `ggplot2::stat_function()` to compute and draw a function as a continuous curve. This makes it easy to superimpose a function on top of an existing plot.
-
-
-
+Gawking at the raw data, to try to decide how to model them, is usually
+not a good idea. The data could be, for example, a mixture of different
+Gaussian distributions. Furthermore, the empirical distribution need not
+be actually Gaussian in order to justify using a Gaussian probability
+distribution.
 :::
 
-::::
-:::::
+Define the heights as normally distributed with a mean `μ` and standard
+deviation `σ`
 
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-WATCH OUT! Looking at the raw data is not enough for a model decision
-:::
-::::{.my-watch-out-container}
-> “Gawking at the raw data, to try to decide how to model them, is usually not a good idea. The data could be a mixture of different Gaussian distributions, for example, and in that case you won’t be able to detect the underlying normality just by eyeballing the outcome distribution.” ([McElreath, 2020, p. 81](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=100&annotation=DMU8TC6L))
-::::
-:::::
+------------------------------------------------------------------------
 
-
-:::::{.my-theorem}
-:::{.my-theorem-header}
-:::::: {#thm-def-heights}
-: Define the heights as normally distributed with a mean $\mu$ and standard
-deviation $\sigma$
-::::::
-:::
-::::{.my-theorem-container}
+::: {#def-height-normal-dist}
+Heights normally distributed
 
 $$
 h_{i} \sim \operatorname{Normal}(σ, μ) 
 $$ {#eq-height-normal-dist}
+:::
 
-- **Symbol h**: refers to the list of heights
-- **Subscript i**: refers to each individual element of the list. It is conventional to use
-$i$ because it stands for index. The index $i$ takes on row numbers, and
+------------------------------------------------------------------------
+
+The symbol `h` refers to the list of heights, and the subscript `i`
+means each individual element of this list. It is conventional to use
+`i` because it stands for index. The index `i` takes on row numbers, and
 so in this example can take any value from 1 to 352 (the number of
 heights in `d2_a$height`). As such, the model above is saying that all
 the golem knows about each height measurement is defined by the same
-normal distribution, with mean $\mu$ and standard deviation $\sigma$.
+normal distribution, with mean `μ` and standard deviation `σ`.
 
-@eq-height-normal-dist assumes that the values
-$h_{i}$ are `r glossary("i.i.d.")` (independent and identically distributed) 
-::::
-:::::
+The short model in @def-height-normal-dist assumes that the values
+$h_{i}$ are *independent and identically distributed*, abbreviated
+`i.i.d.`, `iid`, or `IID`.
 
-> “The i.i.d. assumption doesn’t have to seem awkward, as long as you remember that probability is inside the golem, not outside in the world. The i.i.d. assumption is about how the golem represents its uncertainty. It is an *epistemological* assumption. It is not a physical assumption about the world, an *ontological* one. E. T. Jaynes (1922–1998) called this the *mind projection fallacy*, the mistake of confusing epistemological claims with ontological claims.” ([McElreath, 2020, p. 81](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=100&annotation=VFIF5ITN))
+To complete the model, we're going to need some priors. The parameters
+to be estimated are both `μ` and `σ`, so we need a prior `Pr(μ, σ)`, the
+joint prior probability for all parameters. In most cases, priors are
+specified independently for each parameter, which amounts to assuming
+$Pr(μ,σ) = Pr(μ)Pr(σ)$.
 
-> “To complete the model, we’re going to need some priors. The parameters to be estimated are both $\mu$ and $\sigma$, so we need a prior $Pr(\mu, \sigma)$, the joint prior probability for all parameters. In most cases, priors are specified independently for each parameter, which amounts to assuming $Pr(\mu, \sigma) = Pr(\mu)Pr(\sigma)$.” ([McElreath, 2020, p. 82](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=101&annotation=5HVI6LB4))
+------------------------------------------------------------------------
 
-
-:::::{.my-theorem}
-:::{.my-theorem-header}
-:::::: {#thm-linear-heights-model}
-: Define the linear heights model
-::::::
-:::
-::::{.my-theorem-container}
+::: {#def-height-linear-model-m4.1}
+###### Linear heights model
 
 $$
 \begin{align*}
-h_{i} \sim \operatorname{Normal}(\mu, \sigma) \space \space (1) \\ 
+h_{i} \sim \operatorname{Normal}(μ, σ) \space \space (1) \\ 
 μ \sim \operatorname{Normal}(178, 20)  \space \space (2) \\ 
 μ \sim \operatorname{Uniform}(0, 50)   \space \space (3)      
 \end{align*}
 $$ {#eq-height-linear-model-m4.1}
 
-***
 1.  First line represents the likelihood.
-2.  Second line is the chosen $\mu$ (mu, mean) prior. It is a broad Gaussian prior, centered on 178 cm, with 95% of probability between 178 ± 40 cm. 
-3.  Third line is the chosen $\sigma$ (sigma, standard deviation) prior.
+2.  Second line is the chosen `μ`(mu, mean) prior.
+3.  Third line is the chosen `σ` (sigma, standard deviation) prior.
+:::
 
-::::
-:::::
-
-
-
-
+------------------------------------------------------------------------
 
 Let's think about the chosen value for the priors more in detail:
 
-**1. Choosing the mean prior**
+The prior for `μ` is a broad Gaussian prior, centered on 178 cm, with
+95% of probability between 178 ± 40 cm.
 
-- **Why normal distribution?**: As we have stated before in @thm-def-heights the heights distribution of adults is a Gaussian distribution.
-- **Why 178cm?**: “Your author is 178 cm tall. And the range from 138 cm to 218 cm encompasses a huge range of plausible mean heights for human populations. So domain-specific information has gone into this prior.” ([McElreath, 2020, p. 82](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=101&annotation=DUN4YP7H))
-- **Why 95% and 40cm?**: 40cm (T= twice sigma = 2* 20) and 95% is a reference to the [68–95–99.7 rule](https://en.wikipedia.org/w/index.php?title=68%E2%80%9395%E2%80%9399.7_rule&oldid=1187581793) that helps to remember how many percentages of values lie within an interval estimate in a normal distribution:
+Why 178 cm? Your author is 178 cm tall. And the range from 138 cm to 218
+cm encompasses a huge range of plausible mean heights for human
+populations. So domain-specific information has gone into this prior.
+Everyone knows something about human height and can set a reasonable and
+vague prior of this kind. But in many regression problems, as you'll see
+later, using prior information is more subtle, because parameters don't
+always have such clear physical meaning.
 
-$$
-\begin{align}
-  \Pr(\mu-1\sigma \le X \le \mu+1\sigma) & \approx 68.27\% \\
-  \Pr(\mu-2\sigma \le X \le \mu+2\sigma) & \approx 95.45\% \\
-  \Pr(\mu-3\sigma \le X \le \mu+3\sigma) & \approx 99.73\%
-\end{align}
-$$
+Whatever the prior, it's a very good idea to plot your priors, so you
+have a sense of the assumption they build into the model.
 
-**2. Choosing the sigma prior**
-
-- **Why uniform distribution?**: We assume `r glossary("i.i.d.")`, e.g., the standard deviation is over the whole distribution identical.
-- **Why 0 as lower limit?**: “A standard deviation like σ must be positive, so bounding it at zero makes sense.” ([McElreath, 2020, p. 82](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=101&annotation=9KXSZF9A))
-- **Why 50 as upper limit?** “… a standard deviation of 50 cm would imply that 95% of individual heights lie within 100 cm of the average height.” ([McElreath, 2020, p. 82](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=101&annotation=5653WGIL)) Thas is a range large enough to include variation of heights.
-
-:::::{.my-important}
-:::{.my-important-header}
-Plot the chosen priors!
-:::
-::::{.my-important-container}
-It is important to plot the priors to get an idea about the assumptions they build into your model.
-::::
-:::::
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-ID-text}
-: Numbered Example Title
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### $\mu$ (Original)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-code-name-a}
-a: Plot the chosen mean prior (Original)
-::::::
-:::
-::::{.my-r-code-container}
+##### Plot the mean prior (mu)
 
 ```{r}
 #| label: fig-mean-prior-a
-#| fig-cap: "Plot of the chosen mean prior (Original)"
+#| fig-cap: "Plot of the chosen mean prior: base R version"
+#| attr-source: '#lst-fig-mean-prior-a lst-cap="Plot the chosen mean prior: base R version"'
 
 ## R code 4.12 ###############################
-graphics::curve(stats::dnorm(x, 178, 20), from = 100, to = 250)
+curve(dnorm(x, 178, 20), from = 100, to = 250)
 ```
-
-
-::::
-:::::
 
 You can see that the golem is assuming that the average height (not each
 individual height) is almost certainly between 140 cm and 220 cm. So
 this prior carries a little information, but not a lot.
 
+##### Plot the prior of the standard deviation (sigma)
 
-###### $\sigma$ (Original)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-code-name-b}
-a: Plot chosen prior for the standard deviation (Original)
-::::::
-:::
-::::{.my-r-code-container}
+A standard deviation like `σ` must be positive, so bounding it at zero
+makes sense. How should we pick the upper bound? In this case, a
+standard deviation of 50 cm would imply that 95% of individual heights
+lie within 100 cm of the average height. That's a very large range.
 
 ```{r}
 #| label: fig-sd-prior-a
-#| fig-cap: "Plot the chosen prior for the standard deviation (Original)"
+#| fig-cap: "Plot the chosen prior for the standard deviation: base R version"
+#| attr-source: '#lst-fig-sd-prior-a lst-cap="Plot chosen prior for the standard deviation: base R version"'
 
 ## R code 4.13 ###########################
-graphics::curve(stats::dunif(x, 0, 50), from = -10, to = 60)
+curve(dunif(x, 0, 50), from = -10, to = 60)
 ```
-
-::::
-:::::
-
-###### $\mu$ (Tidyverse)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-code-name-a}
-b: Plot the chosen mean prior (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r, fig.height=4, fig.width=6}
-#| label: fig-mean-prior-b
-#| fig-cap: "Plot of the chosen mean prior (Tidyverse)"
-#| fig-height: 4
-#| fig-width: 6
-
-tibble::tibble(x = base::seq(from = 100, to = 250, by = .1)) |> 
-    
-  ggplot2::ggplot(ggplot2::aes(x = x, y = stats::dnorm(x, mean = 178, sd = 20))) +
-  ggplot2::geom_line() +
-  ggplot2::scale_x_continuous(breaks = base::seq(from = 100, to = 250, by = 25)) +
-  ggplot2::labs(title = "mu ~ dnorm(178, 20)",
-       y = "density") +
-  ggplot2::theme_bw()
-```
-
-::::
-:::::
-
-As there is only one variable $y$ (= `dnorm(x, mean = 178, sd = 20)`) we need to specify $x$ as a sequence of 1501 points to provide a $x$ and $y$ aesthetic for the plot.
-
-###### $\sigma$ (Tidyverse)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-code-name-b}
-b: Plot the chosen prior for the standard deviation (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r fig.height=4, fig.width=6}
-#| label: fig-sd-prior-b
-#| fig-cap: "Plot the chosen prior for the standard deviation (Tidyverse)"
-#| fig-height: 4
-#| fig-width: 6
-
-tibble::tibble(x = base::seq(from = -10, to = 60, by = .1)) |>
-
-  ggplot2::ggplot(ggplot2::aes(x = x, y = stats::dunif(x, min = 0, max = 50))) +
-  ggplot2::geom_line() +
-  ggplot2::scale_x_continuous(breaks = c(0, 50)) +
-  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
-  ggplot2::ggtitle("sigma ~ dunif(0, 50)") +
-  ggplot2::theme_bw()
-```
-
-::::
-:::::
-
-We don't really need the $y$-axis when looking at the shapes of a density,
-so we'll just remove it with `scale_y_continuous(NULL, breaks = NULL)`.
-
-:::
-
-::::
-:::::
-
-# I STOPPED HERE (ORIGINAL)
-
-```{r}
-## ************************** ############
-## I STOPPED HERE (ORIGINAL) #############
-## ************************** ############
-```
-
 
 ##### Prior predictive simulation
 
@@ -3396,14 +3020,225 @@ Resources for GAMs
 ::::
 ***
 
-# I STOPPED HERE (TIDYVERSE)
+## `TIDYVERSE`
+
+### Why normal distributions?
+
+I am not going to replicate the examples of @sec-why-normal-dist-a. They
+do not help conceptually about the main issues why normal distributions
+are wide-spread. But I will mention even the empty sub-chapter to get a
+symmetry in the table of content.
+
+#### EMPTY: Normal by addition
+
+#### EMPTY: Normal by multiplication
+
+#### EMPTY: Normal by log-multiplication
+
+#### EMPTY: Using Gaussian distributions
+
+### Model describing language
+
+#### From model definition to Bayes’ theorem
+
+We can use grid approximation to work through our globe tossing model.
 
 ```{r}
-## ************************** ############
-## I STOPPED HERE (TIDYVERSE) #############
-## ************************** ############
+#| label: model-bayes-b
+#| attr-source: '#lst-model-bayes-b lst-cap="Calculate globe tossing model with syntax from Bayes theorem"'
+
+
+# how many `p_grid` points would you like?
+n_points <- 100
+
+d_bayes_b <-
+  tibble(p_grid = seq(from = 0, to = 1, length.out = n_points),
+         w      = 6, 
+         n      = 9) %>% 
+  mutate(prior      = dunif(p_grid, min = 0, max = 1),
+         likelihood = dbinom(w, size = n, prob = p_grid)) %>%
+  mutate(posterior = likelihood * prior / sum(likelihood * prior))
+
+head(d_bayes_b)
 ```
 
+In case you were curious, here's what they look like.
+
+```{r}
+#| label: fig-prior-likelihood-posterior-b
+#| fig-cap: "Prior, likelihood and posterior distribution for globe tossing model calculated with syntax accoridng to Bayes' theorem"
+#| attr-source: '#lst-fig-prior-likelihood-posterior-b lst-cap="Prior, likelihood and posterior distribution for globe tossing model calculated with syntax accoridng to Bayes theorem"'
+
+d_bayes_b %>% 
+  pivot_longer(prior:posterior) %>% 
+  
+  # dictate the order in which the panels will appear
+  mutate(name = factor(name, levels = c("prior", "likelihood", "posterior"))) %>% 
+    
+  ggplot(aes(x = p_grid, y = value, fill = name)) +
+  geom_area() +
+  scale_fill_manual(values = c("blue", "red", "purple")) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme(legend.position = "none") +
+  facet_wrap(~ name, scales = "free")
+```
+
+The posterior is a combination of the prior and the likelihood. When the
+prior is flat across the parameter space, the posterior is just the
+likelihood re-expressed as a probability. As we go along, you'll see we
+almost never use flat priors in practice. Be warned that eschewing flat
+priors is a recent development, however. You only have to look at the
+literature from a couple decades ago to see mounds and mounds of flat
+priors.
+
+### Gaussian model of height
+
+#### The data
+
+##### Show the data
+
+```{r}
+#| label: loading-data-from-package_b
+#| attr-source: '#lst-loading-data-from-package_b lst-cap="Load data `Howell1` from the {**rethinking**} package without loading the package and assign the data to an object. Tidyverse"'
+
+data(package = "rethinking", list = "Howell1")
+d_b <- Howell1
+```
+
+```{r}
+#| label: show-howell-data1-b
+
+d_b |>
+    glimpse()
+
+```
+
+`glimpse()` is the tidyverse analogue for `str()`.
+
+```{r}
+#| label: show-howell-data2-b
+d_b |> 
+    summary()
+```
+
+Kurz tells us that the {**brms**} package does not have a function that
+works like `rethinking::precis()` for providing numeric and graphical
+summaries of variables, as in the second part of
+@lst-show-howell-data-a. Kurz suggests `base::summary()` to get some of
+the information from `rethinking::precis()`.
+
+```{r}
+#| label: show-howell-data3-b
+d_b |>            
+    skimr::skim() 
+
+```
+
+I think `skimr::skim()` is a better option as an alternative to
+`rethinking::precis()` as `base::summary()` because it also has a
+graphical summary of the variables. {**skimr**} has many other useful
+functions and is very adaptable. I propose to install and to try it out.
+
+##### Select the height data of adults
+
+With {**tidyverse**} we can isolate height values with the
+`dplyr::select()` function and we are using the `dplyr::filter()`
+function to make an adults-only data frame.
+
+```{r}
+#| label: select-height-adults-b
+#| attr-source: '#lst-select-height-adults-b lst-cap="Select the height data of adults (individuals older or equal than 18 years): tidyverse version"'
+
+d_b %>%
+  select(height) %>% 
+  glimpse()
+
+d2_b <- 
+  d_b %>%
+  filter(age >= 18) 
+ 
+glimpse(d2_b)
+```
+
+The two functions of @lst-select-height-adults-b are much more readable
+and understandable as the weird base R syntax in
+@lst-select-height-adults-a.
+
+#### The model
+
+##### Plot the distribution of heights
+
+The plot of the heights distribution compared with the standard Gaussian
+distribution is missing in Kurz's version. I added this plot by using
+the last example of [How to Plot a Normal Distribution in
+R](https://www.statology.org/plot-normal-distribution-r/). It uses the `ggplot2::stat_function()` to compute and draw a function as a continuous curve. This makes it easy to superimpose a function on top of an existing plot.
+
+```{r}
+#| label: fig-dist-heights-b
+#| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution: tidyverse version"
+#| attr-source: '#lst-fig-dist-heights-b lst-cap="Plot the distribution of the heights of adults, overlaid by an ideal Gaussian distribution: tidyverse version"'
+
+p0 <- 
+    d2_b |> 
+    ggplot(aes(height)) +
+    geom_density() +
+
+    stat_function(
+        fun = dnorm,
+        args = with(d2_b, c(mean = mean(height), sd = sd(height)))
+        ) +
+    scale_x_continuous("Height in cm")
+
+p0
+```
+
+##### Plot the mean prior (mu)
+
+Here is the shape for the prior $μ \sim Normal(178, 20)$.
+
+```{r}
+#| label: fig-mean-prior-b
+#| fig-cap: "Plot of the chosen mean prior: tidyverse version"
+#| attr-source: '#lst-fig-mean-prior-b lst-cap="Plot of the chosen mean prior: tidyverse version"'
+
+p1 <-
+  tibble(x = seq(from = 100, to = 250, by = .1)) %>% 
+    
+  ggplot(aes(x = x, y = dnorm(x, mean = 178, sd = 20))) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(from = 100, to = 250, by = 25)) +
+  labs(title = "mu ~ dnorm(178, 20)",
+       y = "density")
+
+p1
+```
+
+As there is only one variable y (= `dnorm(x, mean = 178, sd = 20)`) we need to specify x as a sequence of 1501 points t provide a x and y aesthetic for the plot.
+
+
+##### Plot the prior of the standard deviation (sigma)
+
+And here's the ggplot2 code for our prior for `σ`, a uniform
+distribution with a minimum value of 0 and a maximum value of 50. We
+don't really need the `y`-axis when looking at the shapes of a density,
+so we'll just remove it with `scale_y_continuous()`.
+
+```{r}
+#| label: fig-sd-prior-b
+#| fig-cap: "Plot the chosen prior for the standard deviation: tidyverse version"
+#| attr-source: '#lst-fig-sd-prior-b lst-cap="Plot the chosen prior for the standard deviation: tidyverse version"'
+
+p2 <-
+  tibble(x = seq(from = -10, to = 60, by = .1)) %>%
+  
+  ggplot(aes(x = x, y = dunif(x, min = 0, max = 50))) +
+  geom_line() +
+  scale_x_continuous(breaks = c(0, 50)) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  ggtitle("sigma ~ dunif(0, 50)")
+
+p2
+```
 
 ##### Prior predictive simulation
 
@@ -3422,10 +3257,10 @@ set.seed(4)
 
 sim <-
   tibble(sample_mu_b    = rnorm(n, mean = 178, sd  = 20),
-         sample_sigma_b = runif(n, min = 0, max = 50)) |> 
+         sample_sigma_b = runif(n, min = 0, max = 50)) %>% 
   mutate(height = rnorm(n, mean = sample_mu_b, sd = sample_sigma_b))
   
-p3 <- sim |> 
+p3 <- sim %>% 
   ggplot(aes(x = height)) +
   geom_density(fill = "deepskyblue") +
   scale_x_continuous(breaks = c(0, 73, 178, 283)) +
@@ -3445,10 +3280,10 @@ mean and 3 standard deviations above and below, you might do this.
 
 ```{r}
 #| label: compute-mean-3sd-b
-sim |> 
+sim %>% 
   summarise(ll   = mean(height) - sd(height) * 3,
             mean = mean(height),
-            ul   = mean(height) + sd(height) * 3) |> 
+            ul   = mean(height) + sd(height) * 3) %>% 
   mutate_all(round, digits = 1)
 ```
 
@@ -3465,12 +3300,12 @@ set.seed(4)
 
 sim <-
   tibble(sample_mu_b    = rnorm(n, mean = 178, sd = 100),
-         sample_sigma_b = runif(n, min = 0, max = 50)) |> 
+         sample_sigma_b = runif(n, min = 0, max = 50)) %>% 
   mutate(height = rnorm(n, mean = sample_mu_b, sd = sample_sigma_b))
 
 # compute the values we'll use to break on our x axis
 breaks <-
-  c(mean(sim$height) - 3 * sd(sim$height), 0, mean(sim$height), mean(sim$height) + 3 * sd(sim$height)) |> 
+  c(mean(sim$height) - 3 * sd(sim$height), 0, mean(sim$height), mean(sim$height) + 3 * sd(sim$height)) %>% 
   round(digits = 0)
 
 # this is just for aesthetics
@@ -3482,7 +3317,7 @@ text <-
 
 # plot
 p4 <-
-  sim |> 
+  sim %>% 
   ggplot(aes(x = height)) +
   geom_density(fill = "deepskyblue", color = "black") +
   geom_vline(xintercept = 0, color = "black") +
@@ -3517,12 +3352,12 @@ Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) (1918--1940).
 ```{r}
 #| label: calc-breaks-b
 
-sim |> 
-  count(height < 0) |> 
+sim %>% 
+  count(height < 0) %>% 
   mutate(percent = 100 * n / sum(n))
 
-sim |> 
-  count(height < 272) |> 
+sim %>% 
+  count(height < 272) %>% 
   mutate(percent = 100 * n / sum(n))
 ```
 
@@ -3572,18 +3407,18 @@ glimpse(d_grid_b)
 
 grid_function <- function(mu, sigma) {
   
-  dnorm(d2_b$height, mean = mu, sd = sigma, log = TRUE) |> 
+  dnorm(d2_b$height, mean = mu, sd = sigma, log = TRUE) %>% 
     sum()
   
 }
 
 d_grid2_b <-
-  d_grid_b |> 
-  mutate(log_likelihood_b = map2(mu_b, sigma_b, grid_function)) |>
-  unnest(log_likelihood_b) |> 
+  d_grid_b %>% 
+  mutate(log_likelihood_b = map2(mu_b, sigma_b, grid_function)) %>%
+  unnest(log_likelihood_b) %>% 
   mutate(prior_mu_b    = dnorm(mu_b, mean = 178, sd = 20, log = T),
-         prior_sigma_b = dunif(sigma_b, min = 0, max = 50, log = T)) |> 
-  mutate(product_b = log_likelihood_b + prior_mu_b + prior_sigma_b) |> 
+         prior_sigma_b = dunif(sigma_b, min = 0, max = 50, log = T)) %>% 
+  mutate(product_b = log_likelihood_b + prior_mu_b + prior_sigma_b) %>% 
   mutate(probability_b = exp(product_b - max(product_b)))
   
 head(d_grid2_b)
@@ -3594,7 +3429,7 @@ head(d_grid2_b)
 #| fig-cap: "Draw 2D contours of a 3D surface"
 #| attr-source: '#lst-fig-contour-b lst-cap="Draw 2D contours of a 3D surface: tidyverse version"'
 
-d_grid2_b |> 
+d_grid2_b %>% 
   ggplot(aes(x = mu_b, y = sigma_b, z = probability_b)) + 
   geom_contour() +
   labs(x = expression(mu),
@@ -3610,7 +3445,7 @@ d_grid2_b |>
 #| fig-cap: "Draw heat map"
 #| attr-source: '#lst-fig-heatmap-b lst-cap="Draw heat map: tidyverse version"'
 
-d_grid2_b |> 
+d_grid2_b %>% 
   ggplot(aes(x = mu_b, y = sigma_b, fill = probability_b)) + 
   geom_raster(interpolate = TRUE) +
   scale_fill_viridis_c(option = "B") +
@@ -3633,10 +3468,10 @@ We can use `dplyr::sample_n()` to sample rows, with replacement, from
 set.seed(4)
 
 d_grid_samples_b <- 
-  d_grid2_b |> 
+  d_grid2_b %>% 
   sample_n(size = 1e4, replace = T, weight = probability_b)
 
-d_grid_samples_b |> 
+d_grid_samples_b %>% 
   ggplot(aes(x = mu_b, y = sigma_b)) + 
   geom_point(size = .9, alpha = 1/15) +
   scale_fill_viridis_c() +
@@ -3653,8 +3488,8 @@ plot the densities for both `mu` and `sigma` at once.
 #| fig-cap: "Shapes of the marginal posterior densities of μ and σ: tidyverse version"
 #| attr-source: '#lst-fig-densities-mu-sigma lst-cap="Plot shapes of the marginal posterior densities of μ and σ: tidyverse version"'
 
-d_grid_samples_b |> 
-  pivot_longer(mu_b:sigma_b) |> 
+d_grid_samples_b %>% 
+  pivot_longer(mu_b:sigma_b) %>% 
 
   ggplot(aes(x = value)) + 
   geom_density(fill = "deepskyblue", color = "black") +
@@ -3706,9 +3541,9 @@ important when you want to find the related help file.
 ```{r}
 #| label: post-mode-hdi95-b
 
-d_grid_samples_b |> 
-  pivot_longer(mu_b:sigma_b) |> 
-  group_by(name) |> 
+d_grid_samples_b %>% 
+  pivot_longer(mu_b:sigma_b) %>% 
+  group_by(name) %>% 
   tidybayes::mode_hdi(value) 
 ```
 
@@ -3719,9 +3554,9 @@ intervals, instead. Just switch out the last line for
 ```{r}
 #| label: post-median-qi90-b
 
-d_grid_samples_b |> 
-  pivot_longer(mu_b:sigma_b) |> 
-  group_by(name) |> 
+d_grid_samples_b %>% 
+  pivot_longer(mu_b:sigma_b) %>% 
+  group_by(name) %>% 
   tidybayes::median_qi(value, .width = .5)
 ```
 
@@ -4032,7 +3867,7 @@ parameters `b_Intercept` and `sigma` and feed them into `cov()`.
 #| label: calc-cov-post-b
 #| attr-source: '#lst-calc-cov-post-b lst-cap="Calculate the vector of variances and correlation matrix for b_Intercept and sigma"'
 
-select(post_b, b_Intercept:sigma) |> 
+select(post_b, b_Intercept:sigma) %>% 
   stats::cov()
 ```
 
@@ -4044,8 +3879,8 @@ the variances (i.e., the diagonal elements) and the correlation matrix.
 #| label: calc-var-post-b
 #| attr-source: '#lst-calc-var-post-b lst-cap="Calculate only variances (the diagonal values)"'
 
-select(post_b, b_Intercept:sigma) |>
-  stats::cov() |>
+select(post_b, b_Intercept:sigma) %>%
+  stats::cov() %>%
   base::diag()
 
 ```
@@ -4055,8 +3890,8 @@ select(post_b, b_Intercept:sigma) |>
 #| attr-source: '#lst-calc-corr-matrix-post-b lst-cap="Calculate only crrelation"'
 
 # correlation
-post_b |>
-  select(b_Intercept, sigma) |>
+post_b %>%
+  select(b_Intercept, sigma) %>%
   stats::cor()
 ```
 
@@ -4202,12 +4037,12 @@ n_lines <- 100
 lines <-
   tibble(n = 1:n_lines,
          a = rnorm(n_lines, mean = 178, sd = 20),
-         b = rnorm(n_lines, mean = 0, sd = 10)) |> 
-  expand_grid(weight = range(d2_b$weight)) |> 
+         b = rnorm(n_lines, mean = 0, sd = 10)) %>% 
+  expand_grid(weight = range(d2_b$weight)) %>% 
   mutate(height = a + b * (weight - mean(d2_b$weight)))
 
 
-lines |> 
+lines %>% 
   ggplot(aes(x = weight, y = height, group = n)) +
   geom_hline(yintercept = c(0, 272), linetype = 2:1, linewidth = 1/3) +
   geom_line(alpha = 1/10) +
@@ -4227,7 +4062,7 @@ under 0.
 
 set.seed(4)
 
-tibble(b = rlnorm(1e4, meanlog = 0, sdlog = 1)) |> 
+tibble(b = rlnorm(1e4, meanlog = 0, sdlog = 1)) %>% 
   ggplot(aes(x = b)) +
   geom_density(fill = "grey92") +
   coord_cartesian(xlim = c(0, 5)) +
@@ -4254,8 +4089,8 @@ happy that Kurz added some explanations:
 set.seed(4)
 
 tibble(rnorm           = rnorm(1e5, mean = 0, sd = 1),
-       `log(rlognorm)` = log(rlnorm(1e5, meanlog = 0, sdlog = 1))) |> 
-  pivot_longer(everything()) |> 
+       `log(rlognorm)` = log(rlnorm(1e5, meanlog = 0, sdlog = 1))) %>% 
+  pivot_longer(everything()) %>% 
 
   ggplot(aes(x = value)) +
   geom_density(fill = "grey92") +
@@ -4309,7 +4144,7 @@ Let's confirm with simulated draws from `rlnorm()`.
 
 set.seed(4)
 
-tibble(x = rlnorm(1e7, meanlog = 0, sdlog = 1)) |> 
+tibble(x = rlnorm(1e7, meanlog = 0, sdlog = 1)) %>% 
   summarise(mean = mean(x),
             sd   = sd(x))
 ```
@@ -4330,9 +4165,9 @@ set.seed(2971)
 
 tibble(n = 1:n_lines,
        a = rnorm(n_lines, mean = 178, sd = 20),
-       b = rlnorm(n_lines, mean = 0, sd = 1)) |> 
-  expand_grid(weight = range(d2_b$weight)) |> 
-  mutate(height = a + b * (weight - mean(d2_b$weight))) |>
+       b = rlnorm(n_lines, mean = 0, sd = 1)) %>% 
+  expand_grid(weight = range(d2_b$weight)) %>% 
+  mutate(height = a + b * (weight - mean(d2_b$weight))) %>%
   
   # plot
   ggplot(aes(x = weight, y = height, group = n)) +
@@ -4374,7 +4209,7 @@ that is equivalent to `weight – mean(weight)`. We'll call it `weight_c`.
 
 
 d2_b <-
-  d2_b |> 
+  d2_b %>% 
   mutate(weight_c = weight - mean(weight))
 ```
 
@@ -4459,7 +4294,7 @@ $\beta^{b4.3} = exp(\beta^{b4.3b})$.
 #| attr-source: '#lst-extract-foxed-effects-b lst-cap="Extract and compare the population-level (fixed) effects from object b4.3 and b4.3b"'
 
 brms::fixef(b4.3)["weight_c", "Estimate"]
-brms::fixef(b4.3b)["lb_Intercept", "Estimate"] |> exp()
+brms::fixef(b4.3b)["lb_Intercept", "Estimate"] %>% exp()
 ```
 
 They're the same within simulation variance.
@@ -4475,7 +4310,7 @@ summary for `b4.3`.
 #| label: table-summary-b4.3
 #| attr-source: '#lst-table-summary-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: brms version"'
 
-brms::posterior_summary(b4.3)[1:3, ] |> 
+brms::posterior_summary(b4.3)[1:3, ] %>% 
   round(digits = 2)
 ```
 
@@ -4485,7 +4320,7 @@ Without the subsetting we will get 2 more lines:
 #| label: table-summary2-b4.3
 #| attr-source: '#lst-table-summary2-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: brms version"'
 
-brms::posterior_summary(b4.3) |> 
+brms::posterior_summary(b4.3) %>% 
   round(digits = 2)
 ```
 
@@ -4558,7 +4393,7 @@ we'll get the variance/covariance matrix of the `intercept` and
 #| label: var-cov-matrix-b4.3
 #| attr-source: '#lst-var-cov-matrix-b4.3 lst-cap="Calculate the variance-covariance matrix for model b4.3"'
 
-brms:::vcov.brmsfit(b4.3) |> 
+brms:::vcov.brmsfit(b4.3) %>% 
   round(3)
 ```
 
@@ -4569,9 +4404,9 @@ and use the `cov()` function, instead.
 #| label: var-cov-matrix2-b4.3
 #| attr-source: '#lst-var-cov-matrix2-b4.3 lst-cap="Calculate the variance-covariance matrix for model b4.3 with {posterior} draws objects"'
 
-brms::as_draws_df(b4.3) |>
-  select(b_Intercept:sigma) |>
-  cov() |>
+brms::as_draws_df(b4.3) %>%
+  select(b_Intercept:sigma) %>%
+  cov() %>%
   round(digits = 3)
 ```
 
@@ -4596,7 +4431,7 @@ Here is the code for Figure 4.6.
 #| fig-cap: "Height in centimeters (vertical) plotted against weight_c (horizontal), with the line at the posterior mean plotted in black: tidyverse version"
 
 
-d2_b |>
+d2_b %>%
   ggplot(aes(x = weight_c, y = height)) +
   geom_abline(intercept = brms:::fixef.brmsfit(b4.3)[1], 
               slope     = brms:::fixef.brmsfit(b4.3)[2]) +
@@ -4616,10 +4451,10 @@ that value back.
 #| attr-source: '#lst-fig-raw-data-line2-b4.3 lst-cap="Reproducing Figure 4.6 of SR2 with adjusted x-axis"'
 
 labels <-
-  c(-10, 0, 10) + mean(d2_b$weight) |> 
+  c(-10, 0, 10) + mean(d2_b$weight) %>% 
   round(digits = 0)
 
-d2_b |>
+d2_b %>%
   ggplot(aes(x = weight_c, y = height)) +
   geom_abline(intercept = brms::fixef(b4.3, probs = c(0.055, 0.945))[[1]], 
               slope     = brms::fixef(b4.3, probs = c(0.055, 0.945))[[2]]) +
@@ -4708,7 +4543,7 @@ here using `dplyr::slice(1:6)` instead of `utils::head()`
 #| attr-source: '#lst-put-hmc-into-df2-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
 
 post_b <- brms::as_draws_df(b4.3)
-post_b |>
+post_b %>%
   slice(1:6)
 ```
 
@@ -4721,7 +4556,7 @@ Here are the four models leading up to Figure 4.7:
 dN10_b <- 10
 
 b4.3_010 <- 
-  brms::brm(data = d2_b |>
+  brms::brm(data = d2_b %>%
         slice(1:dN10_b),  # note our tricky use of `N` and `slice()`
       family = gaussian,
       height ~ 1 + weight_c,
@@ -4735,7 +4570,7 @@ b4.3_010 <-
 dN50_b <- 50
 
 b4.3_050 <- 
-  brms::brm(data = d2_b |>
+  brms::brm(data = d2_b %>%
         slice(1:dN50_b), 
       family = gaussian,
       height ~ 1 + weight_c,
@@ -4749,7 +4584,7 @@ b4.3_050 <-
 dN150_b <- 150
 
 b4.3_150 <- 
-  brms::brm(data = d2_b |>
+  brms::brm(data = d2_b %>%
         slice(1:dN150_b), 
       family = gaussian,
       height ~ 1 + weight_c,
@@ -4763,7 +4598,7 @@ b4.3_150 <-
 dN352_b <- 352
 
 b4.3_352 <- 
-  brms::brm(data = d2_b |>
+  brms::brm(data = d2_b %>%
         slice(1:dN352_b), 
       family = gaussian,
       height ~ 1 + weight_c,
@@ -4826,7 +4661,7 @@ Here is the code for the four individual plots:
 p5 <- 
   ggplot(data =  d2_b[1:10, ], 
          aes(x = weight_c, y = height)) +
-  geom_abline(data = post010_b4.3 |> slice(1:20),
+  geom_abline(data = post010_b4.3 %>% slice(1:20),
               aes(intercept = b_Intercept, slope = b_weight_c),
               linewidth = 1/3, alpha = .3) +
   geom_point(shape = 1, size = 2, color = "royalblue") +
@@ -4837,7 +4672,7 @@ p5 <-
 p6 <-
   ggplot(data =  d2_b[1:50, ], 
          aes(x = weight_c, y = height)) +
-  geom_abline(data = post050_b4.3 |> slice(1:20),
+  geom_abline(data = post050_b4.3 %>% slice(1:20),
               aes(intercept = b_Intercept, slope = b_weight_c),
               linewidth = 1/3, alpha = .3) +
   geom_point(shape = 1, size = 2, color = "royalblue") +
@@ -4848,7 +4683,7 @@ p6 <-
 p7 <-
   ggplot(data =  d2_b[1:150, ], 
          aes(x = weight_c, y = height)) +
-  geom_abline(data = post150_b4.3 |> slice(1:20),
+  geom_abline(data = post150_b4.3 %>% slice(1:20),
               aes(intercept = b_Intercept, slope = b_weight_c),
               linewidth = 1/3, alpha = .3) +
   geom_point(shape = 1, size = 2, color = "royalblue") +
@@ -4859,7 +4694,7 @@ p7 <-
 p8 <- 
   ggplot(data =  d2_b[1:352, ], 
          aes(x = weight_c, y = height)) +
-  geom_abline(data = post352_b4.3 |> slice(1:20),
+  geom_abline(data = post352_b4.3 %>% slice(1:20),
               aes(intercept = b_Intercept, slope = b_weight_c),
               linewidth = 1/3, alpha = .3) +
   geom_point(shape = 1, size = 2, color = "royalblue") +
@@ -4908,7 +4743,7 @@ $\alpha + \beta \cdot 5.01$. Here's what that looks like with `post_b`.
 #| attr-source: '#lst-calc-mean-weight-at-50-b lst-cap="Calculate the mean at weight 50 kg"'
 
 mu_at_50_b <- 
-  post_b |> 
+  post_b %>% 
   transmute(mu_at_50_b = b_Intercept + b_weight_c * 5.01)
  
 head(mu_at_50_b)
@@ -4920,7 +4755,7 @@ And here is a version McElreath's Figure 4.8 density plot.
 #| label: fig-density-vector-mean-50-b
 #| fig-cap: "The quadratic approximate posterior distribution of the mean height, μ, when weight is 50 kg. This distribution represents the relative plausibility of different values of the mean. Tidyverse version"
 
-mu_at_50_b |>
+mu_at_50_b %>%
   ggplot(aes(x = mu_at_50_b)) +
   geom_density(linewidth = 0, fill = "deepskyblue") +
   scale_y_continuous(NULL, breaks = NULL) +
@@ -4945,7 +4780,7 @@ also returns a point estimate, we'll throw in the mode.
 ```{r}
 #| label: fig-half-eye-b
 #| fig-cap: "Plot of half-eye (density + interval) geometry"
-mu_at_50_b |>
+mu_at_50_b %>%
   ggplot(aes(x = mu_at_50_b, y = 0)) +
   tidybayes::stat_halfeye(point_interval = tidybayes::mode_hdi, .width = .95,
                fill = "deepskyblue") +
@@ -4999,16 +4834,16 @@ accommodate custom predictor values with its `newdata` argument.
 #| attr-source: '#lst-calc-dist-mu-unique-with-fitted.brmsfit-b lst-cap="Calculate a distribution of μ for each unique weight value on the horizontal axis: tidyverse version"'
 
 weight_seq <- 
-  tibble(weight = 25:70) |> 
+  tibble(weight = 25:70) %>% 
   mutate(weight_c = weight - mean(d2_b$weight))
 
 mu3_b <-
   brms:::fitted.brmsfit(b4.3,
          summary = F,
-         newdata = weight_seq) |>
-  data.frame() |>
+         newdata = weight_seq) %>%
+  data.frame() %>%
   # here we name the columns after the `weight` values from which they were computed
-  set_names(25:70) |> 
+  set_names(25:70) %>% 
   mutate(iter = 1:n())
 
 head(mu3_b)
@@ -5046,10 +4881,10 @@ data](https://www.theanalysisfactor.com/wide-and-long-data/).
 #| attr-source: '#lst-convert-wide-to-long-b lst-cap="Data processing: Convert data from wide to long format: tidyverse version"'
 
 mu4_b <- 
-  mu3_b |>
+  mu3_b %>%
   pivot_longer(-iter,
                names_to = "weight",
-               values_to = "height") |> 
+               values_to = "height") %>% 
   # we might reformat `weight` to numerals
   mutate(weight = as.numeric(weight))
 
@@ -5062,9 +4897,9 @@ Now our data processing is done, here we reproduce McElreath's Figure
 ```{r}
 #| label: fig-dist-mu-height-100-b
 #| fig-cap: "The first 100 values in the distribution of μ at each weight value. Tidyverse version"
-d2_b |>
+d2_b %>%
   ggplot(aes(x = weight, y = height)) +
-  geom_point(data = mu4_b |> filter(iter < 101), 
+  geom_point(data = mu4_b %>% filter(iter < 101), 
              color = "navyblue", alpha = .05) +
   coord_cartesian(xlim = c(30, 65)) +
   theme(panel.grid = element_blank())
@@ -5079,8 +4914,8 @@ line and its intervals. Just omit the `summary = T` argument.
 
 mu_summary <-
   brms:::fitted.brmsfit(b4.3, 
-         newdata = weight_seq) |>
-  data.frame() |>
+         newdata = weight_seq) %>%
+  data.frame() %>%
   bind_cols(weight_seq)
 
 head(mu_summary)
@@ -5093,7 +4928,7 @@ Here it is, our analogue to Figure 4.9.b.
 #| fig-cap: "Plot of the summaries on top of the !Kung height data again, now with 89% compatibility interval of the mean indicated by the shaded region. Compare this region to the distributions of blue points in @fig-dist-mu-height-100-b."
 
 
-d2_b |>
+d2_b %>%
   ggplot(aes(x = weight, y = height)) +
   geom_smooth(data = mu_summary,
               aes(y = Estimate, ymin = Q2.5, ymax = Q97.5),
@@ -5146,11 +4981,11 @@ looks a lot like what we used for `fitted()`. Compare
 
 pred_height <-
   brms:::predict.brmsfit(b4.3,
-          newdata = weight_seq) |>
-  data.frame() |>
+          newdata = weight_seq) %>%
+  data.frame() %>%
   bind_cols(weight_seq)
   
-pred_height |>
+pred_height %>%
   slice(1:6)
 ```
 
@@ -5166,7 +5001,7 @@ Figure 4.10 shows how you might visualize them:
 #| label: fig-reproduce-figure-4.10
 #| fig-cap: "89% prediction interval for height, as a function of weight. The solid line is the average line for the mean height at each weight. The two shaded regions show different 89% plausible regions. The narrow shaded interval around the line is the distribution of μ. The wider shaded region represents the region within which the model expects to find 89% of actual heights in the population, at each weight. (tidyverse version)"
 
-d2_b |>
+d2_b %>%
   ggplot(aes(x = weight)) +
   geom_ribbon(data = pred_height, 
               aes(ymin = Q2.5, ymax = Q97.5),
@@ -5220,16 +5055,16 @@ action in the tidyverse approach is in `expand_grid()`, the second
 
 set.seed(4)
 
-post_b |> 
-  tidyr::expand_grid(weight = 25:70) |> 
-  mutate(weight_c = weight - mean(d2_b$weight)) |> 
+post_b %>% 
+  tidyr::expand_grid(weight = 25:70) %>% 
+  mutate(weight_c = weight - mean(d2_b$weight)) %>% 
   mutate(sim_height = rnorm(n(),
                             mean = b_Intercept + b_weight_c * weight_c,
-                            sd   = sigma)) |> 
-  group_by(weight) |> 
+                            sd   = sigma)) %>% 
+  group_by(weight) %>% 
   summarise(mean = mean(sim_height),
             ll   = quantile(sim_height, prob = .025),
-            ul   = quantile(sim_height, prob = .975)) |> 
+            ul   = quantile(sim_height, prob = .975)) %>% 
   
   # plot
   ggplot(aes(x = weight)) +
@@ -5260,14 +5095,14 @@ Let's try this out:
 
 set.seed(4)
 
-post_b |> 
-  tidyr::expand_grid(weight = 25:70) |> 
-  mutate(weight_c = weight - mean(d2_b$weight)) |> 
+post_b %>% 
+  tidyr::expand_grid(weight = 25:70) %>% 
+  mutate(weight_c = weight - mean(d2_b$weight)) %>% 
   mutate(sim_height = rnorm(n(),
                             mean = b_Intercept + b_weight_c * weight_c,
-                            sd   = sigma)) |> 
-  group_by(weight) |> 
-  tidybayes::mean_qi(sim_height, .width = .89) |> 
+                            sd   = sigma)) %>% 
+  group_by(weight) %>% 
+  tidybayes::mean_qi(sim_height, .width = .89) %>% 
   
   # plot
   ggplot(aes(x = weight)) +
@@ -5289,14 +5124,14 @@ post_b |>
 
 set.seed(4)
 
-post_b |> 
-  tidyr::expand_grid(weight = 25:70) |> 
-  mutate(weight_c = weight - mean(d2_b$weight)) |> 
+post_b %>% 
+  tidyr::expand_grid(weight = 25:70) %>% 
+  mutate(weight_c = weight - mean(d2_b$weight)) %>% 
   mutate(sim_height = rnorm(n(),
                             mean = b_Intercept + b_weight_c * weight_c,
-                            sd   = sigma)) |> 
-  group_by(weight) |> 
-  tidybayes::mode_hdi(sim_height, .width = .89) |> 
+                            sd   = sigma)) %>% 
+  group_by(weight) %>% 
+  tidybayes::mode_hdi(sim_height, .width = .89) %>% 
   
   # plot
   ggplot(aes(x = weight)) +
@@ -5338,7 +5173,7 @@ adult years.
 #| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal). This time with the full data, e.g., the non-adults data."
 #| attr-source: '#fig-scatterplot-height-weight-b lst-cap="Height in centimeters (vertical) plotted against weight in kilograms (horizontal): tidyverse version"'
 
-d_b |> 
+d_b %>% 
   ggplot(aes(x = weight, y = height)) +
   geom_point(color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
   annotate(geom = "text",
@@ -5357,8 +5192,8 @@ standardize our weight variable like so:
 #| attr-source: '#lst-standardize-weight-b lst-cap="Stadardize the weight variable"'
 
 d3_b <-
-  d_b |>
-  mutate(weight_s = (weight - mean(weight)) / sd(weight)) |> 
+  d_b %>%
+  mutate(weight_s = (weight - mean(weight)) / sd(weight)) %>% 
   mutate(weight_s2 = weight_s^2)
 ```
 
@@ -5415,19 +5250,19 @@ data wrangling.
 #| attr-source: '#lst-wrangling-for-parabolic-model-b lst-cap="Data wrangling as a preparation for the parabolic (quadratic) model"'
 
 weight_seq_full <- 
-  tibble(weight_s = seq(from = -2.5, to = 2.5, length.out = 30)) |> 
+  tibble(weight_s = seq(from = -2.5, to = 2.5, length.out = 30)) %>% 
   mutate(weight_s2 = weight_s^2)
 
 fitd_quad <-
   fitted(b4.5, 
-         newdata = weight_seq_full) |>
-  data.frame() |>
+         newdata = weight_seq_full) %>%
+  data.frame() %>%
   bind_cols(weight_seq_full)
 
 pred_quad <-
   predict(b4.5, 
-          newdata = weight_seq_full) |>
-  data.frame() |>
+          newdata = weight_seq_full) %>%
+  data.frame() %>%
   bind_cols(weight_seq_full)  
 ```
 
@@ -5468,7 +5303,7 @@ Before we fit the model, we need to wrangle the data again.
 #| attr-source: '#lst-wrangling-for-cubic-model-b lst-cap="Data wrangling as a preparation for the cubic model."'
 
 d3_b <-
-  d3_b |> 
+  d3_b %>% 
   mutate(weight_s3 = weight_s^3)
 ```
 
@@ -5501,19 +5336,19 @@ Here's the `fitted()`, `predict()`, and {**ggplot2**} code for Figure
 #| attr-source: '#lst-fig-cubic-regression-model-b lst-cap="Fit a cubic regression model of height on weight (standardized), for the full !Kung data: tidyverse version"'
 
 weight_seq_full <- 
-  weight_seq_full |> 
+  weight_seq_full %>% 
   mutate(weight_s3 = weight_s^3)
 
 fitd_cub <-
   fitted(b4.6, 
-         newdata = weight_seq_full) |>
-  as_tibble() |>
+         newdata = weight_seq_full) %>%
+  as_tibble() %>%
   bind_cols(weight_seq_full)
 
 pred_cub <-
   predict(b4.6, 
-          newdata = weight_seq_full) |>
-  as_tibble() |>
+          newdata = weight_seq_full) %>%
+  as_tibble() %>%
   bind_cols(weight_seq_full) 
 
 p11 <-
@@ -5566,14 +5401,14 @@ Figure 4.11.a, the linear model.
 
 fitd_line <-
   fitted(b4.7, 
-         newdata = weight_seq_full) |>
-  as_tibble() |>
+         newdata = weight_seq_full) %>%
+  as_tibble() %>%
   bind_cols(weight_seq_full)
 
 pred_line <-
   predict(b4.7, 
-          newdata = weight_seq_full) |>
-  as_tibble() |>
+          newdata = weight_seq_full) %>%
+  as_tibble() %>%
   bind_cols(weight_seq_full) 
 
 p9 <-
@@ -5652,13 +5487,13 @@ d4_b <- cherry_blossoms
 # ground-up tidyverse way to summarize
 (
 d4.2_b <- 
-    d4_b |> 
-      gather() |> 
-      group_by(key) |> 
+    d4_b %>% 
+      gather() %>% 
+      group_by(key) %>% 
       summarise(mean = mean(value, na.rm = T),
                 sd   = sd(value, na.rm = T),
                 ll   = quantile(value, prob = .055, na.rm = T),
-                ul   = quantile(value, prob = .945, na.rm = T)) |> 
+                ul   = quantile(value, prob = .945, na.rm = T)) %>% 
       mutate_if(is.double, round, digits = 2) 
 )
 
@@ -5677,7 +5512,7 @@ summary with `skimr::skim()` to add tiny graphics.
 #| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year: tidyverse version"
 #| warning: true
 
-d4_b |> 
+d4_b %>% 
   ggplot(aes(x = year, y = doy)) +
   # color from here: https://www.colorhexa.com/ffb7c5
   geom_point(color = "#ffb7c5", alpha = 1/2) +
@@ -5695,8 +5530,8 @@ turns out there are cases with missing data for the `doy` variable.
 #| label: doy-missing-data
 #| attr-source: '#lst-doy-missing-data lst-cap="Display missing data of the day of the year variable `doy`"'
 
-d4_b |> 
-  count(is.na(doy)) |> 
+d4_b %>% 
+  count(is.na(doy)) %>% 
   mutate(percent = 100 * n / sum(n))
 ```
 
@@ -5711,7 +5546,7 @@ approach using `dplyr::filter()` (See
 #| attr-source: '#lst-remove-missing-data-records lst-cap="Remove records of missing data for the two interesting variable `doy` and `year`"'
 
 d5_b <- 
-    d4_b |> 
+    d4_b %>% 
         filter(if_all(.col = c(year, doy), .fns = Negate(is.na)))
 d5_b
 ```
@@ -5739,7 +5574,7 @@ knot_list15_b
 #| fig-cap: "Show scatterplot with chosen knots: tiyverse version"
 #| attr-source: '#lst-fig-chosen-knots-b lst-cap="Scatterplot with chosen knots: tiyverse version"'
 
-d5_b |> 
+d5_b %>% 
   ggplot(aes(x = year, y = doy)) +
   geom_vline(xintercept = knot_list15_b, 
              color = "white", alpha = 1/2) +
@@ -5773,7 +5608,7 @@ avoid redundancies. We can confirm this with the code, below.
 #| label: show-data-structure-b
 #| attr-source: '#lst-show-data-structure-b lst-cap="Show data structure to verify that `splines::bs()` adds the boundary knots"'
 
-B_b |> str()
+B_b %>% str()
 ```
 
 Look at the second to last line,
@@ -5803,16 +5638,16 @@ Here's how we might make our version of the top panel of Figure 4.13.
 
 # wrangle a bit
 b_b <-
-  B_b |> 
-  data.frame() |> 
-  set_names(str_c(0, 1:9), 10:17) |>  
-  bind_cols(select(d5_b, year)) |> 
+  B_b %>% 
+  data.frame() %>% 
+  set_names(str_c(0, 1:9), 10:17) %>%  
+  bind_cols(select(d5_b, year)) %>% 
   pivot_longer(-year,
                names_to = "bias_function",
                values_to = "bias")
 
 # plot
-b_b |> 
+b_b %>% 
   ggplot(aes(x = year, y = bias, group = bias_function)) +
   geom_vline(xintercept = knot_list15_b, color = "white", alpha = 1/2) +
   geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
@@ -5831,9 +5666,9 @@ To elucidate what's going on in that plot, we might break it up with
 #| fig-height: 10
 #| attr-source: '#lst-fig-facet-basis-functions-b lst-cap="Basis functions of a cubic spline with 15 knots broken up in different facets"'
 
-b_b |> 
+b_b %>% 
   mutate(bias_function = str_c("bias function ", 
-                               bias_function)) |> 
+                               bias_function)) %>% 
   ggplot(aes(x = year, y = bias)) +
   geom_vline(xintercept = knot_list15_b, 
              color = "white", alpha = 1/2) +
@@ -5894,8 +5729,8 @@ prior looks like.
 #| fig-height: 2.5
 #| attr-source: '#lst-fig-exponential-prior-b lst-cap="Using the density of the exponential distribution to show the prior"'
 
-tibble(x = seq(from = 0, to = 10, by = 0.1)) |> 
-  mutate(d = dexp(x, rate = 1)) |> 
+tibble(x = seq(from = 0, to = 10, by = 0.1)) %>% 
+  mutate(d = dexp(x, rate = 1)) %>% 
   
   ggplot(aes(x = x, y = d)) +
   geom_area(fill = "#ffb7c5") +
@@ -5920,11 +5755,11 @@ will be a little different. Here, we'll add the `B_b` matrix to our
 #| attr-source: '#lst-add-matrix-to-df-b lst-cap="Add B-splines matrix for 15 knots to the data frame by creating a new data frame"'
 
 d6_b <-
-  d5_b |> 
+  d5_b %>% 
   mutate(B = B_b) 
 
 # take a look at the structure of the new data frame d6_b
-d6_b |> glimpse()
+d6_b %>% glimpse()
 ```
 
 In the `d6_b` data, columns `year` through `temp_lower` are all standard
@@ -6002,13 +5837,13 @@ to make our version of the middle panel of Figure 4.13.
 #| fig-cap: "Each basis function weighted by its corresponding parameter"
 #| attr-source: '#lst-fig-basis-fun-weighted-b lst-cap="Weight each basis function by its corresponding parameter"'
 
-post6_b |> 
-  select(b_B1:b_B17) |> 
-  set_names(c(str_c(0, 1:9), 10:17)) |> 
-  pivot_longer(everything(), names_to = "bias_function") |> 
-  group_by(bias_function) |> 
-  summarise(weight = mean(value)) |> 
-  full_join(b_b, by = "bias_function") |> 
+post6_b %>% 
+  select(b_B1:b_B17) %>% 
+  set_names(c(str_c(0, 1:9), 10:17)) %>% 
+  pivot_longer(everything(), names_to = "bias_function") %>% 
+  group_by(bias_function) %>% 
+  summarise(weight = mean(value)) %>% 
+  full_join(b_b, by = "bias_function") %>% 
   
   # plot
   ggplot(aes(x = year, y = bias * weight, group = bias_function)) +
@@ -6035,9 +5870,9 @@ lower plot of Figure 4.13.
 
 f <- brms:::fitted.brmsfit(b4.8)
 
-f |> 
-  data.frame() |> 
-  bind_cols(d6_b) |> 
+f %>% 
+  data.frame() %>% 
+  bind_cols(d6_b) %>% 
   
   ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) + 
   geom_vline(xintercept = knot_list15_b, color = "white", alpha = 1/2) +
@@ -6076,7 +5911,7 @@ B5_b <- splines::bs(d5_b$year,
 
 # define a new data frame (d7_b)
 d7_b <- 
-  d5_b |> 
+  d5_b %>% 
   mutate(B = B5_b)
 
 b4.9 <- 
@@ -6111,14 +5946,14 @@ Figure 4.12.
 ## wrangle a bit
 
 b5_b <-
-  invoke(data.frame, d7_b) |> 
+  invoke(data.frame, d7_b) %>% 
   pivot_longer(starts_with("B"),
                names_to = "bias_function",
                values_to = "bias")
   
 # plot
 p10 <- 
-  b5_b |> 
+  b5_b %>% 
   ggplot(aes(x = year, y = bias, group = bias_function)) +
   geom_vline(xintercept = knot_list5_b, color = "white", alpha = 1/2) +
   geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
@@ -6128,13 +5963,13 @@ p10 <-
 ## middle
 # wrangle
 p11 <-
-  brms::as_draws_df(b4.9) |> 
-  select(b_B1:b_B5) |> 
-  set_names(str_c("B.", 1:5)) |> 
-  pivot_longer(everything(), names_to = "bias_function") |> 
-  group_by(bias_function) |> 
-  summarise(weight = mean(value)) |> 
-  full_join(b5_b, by = "bias_function") |> 
+  brms::as_draws_df(b4.9) %>% 
+  select(b_B1:b_B5) %>% 
+  set_names(str_c("B.", 1:5)) %>% 
+  pivot_longer(everything(), names_to = "bias_function") %>% 
+  group_by(bias_function) %>% 
+  summarise(weight = mean(value)) %>% 
+  full_join(b5_b, by = "bias_function") %>% 
   
   # plot
   ggplot(aes(x = year, y = bias * weight, group = bias_function)) +
@@ -6147,9 +5982,9 @@ p11 <-
 f2_b <- fitted(b4.9)
 
 p12 <-
-  f2_b |> 
-  data.frame() |> 
-  bind_cols(d7_b) |> 
+  f2_b %>% 
+  data.frame() %>% 
+  bind_cols(d7_b) %>% 
   
   # plot
   ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) + 
@@ -6254,9 +6089,9 @@ of the model.
 #| label: plot-implications-model-b4.10
 #| attr-source: '#lst-plot-implications-model-b4.10 lst-cap="Implication of model b4.10"'
 
-fitted(b4.10) |> 
-  data.frame() |> 
-  bind_cols(select(d5_b, year, doy)) |> 
+fitted(b4.10) %>% 
+  data.frame() %>% 
+  bind_cols(select(d5_b, year, doy)) %>% 
   
   ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) +
   geom_hline(yintercept = brms::fixef(b4.10)[1, 1], color = "white", linetype = 2) +
@@ -6307,9 +6142,9 @@ Now here's the depiction of our `s()`-based B-spline model:
 #| label: plot-bonus-model-b4.11
 #| attr-source: '#lst-plot-bonus-model-b4.11 lst-cap="B-splines of model b4.11 using `brms::s()`"'
 
-fitted(b4.11) |> 
-  data.frame() |> 
-  bind_cols(select(d5_b, year, doy)) |> 
+fitted(b4.11) %>% 
+  data.frame() %>% 
+  bind_cols(select(d5_b, year, doy)) %>% 
   
   ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) +
   geom_hline(yintercept = brms::fixef(b4.11)[1, 1], color = "white", linetype = 2) +
@@ -6440,11 +6275,11 @@ sigma8_b <- 2
 
 # simulate the criterion
 d9_b <-
-  d8_b |> 
+  d8_b %>% 
   mutate(y = as.vector(a8_b + X %*% b8_b + theta8_b * z + rnorm(n8_b, mean = 0, sd = sigma8_b)))
 
 # check the data structure
-d9_b |> 
+d9_b %>% 
   glimpse()
 ```
 
@@ -6456,8 +6291,8 @@ might access them more directly.
 #| label: access-nested-df
 #| attr-source: '#lst-access-nested-df lst-cap="Acess nested data frame in tibble"'
 
-d9_b |> 
-  pull(X) |> 
+d9_b %>% 
+  pull(X) %>% 
   glimpse()
 ```
 
@@ -6792,11 +6627,11 @@ curve(a_map + b_map * (x - xbar_r), add = TRUE)
 #| fig-cap: "Plotting priors of the height model: tidyverse version"
 #| attr-source: '#lst-ig-priors-t lst-cap="Plot priors of height model: tidyverse version"'
 
-tibble(x = seq(from = 100, to = 250, by = .1)) |> 
+tibble(x = seq(from = 100, to = 250, by = .1)) %>% 
 ggplot(aes(x = x, y = dnorm(x, mean = 178, sd = 20))) +
 geom_line() 
 
-tibble(x = seq(from = -10, to = 60, by = .1)) |>
+tibble(x = seq(from = -10, to = 60, by = .1)) %>%
 ggplot(aes(x = x, y = dunif(x, min = 0, max = 50))) +
 geom_line()
 ```
@@ -6815,7 +6650,7 @@ set.seed(4)
 
 # simulation
   tibble(sample_mu    = rnorm(1e4, mean = 178, sd  = 20),
-         sample_sigma = runif(1e4, min = 0, max = 50)) |> 
+         sample_sigma = runif(1e4, min = 0, max = 50)) %>% 
   mutate(height = rnorm(1e4, mean = sample_mu, sd = sample_sigma)) |> 
   
 # plot
