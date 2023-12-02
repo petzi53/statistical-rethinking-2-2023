@@ -1574,7 +1574,7 @@ Fitting the model is part of the model
 
 #### TIDYVERSE (empty)
 
-### Grid approximation
+### Grid approximation {#sec-grid-approx}
 
 #### ORIGINAL
 
