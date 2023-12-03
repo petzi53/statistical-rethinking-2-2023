@@ -322,7 +322,7 @@ tibble::tibble(pr_vampire_b2          = 100 / 100000,
 :::
 :::
 
-## Sampling from a grid-approximate posterior {#sec-chap-03-sampling-grid}
+## Sampling from a grid-approximate posterior {#sec-chap03-sampling-grid}
 
 ### ORIGINAL
 
@@ -339,8 +339,8 @@ tossing example.
 ::: my-r-code
 ::: my-r-code-header
 ::: {#cnj-grid-globe-tossing-a}
-a: Generate the posterior distribution form the globe-tossing example
-(Base R)
+a: Generate the posterior distribution for the globe-tossing example
+(Original)
 :::
 :::
 
@@ -383,8 +383,8 @@ posterior_a <- posterior_a / sum(posterior_a)
 
 ::: my-r-code
 ::: my-r-code-header
-::: {#cnj-sample-globe-tossing}
-a: Draw 1000 samples from the posterior distribution (Base R)
+::: {#cnj-chap03-sample-posterior-globe-tossing}
+a: Draw 1000 samples from the posterior distribution (Original)
 :::
 :::
 
@@ -720,7 +720,7 @@ d_b |>
 :::
 :::
 
-## Sampling to Summarize {#sec-sampling-to-summarize}
+## Sampling to Summarize {#sec-chap03-sampling-to-summarize}
 
 All we have done so far is crudely replicate the posterior density we
 had already computed in the previous chapter. Now it is time to use
@@ -768,7 +768,7 @@ sum(posterior_a[p_grid_a < 0.5])
 
 About 17% of the posterior probability is below 0.5.
 
-##### Samples from the Posterior
+##### Samples from the Posterior {#sec-chap03-samples-from-posterior}
 
 But this easy calculation based on grid approximation is often not
 practical when there are more parameters. In this case you can draw

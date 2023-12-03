@@ -1574,7 +1574,7 @@ Fitting the model is part of the model
 
 #### TIDYVERSE (empty)
 
-### Grid approximation {#sec-grid-approx}
+### Grid approximation {#sec-chap02-grid-approx}
 
 #### ORIGINAL
 
@@ -2504,7 +2504,7 @@ Non-Bayesian inference (`r glossary("frequentist statistics")` or
 
 ### Easy
 
-#### 2E1 {#sec-chap02-e1}
+#### 2E1 {#sec-chap02-2e1}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2545,7 +2545,7 @@ convinced me:
 :::::
 
 
-#### 2E2 {#sec-chap02-e2}
+#### 2E2 {#sec-chap02-2e2}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2569,7 +2569,7 @@ Exercise 2E2: Which of the following statements corresponds to the expression: $
 :::::
 
 
-#### 2E3 {#sec-chap02-e3}
+#### 2E3 {#sec-chap02-2e3}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2604,7 +2604,7 @@ has a short explanation:
 ::::
 :::::
 
-#### 2E4 {#sec-chap02-e4}
+#### 2E4 {#sec-chap02-2e4}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2643,7 +2643,7 @@ The answers to this question differ widely. One answer I like especially is from
 
 ### Middle
 
-#### 2M1 {#sec-chap02-m1}
+#### 2M1 {#sec-chap02-2m1}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2711,7 +2711,7 @@ df_2m1 <- tibble::tibble(grid_2m1 =
 ::::
 :::::
 
-My original code was with 100 points and a uniform prior of 0.5. The shape of the curves conformed to both [Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-m1--m2) and [Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2), but the values of the y-axis were different. For a better comparison I chanced my code to the prior 0f 1 with 20 points.
+My original code was with 100 points and a uniform prior of 0.5. The shape of the curves conformed to both [Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-m1--m2) and [Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2), but the values of the y-axis were different. For a better comparison I chanced my code to the prior of 1 with 20 points.
 
 BTW: The code from Thompson is very advanced. Obviously he is very experienced with R.
 
@@ -2721,7 +2721,7 @@ BTW: The code from Thompson is very advanced. Obviously he is very experienced w
 ::::
 
 
-#### 2M2 {#sec-chap02-m2}
+#### 2M2 {#sec-chap02-2m2}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2790,9 +2790,12 @@ equal to zero when p < 0.5 and is a positive constant when p ≥ 0.5",
 :::::
 
 
+:::
+
+
 ::::
 
-#### 2M3 {#sec-chap02-m3}
+#### 2M3 {#sec-chap02-2m3}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2825,24 +2828,16 @@ $$ {#eq-2m3}
 ::: {.callout-warning}
 I have to confess that I didn't know the solution. I had to cheat and look at the solution of [Aidan Marshall](https://github.com/AidanMar/Statistical-Rethinking-Solutions/blob/main/Chapter%202%20-%20SMALL%20WORLDS%20AND%20LARGE%20WORLDS.ipynb), [Taras Svirskyi](https://github.com/jffist/statistical-rethinking-solutions/blob/master/ch02_hw.R), [Jake Thompson](https://sr2-solutions.wjakethompson.com/bayesian-inference#chapter-2) and [Erik Kusch](https://www.erikkusch.com/courses/rethinking/chapter-02/#practice-m3). All of them knew the correct answer! 
 
-My answers follows the solution of Erik Kusch. By this occasion I detected an error in my writing down the derivation of the Bayes' theorem (@thm-bayes-theorem). No surprise that I failed this exercise and all the others with the Bayes’ theorem as part of the solution (\nameref{sec-chap02-e1} and \nameref{sec-chap02-e3}).
+My answers follows the solution of Erik Kusch. By this occasion I detected an error in my writing down the derivation of the Bayes' theorem (@thm-bayes-theorem). No surprise that I failed this exercise and all the others with the Bayes’ theorem as part of the solution (\nameref{sec-chap02-2e1} and \nameref{sec-chap02-2e3}).
 :::
 
-
-
-
-
-
-
 :::
-:::
-
 
 ::::
 
 
 
-#### 2M4 {#sec-chap02-m4}
+#### 2M4 {#sec-chap02-2m4}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2908,7 +2903,7 @@ But with the next example my method yields $\frac{3}{4}$ whereas the solution of
 
 :::
 
-#### 2M5 {#sec-chap02-m5}
+#### 2M5 {#sec-chap02-2m5}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -2955,7 +2950,7 @@ posterior[1] + posterior[4]
 ::::
 :::::
 
-#### 2M6 {#sec-chap02-m6}
+#### 2M6 {#sec-chap02-2m6}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -3003,7 +2998,7 @@ posterior[1]
 :::
 ::::
 
-#### 2M7 {#sec-chap02-m7}
+#### 2M7 {#sec-chap02-2m7}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -3063,7 +3058,7 @@ posterior[1]
 
 ### Hard
 
-#### 2H1 {#sec-chap02-h1}
+#### 2H1 {#sec-chap02-2h1}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -3152,7 +3147,7 @@ glue::glue(
 
 
 
-#### 2H2 {#sec-chap02-h2}
+#### 2H2 {#sec-chap02-2h2}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -3181,7 +3176,7 @@ All the other people have just taken the already computed for species A the prob
 
 
 
-#### 2H3 {#sec-chap02-h3}
+#### 2H3 {#sec-chap02-2h3}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}
@@ -3257,7 +3252,7 @@ I had it wrong. Instead of multiplying $Pr(single \mid species)$ with the previo
 ::::
 :::::
 
-#### 2H4 {#sec-chap02-h4}
+#### 2H4 {#sec-chap02-2h4}
 
 :::::{.my-exercise}
 :::{.my-exercise-header}

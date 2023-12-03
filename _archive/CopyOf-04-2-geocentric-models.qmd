@@ -1583,7 +1583,7 @@ rethinking::dens(sample.sigma_a, adj = 1, show.HPDI = 0.89,
 :::::
 
 
-###### Tidyverse
+###### Tidyverse 1
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
@@ -1593,7 +1593,8 @@ b: Marginal posterior densities of $\mu$ and $\sigma$ for the heights data (Tidy
 :::
 ::::{.my-r-code-container}
 
-
+We can use `tidyr::pivot_longer()` and then `ggplot2::facet_wrap()` to
+plot the densities for both `mu` and `sigma` at once.
 
 ```{r}
 #| label: fig-chap04-heights-posterior-densities-b
@@ -1610,83 +1611,137 @@ d_grid_samples_b |>
   ggplot2::facet_wrap(~ name, scales = "free",
                       labeller = ggplot2::label_parsed)
 ```
-Kurz used `tidyr::pivot_longer()` and then `ggplot2::facet_wrap()` to
-plot the densities for both `mu` and `sigma` at once. But I do not know how to incorporate in these code lines for the comparison the normal distribution.
-::::
-:::::
-
-
-:::
 
 ::::
 :::::
 
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-chap04-summarize-pi}
-: Summarize the widths of @exm-chap04-heights-posterior-densities with posterior `r glossary("compatibility interval", "compatibility intervals")`
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### Original
+###### Tidyverse 2
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
-:::::: {#cnj-chap04-summarize-pi-a}
-a: Posterior compatibility intervals (PIs) (Original)
+:::::: {#cnj-chap04-heights-posterior-densities2-b}
+b: Marginal posterior densities of $\mu$ and $\sigma$ for the heights data (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+We can use `tidyr::pivot_longer()` and then `ggplot2::facet_wrap()` to
+plot the densities for both `mu` and `sigma` at once.
+
+```{r}
+#| label: fig-chap04-heights-posterior-densities2-b
+#| fig-cap: "Marginal posterior densities of μ and σ for the heights data (Tidyverse)"
+
+d_grid3_b <- 
+  d_grid2_b |> 
+    dplyr::mutate(mu_norm_b = 
+              stats::rnorm(N_sim_height_b,
+                           mean = prior_mu_b,
+                           sd = prior_mu_b)) 
+    # dplyr::mutate(sigma_norm_b = 
+    #           stats::rnorm(N_sim_height_b,
+    #                        mean = prior_sigma_b,
+    #                        sd = prior_sigma_b)) 
+
+
+d_grid_samples_b |> 
+
+  ggplot2::ggplot(ggplot2::aes(x = mu_b)) + 
+  ggplot2::geom_density(color = "red") +
+  ggplot2::stat_function(
+          fun = dnorm,
+          args = with(d_grid3_b, c(
+            mean = mean(mu_norm_b), 
+            sd = sd(mu_norm_b)))
+          ) +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::xlab(NULL) +
+  ggplot2::theme_bw()
+```
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+***
+
+
+
+
+***
+
+
+
+
+
+***
+
+###### Densities (O)
+###### Summarize (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-sampling-heights-from-posterior-a}
+a: Posterior `r glossary("Compatibility Interval", "Compatibility Intervals")` (PIs) (Original)
 ::::::
 :::
 ::::{.my-r-code-container}
 
 ```{r}
-#| label: chap04-summarize-pi-a
-#| results: hold
+#| label: post-comp-intervals-a
 
 ## R code 4.22a ####################
 rethinking::PI(sample.mu_a)
 rethinking::PI(sample.sigma_a)
+
+rethinking::HPDI(sample.mu_a)
+rethinking::HPDI(sample.sigma_a)
 ```
+
+
 
 ::::
 :::::
+
+
+
+
+We'll use the {**tidybayes**} package to compute their posterior modes
+and 95% HDIs.
+
+**Marginal Posterior Density**
+
+
+
+**Posterior Compatibility Intervals (PIs)**
+
+To summarize the widths of these densities with posterior compatibility
+intervals we use:
+
+```{r}
+
+```
 
 Since these samples are just vectors of numbers, you can compute any
 statistic from them that you could from ordinary data: `mean`, `median`,
 or `quantile`, for example.
 
 
-###### header for second tab
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-code-name-b}
-b: Numbered R Code Title (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+***
+
+# I STOPPED HERE (ORIGINAL)
 
 ```{r}
-#| label: chap04-summarize-pi-b
-
 ## ************************** ############
 ## I STOPPED HERE (ORIGINAL) #############
 ## ************************** ############
 ```
 
-
-We'll use the {**tidybayes**} package to compute their posterior modes
-and 95% HDIs.
-::::
-:::::
-
-:::
-
-::::
-:::::
 
 
 **Sample size and the normality of sigmas posterior**
