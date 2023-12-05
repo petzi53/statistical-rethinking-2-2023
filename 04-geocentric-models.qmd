@@ -2014,7 +2014,7 @@ Compare the left panel with @fig-posterior-sample-b and the right panel with the
 
 
 
-#### Finding the posterior distribution with quap()
+#### Finding the posterior distribution with quadratic approximation
 
 > “To build the quadratic approximation, we’ll use `quap()`, a command in the {**rethinking**} package. The `quap()` function works by using the model definition you were introduced to earlier in this chapter. Each line in the definition has a corresponding definition in the form of R code. The engine inside quap then uses these definitions to define the posterior probability at each combination of parameter values. Then it can climb the posterior distribution and find the peak, its `r glossary("MAP")` (**Maximum A Posteriori** estimate). Finally, it estimates the quadratic curvature at the MAP to produce an approximation of the posterior distribution. Remember: This procedure is very similar to what many non-Bayesian procedures do, just without any priors.” ([McElreath, 2020, p. 87](zotero://select/groups/5243560/items/NFUEVASQ), parenthesis and emphasis are mine) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=106&annotation=FFDN2FE2))
 
@@ -2031,6 +2031,7 @@ Compare the left panel with @fig-posterior-sample-b and the right panel with the
 
 1. We start with the `Howell1` data frame for adults (age \>= 18) (**Code 4.26**).
 2. We place the R code equivalents into `base::alist()` We are going to use the @eq-height-linear-model-m4-1 (**Code 4.27**).
+3. We can add some additional options like start values (**Code 4.30**)
 3. We fit the model to the data of our data frame and store the fitted model (**Code 4.28**).
 4. Now we can have a look at the posterior distribution (**Code 4.29**).
 ::::
@@ -2072,23 +2073,79 @@ flist <- alist(
   sigma ~ dunif(0, 50)
 )
 
+## R code 4.30a #####################
+start <- list(
+  mu = mean(d2_a$height),
+  sigma = sd(d2_a$height)
+)
+
 ## R code 4.28a ######################
-m4.1a <- rethinking::quap(flist, data = d2_a)
+m4.1a <- rethinking::quap(flist, data = d2_a, start = start)
+m4.1a
+```
+
+***
+
+The `rethinking::quap()` function returns a "map" object.
+
+Sometimes I got an error message when computing this code chunk. The reason was that `quap()` has chosen an inconvenient value to start for its estimation of the posterior. I believe that one could visualize the problem with a metaphor: Instead of climbing up the hill `quap()` started with a value where it was captured in a narrow valley.
+
+::::
+:::::
+
+:::::{.my-note}
+:::{.my-note-header}
+The three parts of `rethinking::quap()`
+:::
+::::{.my-note-container}
+1.  A formula or `base::alist()` of formulas that define the likelihood
+    and priors.
+2.  A data frame or list containing the data.
+3.  Some options like start values of method for search optimization. (Not used here in this example). Note that the list of start values is a regular `list()`, not an
+    `alist()` like the formula list is. 
+::::
+:::::
+
+:::::{.my-resource}
+:::{.my-resource-header}
+How to use formulae in statistical models in R
+:::
+::::{.my-resource-container}
+To learn more about using formulae read "Statistical Models in R" [online](https://cran.r-project.org/doc/manuals/R-intro.html#Statistical-models-in-R) or chapter 11 in the [PDF](https://cran.r-project.org/doc/manuals/R-intro.pdf).
+::::
+:::::
+
+
+###### precis
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-precis-m4-1a}
+a: Printing with `rethinking::precis` (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-precis-m4-1a
 
 ## R code 4.29a ######################
 rethinking::precis(m4.1a)
 ```
 
+> “These numbers provide Gaussian approximations for each parameter’s marginal distribution. This means the plausibility of each value of μ, after averaging over the plausibilities of each value of σ, is given by a Gaussian distribution with mean 154.6 and standard deviation 0.4. The 5.5% and 94.5% quantiles are percentile interval boundaries, corresponding to an 89% compatibility interval. Why 89%? It’s just the default. It displays a quite wide interval, so it shows a high-probability range of parameter values. If you want another interval, such as the conventional and mindless 95%, you can use precis(m4.1,prob=0.95). But I don’t recommend 95% intervals, because readers will have a hard time not viewing them as significance tests. 89 is also a prime number, so if someone asks you to justify it, you can stare at them meaningfully and incant, “Because it is prime.” That’s no worse justification than the conventional justification for 95%.” ([McElreath, 2020, p. 88](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=107&annotation=5ARWQP2N))
+
 ::::
 :::::
 
+When you compare the 89% boundaries with the result of the grid approximation in @exm-chap04-summarize-pi you will see that they are almost identical as the posterior is approximately Gaussian.
 
 ###### Tidyverse
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-chap04-m4-1b}
-b: Finding the posterior distribution with `brms::brm()` (Tidyverse)
+b: Finding the posterior distribution with `brms::brm()` 
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -2096,7 +2153,6 @@ b: Finding the posterior distribution with `brms::brm()` (Tidyverse)
 
 ```{r}
 #| label: chap04-m4-1b
-#| cache: true
 
 ## R code 4.26b ######################
 data(package = "rethinking", list = "Howell1")
@@ -2121,28 +2177,45 @@ m4.1b <-
       cores = 4,                 # 8 
       seed = 4,                  # 9
       file = "brm_fits/m04.01b") # 10
+m4.1b
 ```
 
+***
 
-1. **formula** describes the relation between dependent and independent variables in the form of a linear model. The left hand side are the dependent variables, the right hand side the independent. The independent variables are used to calculate the trend component of the linear model, the residuals are then assumed to have some kind of distribution. When the independent are equal to one `~ 1`, the trend component is a single value, e.g. the mean value of the data, i.e. the linear model only has an intercept. ([StackOverflow](https://stackoverflow.com/a/13366973/7322615)) In other words, it is the value the dependent variable is expected to have when the independent variables are zero or have no influence.  ([StackOverflow](https://stackoverflow.com/a/13367260/7322615)). The formula `y ~ 1` is just a model with a constant (intercept) and no regressor ([StackOverflow](https://stackoverflow.com/questions/53812741/tilde-operator-in-r)).
+The `brms::brm()` function returns a "brmsfit" object.
+
+The convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` are described in detail in [@vehtari2021].
+
+If you don't want to specify the result more in detail (for instance to change the PI) than you get the same result with `brms:::print.brmsfit(m4.1b)` and `brms:::summary.brmsfit(m41b)`.
+
+::::
+:::::
+
+`brms::brm()` has more than 40 arguments but only three (formula, data and prior) are for our case mandatory. All the other have sensible default values. The correspondence of these three arguments to the {**rethinking**} version is obvious.
+
+In the simple demonstration of `brms::brm()` in the toy globe example (@cnj-chap02-brms-globe-tossing), I have just used Kurz’ code lines without any explanation. This time I will explain all 10 arguments from Kurz’ example.
+
+***
+
+1. **formula** describes the relation between dependent and independent variables in the form of a linear model. The left hand side are the dependent variables, the right hand side the independent. The independent variables are used to calculate the trend component of the linear model, the residuals are then assumed to have some kind of distribution. When the independent are equal to one `~ 1`, the trend component is a single value, e.g. the mean value of the data, i.e. the linear model only has an intercept. ([StackOverflow](https://stackoverflow.com/a/13366973/7322615)) In other words, it is the value the dependent variable is expected to have when the independent variables are zero or have no influence.  ([StackOverflow](https://stackoverflow.com/a/13367260/7322615)). The formula `y ~ 1` is just a model with a constant (intercept) and no regressor ([StackOverflow](https://stackoverflow.com/questions/53812741/tilde-operator-in-r)). Or more understandable for our case are Kurz’ explication: "… the intercept of a typical regression model with no predictors is the same as its mean. In the special case of a model using the binomial likelihood, the mean is the probability of a 1 in a given trial, $\theta$." ([Kurz](https://bookdown.org/content/4857/small-worlds-and-large-worlds.html))
+ .
 2. **data**: A data frame that contains all the variables used in the model.
 3. **family**: A description of the response distribution and link function to be used in the model. This can be a family function, a call to a family function or a character string naming the family. By default a linear `gaussian` model is applied. So this line would not have been necessary. There are [standard family functions `stats::family()`](https://www.stat.ethz.ch/R-manual/R-devel/library/stats/html/family.html)that will work with {**brms**}, but there are also [special family functions `brms::brmsfamily()`](https://paul-buerkner.github.io/brms/reference/brmsfamily.html) that work only for {**brms**} models. Additionally you can [specify custom families](https://paul-buerkner.github.io/brms/reference/custom_family.html) for use in brms with the `brms::custom_family()` function.
 4. **prior**: The next two lines specify priors for the normal and the uniform distribution. As you can see this is another place where parts for the formula are provided for the `brms::brm()` function work. --- `class` specifies the parameter class. It defaults to "b" ((i.e. population-level -- 'fixed' -- effects)). (There is also the argument `group` for grouping of factors for group-level effects. Not used in this code example.) --- Besides the "b" class there are other classes for the "Intercept" and the standard deviation "Sigma" on the population level: There is also a "sd" class for the standard deviation of group-level effects. Finally there is the special case of `class = "cor"` to set the same prior on every correlation matrix. --- `ub = 50` sets the upper bound to 50. There is also a `lb` (lower bound). Both bounds are for parameter restriction, so that population-level effects must fall within a certain interval using the `lb` and `ub` arguments. `lb` and `ub` default to `NULL`, i.e. there is no restriction.
 5. **iter**: Number of total iterations per chain (including `warmup`; defaults to 2000).
-6. **warmup**: A positive integer specifying number of warmup iterations. This also specifies the number of iterations used for stepsize adaptation, so warmup draws should not be used for inference. The number of warmup should not be larger than iter and the default is iter/2.
+6. **warmup**: A positive integer specifying number of warmup iterations. This also specifies the number of iterations used for stepsize adaptation, so warmup draws should not be used for inference. The number of warmup should not be larger than `iter` and the default is $iter/2$.
 7. **chains**: Number of `r glossary("Markov chain", "Markov chains")` (defaults to 4). 
 8. **cores**: Number of cores to use when executing the chains in parallel, which defaults to 1 but we recommend setting the `mc.cores` option to be as many processors as the hardware and RAM allow (up to the number of chains).
 9. **seed**: The seed for random number generation to make results reproducible. Kurz has always used for `set.seed()` in other code chunks the chapter number. If `NA` (the default), Stan will set the seed randomly.
 10. **file**: Either `NULL` or a character string. In the latter case, the fitted model object is saved via `base::saveRDS()` in a file named after the string supplied in file. The `.rds` extension is added automatically. If the file already exists, `brms::brm()` will load and return the saved model object instead of refitting the model. Unless you specify the `file_refit` argument as well, the existing files won't be overwritten, you have to manually remove the file in order to refit and save the model under an existing file name. The file name is stored in the brmsfit object for later usage.
-::::
-:::::
 
-###### Print
+
+###### print
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-chap04-print-m4-1b}
-b: Print the results of the `brmsfit` object
+b: Print the specified results of the `brmsfit` object
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -2150,112 +2223,23 @@ b: Print the results of the `brmsfit` object
 
 ```{r}
 #| label: chap04-print-m4-1b
+#| results: hold
 
 ## R code 4.29b print ######################
 brms:::print.brmsfit(m4.1b, prob = .89)
+
+## brms:::summary.brmsfit(m4.1b, prob = .89) # (same result)
 ```
 
-Using `print.brmsfit` with {**brms**} models defaults to 95% intervals. As {**rethinking**} defaults to 89% intervals, I have changed the `prob` parameter of the print method also to 89%. 
+***
 
-::::
-:::::
+The convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` are described in detail in [@vehtari2021].
 
-`brms:::summary.brmsfit()` and `brms:::print.brmsfit()` result in identical output.
+`brms:::summary.brmsfit()` results in the same output `as brms:::print.brmsfit()`. Both return a `brmssummary` object. But there are some internal differences:
 
-For the interpretation of this output I am going to use the explication in the [How to use brms](https://github.com/paul-buerkner/brms#how-to-use-brms) section of the {**brms**} GitHup page.
+> There is also a ⁠$print()⁠ method that prints the same summary stats but removes the extra formatting used for printing tibbles and returns the fitted model object itself. The ⁠$print()⁠ method may also be faster than ⁠$summary()⁠ because it is designed to only compute the summary statistics for the variables that will actually fit in the printed output whereas ⁠$summary()⁠ will compute them for all of the specified variables in order to be able to return them to the user. 
 
-1. **Top**: On the top of the output, some general information on the model is given, such as family, formula, number of iterations and chains.
-2. **Upper Middle**: If the data were grouped the next part would display group-level effects separately for each grouping factor in terms of standard deviations and (in case of more than one group-level effect per grouping factor) correlations between group-level effects. (This part is absent above as there are no grouping factors.)
-3. **Lower Middle: here Middle**: Next follow the display of the population-level effects (i.e. regression coefficients). If incorporated, autocorrelation effects and family specific parameters (e.g., the residual standard deviation ‘sigma’ in normal models) are also given.
-    In general, every parameter is summarized using the mean (`Estimate`) and the standard deviation (`Est.Error`) of the posterior distribution as well as two-sided 95% credible intervals (`l-95% CI` and `u-95% CI`) based on quantiles. The last three values (`ESS_bulk`, `ESS_tail`, and `Rhat`) provide information on how well the algorithm could estimate the posterior distribution of this parameter. If `Rhat` is considerably greater than 1, the algorithm has not yet converged and it is necessary to run more iterations and / or set stronger priors.
-4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (HMC) Method. This means that it is not a `r glossary("Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
-    Instead of doing the random walk, NUTS does jumps of length x. Each jump doubles as the algorithm continues to run. This happens until the trajectory reaches a point where it wants to return to the starting point.
-
-###### Summary
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-print-m4-1b}
-b: Summarize the results of the `brmsfit` object
-::::::
-:::
-::::{.my-r-code-container}
-
-
-```{r}
-#| label: chap04-summary-m4-1b
-
-## R code 4.29b summary ######################
-brms:::summary.brmsfit(m4.1b, prob = .89)
-
-```
-
-Using `summary.brmsfit` with {**brms**} models defaults to 95% intervals. As {**rethinking**} defaults to 89% intervals, I have changed the `prob` parameter of the summary method also to 89%. 
-
-::::
-:::::
-
-`brms:::summary.brmsfit()` and `brms:::print.brmsfit()` result in identical output.
-
-For the interpretation of this output I am going to use the explication in the [How to use brms](https://github.com/paul-buerkner/brms#how-to-use-brms) section of the {**brms**} GitHup page.
-
-1. **Top**: On the top of the output, some general information on the model is given, such as family, formula, number of iterations and chains.
-2. **Upper Middle**: If the data were grouped the next part would display group-level effects separately for each grouping factor in terms of standard deviations and (in case of more than one group-level effect per grouping factor) correlations between group-level effects. (This part is absent above as there are no grouping factors.)
-3. **Lower Middle: here Middle**: Next follow the display of the population-level effects (i.e. regression coefficients). If incorporated, autocorrelation effects and family specific parameters (e.g., the residual standard deviation ‘sigma’ in normal models) are also given.
-    In general, every parameter is summarized using the mean (`Estimate`) and the standard deviation (`Est.Error`) of the posterior distribution as well as two-sided 95% credible intervals (`l-95% CI` and `u-95% CI`) based on quantiles. The last three values (`ESS_bulk`, `ESS_tail`, and `Rhat`) provide information on how well the algorithm could estimate the posterior distribution of this parameter. If `Rhat` is considerably greater than 1, the algorithm has not yet converged and it is necessary to run more iterations and / or set stronger priors.
-4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (HMC) Method. This means that it is not a `r glossary("Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
-    Instead of doing the random walk, NUTS does jumps of length x. Each jump doubles as the algorithm continues to run. This happens until the trajectory reaches a point where it wants to return to the starting point.
-
-###### fit
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-print-m4-1b}
-b: Print a Stan like summary of the model (brms)
-::::::
-:::
-::::{.my-r-code-container}
-
-
-```{r}
-#| label: chap04-fit-m4-1b
-
-
-## R code 4.29b stan like summary ######################
-m4.1b$fit
-```
-
-
-::::
-:::::
-
-###### plot
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-print-m4-1b}
-b: Finding the posterior distribution with `brms::brm()` (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-
-```{r}
-#| label: fig-chap04-plot-m4-1b
-#| fig-cap: "Plot model m4.1b"
-
-## R code 4.29b plot ######################
-brms:::plot.brmsfit(m4.1b)
-```
-
-
-::::
-:::::
-
-:::
-
-::::
-:::::
+Using `print.brmsfit()` or `summary.brmsfit()` defaults to 95% intervals. As {**rethinking**} defaults to 89% intervals, I have changed the `prob` parameter of the print method also to 89%. 
 
 :::::{.my-watch-out}
 :::{.my-watch-out-header}
@@ -2274,6 +2258,11 @@ contrary: Adding `brms::` would result into the message: "Error:
 As I really want to specify explicitly the method these generic
 functions should use, I need to use the syntax with *three* colons, like `brms:::print.brmsfit()` or `brms:::summary.brmsfit()` respectively.
 
+:::::{.my-resource}
+:::{.my-resource-header}
+Learning more about S3 classes in R
+:::
+::::{.my-resource-container}
 In this respect I have to learn more about S3 classes. There are many
 important web resources about this subject that I have found with the
 search string "r what is s3 class". Maybe I should start with the [S3
@@ -2282,6 +2271,208 @@ chapter in Advanced R](https://adv-r.hadley.nz/s3.html).
 ::::
 :::::
 
+::::
+:::::
+
+
+::::
+:::::
+
+For the interpretation of this output I am going to use the explication in the [How to use brms](https://github.com/paul-buerkner/brms#how-to-use-brms) section of the {**brms**} GitHup page.
+
+1. **Top**: On the top of the output, some general information on the model is given, such as family, formula, number of iterations and chains.
+2. **Upper Middle**: If the data were grouped the next part would display group-level effects separately for each grouping factor in terms of standard deviations and (in case of more than one group-level effect per grouping factor) correlations between group-level effects. (This part is absent above as there are no grouping factors.)
+3. **Lower Middle: here Middle**: Next follow the display of the population-level effects (i.e. regression coefficients). If incorporated, autocorrelation effects and family specific parameters (e.g., the residual standard deviation ‘sigma’ in normal models) are also given.
+    In general, every parameter is summarized using the mean (`Estimate`) and the standard deviation (`Est.Error`) of the posterior distribution as well as two-sided 95% credible intervals (`l-95% CI` and `u-95% CI`) based on quantiles. The last three values (`ESS_bulk`, `ESS_tail`, and `Rhat`) provide information on how well the algorithm could estimate the posterior distribution of this parameter. If `Rhat` is considerably greater than 1, the algorithm has not yet converged and it is necessary to run more iterations and / or set stronger priors.
+4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (`r glossary("HMC")` Method. This means that it is not a `r glossary("Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
+    Instead of doing the random walk, NUTS does jumps of length x. Each jump doubles as the algorithm continues to run. This happens until the trajectory reaches a point where it wants to return to the starting point.
+
+###### fit
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-fit-m4-1b}
+b: Print a Stan like summary
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: chap04-fit-m4-1b
+
+
+## R code 4.29b stan like summary ######################
+m4.1b$fit
+```
+
+Kurz refers to [RStan: the R interface to Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html) for a detailed description. I didn't study the extensive documentation but I found out two items:
+
+- `lp__` is the logarithm of the (unnormalized) posterior density as calculated by Stan. This log density can be used in various ways for model evaluation and comparison.
+- `Rhat` estimates the degree of convergence of a random Markov Chain based on the stability of outcomes between and within chains of the same length. Values close to one indicate convergence to the underlying distribution. Values greater than 1.1 indicate inadequate convergence.
+
+::::
+:::::
+
+###### plot
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-plot-m4-1b}
+b: Plot the visual chain diagnostics of the `brmsfit` object
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: fig-chap04-plot-m4-1b
+#| fig-cap: "Plot model m4.1b"
+
+## R code 4.29b plot ######################
+brms:::plot.brmsfit(m4.1b)
+```
+
+> After running a model fit with `r glossary("HMC")`, it’s a good idea to inspect the chains. As we’ll see, McElreath covered visual chain diagnostics in @sec-chap09. … If you want detailed diagnostics for the HMC chains, call `launch_shinystan(m4.1b)`. ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#finding-the-posterior-distribution-with-quap-brm.))
+
+Just a quick preview: It is important over the whole length of the samples (not counting the warmups, e.g., in our case: 1000 iteration) the width is constant and that the graph show all (four) chains at the top resp. bottom. Unfortunately is looking at the (small) graph not always conclusive.
+
+:::::{.my-resource}
+:::{.my-resource-header}
+Learn more about {**shinystan**}
+:::
+::::{.my-resource-container}
+I haven’t applied `launch_shinystan(m4.1b)` as it takes much time and I do not (yet) understand the detailed report anyway.  To learn to work with {**shinystan**} see
+the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan)
+and the vignettes of the R package vignettes ([Deploying to shinyapps.io](https://rdrr.io/cran/shinystan/f/vignettes/deploy_shinystan.Rmd), [Getting Started](https://rdrr.io/cran/shinystan/f/vignettes/shinystan-package.Rmd)) and documentation.
+::::
+:::::
+
+
+
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+
+:::::{.my-resource}
+:::{.my-resource-header}
+Package documentation of Stan and friends
+:::
+::::{.my-resource-container}
+- [Interface to shinystan](https://paul-buerkner.github.io/brms/reference/launch_shinystan.brmsfit.html) (`brms::launch_shinystan`)
+- I believe that it is also very important to understand [RStan: the R interface to Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html).
+- Possibly I should read [Using the ShinyStan GUI with rstanarm models](https://mc-stan.org/rstanarm/reference/launch_shinystan.stanreg.html)
+- And maybe it could be also helpful to read selected chapters from the [rstanarm documentation](https://mc-stan.org/rstanarm/index.html), from the [{**rstan**} documentation](https://mc-stan.org/rstan/) or generally from [Stan User’s Guide](https://mc-stan.org/docs/stan-users-guide/index.html) resp. [Stan Language Reference Manual](https://mc-stan.org/docs/reference-manual/index.html. 
+
+Ooops, this opens up Pandora's box!
+
+I do not even understand completely what the different packages do. What follows is a first try where I copied from the documentation pages:
+
+> {**rstanarm**} is an R package that emulates other R model-fitting functions but uses Stan (via the {**rstan**} package) for the back-end estimation. The primary target audience is people who would be open to Bayesian inference if using Bayesian software were easier but would use frequentist software otherwise.
+
+> RStan is the R interface to Stan. It is distributed on CRAN as the {**rstan**} package and its source code is hosted on GitHub.
+
+> Stan is a state-of-the-art platform for statistical modeling and high-performance statistical computation.
+::::
+:::::
+
+The next example shows the effect a very narrow $\mu$ prior has. Instead of a sigma of 20 we provide only a standard deviation of 0.1.
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-chap04-narrow-mu-prior-m4-2}
+: The same model but with a more informative, e.g., very narrow $\mu$ prior 
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-narrow-mu-prior-m4.2a}
+a: Model with a very narrow $\mu$ prior  (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-narrow-mu-prior-m4.2a
+#| cache: true
+
+
+## R code 4.27a ######################
+flist <- alist(
+  height ~ dnorm(mu, sigma),
+  mu ~ dnorm(178, .1),
+  sigma ~ dunif(0, 50)
+)
+
+## R code 4.30a #####################
+start <- list(
+  mu = mean(d2_a$height),
+  sigma = sd(d2_a$height)
+)
+
+## R code 4.28a ######################
+m4.2a <- rethinking::quap(flist, data = d2_a, start = start)
+rethinking::precis(m4.2a)
+```
+> “Notice that the estimate for μ has hardly moved off the prior. The prior was very concentrated around 178. So this is not surprising. But also notice that the estimate for σ has changed quite a lot, even though we didn’t change its prior at all. Once the golem is certain that the mean is near 178—as the prior insists—then the golem has to estimate σ conditional on that fact. This results in a different posterior for σ, even though all we changed is prior information about the other parameter.” ([McElreath, 2020, p. 89](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=108&annotation=KW4QU3CM))
+
+
+::::
+:::::
+
+
+###### brms
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-narrow-mu-prior-m4.2b}
+b: Model with a very narrow $\mu$ prior (brms)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-narrow-mu-prior-m4.2b
+
+m4.2b <- 
+  brms::brm(
+      formula = height ~ 1,                               
+      data = d2_b,                                                   
+      family = gaussian(),      
+      prior = c(prior(normal(178, 0.1), class = Intercept),
+                prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brm_fits/m04.02b")
+
+base::rbind(
+      brms:::summary.brmsfit(m4.1b, prob = .89)$fixed,
+      brms:::summary.brmsfit(m4.2b, prob = .89)$fixed
+      )
+```
+Subsetting the `summary.brmsfit()` output of the `brmssummary` object with `$fixed` provides a convenient way to compare the Intercept summaries between `m4.1b` and `m4.2b`.
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+***
 
 # 2nd PASS: STOPPED HERE
 
@@ -2291,118 +2482,6 @@ chapter in Advanced R](https://adv-r.hadley.nz/s3.html).
 ## ************************** ############
 ```
 
-
-```{r}
-#| label: post-dist-quap-m4-1
-#| attr-source: '#lst-post-dist-quap-m4-1 lst-cap="Finding the posterior distribution with rethinking::quap(): Model m4-1"'
-
-
-```
-
-> These numbers provide Gaussian approximations for each parameter's
-> `r glossary("marginal distribution")`. This means the plausibility of
-> each value of `_μ_`, after averaging over the plausibilities of each
-> value of `_σ_`, is given by a Gaussian distribution with mean 154.6
-> and standard deviation 0.4.
->
-> The 5.5% and 94.5% quantiles are percentile interval boundaries,
-> corresponding to an 89% compatibility interval. Why 89%? It's just the
-> default. It displays a quite wide interval, so it shows a
-> high-probability range of parameter values. If you want another
-> interval, such as the conventional and mindless 95%, you can use
-> `precis(m4.1a, prob=0.95)`. But I don't recommend 95% intervals,
-> because readers will have a hard time not viewing them as significance
-> tests. 89 is also a prime number, so if someone asks you to justify
-> it, you can stare at them meaningfully and incant, "Because it is
-> prime." That's no worse justification than the conventional
-> justification for 95%.
-
-> I encourage you to compare these 89% boundaries to the compatibility
-intervals from the grid approximation in @lst-post-comp-intervals-a
-earlier. You'll find that they are almost identical. When the posterior
-is approximately Gaussian, then this is what you should expect.
-
-##### Start values for `rethinking::quap()` {#sec-start-values-rethinking}
-
-Mean and standard deviation are good values to start values for hill
-climbing. If you don't specify `rethinking::quap()` will use a random
-value.
-
-```{r}
-#| label: start-values-quap
-#| attr-source: '#start-values-quap lst-cap="Define start values for rethinking::quap()"'
-
-## R code 4.30 ######################
-start <- list(
-  mu = mean(d2_a$height),
-  sigma = sd(d2_a$height)
-)
-m4.1_2 <- rethinking::quap(flist, data = d2_a, start = start)
-rethinking::precis(m4.1_2)
-
-```
-
-::: callout-note
-###### list() and alist()
-
-Note that the list of start values is a regular `list`, not an `alist`
-like the formula list is. The two functions `alist` and `list` do the
-same basic thing: allow you to make a collection of arbitrary R objects.
-They differ in one important respect: `list` evaluates the code you
-embed inside it, while `alist` does not. So when you define a list of
-formulas, you should use `alist`, so the code isn't executed. But when
-you define a list of start values for parameters, you should use `list`,
-so that code like `mean(d2_a$height)` will be evaluated to a numeric
-value.
-:::
-
-**Slicing in more information**
-
-> The priors we used before are very weak, both because they are nearly
-> flat and because there is so much data. So I'll splice in a more
-> informative prior for `*μ*`, so you can see the effect. All I'm going
-> to do is change the standard deviation of the prior to 0.1, so it's a
-> very narrow prior. I'll also build the formula right into the call to
-> `quap` this time.
-
-```{r}
-#| label: post-dist-quap-m4.2
-#| attr-source: '#lst-post-dist-quap-m4.2 lst-cap="Finding the posterior distribution with a narrower prior rethinking::quap(): Model m4.2"'
-
-## R code 4.31 ###########################
-m4.2 <- rethinking::quap(
-  alist(
-    height ~ dnorm(mu, sigma),
-    mu ~ dnorm(178, 0.1),
-    sigma ~ dunif(0, 50)
-  ),
-  data = d2_a
-)
-rethinking::precis(m4.2)
-
-```
-
-> Notice that the estimate for `*μ*` has hardly moved off the prior. The
-> prior was very concentrated around 178. So this is not surprising. But
-> also notice that the estimate for `*σ*` has changed quite a lot, even
-> though we didn't change its prior at all. Once the golem is certain
-> that the mean is near 178---as the prior insists---then the golem has
-> to estimate `*σ*` conditional on that fact. This results in a
-> different posterior for `*σ*`, even though all we changed is prior
-> information about the other parameter.
-
-::: callout-caution
-###### `μ` has hardly moved off the prior
-
-At first I did not understand "that the estimate for `*μ*` has hardly
-moved off the prior". I thought this assertion refers to the value of
-`*μ*` in both calculation. *μ* has changed considerably from 154.61 to
-177.86 and under that assumption the above quote does not make sense.
-
-But in contrast to my wrong assumption the assertion refers to the
-difference between the chosen prior (178) and the resulting value of
-`*μ*` (177.86).
-:::
 
 #### Sampling from a quap
 
@@ -4458,215 +4537,6 @@ Resources for GAMs
 ```
 
 
-
-**Sample size and the normality of σ's posterior**
-
-I will skip this part as there is nothing conceptually new in this
-section.
-
-#### Finding the posterior distribution with brm()
-
-> In the text, McElreath indexed his models with names like `m4.1a`. I
-> will largely follow that convention, but will replace the *m* with a
-> *b* to stand for the **`brms`** package.
-
-Here's how to fit the first model for this chapter.
-
-::: callout-tip
-###### Code slightly changed
-
-I have worked my way through the `brms::brm()` help file. From its more than 40 (!) arguments I have concentrated my learning on those arguments, that are used explicitly by Kurz.
-
-But to understand the syntax I had made some minor changes:
-
-1. Instead of `height ~ 1` I wrote the argument with it argument name `formula = height ~ 1" and changed put it as first argument.
-2. Instead of `family = gaussian` I wrote `family = gaussian()`as in the help file mentioned.
-
-To understand the syntax it is also quite revealing to look at @tbl-mirror-rethinking-tidyverse.
-
-To learn more read [Defining statistical models; formulae](https://cran.r-project.org/doc/manuals/R-intro.html#Formulae-for-statistical-models) and Chapter 11 of [Introduction to R](https://cran.r-project.org/doc/manuals/R-intro.pdf).
-:::
-
-The following table I have inserted here from Kurz's explanation of model `b4.3`. It is the first time that I used brms::brm() and therefore I need slow down here and go into the gritty details.
-
-> Unlike with McElreath's {**rethinking**} package, the conventional
-`brms::brm()` syntax doesn't mirror the statistical notation. But here
-are the analogues to the exposition at the bottom of page 97:
-
-| {**rethinking**} package                                    | {**brms**} package: `brms::brm()`          |
-|------------------------------------|------------------------------------|
-| $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$ | `family = gaussian`                        |
-| $\mu_i = \alpha + \beta \text{weight}_i$                    | `height ~ 1 + weight_c`                 |
-| $\alpha \sim \operatorname{Normal}(178, 20)$                | `prior(normal(178, 20), class = Intercept` |
-| $\beta \sim \operatorname{Log-Normal}(0, 1)$                | `prior(lognormal(0, 1), class = b)`        |
-| $\sigma \sim \operatorname{Uniform}(0, 50)$                 | `prior(uniform(0, 50), class = sigma)`     |
-
-: Mirror the statistical notation of the rethinking package with the
-tidyverse approach using the brms package {#tbl-mirror-rethinking-tidyverse}
-
-
-
-If you want detailed diagnostics for the HMC chains, call
-`brms::launch_shinystan(m4.1b)`. That'll keep you busy for a while. See
-the [ShinyStan website](https://mc-stan.org/users/interfaces/shinystan)
-for more information.
-
-***
-:::: {#prp-shinystan}
-Launch of shinystan turned off
-
-::: callout-warning
-
-I turned off the evaluation of the following chunk that should launch {*shinystan*). Besides that the evaluation takes time
-I am not yet ready to understand the many configurable options programmed with a {**shiny**) interface. 
-::::
-
-:::
-***
-
-
-A short investigation showed that there are several pages of documentation of different packages that I would need to study. These include:
-
-:::: {prp-stan-literature}
-
-Package documentation of Stan and friends
-
-::: callout-tip
-
-- [Interface to shinystan](https://paul-buerkner.github.io/brms/reference/launch_shinystan.brmsfit.html) (`brms::launch_shinystan`)
-- I believe that it is also very important to understand [RStan: the R interface to Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html).
-- Possibly I should read [Using the ShinyStan GUI with rstanarm models](https://mc-stan.org/rstanarm/reference/launch_shinystan.stanreg.html)
-- And maybe it could be also helpful to read selected chapters from the [rstanarm documentation](https://mc-stan.org/rstanarm/index.html), from the [{**rstan**} documentation](https://mc-stan.org/rstan/) or generally from [Stan User’s Guide](https://mc-stan.org/docs/stan-users-guide/index.html) resp. [Stan Language Reference Manual](https://mc-stan.org/docs/reference-manual/index.html. 
-
-Ooops, this opens up Pandora's box!
-
-I do not even understand completely what the different packages do. What follows is a first try where I copied from the documentation pages:
-
-> {**rstanarm**} is an R package that emulates other R model-fitting functions but uses Stan (via the {**rstan**} package) for the back-end estimation. The primary target audience is people who would be open to Bayesian inference if using Bayesian software were easier but would use frequentist software otherwise.
-
-> RStan is the R interface to Stan. It is distributed on CRAN as the {**rstan**} package and its source code is hosted on GitHub.
-
-> Stan is a state-of-the-art platform for statistical modeling and high-performance statistical computation.
-
-:::
-
-::::
-***
-
-```{r}
-#| label: detailed-diganostic-chains-brms-m4.1bx
-#| attr-source: '#lst-detailed-diganostic-chains-brms-m4.1b lst-cap="Detailed diagnostic using {**shinystan**}"'
-
-# brms::launch_shinystan(m4.1b)
-
-```
-
-```{r}
-#| label: print-summary-brms-m4.1bx
-
-brms:::print.brmsfit(m4.1b)
-
-```
-For the interpretation of this output I am going to use the explication in the [How to use brms](https://github.com/paul-buerkner/brms#how-to-use-brms) section of the {**brms**} GitHup page.
-
-1. **Top**: On the top of the output, some general information on the model is given, such as family, formula, number of iterations and chains.
-2. **Upper Middle**: If the data were grouped the next part would display group-level effects separately for each grouping factor in terms of standard deviations and (in case of more than one group-level effect per grouping factor) correlations between group-level effects. (This part is absent above as there are no grouping factors.)
-3. **Lower Middle: here Middle**: Next follow the display of the population-level effects (i.e. regression coefficients). If incorporated, autocorrelation effects and family specific parameters (e.g., the residual standard deviation ‘sigma’ in normal models) are also given.
-    In general, every parameter is summarized using the mean (`Estimate`) and the standard deviation (`Est.Error`) of the posterior distribution as well as two-sided 95% credible intervals (`l-95% CI` and `u-95% CI`) based on quantiles. The last three values (`ESS_bulk`, `ESS_tail`, and `Rhat`) provide information on how well the algorithm could estimate the posterior distribution of this parameter. If `Rhat` is considerably greater than 1, the algorithm has not yet converged and it is necessary to run more iterations and / or set stronger priors.
-4. **Bottom**: The last part is some short explanation of the sampling procedure. `r glossary("NUTS")` stands for **No U-Turn Sampler** and is a Hamiltonian Monte Carlo (HMC) Method. This means that it is not a `r glossary("Markov Chain")` method and thus, this algorithm avoids the random walk part, which is often deemed as inefficient and slow to converge.
-    Instead of doing the random walk, NUTS does jumps of length x. Each jump doubles as the algorithm continues to run. This happens until the trajectory reaches a point where it wants to return to the starting point.
-
-```{r}
-#| label: print-stan-like-summary-brms-m4.1bx
-
-m4.1b$fit
-```
-
-
-
-```{r}
-#| label: fig-plot-m4.1bx
-#| fig-cap: "Plot model m4.1b"
-#| attr-source: '#lst-fig-plot-m4.1b lst-cap="Plot model m4.1b"'
-
-brms:::plot.brmsfit(m4.1b)
-```
-
-Whereas rethinking defaults to 89% intervals, using `print()` or
-`summary()` with {**brms**} models defaults to 95% intervals.
-
-::: callout-note
-As I have learned shortly: `print()` or `summary()` are generic
-functions where one can add new printing methods with new classes. In
-this case `class(m4.1b)` = `r class(m4.1b)`. This means I do not need to
-add `brms::` to secure that I will get the {**brms**} printing or
-summary method as I didn't load the {**brms**} package. Quite the
-contrary: Adding `brms::` would result into the message: "Error:
-'summary' is not an exported object from 'namespace:brms'".
-
-As I really want to specify explicitly the method these generic
-functions should use, I need to use the syntax with *three* columns, like `brms:::print.brmsfit()` or `brms:::summary.brmsfit()` respectively.
-
-In this respect I have to learn more about S3 classes. There are many
-important web resources about this subject that I have found with the
-search string "r what is s3 class". Maybe I should start with the [S3
-chapter in Advanced R](https://adv-r.hadley.nz/s3.html).
-:::
-
-Unless otherwise specified, Kurz will stick with 95% intervals
-throughout. To get those 89% intervals or McElreath approach, one could
-use the `prob` argument within `summary()` or `print()`.
-
-```{r}
-#| label: summary-interval-.89-brms-m4.1bx
-
-brms:::summary.brmsfit(m4.1b, prob = .89)
-
-```
-
-Here's the `brms::brm()` code for the model with the very narrow `μ`
-prior corresponding to the `rethinking::quap()` code in
-@lst-post-dist-quap-m4.2.
-
-```{r}
-#| label: fig-post-dist-brms-b4.2
-#| fig-cap: "Finding the posterior distribution with a narrower prior using brms::brm()"
-#| att-source: '#lst-post-dist-brms-b4.2 lst-cap="Finding the posterior distribution with a narrower prior using brms::brm()"'
-
-b4.2 <- 
-  brms::brm(data = d2_b, 
-      family = gaussian,
-      height ~ 1,
-      prior = c(brms::prior(normal(178, 0.1), class = Intercept),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "fits/b04.02")
-
-brms:::plot.brmsfit(b4.2, widths = c(1, 2))
-
-```
-
-And here's the model `summary()`.
-
-```{r}
-#| label: summary-narrow-prior
-
-brms:::summary.brmsfit(b4.2)
-
-```
-
-Subsetting the `summary()` output with `$fixed` provides a convenient
-way to compare the Intercept summaries between `m4.1b` and `b4.2`.
-
-```{r}
-#| label: compare-summaries-m4.1b-b4.2
-
-rbind(brms:::summary.brmsfit(m4.1b)$fixed,
-      brms:::summary.brmsfit(b4.2)$fixed)
-
-```
-
 #### Sampling from a ~~quap()~~ `brm()` fit
 
 {**brms**} doesn't seem to have a convenience function that works the
@@ -5084,7 +4954,28 @@ d2_b <-
   mutate(weight_c = weight - mean(weight))
 ```
 
-Remember: The detailed explication of the syntax for the following `brms::brm()` function are in @tbl-mirror-rethinking-tidyverse and @lst-post-dist-brms-m4.1b.
+Remember: The detailed explication of the syntax for the following `brms::brm()` function is in @exm-chap04-m4-1.
+
+To understand the differences in syntax between {**rethinking**} and {**brms**} it is also quite revealing to look at @tbl-mirror-rethinking-tidyverse.
+
+I have inserted the following table from Kurz’ explanation of model `b4.3`.
+
+> Unlike with McElreath's {**rethinking**} package, the conventional
+`brms::brm()` syntax doesn't mirror the statistical notation. But here
+are the analogues to the exposition at the bottom of page 97:
+
+| {**rethinking**} package                                    | {**brms**} package:   |
+|------------------------------------|------------------------------------|
+| $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$ | `family = gaussian`                        |
+| $\mu_i = \alpha + \beta \text{weight}_i$                    | `height ~ 1 + weight_c`                 |
+| $\alpha \sim \operatorname{Normal}(178, 20)$                | `prior(normal(178, 20), class = Intercept` |
+| $\beta \sim \operatorname{Log-Normal}(0, 1)$                | `prior(lognormal(0, 1), class = b)`        |
+| $\sigma \sim \operatorname{Uniform}(0, 50)$                 | `prior(uniform(0, 50), class = sigma)`     |
+
+: Compare statistical notation of rethinking with brms package {#tbl-mirror-rethinking-tidyverse}
+
+***
+
 
 
 ```{r}

@@ -2354,14 +2354,14 @@ procedure callout:
 
 ::: my-r-code
 ::: my-r-code-header
-::: {#cnj-brms-clobe-tossing}
+::: {#cnj-chap02-brms-globe-tossing}
 : Demonstration of the `brm()` function of the {**brms**} package.
 :::
 :::
 
 ::: my-r-code-container
 ```{r}
-#| label: brms-globe-tossing
+#| label: chap02-brms-globe-tossing
 
 b2.1 <-
   brms::brm(data = list(w = 24), 
@@ -2374,7 +2374,7 @@ b2.1 <-
 print(b2.1)
 ```
 
-A detailed explanation of the result is postponed to @sec-chap04. Here I
+A detailed explanation of the result is postponed to @exm-chap04-m4-1. Here I
 will just copy the notes by Kurz to get a first understanding and a
 starting point for further exploration in the following chapters.
 
