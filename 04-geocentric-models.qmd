@@ -494,7 +494,9 @@ b: Randomly select a small number of observations and put it into `knitr::kable(
 
 ```{r}
 #| label: show-howell-data-as-tbl-obs-b
+#| warning: false
 
+set.seed(4)
 d_b |>            
     bayr::as_tbl_obs() 
 ```
@@ -2130,7 +2132,7 @@ a: Printing with `rethinking::precis` (Original)
 #| label: chap04-precis-m4-1a
 
 ## R code 4.29a ######################
-rethinking::precis(m4.1a)
+(precis_m4.1a <- rethinking::precis(m4.1a))
 ```
 
 > “These numbers provide Gaussian approximations for each parameter’s marginal distribution. This means the plausibility of each value of μ, after averaging over the plausibilities of each value of σ, is given by a Gaussian distribution with mean 154.6 and standard deviation 0.4. The 5.5% and 94.5% quantiles are percentile interval boundaries, corresponding to an 89% compatibility interval. Why 89%? It’s just the default. It displays a quite wide interval, so it shows a high-probability range of parameter values. If you want another interval, such as the conventional and mindless 95%, you can use precis(m4.1,prob=0.95). But I don’t recommend 95% intervals, because readers will have a hard time not viewing them as significance tests. 89 is also a prime number, so if someone asks you to justify it, you can stare at them meaningfully and incant, “Because it is prime.” That’s no worse justification than the conventional justification for 95%.” ([McElreath, 2020, p. 88](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=107&annotation=5ARWQP2N))
@@ -2208,6 +2210,8 @@ In the simple demonstration of `brms::brm()` in the toy globe example (@cnj-chap
 8. **cores**: Number of cores to use when executing the chains in parallel, which defaults to 1 but we recommend setting the `mc.cores` option to be as many processors as the hardware and RAM allow (up to the number of chains).
 9. **seed**: The seed for random number generation to make results reproducible. Kurz has always used for `set.seed()` in other code chunks the chapter number. If `NA` (the default), Stan will set the seed randomly.
 10. **file**: Either `NULL` or a character string. In the latter case, the fitted model object is saved via `base::saveRDS()` in a file named after the string supplied in file. The `.rds` extension is added automatically. If the file already exists, `brms::brm()` will load and return the saved model object instead of refitting the model. Unless you specify the `file_refit` argument as well, the existing files won't be overwritten, you have to manually remove the file in order to refit and save the model under an existing file name. The file name is stored in the brmsfit object for later usage.
+
+- **init**: Not used here: Within the `brm()` function, you use the `init` argument for the start values for the sampler. "If NULL (the default) or "random", Stan will randomly generate initial values for parameters in a reasonable range. If 0, all parameters are initialized to zero on the unconstrained space. This option is sometimes useful for certain families, as it happens that default random initial values cause draws to be essentially constant. Generally, setting init = 0 is worth a try, if chains do not initialize or behave well. Alternatively, init can be a list of lists containing the initial values …" (Help file)
 
 
 ###### print
@@ -2472,54 +2476,74 @@ Subsetting the `summary.brmsfit()` output of the `brmssummary` object with `$fix
 ::::
 :::::
 
-***
 
-# 2nd PASS: STOPPED HERE
+#### Sampling
+
+##### Sampling from `rethinking::quap()`
+
+How do we get samples from the quadratic approximate posterior distribution?
+
+> “… a quadratic approximation to a posterior distribution with more than one parameter dimension—μ and σ each contribute one dimension—is just a multi-dimensional Gaussian distribution.” ([McElreath, 2020, p. 90](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=109&annotation=B666RAFR))
+
+> “As a consequence, when R constructs a quadratic approximation, it calculates not only standard deviations for all parameters, but also the covariances among all pairs of parameters. Just like a mean and standard deviation (or its square, a variance) are sufficient to describe a one-dimensional Gaussian distribution, a list of means and a matrix of variances and covariances are sufficient to describe a multi-dimensional Gaussian distribution.” ([McElreath, 2020, p. 90](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=109&annotation=XN54B26K))
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Rethinking and Tidyverse (brms) Codes in separate examples
+:::
+::::{.my-watch-out-container}
+As there are quite big differences in the calculation of the `r glossary("variance var", "variance")`-`r glossary("covariance cov", "covariance")` matrix, I will explain the appropriate steps in different examples.
+::::
+:::::
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-chap04-sampling-quap-m4-1a}
+a: Sampling from a `quap()` (Original)
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### vcov
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-vcov-a}
+a: Variance-covariance matrix (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-## ************************** ############
-## I STOPPED HERE (ORIGINAL) #############
-## ************************** ############
-```
+#| label: chap04-vcov-m4-1a
 
-
-#### Sampling from a quap
-
-The above explains how to get a quadratic approximation of the
-posterior, using `rethinking::quap()`. But how do we then get samples
-from the quadratic approximate posterior distribution? --- When R
-constructs a quadratic approximation, it calculates not only standard
-deviations for all parameters, but also the covariances among all pairs
-of parameters. Just like a mean and standard deviation (or its square, a
-variance) are sufficient to describe a one-dimensional Gaussian
-distribution, a list of means and a matrix of variances and covariances
-are sufficient to describe a multi-dimensional Gaussian distribution.
-
-
-
-```{r}
-#| label: vcov-matrix-m4.1a
-#| attr-source: '#lst-vcov-matrix-m4.1a lst-cap="Calculation of the variance-covariance matrix: rethinking version"'
-
-## R code 4.32 ###################
+## R code 4.32 vcov #########
 rethinking::vcov(m4.1a)
 ```
+
+> “The above is a variance-covariance matrix. It is the multi-dimensional glue of a quadratic approximation, because it tells us how each parameter relates to every other parameter in the posterior distribution. A variance-covariance matrix can be factored into two elements: (1) a vector of variances for the parameters and (2) a correlation matrix that tells us how changes in any parameter lead to correlated changes in the others. This decomposition is usually easier to understand.” ([McElreath, 2020, p. 90](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=109&annotation=69ZF8LKP))
 
 `vcov()` returns the variance-covariance matrix of the main parameters
 of a fitted model object. In the above {**rethinking**} version is uses
 the class `map2stan` for a fitted Stan model as `m4.1a` is of class
 `map`.
 
-***
-:::: {#prp-vcov-function)
-Two different `vcov()` functions
+::::
+:::::
 
-::: callout-warning
-In @lst-vcov-matrix-m4.1a I am explicitly using the package
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Two different `vcov()` functions
+:::
+::::{.my-watch-out-container}
+
+I am explicitly using the package
 {**rethinking**} for the `vcov()` function. The same function is also
 available as a base R function with `stats::vcov()`. But this generates
 an error because there is no method known for an object of class `map`
-from the rethinking package. The help file for `stats::vcov()` only says
+from the {**rethinking**} package. The help file for `stats::vcov()` only says
 that the `vcov` object is an S3 method for classes `lm`, `glm`, `mlm`
 and `aov` but not for `map`.
 
@@ -2530,94 +2554,94 @@ I could have used only `vcov()`. But this only works when the
 {**rethinking**} package is already loaded. In that case R knows because
 of the class of the object which `vcov()` version to use. In this case:
 class of object = `class(m4.1a)` `r class(m4.1a)`.
-:::
 
 ::::
-***
-
-@lst-vcov-matrix-m4.1a results in a variance-covariance matrix. It is
-the multi-dimensional glue of a quadratic approximation, because it
-tells us how each parameter relates to every other parameter in the
-posterior distribution. A variance-covariance matrix can be factored
-into two elements: (1) a vector of variances for the parameters and (2)
-a correlation matrix that tells us how changes in any parameter lead to
-correlated changes in the others.
+:::::
 
 
+
+
+###### var
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-var-a}
+a: List of variances (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: vcov-decomp-m4.1a
-#| attr-source: '#lst-vcov-decomp-m4.1a lst-cap="Variance-Covariance Matrix of model m4.1a decomposed"'
+#| label: chap04-var-m4-1a
 
-## R code 4.33 #######################
-base::diag(rethinking::vcov(m4.1a))      # 1
-stats::cov2cor(rethinking::vcov(m4.1a))  # 2
+## R code 4.33 var adapted ##########
+(var_list <- base::diag(rethinking::vcov(m4.1a)))
+
 ```
 
-1.  `base::diag()` extracts the diagonal of the (variance-covariance)
-    matrix. The two-element vector in the output is the list of
-    variances. If you take the square root of this vector, you get the
-    standard deviations that are shown in the `rethinking::precis()` output of
-    @lst-post-dist-quap-m4-1.
-2.  `stats::cov2cor()` scales a covariance matrix into the corresponding
-    correlation matrix. The two-by-two matrix in the output is this
-    correlation matrix. Each entry shows the correlation, bounded
-    between −1 and +1, for each pair of parameters. The 1's indicate a
-    parameter's correlation with itself. If these values were anything
-    except 1, we would be worried. The other entries are typically
-    closer to zero, and they are very close to zero in this example.
-    This indicates that learning `μ` tells us nothing about `σ` and likewise
-    that learning `σ` tells us nothing about `μ`. This is typical of simple
-    Gaussian models of this kind. But it is quite rare more generally,
-    as you'll see in later chapters.
+> “The two-element vector in the output is the list of variances. If you take the square root of this vector, you get the standard deviations that are shown in `rethinking::precis()` (@exm-chap04-m4-1) output.” ([McElreath, 2020, p. 90](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=109&annotation=TAVMWSMM))
 
-***
-:::: {#prp-why-cor-almost-0}
+Let's check this out:
 
-Confusing m4.1a (Gaussian distribution) with m4.3 (height-weight against each other)
+| Result / Parameter             | mu sd, sigma sd                  |
+|--------------------------------|----------------------------------|
+| `sqrt(base::unname(var_list))` | `r sqrt(base::unname(var_list))` |
+| `precis_m4.1a[["sd"]]`         | `r precis_m4.1a[["sd"]]`         |
+: Convert list of variances to standard deviations and compare with the precis result
 
-::: callout-warning
-
-Frankly speaking I had troubles to understand why the correlation is almost 0. It turned out that I had unconsciously in mind a correlation between height and weight, an issue that is raised later in this chapter with `m4.3`. 
-
-But here there is only a Gaussian distribution of height under discussion, and not the correlation between height and weight.
-:::
 ::::
+:::::
 
-***
+###### cor to cov
 
-But wait, there is another problem in my understanding:
-
-***
-:::: {#prp-from-vcov-to-cor}
-
-How to compute correlation from variance-covariance matrix?
-
-::: {.callout-warning}
-
-I wonder how to compute the correlation matrix by hand form the covariance-variance matrix. I thought that I have to use `sqrt()`, but it didn't work. After I inspected the  code of the `cov2cor()` function I noticed that it uses the expression `sqrt(1/diag(V))`. I don't understand why it is using the inverse value and not just `sqrt()`. Maybe it has to do with matrix calculation, where I am not firm about it?
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-cor-a}
+a: Correlation matrix (Original)
+::::::
 :::
-::::
-
-***
-
-Let's check the assertion that the square root of the variance vector, will get us the standard deviations that are shown in the `rethinking::precis()` output of @lst-post-dist-quap-m4-1 (0.41 for $\mu$ and 0.29 for $\sigma$):
+::::{.my-r-code-container}
 
 ```{r}
-#| label: sqrt-var-m4.1a
-#| attr-source: '#lst-sqrt-var-m41 lst-cap="Square root of variance vector of model m4.1a"'
-sqrt(base::diag(rethinking::vcov(m4.1a)))
+#| label: chap04-cor-m4-1a
+
+## R code 4.33 cor #############
+stats::cov2cor(rethinking::vcov(m4.1a))
 ```
 
-In fact: The square roots of the variance vector results in the standard deviation and therefore in the same output as in @lst-post-dist-quap-m4-1.
+> “The two-by-two matrix in the output is the correlation matrix. Each entry shows the correlation, bounded between −1 and +1, for each pair of parameters. The 1’s indicate a parameter’s correlation with itself. If these values were anything except 1, we would be worried. The other entries are typically closer to zero, and they are very close to zero in this example. This indicates that learning μ tells us nothing about σ and likewise that learning σ tells us nothing about μ. This is typical of simple Gaussian models of this kind. But it is quite rare more generally, as you’ll see in later chapters.” ([McElreath, 2020, p. 90](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=109&annotation=Y9WJAQYQ))
 
-> Scaling a covariance matrix into a correlation one can be achieved in many ways, mathematically most appealing by multiplication with a diagonal matrix from left and right, or more efficiently by using `base::sweep(.., FUN = "/")` twice. The `stats::cov2cor()` function is even a bit more efficient, and provided mostly for didactical reasons.
 
-For computing the covariance matrix with `base::sweep()` see the answer in  [StackOverflow](https://stats.stackexchange.com/a/407954/207389).
+::::
+:::::
+
+
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Confusing `m4.1a` with `m4.3a`
+:::
+::::{.my-watch-out-container}
+
+
+Frankly speaking I had troubles to understand why the correlation in `m4.1a` is almost 0. It turned out that I had unconsciously in mind a correlation between height and weight, an issue that is raised later in the chapter with `m4.3a`. 
+
+Although with `m4.1b`is a multi-dimensional Gaussian distribution in discussion but only with the height correlation of $\mu$ and $\sigma$. $\mu$ of the height distribution does not help you in the estimation of $\sigma$ in this distribution -- and vice-versa.
+::::
+:::::
+
+###### cor to cov
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-cor-a}
+a: Compute covariance matrix from the correlation using `base::sweep()` (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: compute-vcov-with-sweep
-#| attr-source: '#lst-compute-vcov-with-sweep lst-cap="Compute covariance matrix using sweep()"'
+#| label: chap04-cov-to-cor-m4-1a
 
 R <- stats::cov2cor(rethinking::vcov(m4.1a))
 S <- sqrt(base::diag(rethinking::vcov(m4.1a)))
@@ -2625,87 +2649,460 @@ S <- sqrt(base::diag(rethinking::vcov(m4.1a)))
 sweep(sweep(R, 1, S, "*"), 2, S, "*")
 ```
 
+I wonder how to compute the correlation matrix by hand form the covariance-variance matrix. I thought that I have to use `sqrt()`, but it didn't work. After I inspected the  code of the `cov2cor()` function I noticed that it uses the expression `sqrt(1/diag(V))`.
 
+From the `stats::cor()` help file: 
 
-:::: {#prp-vcov-interpretation}
-How to interpret covariances?
+> Scaling a covariance matrix into a correlation one can be achieved in many ways, mathematically most appealing by multiplication with a diagonal matrix from left and right, or more efficiently by using `base::sweep(.., FUN = "/")` twice. The `stats::cov2cor()` function is even a bit more efficient, and provided mostly for didactical reasons.
 
-::: callout-caution
-A large covariance can mean a strong relationship between variables. However, you can’t compare variances over data sets with different scales (like pounds and inches).
-
-The main problem with interpretation is that the wide range of results that it takes on makes it hard to interpret. For example, your data set could return a value of 3, or 3,000. This wide range of values is cause by a simple fact: *The larger the X and Y values, the larger the covariance*. A value of 300 tells us that the variables are correlated, but unlike the correlation coefficient, that number doesn’t tell us exactly how strong that relationship is. The problem can be fixed by dividing the covariance by the standard deviation to get the correlation coefficient. ([Statistics How To](https://www.statisticshowto.com/probability-and-statistics/statistics-definitions/covariance/))
-
-:::
+For computing the covariance matrix with `base::sweep()` see the answer in  [StackOverflow](https://stats.stackexchange.com/a/407954/207389).
 
 ::::
-***
+:::::
 
-Okay, so how do we get samples from this multi-dimensional posterior?
-Now instead of sampling single values from a simple Gaussian
-distribution, we sample vectors of values from a multi-dimensional
-Gaussian distribution.
+
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Confusing `m4.1a` with `m4.3a`
+:::
+::::{.my-watch-out-container}
+
+
+Frankly speaking I had troubles to understand why the correlation in `m4.1a` is almost 0. It turned out that I had unconsciously in mind a correlation between height and weight, an issue that is raised later in the chapter with `m4.3a`. 
+
+Although with `m4.1b`is a multi-dimensional Gaussian distribution in discussion but only with the height correlation of $\mu$ and $\sigma$. $\mu$ of the height distribution does not help you in the estimation of $\sigma$ in this distribution -- and vice-versa.
+::::
+:::::
+
+
+###### Samples1
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-samples1-m4-1a}
+a: Samples from the multi-dimensional posterior (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: extract-samples-m4.1-a
-#| attr-source: '#lst-extract-samples-m4.1-a lst-cap="Extract sample vectors of values from the multi-dimensional Gaussian distribution of m4.1a: rethinking version"'
+#| label: chap04-samples-m4.1a
+#| warning: false
 
-
-## R code 4.34 #######################
+set.seed(4)
 post3_a <- rethinking::extract.samples(m4.1a, n = 1e4)
-head(post3_a)
+
+bayr::as_tbl_obs(post3_a)
 ```
 
-You end up with a data frame, post, with 10,000 (1e4) rows and two
-columns, one column for `_μ_` and one for `_σ_`. Each value is a sample
-from the posterior, so the mean and standard deviation of each column
-will be very close to the `r glossary("MAP")` values from before. You can confirm this by summarizing the samples:
+> “You end up with a data frame, post, with 10,000 (1e4) rows and two columns, one column for μ and one for σ. Each value is a sample from the posterior, so the mean and standard deviation of each column will be very close to the `r glossary("MAP")` values from before.” ([McElreath, 2020, p. 91](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=110&annotation=4ZE9H4NT))
+
+
+::::
+:::::
+
+###### precis
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-precis2-m4.1a}
+a: Summary from the samples of the multi-dimensional posterior (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: summary-samples-m4.1-a
-#| attr-source: '#lst-summary-samples-m4.1-a lst-cap="Summary the extracted samples: rethinking version"'
+#| label: chap04-precis2-m4-1a
 
-## R code 4.35 ##################
+## R code 4.35 precis ##################
 rethinking::precis(post3_a)
 ```
 
-Compare these values to the output from @lst-post-dist-quap-m4-1. And
-you can use `plot(post)` to see how much they resemble the samples from
-the grid approximation in FIGURE 4.4 (here @fig-posterior-sample-a).
-These samples also preserve the covariance between `_μ_` and `_σ_`. This
-hardly matters right now, because `_μ_` and `_σ_` don't co-vary at all
-in this model. But once you add a predictor variable to your model,
-covariance will matter a lot.
+Compare these values to the output from the summaries with `rethinking::precis()` in @exm-chap04-m4-1. 
+
+
+::::
+:::::
+
+###### plot
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-precis-m4.1a}
+a: Plot the samples distribution from the multi-dimensional posterior (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: fig-posterior-sample-vectors-a
-#| fig-cap: "Samples from the vectors of values from a multi-dimensional Gaussian distribution. The density of points is highest in the center, reflecting the most plausible combinations of μ and σ. It is very similar to @fig-posterior-sample-a (rethinking version)"
-#| attr-source: '#lst-fig-posterior-sample-vectors-a lst-cap="Samples from the vectors of values from a multi-dimensional Gaussian distribution"'
+#| label: fig-chap04-plot-m4-1a
+#| fig-cap: "Samples distribution from the multi-dimensional posterior"
 
-base::plot(post3_a)
+## plot sample posterior  ##################
+plot(post3_a, col = rethinking::col.alpha(rethinking:::rangi2, 0.1))
 ```
+> “see how much they resemble the samples from the grid approximation in @fig-chap04-posterior-sample-heights-a. These samples also preserve the covariance between $\mu$ and $\sigma$. This hardly matters right now, because $\mu$ and $\sigma$ don’t covary at all in this model. But once you add a predictor variable to your model, covariance will matter a lot.” ([McElreath, 2020, p. 91](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=110&annotation=2B983ITL))
 
-##### Under the hood with multivariate sampling {#sec-under-the-hood-multivariate-sampling-a}
 
-The function `rethinking::extract.samples()` is for convenience. It is
-just running a simple simulation of the sort you conducted near the end
-of @sec-chap03 with @lst-sim-pred-samples-a. Here's a
-peak at the motor. The work is done by a multi-dimensional version of
-`stats::rnorm()`, `MASS::mvrnorm()`. The function `stats::rnorm()`
-simulates random Gaussian values, while `MASS::mvrnorm()` simulates
-random vectors of multivariate Gaussian values. Here's how to use it the
-{**MASS**} function to do what `rethinking::extract.samples()` does:
+::::
+:::::
+
+###### Samples2
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-sample2-m4-1a}
+a: Extract samples from the vectors of values from a multi-dimensional Gaussian distribution with `MASS::mvrnorm()` and plot the result (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: fig-posterior-sample-vectors-MASS-a
-#| fig-cap: "Extract samples from the vectors of values from a multi-dimensional Gaussian distribution using the {**MASS**} package. It is the same calculation as in @fig-posterior-sample-a (rethinking version)"
-#| attr-source: '#lst-fig-posterior-sample-vectors-MASS-a lst-cap="Extract samples from the vectors of values from a multi-dimensional Gaussian distribution (rethinking version)"'
-
+#| label: fig-chap04-plot2-m4.1a
+#| fig-cap: "Samples distribution from a multi-dimensional Gaussian distribution with `MASS::mvrnorm()`"
 
 ## R code 4.36 ######################
 post4_a <- MASS::mvrnorm(n = 1e4, mu = rethinking::coef(m4.1a), 
                       Sigma = rethinking::vcov(m4.1a))
-plot(post4_a)
+
+plot(post4_a, col = rethinking::col.alpha(rethinking:::rangi2, 0.1))
 ```
+
+The function `rethinking::extract.samples()` in the "Sample1" tab is for convenience. It is just running a simple simulation of the sort you conducted near the end
+of @sec-chap03 with @cnj-fig-post-pred-sim-a. 
+
+Under the hood the work of `rethinking::extract.samples()` is done by a multi-dimensional version of `stats::rnorm()`, `MASS::mvrnorm()`. The function `stats::rnorm()`
+simulates random Gaussian values, while `MASS::mvrnorm()` simulates
+random vectors of multivariate Gaussian values. 
+
+
+
+::::
+:::::
+
+
+:::
+
+::::
+:::::
+
+:::::{.my-note}
+:::{.my-note-header}
+How to interpret covariances?
+:::
+::::{.my-note-container}
+> A large covariance can mean a strong relationship between variables. However, you can’t compare variances over data sets with different scales (like pounds and inches). A weak covariance in one data set may be a strong one in a different data set with different scales.
+
+> The main problem with interpretation is that the wide range of results that it takes on makes it hard to interpret. For example, your data set could return a value of 3, or 3,000. This wide range of values is caused by a simple fact: *The larger the X and Y values, the larger the covariance*. A value of 300 tells us that the variables are correlated, but unlike the correlation coefficient, that number doesn’t tell us exactly how strong that relationship is. The problem can be fixed by dividing the covariance by the standard deviation to get the correlation coefficient. ([Statistics How To](https://www.statisticshowto.com/probability-and-statistics/statistics-definitions/covariance/))
+::::
+:::::
+
+
+
+##### Sampling from a `brms::brm()` fit
+
+In contrast to the {**rethinking**} approach the {**brms**} doesn't seem to have the same convenience functions and therefore we have to use different workarounds to get the same results. To get equivalent output it is the best strategy to put the Hamilton Monte Carlo (`r glossary("HMC")`) chains in a data frame and then apply the appropriate functions.
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-chap04-sampling-brm-m4-1b}
+b: Sampling with `as_draw()` functions from a `brms::brm()` fit
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### vcov1
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-vcov-m4-1b}
+b: Variance-covariance matrix (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-vcov1-m4-1b
+
+brms:::vcov.brmsfit(m4.1b)
+```
+
+::::
+:::::
+
+The `vcov()` function working with `brmsfit` objects only returns the first element in the matrix it did for {**rethinking**}. That is, it appears `brms::vcov.brmsfit()` only returns the variance/covariance matrix for the single-level `_β_` parameters.
+
+If we want the same information, we put the HMC chains in a data frame with the `brms::as_draws_df()` function as shown in the next tab "draws".
+
+###### draws1
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-draws-m4-1b}
+b: Extract the iteration of the Hamilton Monte Carlo (HMC) chains into a data frame (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-draws-m4-1b
+#| warning: false
+
+set.seed(4)
+post_b <- brms::as_draws_df(m4.1b)
+
+bayr::as_tbl_obs(post_b)
+```
+
+::::
+:::::
+
+:::::{.my-note}
+:::{.my-note-header}
+Family of `as_draws()` functions and the {**posterior**} package
+:::
+::::{.my-note-container}
+
+The functions of the family `as_draws()` transform `brmsfit` objects to
+`draws` objects, a format supported by the {**posterior**} package.
+{**brms**} currently imports the family of `as_draws()`functions from the
+{**posterior**} package, a tool for working with posterior
+distributions, i.e. for fitting Bayesian models or working with output from Bayesian models. (See as an introduction [The posterior R package](https://mc-stan.org/posterior/articles/posterior.html))
+
+***
+
+It’s also noteworthy that the `as_draws_df()` is part of a larger class of `as_draws()` functions {**brms**} currently imports from the {**posterior**} package. 
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-class-as-draws}
+b: Class of `as_draws()` functions {**brms**}
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: chap04-class-as-draws-b
+
+class(post_b)
+```
+
+::::
+:::::
+
+
+Besides of class `tbl_df` and `tbl`, [subclasses of data.frame with different behavior](https://tibble.tidyverse.org/reference/tbl_df-class.html) the `as_draws_df()` function has created the `draws` class, the parent class of all supported [draws formats](https://mc-stan.org/posterior/articles/posterior.html#draws-formats). 
+
+::::
+:::::
+
+###### vcov2
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-vcov-m4-1b}
+b: Vector of variances and correlation matrix for `b_Intercept` and $\sigma$ (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-vcov2-m4-1b
+
+dplyr::select(post_b, b_Intercept:sigma) |>
+  stats::cov() |>
+  base::diag()
+```
+
+This result is now the equivalent of the `rethinking::vcov()` in panel "vcov" of @exm-chap04-sampling-quap-m4-1a.
+
+::::
+:::::
+
+###### cov
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-cov-m4-1b}
+b: Covariance matrix (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-cov-m4.1b
+
+brms:::vcov.brmsfit(m4.1b)
+```
+
+::::
+:::::
+
+###### cor
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-cor-m4-1b}
+b: Corrrelation (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-cor-m4-1b
+
+post_b |>
+  dplyr::select(b_Intercept, sigma) |>
+  stats::cor()
+```
+
+::::
+:::::
+
+###### str
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-str-m4-1b}
+b: Variance-covariance matrix (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-str-m4-1b
+
+utils::str(post_b)
+```
+
+> The `post_b` object is not just a data frame, but also of class
+`draws_df`, which means it contains three metadata variables ----
+`.chain`, `.iteration`, and `.draw` --- which are often hidden from
+view, but are there in the background when needed. As you'll see, we'll
+make good use of the `.draw` variable in the future. Notice how our post
+data frame also includes a vector named `lp__`. That's the log
+posterior. (Kurz, [Sec.4.3.6](https://bookdown.org/content/4857/geocentric-models.html#sampling-from-a-quap-brm-fit.))
+
+For details, see: - The [Log-Posterior (function and
+gradient)](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html#the-log-posterior-function-and-gradient)
+section of the Stan Development Team's (2023) vignette [RStan: the R
+interface to
+Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html)
+and - Stephen Martin's [explanation of the log
+posterior](https://discourse.mc-stan.org/t/basic-question-what-is-lp-in-posterior-samples-of-a-brms-regression/17567/2)
+on the Stan Forums.
+
+
+::::
+:::::
+
+###### summary1
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-summary1-m4-1b}
+b: Summarize the extracted iterations of the HMC chains: `base()` version
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-base-summary1-m4.1b
+
+base::summary(post_b[, 1:2])
+```
+::::
+:::::
+
+###### summary2
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-summary1-m4-1b}
+b: Summarize the extracted iterations of the HMC chains: `posterior()` version
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: chap04-posterior-summary2-m4.1b
+
+posterior:::summary.draws(post_b[, 1:2])
+```
+
+::::
+:::::
+
+###### skim
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-skim1-m4-1b}
+b: Summarize with `skimr::skim()`
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: chap04-skim-m4.1b
+
+
+skimr::skim(post_b[, 1:2])
+```
+
+::::
+:::::
+
+:::::{.my-note}
+:::{.my-note-header}
+Create summaries of samples that include tiny histograms
+:::
+::::{.my-note-container}
+Kurz didn't mention my suggestion to use skimr::skim() to get tiny histograms as part of the summary but proposes several other methods:
+
+-   A base R approach by using the transpose of a `stats::quantile()`
+    call nested within `base::apply()`
+-   A {**tidyverse**} approach
+-   A {**brms**} approach by just putting the `brm()` fit object into
+    `posterior_summary()`
+-   A {**tidybayes**} approach using `tidybayes::mean_hdi()` if you're
+    willing to drop the posterior `sd` and
+-   Using additionally the [function
+    `histospark()`](https://github.com/hadley/precis/blob/master/R/histospark.R)
+    (from the unfinished {**precis**} package by Hadley Wickham supposed
+    to replace `base::summary()`) to get the tiny histograms and to add
+    them into the tidyverse approach.
+
+::::
+:::::
+
+
+
+
+:::
+
+::::
+:::::
+
+
+
+
+# 2nd PASS: STOPPED HERE
+
+```{r}
+## ************************** ############
+## I STOPPED HERE (ORIGINAL) #############
+## ************************** ############
+```
+
+
+
+
+
 
 ### Linear prediction {#sec-linear-prediction-a}
 
@@ -3098,7 +3495,7 @@ posterior distribution, you get `log((β)`. It is easy to translate
 between the two, because $\beta = exp(log(\beta))$. In code form:
 `b <- exp(log_b)`.
 
-#### Interpretating the posterior distribution
+#### Interpreting the posterior distribution
 
 Statistical models are hard to interpret. There are two broad categories
 of interpretation: - reading tables - plotting simulation
@@ -4536,214 +4933,6 @@ Resources for GAMs
 ## ************************** ############
 ```
 
-
-#### Sampling from a ~~quap()~~ `brm()` fit
-
-{**brms**} doesn't seem to have a convenience function that works the
-way `vcov()` does for {**rethinking**}.
-
-```{r}
-#| label: calc-var-cov-m4.1-b
-#| attr-source: '#lst-calc-var-cov-m4.1-b lst-cap="Calculation of vcov(): tidyverse version."'
-
-brms:::vcov.brmsfit(m4.1b)
-```
-
-This only returns the first element in the matrix it did for
-{**rethinking**}. That is, it appears `brms::vcov()` only returns the
-variance/covariance matrix for the single-level `_β_` parameters.
-
-::: callout-caution
-###### brms::vcov()
-
-Referring to a similar situation with `rethinking::vcov()` in
-@lst-vcov-matrix-m4.1a I cannot write `brms::vcov()`, but have to use
-either `brms:::vcov.brmsfit(m4.1b)` or just `vcov(m4.1b)`. The weird thing
-is that the first time it also works with `brms::vcov()` but only the
-first time!
-:::
-
-However, if you really wanted this information, you could get it after
-putting the Hamilton Monte Carlo (HMC) chains in a data frame. We do
-that with the `brms::as_draws_df()` function:
-
-```{r}
-#| label: put-hmc-into-df-b
-#| attr-source: '#lst-put-hmc-into-df-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
-
-post_b <- brms::as_draws_df(m4.1b)
-
-head(post_b)
-```
-
-::: callout-tip
-###### draws object
-
-The functions of the family `as_draws()` transform `brmsfit` objects to
-`draws` objects, a format supported by the {**posterior**} package.
-{**brms**} currently imports the family of `as_draws()`functions from the
-{**posterior**} package, a tool for working with posterior
-distributions, i.e. for fitting Bayesian models or working with output from Bayesian models. (See as an introduction [The posterior R package](https://mc-stan.org/posterior/articles/posterior.html))
-
-@lst-put-hmc-into-df-b produced the {**brms**} version of what McElreath
-achieved with `extract.samples()` in @lst-extract-samples-m4.1-a.
-However, what happened under the hood was different. Whereas {**rethinking**} used the `mvnorm()` function from the {**MASS**} package with {**brms**} we just extracted the iterations of the `r glossary("HMC")` chains and put them in a data frame. 
-
-It’s also noteworthy that the `as_draws_df()` is part of a larger class of `as_draws()` functions {**brms**} currently imports from the {**posterior**} package. 
-
-```{r}
-#| label: show-class-post-dist
-#| attr-source: '#lst-show-class-post-dist lst-cap="Show classes of the posterior distribution post_b, an object created by as_draws() function"'
-
-class(post_b)
-```
-
-Besides of class `tbl_df` and `tbl`, [subclasses of data.frame with different behavior](https://tibble.tidyverse.org/reference/tbl_df-class.html) the `as_draws_df()` function has created the `draws` class, the parent class of all supported [draws formats](https://mc-stan.org/posterior/articles/posterior.html#draws-formats). 
-:::
-
-Now `select()` the columns containing the draws from the desired
-parameters `b_Intercept` and `sigma` and feed them into `cov()`.
-
-```{r}
-#| label: calc-cov-post-b
-#| attr-source: '#lst-calc-cov-post-b lst-cap="Calculate the vector of variances and correlation matrix for b_Intercept and sigma"'
-
-select(post_b, b_Intercept:sigma) |> 
-  stats::cov()
-```
-
-@lst-calc-cov-post-b displays "(1) a vector of variances for the
-parameters and (2) a correlation matrix" for them (p. 90). Here are just
-the variances (i.e., the diagonal elements) and the correlation matrix.
-
-```{r}
-#| label: calc-var-post-b
-#| attr-source: '#lst-calc-var-post-b lst-cap="Calculate only variances (the diagonal values)"'
-
-select(post_b, b_Intercept:sigma) |>
-  stats::cov() |>
-  base::diag()
-
-```
-
-```{r}
-#| label: calc-corr-matrix-post-b
-#| attr-source: '#lst-calc-corr-matrix-post-b lst-cap="Calculate only crrelation"'
-
-# correlation
-post_b |>
-  select(b_Intercept, sigma) |>
-  stats::cor()
-```
-
-```{r}
-#| label: show-data-structure
-
-str(post_b)
-```
-
-The `post_b` object is not just a data frame, but also of class
-`draws_df`, which means it contains three metadata variables ----
-`.chain`, `.iteration`, and `.draw` --- which are often hidden from
-view, but are there in the background when needed. As you'll see, we'll
-make good use of the `.draw` variable in the future. Notice how our post
-data frame also includes a vector named `lp__`. That's the log
-posterior.
-
-For details, see: - The [Log-Posterior (function and
-gradient)](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html#the-log-posterior-function-and-gradient)
-section of the Stan Development Team's (2023) vignette [RStan: the R
-interface to
-Stan](https://cran.r-project.org/web/packages/rstan/vignettes/rstan.html)
-and - Stephen Martin's [explanation of the log
-posterior](https://discourse.mc-stan.org/t/basic-question-what-is-lp-in-posterior-samples-of-a-brms-regression/17567/2)
-on the Stan Forums.
-
-::: callout-caution
-###### Summaries of {brms} and {posterior} packages
-
-Kurz claims that `summary()` function doesn't work for {**brms**}
-posterior data frames quite the way `rethinking::precis()` does for
-posterior data frames from the {**rethinking**} package. But I think his
-observation is somewhat misleading.
-
-The posterior data frame `post_b` is not of class `brms`. Let's check
-this:
-
-```{r}
-#| label: class-post_b-b
-
-class(post_b)
-```
-
-The class `draws_df`and `draws` refers to the {**posterior**} and not to
-the {**brms**} package. Remember: In @lst-put-hmc-into-df-b we
-transformed with the function `as_draws_df` the `brms` object into a
-`draws_df` and `draws` object.
-
-Therefore Kurz's claim should be read: The `summary()` function doesn't
-work for {**posterior**} posterior data frames quite the way
-`rethinking::precis()` does for posterior data frames from the
-{**rethinking**} package. Instead of calling `brms:::summary.brmsfit()`
-I will use `posterior:::summary.draws()`.
-
-I wouldn't have noticed this difference if I hadn't mentioned explicitly
-the name of the packages in front of the function, because in that case
-R would have used `base::summary()` as in Kurz's text.
-:::
-
-```{r}
-#| label: base-summary-samples-m4.1b-b
-#| attr-source: '#lst-base-summary-samples-m4.1b-b lst-cap="Summary the extracted iterations of the HMC chains: base version"' 
-
-base::summary(post_b[, 1:2])
-
-```
-
-```{r}
-#| label: posterior-summary-samples-m4.1b-b
-#| attr-source: '#lst-posterior-summary-samples-m4.1b-b lst-cap="Summary the extracted iterations of the HMC chains: posterior version"' 
-
-posterior:::summary.draws(post_b[, 1:2])
-
-
-```
-
-To get a similar summary with tiny histograms Kurz offers different
-solutions:
-
--   A base R approach by using the transpose of a `stats::quantile()`
-    call nested within `base::apply()`
--   A {**tidyverse**} approach
--   A {**brms**} approach by just putting the `brm()` fit object into
-    `posterior_summary()`
--   A {**tidybayes**} approach using `tidybayes::mean_hdi()` if you're
-    willing to drop the posterior `sd` and
--   Using additionally the [function
-    `histospark()`](https://github.com/hadley/precis/blob/master/R/histospark.R)
-    (from the unfinished {**precis**} package by Hadley Wickham supposed
-    to replace `base::summary()`) to get the tiny histograms and to add
-    them into the tidyverse approach.
-
-Additionally I will propose using the {**skimr**} packages:
-
-```{r}
-#| label: skim-summary-samples-m4.1b-b
-#| attr-source: '#lst-skim-summary-samples-m4.1b-b lst-cap="Summary the extracted iterations of the HMC chains: skimr version"' 
-
-skimr::skim(post_b[, 1:2])
-```
-
-Kurz refers only shortly to both `overthinking` blocks of this section:
-
--   Start values for `rethinking::quap()` resp. `brms::brm()` (See
-    @sec-start-values-rethinking): Within the `brm()` function, you use
-    the `init` argument fpr the start values.
--   Under the hood with multivariate sampling (See
-    @sec-under-the-hood-multivariate-sampling-a): Again Kurz remarked
-    that `brms::as_draws_df()` is not the same as
-    `rethinking::extract.samples()`. What this exactly means will
-    (hopefully) explained later in @sec-chap09-markov-chain-monte-carlo.
 
 ### Linear prediction
 
