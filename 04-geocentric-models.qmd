@@ -197,7 +197,7 @@ with deterministic definitions in them.
 :::::
 
 
-### Gaussian model of height {#sec-gaussian-model-of-height-a}
+### Gaussian model of height {#sec-gaussian-model-of-height}
 
 In this section we want a single measurement variable to model as a Gaussian distribution. It is a preparation for the linear regression model in @sec-linear-prediction-a  where we will construct and add a predictor variable to the model. 
 
@@ -251,11 +251,21 @@ already loaded the package.
 #| eval: false
 
 
-## R code 4.7 #######################
-library(rethinking)
-data(Howell1)
-d_a <- Howell1
+## R code 4.7 not executed! #######################
+# library(rethinking)
+# data(Howell1)
+# d_a <- Howell1
+
 ```
+
+The standard loading of data from packages with 
+
+```
+`library(rethinking)`
+`data(Howell1)`
+```
+
+is in this book not executed: I want to prevent clashes with loading {**rethinking**} and {**brms**} at the same time, because of their similar functions.
 
 ::::
 :::::
@@ -280,6 +290,7 @@ a: Data loading from a package -- Unusual procedure (Original)
 
 data(package = "rethinking", list = "Howell1")
 d_a <- Howell1
+head(d_a)
 ```
 
 ::::
@@ -312,6 +323,7 @@ b: Data loading from a package -- Unusual procedure (Tidyverse)
 
 data(package = "rethinking", list = "Howell1")
 d_b <- tibble::as_tibble(Howell1)
+head(d_b)
 ```
 
 ::::
@@ -3091,65 +3103,139 @@ Kurz didn't mention my suggestion to use skimr::skim() to get tiny histograms as
 
 
 
-# 2nd PASS: STOPPED HERE
-
-```{r}
-## ************************** ############
-## I STOPPED HERE (ORIGINAL) #############
-## ************************** ############
-```
-
-
-
-
-
 
 ### Linear prediction {#sec-linear-prediction-a}
 
-What we've done until now is just a Gaussian model of height in a
-population of adults. But it doesn’t really have the usual feel of "regression" to it. Typically, we are interested in modeling how
-an outcome is related to some other variable, a `r glossary("predictor variable")`. If the predictor variable has any statistical association with the outcome
-variable, then we can use it to predict the outcome. When the predictor
-variable is built inside the model in a particular way, we'll have
-linear regression.
+> “What we’ve done above is a Gaussian model of height in a population of adults. But it doesn’t really have the usual feel of “regression” to it. Typically, we are interested in modeling how an outcome is related to some other variable, a `r glossary("predictor variable")`. If the predictor variable has any statistical association with the outcome variable, then we can use it to predict // the outcome. When the predictor variable is built inside the model in a particular way, we’ll have `r glossary("linear regression")`.” ([McElreath, 2020, p. 91/92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=UYJ937ER))
 
-Let's look at how height in these Kalahari foragers (the outcome
-variable) co-varies with weight (the predictor variable).
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-scatterplot-adult-height-weight}
+: Scatterplot of adult height versus weight
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-scatterplot-adult-height-weight-a}
+a: Scatterplot of adult height versus weight (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
 
 ```{r}
 #| label: fig-height-against-weight-a
 #| fig-cap: "Adult height and weight against one another"
-#| attr-source: '#lst-fig-height-against-weight-a lst-cap="Scatterplot of height versus weight (Base R version)"'
 
-## R code 4.37 #####################
+## R code 4.37a #####################
 plot(d2_a$height ~ d2_a$weight)
 ```
 
-There's obviously a relationship: Knowing a person's weight helps you
-predict height. To make this vague observation into a more precise
-quantitative model that relates values of `weight` to plausible values
-of `height`, we need some more technology. How do we take our Gaussian
-model from @sec-gaussian-model-of-height-a and incorporate predictor
-variables?
+
+::::
+:::::
+
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-scatterplot-adult-height-weight-b}
+b: Scatterplot of adult height versus weight (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: fig-height-against-weight-b
+#| fig-cap: "Adult height and weight against one another"
+
+
+## R code 4.37b #####################
+d2_b |> 
+    ggplot2::ggplot(aes(height, weight)) + 
+    ggplot2::geom_point() +
+    ggplot2::theme_bw()
+```
+
+::::
+:::::
+
+:::
+
+There's obviously a relationship: Knowing a person's weight helps to
+predict height. 
+
+::::
+:::::
+
+> “To make this vague observation into a more precise quantitative model that relates values of `weight` to plausible values of `height`, we need some more technology. How do we take our Gaussian model from @sec-gaussian-model-of-height and incorporate predictor variables?” ([McElreath, 2020, p. 92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=BEMZLGBA))
 
 #### The linear model strategy
 
 ##### Model definition
 
-The strategy is to make the parameter for the mean of a Gaussian distribution, `μ`, into a linear function of the predictor variable and other, new parameters that we invent. This strategy is often simply called the `r glossary("linear model")`. The linear model strategy instructs the golem to assume that the predictor variable has a constant and additive relationship to the mean of the outcome. We ask the golem: “Consider all the lines that relate one variable to the other. Rank all of these lines by plausibility, given these data.” The golem answers with a posterior distribution.
+> “The `r glossary("linear model")` strategy instructs the golem to assume that the predictor variable has a constant and additive relationship to the mean of the outcome. The golem then computes the posterior distribution of this constant relationship.” ([McElreath, 2020, p. 92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=FU3R3CJZ))
 
-Recall @def-height-linear-model-m4-1 for the Gaussian height model. How do we
-get `weight` into this model? Let $x$ be the name for the column of
-weight measurements, `d2_a$weight`. Let the average of the $x$ values
-be $\overline{x}$, "ex bar". Now we have a predictor variable `$x$,
-which is a list of measures of the same length as $h$. To get weight
-into the model, we define the mean $\mu$ as a function of the values in
-$x$.
+> “For each combination of values, the machine computes the posterior probability, which is a measure of relative plausibility, given the model and data. So the posterior distribution ranks the infinite possible combinations of parameter values by their logical plausibility.” ([McElreath, 2020, p. 92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=28Z2C2SY))
 
-------------------------------------------------------------------------
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-lm-height-weight}
+: Linear model definition: Height against weight
+::::::
+:::
+::::{.my-example-container}
 
-::: {#def-height-weight-linear-model1-m4.3}
-###### Linear model height against weight (Version 1 of m4.3)
+::: {.panel-tabset}
+
+###### only height
+
+
+:::::{.my-theorem}
+:::{.my-theorem-header}
+:::::: {#thm-linear-heights-model}
+: Define the linear heights model
+::::::
+:::
+::::{.my-theorem-container}
+
+$$
+\begin{align*}
+h_{i} \sim \operatorname{Normal}(\mu, \sigma) \space \space (1) \\ 
+μ \sim \operatorname{Normal}(178, 20)  \space \space (2) \\ 
+μ \sim \operatorname{Uniform}(0, 50)   \space \space (3)      
+\end{align*}
+$$ {#eq-height-linear-model2-m4-1}
+
+Remember @eq-height-linear-model-m4-1:
+
+
+::::
+:::::
+
+1.  **Likelihood**: Represented by the first line. 
+2.  **Mean prior**: Second line is the chosen $\mu$ (mu, mean) prior. It is a broad Gaussian prior, centered on 178 cm, with 95% of probability between 178 ± 40 cm. 
+3.  **Standard deviation prior**: Third line is the chosen $\sigma$ (sigma, standard deviation) prior.
+
+
+###### height against weight
+
+:::::{.my-theorem}
+:::{.my-theorem-header}
+:::::: {#thm-linear-heights-model}
+: Define the linear model `heights` against `weights`
+::::::
+:::
+::::{.my-theorem-container}
 
 $$
 \begin{align*}
@@ -3159,7 +3245,12 @@ h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\
 \beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
 \end{align*}
-$$ {#eq-height-weight-linear-model1-m4.3}
+$$ {#eq-height-weight-linear-model2-m4-3}
+
+Compare the differences with definition inside the Tab "only height".
+
+::::
+:::::
 
 (1) **Likelihood (Probability of the data)**: The first line is nearly
     identical to before, except now there is a little index $i$ on the
@@ -3169,89 +3260,101 @@ $$ {#eq-height-weight-linear-model1-m4.3}
     mean depends upon the row*.
 
 (2) **Linear model**: The mean $μ$ is no longer a parameter to be
-    estimated. Rather, as seen in the second line of the model, $\mu{i}$
+    estimated. Rather, as seen in the second line of the model, $\mu_{i}$
     is constructed from other parameters, $\alpha$ and $\beta$, and the
     observed variable $x$. This line is not a stochastic relationship
     ----- there is no `~` in it, but rather an `=` in it ----- because
-    the definition of $\mu{i}$ is deterministic. That is to say that,
-    once we know $\alpha$ and $\beta$ and $x_{i}$, we know $\mu{i}$ with
-    certainty. (More details in @sec-linear-model-a.)
+    the definition of $\mu_{i}$ is deterministic. That is to say that,
+    once we know $\alpha$ and $\beta$ and $x_{i}$, we know $\mu_{i}$ with
+    certainty. (More details follow in @sec-chap04-linear-model.)
 
 (3) **includes (3),(4) and(5) with** $\alpha, \beta, \sigma$ priors: The
     remaining lines in the model define distributions for the unobserved
     variables. These variables are commonly known as parameters, and
     their distributions as priors. There are three parameters:
     $\alpha, \beta, \sigma$. You've seen priors for $\alpha$ and $\sigma$
-    before, although $\sigma$ was called $\mu$ back then. (More details
-    in @sec-priors-a)
+    before, although $\alpha$ was called $\mu$ back then. (More details
+    in @sec-chap04-priors)
+
+
 :::
 
-------------------------------------------------------------------------
+::::
+:::::
 
-##### Linear model {#sec-linear-model-a}
 
-The mean $\mu$ is no longer a parameter to be estimated. Rather, as seen in the second line of the model, $\mu_{i}$ is constructed from other parameters, $\alpha$ and $\beta$, and the observed variable $x$. This line is not a stochastic relationship—there is no `~` in it, but rather an `=` in it—because the definition of $\mu_{i}$ is deterministic. That is to say that, once we know $\alpha$ and $\beta$ and $x_{i}$, we know $\mu_{i}$ with certainty.
 
-The value $x_{i}$ in the second line of @def-height-weight-linear-model1-m4.3
+##### Linear model {#sec-chap04-linear-model}
+
+> “The value $x_{i}$ [in the second line of @eq-height-weight-linear-model1-m4-3]
 is just the weight value on row $i$. It refers to the same individual as
 the height value, $h_{i}$, on the same row. The parameters $\alpha$ and
 $\beta$ are more mysterious. Where did they come from? We made them up.
 The parameters $\mu$ and $\sigma$ are necessary and sufficient to
 describe a Gaussian distribution. But $\alpha$ and $\beta$ are instead
 devices we invent for manipulating $\mu$, allowing it to vary
-systematically across cases in the data.
+systematically across cases in the data.” ([McElreath, 2020, p. 93](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=112&annotation=V3R75T23))
 
-You'll be making up all manner of parameters as your skills improve. One
-way to understand these made-up parameters is to think of them as
-targets of learning. Each parameter is something that must be described
-in the posterior distribution. So when you want to know something about
-the data, you ask your golem by inventing a parameter for it. This will
-make more and more sense as you progress.
+The second line $μ_{i} = \alpha + \beta(x_{i}-\overline{x})$ of the model definition in @eq-height-weight-linear-model2-m4-3 tells us 
 
-What does the second line of @def-height-weight-linear-model1-m4.3? It tells
-the regression golem that you are asking two questions about the mean of
-the outcome.
+> “that you are asking two questions about the mean of the outcome:
 
-1.  What is the expected height when $x_{i} = \overline{x}$? The
+> 1. What is the expected height when $x_{i} = \overline{x}$? The
     parameter $\alpha$ answers this question, because when
     $x_{i} = \overline{x}$, $\mu_{i} = \alpha$. For this reason,
-    $\alpha$ is often called the **intercept**. But we should think not
+    $\alpha$ is often called the `r glossary("intercept")`. But we should think not
     in terms of some abstract line, but rather in terms of the meaning
     with respect to the observable variables.
-2.  What is the change in expected height, when $x_{i}$ changes by 1
+> 2. What is the change in expected height, when $x_{i}$ changes by 1
     unit? The parameter $\beta$ answers this question. It is often
-    called a **slope**, again because of the abstract line. Better to
+    called a `r glossary("slope")`, again because of the abstract line. Better to
     think of it as a rate of change in expectation.
+>
+> Jointly these two parameters ask the golem to find a line that relates x to h, a line that passes through α when x_{i} = \overline{x} and has slope $\beta$.” ([McElreath, 2020, p. 94](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=113&annotation=Y36FAY8E))
 
-Jointly these two parameters ask the golem to find a line that relates
-$x$ to $h$, a line that passes through $\alpha$ when
-$x_{i} = \overline{x}$ and has slope $\beta$. That is a task that golems
-are very good at. It's up to you, though, to be sure it's a good
-question.
+##### Priors {#sec-chap04-priors}
 
-##### Priors {#sec-priors-a}
-
-The prior for $\beta$ in @def-height-weight-linear-model1-m4.3 deserves
+> "The prior for $\beta$ in @eq-height-weight-linear-model1-m4-3 deserves
 explanation. Why have a Gaussian prior with mean zero? This prior places
 just as much probability below zero as it does above zero, and when
-$\beta = 0$, weight has no relationship to height. To figure out what
+$\beta = 0$, // weight has no relationship to height. To figure out what
 this prior implies, we have to simulate the prior predictive
-distribution.
+distribution.” ([McElreath, 2020, p. 94/95](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=114&annotation=DD56M4KY))
 
-The goal is to simulate heights from the model, using only the priors.
-First, let's consider a range of weight values to simulate over. The
-range of observed weights will do fine. Then we need to simulate a bunch
-of lines, the lines implied by the priors for $\alpha$ and $\beta$.
-Here's how to do it, setting a seed so you can reproduce it exactly:
+The goal in @exm-sim-height-m4-3 is to simulate heights from the model, using only the priors.
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-sim-height-m4-3}
+: Simulating heights from the model, using only the priors
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-sim-height-m4-3a}
+a: Simulating heights from the model, using only the priors (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: fig-sim-heights-only-with-priors-a
-#| fig-cap: "Simulating heights from the model, using only the priors: rethinking version"
-#| attr-source: '#lst-fig-sim-heights-only-with-priors-a lst-cap="Simulating heights from the model, using only the priors: rethinking version"'
+#| label: fig-sim-heights-m4-3a
+#| fig-cap: "Simulating heights from the model, using only the priors (Original)"
 
+## range of weight values to simulate 
 ## R code 4.38 #####################
-set.seed(2971)
 N_100_a <- 100 # 100 lines
+
+## set seed for exact reproduction
+set.seed(2971)
+
+## simulate lines implied by the priors for alpha and beta
 a <- rnorm(N_100_a, 178, 20)
 b <- rnorm(N_100_a, 0, 10)
 
@@ -3261,6 +3364,8 @@ plot(NULL,
   xlim = range(d2_a$weight), ylim = c(-100, 400),
   xlab = "weight", ylab = "height"
 )
+
+## added reference line for 0 and biggest man ever
 abline(h = 0, lty = 2)
 abline(h = 272, lty = 1, lwd = 0.5)
 mtext("b ~ dnorm(0,10)")
@@ -3274,61 +3379,223 @@ for (i in 1:N_100_a) {
 
 ```
 
-For reference, I've added a dashed line at zero---no one is shorter than
-zero---and the "Wadlow" line at 272 cm for the world's tallest person.
-The pattern doesn't look like any human population at all. It
-essentially says that the relationship between weight and height could
-be absurdly positive or negative. Before we've even seen the data, this
-is a bad model. Can we do better?
 
-We can do better immediately. We know that average height increases with
-average weight, at least up to a point. Let's try restricting it to
-positive values. The easiest way to do this is to define the prior as
-Log-Normal instead. Defining $\beta$ as `Log-Normal(0,1)` means to claim
-that the logarithm of $\beta$ has a Normal(0,1) distribution.
 
-------------------------------------------------------------------------
+::::
+:::::
 
-::: {#def-prior-log-normal-dist}
-Defining the prior as Log-Normal distribution
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-sim-height-m4-3b}
+b: Simulating heights from the model, using only the priors (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-sim-heights-m4-3b
+#| fig-cap: "Simulating heights from the model, using only the priors (Tidyverse)"
+
+set.seed(2971)
+# how many lines would you like?
+n_lines <- 100
+
+lines <-
+  tibble::tibble(n = 1:n_lines,
+         a = stats::rnorm(n_lines, mean = 178, sd = 20),
+         b = stats::rnorm(n_lines, mean = 0, sd = 10)) |> 
+  tidyr::expand_grid(weight = base::range(d2_b$weight)) |> 
+  dplyr::mutate(height = a + b * (weight - base::mean(d2_b$weight)))
+
+
+lines |> 
+  ggplot2::ggplot(ggplot2::aes(x = weight, y = height, group = n)) +
+  ggplot2::geom_hline(yintercept = c(0, 272), linetype = 2:1, linewidth = 1/3) +
+  ggplot2::geom_line(alpha = 1/10) +
+  ggplot2::coord_cartesian(ylim = c(-100, 400)) +
+  ggplot2::ggtitle("b ~ dnorm(0, 10)") +
+  ggplot2::theme_classic()
+
+```
+
+
+
+::::
+:::::
+
+:::
+
+The dashed line are reference lines. One at zero---no one is shorter than
+zero---and one at 272 cm for [Robert Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) the world's tallest person.
+
+“The pattern doesn’t look like any human population at all. It essentially says that the relationship // between weight and height could be absurdly positive or negative. Before we’ve even seen the data, this is a bad model.” ([McElreath, 2020, p. 94/95](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=114&annotation=VIJ8XZIB))
+
+::::
+:::::
+
+
+:::::{.my-theorem}
+:::{.my-theorem-header}
+:::::: {#thm-log-normal-m4-3}
+: Defining the $\beta$ prior as a Log-Normal distribution
+::::::
+:::
+::::{.my-theorem-container}
 
 $$
 \beta \sim \operatorname{Log-Normal}(0,1)
-$$ {#eq-prior-log-normal-dist}
+$$ {#eq-prior-log-normal-m4-3}
+
+***
+
+Defining $\beta$ as $Log-Normal(0,1)$ means to claim that the logarithm of $\beta$ has a $Normal(0,1)$ distribution.” ([McElreath, 2020, p. 96](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=115&annotation=YQFLM6PR))
+
+
+
+
+::::
+:::::
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-ID-text}
+: Log-Normal distribution
+::::::
 :::
+::::{.my-example-container}
 
-------------------------------------------------------------------------
+::: {.panel-tabset}
 
-Base R provides the `dlnorm()` and `rlnorm()` densities for working with
-log-normal distributions. You can simulate this relationship to see what
-this means for $\beta$:
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-log-normal-m4-3a}
+a: Log-Normal distribution (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: fig-log-normal-a
-#| fig-cap: "Log-Normal distribution: rethinking version"
-#| attr-source: '#lst-ig-log-normal-a lst-cap="Log-Normal distribution: rethinking version"'
+#| label: fig-log-normal-m4-3a
+#| fig-cap: "Log-Normal distributiom (Original)"
 
 
 set.seed(4) # to reproduce with tidyverse version
-
 ## R code 4.40 ####################
-b <- rlnorm(1e4, 0, 1)
+b <- stats::rlnorm(1e4, 0, 1)
 rethinking::dens(b, xlim = c(0, 5), adj = 0.1)
 ```
 
-If the logarithm of $\beta$ is normal, then $\beta$ itself is strictly
-positive. The reason is that `exp(x)` is greater than zero for any real
-number `x`. This is the reason that Log-Normal priors are commonplace.
-They are an easy way to enforce positive relationships.
+::::
+:::::
 
-So what does this earn us? Do the prior predictive simulation again, now
-with the Log-Normal prior:
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-log-normal-m4-3b}
+b: Log-Normal distribution (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-log-normal-m4-3b
+#| fig-cap: "Log-Normal distribution (Tidyverse)"
+
+set.seed(4)
+
+tibble::tibble(b = stats::rlnorm(1e4, meanlog = 0, sdlog = 1)) |> 
+  ggplot2::ggplot(ggplot2::aes(x = b)) +
+  ggplot2::geom_density() +
+  ggplot2::coord_cartesian(xlim = c(0, 5)) +
+  ggplot2::theme_bw()
+
+```
+
+::::
+:::::
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Argument matching
+:::
+::::{.my-watch-out-container}
+Kurz wrote just `mean` and `sd` instead of `meanlog` and `sdlog.` These shorter argument names work because of the [partial matching feature in argument evaluation](https://cran.r-project.org/doc/manuals/R-lang.html#Argument-matching) of R functions. But for educational reason (misunderstanding, clashing with other matching arguments and less readable code) I apply this technique only sometimes in interactive use.
+::::
+:::::
+
+
+
+Base R provides the `dlnorm()` and `rlnorm()` densities for working with
+log-normal distributions.
+
+Using the Log-Normal distribution prohibits negative values. This is an
+important constraint for height and weight as these variables cannot be
+under $0$. 
+
+> “The reason is that `exp(x)` is greater than zero for any real number $x$. This is the reason that Log-Normal priors are commonplace. They are an easy way to enforce positive relationships.” ([McElreath, 2020, p. 96](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=115&annotation=8DAGFAH2))
+
+###### Compare
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-comparenormal-log-normal-m4-3b}
+b: Compare Normal(0,1) with log(Log-Normal(0,1))"
+::::::
+:::
+::::{.my-r-code-container}
+
+> If you're unfamiliar with the log-normal distribution, it is the
+> distribution whose logarithm is normally distributed. For example,
+> here's what happens when we compare Normal(0,1) with
+> log(Log-Normal(0,1)). ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#priors.))
+
+```{r}
+#| label: fig-compare-normal-log-normal
+#| fig-cap: "Compare Normal(0,1) with log(Log-Normal(0,1))"
+
+set.seed(4)
+
+tibble::tibble(rnorm             = stats::rnorm(1e5, mean = 0, sd = 1),
+       `log(rlognorm)` = base::log(stats::rlnorm(1e5, meanlog = 0, sdlog = 1))) |> 
+  tidyr::pivot_longer(tidyr::everything()) |> 
+
+  ggplot2::ggplot(ggplot2::aes(x = value)) +
+  ggplot2::geom_density(fill = "grey92") +
+  ggplot2::coord_cartesian(xlim = c(-3, 3)) +
+  ggplot2::theme_bw() +
+  ggplot2::facet_wrap(~ name, nrow = 2)
+```
+
+> Those values are ~~what~~ the mean and standard deviation of the
+> output from the `rlnorm()` function **after** they are log
+> transformed. The formulas for the actual mean and standard deviation
+> for the log-normal distribution itself are complicated (see
+> [Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)). ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#priors.))
+::::
+:::::
+
+
+
+###### Log-Normal (Original)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-log-normal-m4-3a}
+: Prior predictive simulation again, now with the Log-Normal prior: (Original)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
 #| label: fig-prior-pred-sim-a
 #| fig-cap: "Prior predictive simulation again, now with the Log-Normal prior: rethinking version"
-#| attr-source: '#lst-fig-prior-pred-sim-a lst-cap="Prior predictive simulation with Log-Normal prior: rethinking version"'
-
 
 ## R code 4.41 ###################
 set.seed(2971)
@@ -3355,45 +3622,120 @@ for (i in 1:N_100_a) {
 
 ```
 
+
+::::
+:::::
+
 This is much more sensible. There is still a rare impossible
 relationship. But nearly all lines in the joint prior for $\alpha$ and
 $\beta$ are now within human reason.
 
-::: callout-note
-###### What is the correct prior?
+###### Log-Normal (Tidyverse)
 
-There is no more a uniquely correct prior than there is a uniquely
-correct likelihood. Statistical models are machines for inference. Many
-machines will work, but some work better than others. Priors can be
-wrong, but only in the same sense that a kind of hammer can be wrong for
-building a table.
 
-Priors encode states of information before seeing data. So priors allow
-us to explore the consequences of beginning with different information.
-In cases in which we have good prior information that discounts the
-plausibility of some parameter values, like negative associations
-between height and weight, we can encode that information directly into
-priors. When we don't have such information, we still usually know
-enough about the plausible range of values. And you can vary the priors
-and repeat the analysis in order to study how different states of
-initial information influence inference. Frequently, there are many
-reasonable choices for a prior, and all of them produce the same
-inference.
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-ID-text}
+b: Prior predictive simulation again, now with the Log-Normal prior (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-prior-pred-sim-b
+#| fig-cap: "Prior predictive simulation again, now with the Log-Normal prior (Tidyverse)"
+
+# make a tibble to annotate the plot
+text <-
+  tibble::tibble(weight = c(34, 43),
+         height = c(0 - 25, 272 + 25),
+         label  = c("Embryo", "World's tallest person (272 cm)"))
+
+# simulate
+base::set.seed(2971)
+
+tibble::tibble(n = 1:n_lines,
+       a = stats::rnorm(n_lines, mean = 178, sd = 20),
+       b = stats::rlnorm(n_lines, mean = 0, sd = 1)) |> 
+  tidyr::expand_grid(weight = base::range(d2_b$weight)) |> 
+  dplyr::mutate(height = a + b * (weight - base::mean(d2_b$weight))) |>
+  
+  # plot
+  ggplot2::ggplot(ggplot2::aes(x = weight, y = height, group = n)) +
+  ggplot2::geom_hline(yintercept = c(0, 272), linetype = 2:1, linewidth = 1/3) +
+  ggplot2::geom_line(alpha = 1/10) +
+  ggplot2::geom_text(data = text,
+            ggplot2::aes(label = label),
+            size = 3) +
+  ggplot2::coord_cartesian(ylim = c(-100, 400)) +
+  ggplot2::ggtitle("log(b) ~ dnorm(0, 1)") +
+  ggplot2::theme_bw()
+```
+
+::::
+:::::
+
 :::
 
-::: callout-note
-###### Prior predictive simulation and p-hacking
 
-When the model is adjusted in light of the observed data, then p-values
-no longer retain their original meaning. False results are to be
-expected. This is valid for Bayesian and Non-Bayesian statistics. Even
-if Bayesian statistics don't pay any attention to p-values, the danger
-remains. We could choose our priors conditional on the observed sample,
-just to get some desired (wrong) result. It is therefore important to
-choose priors conditional on pre-data knowledge of the variables---their
-constraints, ranges, and theoretical relationships. We should always
-judge our priors against general facts, not the sample.
+
+::::
+:::::
+
+
+:::::{.my-note}
+:::{.my-note-header}
+What is the correct prior?
 :::
+::::{.my-note-container}
+
+> “There is no more a uniquely correct prior than there is a uniquely correct likelihood. …
+>
+> In choosing priors, there are simple guidelines to get you started. Priors encode states of information before seeing data. So priors allow us to explore the consequences of beginning with different information. In cases in which we have good prior information that discounts the plausibility of some parameter values, like negative associations between height and weight, we can encode that information directly into priors. When we don’t have such information, we still usually know enough about the plausible range of values. And you can vary the priors and repeat the analysis in order to study // how different states of initial information influence inference. Frequently, there are many reasonable choices for a prior, and all of them produce the same inference.” ([McElreath, 2020, p. 95/96](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=115&annotation=UJG4Y8MH))
+
+::::
+:::::
+
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Prior predictive simulation and p-hacking
+:::
+::::{.my-watch-out-container}
+> “A serious problem in contemporary applied statistics is `r glossary("p-hacking")`, the practice of adjusting the model and the data to achieve a desired result. The desired result is usually a p-value less then 5%. The problem is that when the model is adjusted in light of the observed data, then p-values no longer retain their original meaning. False results are to be expected.” ([McElreath, 2020, p. 97](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=116&annotation=MKCQIVRV))
+
+:::::{.my-resource}
+:::{.my-resource-header}
+Prior predictive simulation and `r glossary("p-hacking")`
+:::
+::::{.my-resource-container}
+The paper by Simmons, Nelson and Simonsohn (2011), [False-positive
+psychology: Undisclosed flexibility in data collection and analysis
+allows presenting anything as
+significant](https://journals.sagepub.com/doi/10.1177/0956797611417632),
+is often cited as an introduction to the problem.
+
+Another more recent publication is: MacCoun, R. J. (2022). MacCoun, R. J. (2022). P-hacking: A Strategic Analysis. In L. Jussim, J. A. Krosnick, & S. T. Stevens (Eds.), Research Integrity: Best Practices for the Social and Behavioral Sciences (pp. 295–315). Oxford University Press. https://doi.org/10.1093/oso/9780190938550.003.0011.
+
+A book wide treatment is: Chambers, C. (2017). Seven Deadly Sins of Psychology: A Manifesto for Reforming the Culture of Scientific Practice (Illustrated Edition). Princeton University Press.
+
+
+
+::::
+:::::
+
+::::
+:::::
+
+# 2nd PASS: STOPPED HERE
+
+```{r}
+## ************************** ############
+## I STOPPED HERE (ORIGINAL) #############
+## ************************** ############
+```
+
+
 
 #### Finding the posterior distribution
 
@@ -4934,194 +5276,6 @@ Resources for GAMs
 ```
 
 
-### Linear prediction
-
-```{r}
-#| label: fig-height-against-weight-b
-#| fig-cap: "Adult height and weight against one another"
-#| attr-source: '#lst-fig-height-against-weight-b lst-cap="Scatterplot of adult height and weight"'
-
-
-d2_b |> 
-    ggplot(aes(height, weight)) + 
-    geom_point()
-```
-
-#### The linear model strategy
-
-##### EMPTY: Model definition
-
-##### EMPTY: Linear model
-
-##### Priors {#sec-priors-b}
-
-```{r}
-#| label: fig-sim-heights-only-with-priors-b
-#| fig-cap: "Simulating heights from the model, using only the priors: tidyverse version"
-#| attr-source: '#lst-fig-sim-heights-only-with-priors-b lst-cap="Simulate heights from the model, using only the priors: tidyverse version"'
-
-set.seed(2971)
-# how many lines would you like?
-n_lines <- 100
-
-lines <-
-  tibble(n = 1:n_lines,
-         a = rnorm(n_lines, mean = 178, sd = 20),
-         b = rnorm(n_lines, mean = 0, sd = 10)) |> 
-  expand_grid(weight = range(d2_b$weight)) |> 
-  mutate(height = a + b * (weight - mean(d2_b$weight)))
-
-
-lines |> 
-  ggplot(aes(x = weight, y = height, group = n)) +
-  geom_hline(yintercept = c(0, 272), linetype = 2:1, linewidth = 1/3) +
-  geom_line(alpha = 1/10) +
-  coord_cartesian(ylim = c(-100, 400)) +
-  ggtitle("b ~ dnorm(0, 10)") +
-  theme_classic()
-
-```
-
-Using the Log-Normal distribution prohibits negative values. This is an
-important constraint for height and weight as these variables cannot be
-under 0.
-
-```{r}
-#| label: fig-log-normal-b
-#| fig-cap: "Log-Normal distribution: tidyverse version"
-
-set.seed(4)
-
-tibble(b = rlnorm(1e4, meanlog = 0, sdlog = 1)) |> 
-  ggplot(aes(x = b)) +
-  geom_density(fill = "grey92") +
-  coord_cartesian(xlim = c(0, 5)) +
-  theme_classic()
-
-```
-
-::: callout-note
-Kurz wrote just `mean` and `sd` instead of `meanlog` and `sdlog.` These shorter argument names work because of the [partial matching feature in argument evaluation](https://cran.r-project.org/doc/manuals/R-lang.html#Argument-matching) of R functions. But for educational reason (misunderstanding, clashing with other matching arguments and less readable code) I apply this technique only sometimes in interactive use.
-:::
-
-I am not very skilled with the Log-Normal distribution, and so I am
-happy that Kurz added some explanations:
-
-> If you're unfamiliar with the log-normal distribution, it is the
-> distribution whose logarithm is normally distributed. For example,
-> here's what happens when we compare Normal(0,1) with
-> log(Log-Normal(0,1)).
-
-```{r}
-#| label: fig-normal-log-normal
-#| fig-cap: "Compare Normal(0,1) with log(Log-Normal(0,1))"
-
-set.seed(4)
-
-tibble(rnorm           = rnorm(1e5, mean = 0, sd = 1),
-       `log(rlognorm)` = log(rlnorm(1e5, meanlog = 0, sdlog = 1))) |> 
-  pivot_longer(everything()) |> 
-
-  ggplot(aes(x = value)) +
-  geom_density(fill = "grey92") +
-  coord_cartesian(xlim = c(-3, 3)) +
-  theme_classic() +
-  facet_wrap(~ name, nrow = 2)
-```
-
-> Those values are ~~what~~ the mean and standard deviation of the
-> output from the `rlnorm()` function **after** they are log
-> transformed. The formulas for the actual mean and standard deviation
-> for the log-normal distribution itself are complicated (see
-> [Wikipedia](https://en.wikipedia.org/wiki/Log-normal_distribution)).
-
-------------------------------------------------------------------------
-
-::: {#def-mean-sd}
-Calculate mean and standard deviation
-
-$$
-\begin{align*}
-\text{mean}               & = \exp \left (\mu + \frac{\sigma^2}{2} \right) \\
-\text{standard deviation} & = \sqrt{[\exp(\sigma ^{2})-1] \; \exp(2\mu +\sigma ^{2})}
-\end{align*}
-$$ {#eq-formula-mean-sd}
-:::
-
-------------------------------------------------------------------------
-
-Let's try our hand at those formulas and compute the mean and standard
-deviation for Log-Normal(0,1):
-
-```{r}
-#| label: compute-mu-sigma-for-log-normal-manually-b
-
-mu    <- 0
-sigma <- 1
-
-# mean
-exp(mu + (sigma^2) / 2)
-
-# sd
-sqrt((exp(sigma^2) - 1) * exp(2 * mu + sigma^2))
-```
-
-Let's confirm with simulated draws from `rlnorm()`.
-
-```{r}
-#| label: compute-log-normal-b
-#| fig-cap: "Compute mean and standard deviation of the Log-Normal distribution: tidyverse version"
-
-set.seed(4)
-
-tibble(x = rlnorm(1e7, meanlog = 0, sdlog = 1)) |> 
-  summarise(mean = mean(x),
-            sd   = sd(x))
-```
-
-```{r}
-#| label: fig-prior-pred-sim-b
-#| fig-cap: "Prior predictive simulation again, now with the Log-Normal prior: tidyverse version"
-
-
-# make a tibble to annotate the plot
-text <-
-  tibble(weight = c(34, 43),
-         height = c(0 - 25, 272 + 25),
-         label  = c("Embryo", "World's tallest person (272 cm)"))
-
-# simulate
-set.seed(2971)
-
-tibble(n = 1:n_lines,
-       a = rnorm(n_lines, mean = 178, sd = 20),
-       b = rlnorm(n_lines, mean = 0, sd = 1)) |> 
-  expand_grid(weight = range(d2_b$weight)) |> 
-  mutate(height = a + b * (weight - mean(d2_b$weight))) |>
-  
-  # plot
-  ggplot(aes(x = weight, y = height, group = n)) +
-  geom_hline(yintercept = c(0, 272), linetype = 2:1, linewidth = 1/3) +
-  geom_line(alpha = 1/10) +
-  geom_text(data = text,
-            aes(label = label),
-            size = 3) +
-  coord_cartesian(ylim = c(-100, 400)) +
-  ggtitle("log(b) ~ dnorm(0, 1)") +
-  theme_classic()
-```
-***
-:::: {#prp-p-value-problem}
-Torturing data until they fit your expectations / desires
-
-::: callout-tip
-The paper by Simmons, Nelson and Simonsohn (2011), [False-positive
-psychology: Undisclosed flexibility in data collection and analysis
-allows presenting anything as
-significant](https://journals.sagepub.com/doi/10.1177/0956797611417632),
-is often cited as an introduction to the problem.
-:::
-::::
 ***
 
 #### Finding the posterior distribution
