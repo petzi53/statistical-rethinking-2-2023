@@ -17,9 +17,11 @@ This is why so much effort is devoted to
 `r glossary("multiple regression")`, using more than one predictor
 variable to simultaneously model an outcome.
 
+
 Reasons given for multiple regression models include: 1. Statistical
 "control" for confounds 2. Multiple and complex causation 3.
 `r glossary("Interaction")` of variables
+
 
 In this chapter, we begin use multiple regression to deal with simple
 confounds and to take multiple measurements of association.

@@ -19,9 +19,7 @@ Learning Objectives:
 ::::
 :::::
 
-
-
-**File setup**
+## File setup {.unnumbered}
 
 ```{r}
 #| label: setup
@@ -31,8 +29,9 @@ Learning Objectives:
 # library(patchwork)
 ```
 
+## ORIGINAL
 
-## Why normal distributions? {#sec-why-normal-dist-a}
+### Why normal distributions? {#sec-why-normal-dist-a}
 
 Why are there so many distribution approximately normal,
 resulting in a Gaussian curve? Because there will be more combinations
@@ -48,9 +47,7 @@ Why are normal distributions normal?
 ::::
 :::::
 
-
-
-### Normal by addition
+#### Normal by addition
 
  > “Whatever the average value of the source distribution, each sample from it can be thought of as a fluctuation from that average value. When we begin to add these fluctuations together, they also begin to cancel one another out. A large positive fluctuation will cancel a large negative one. The more terms in the sum, the more chances for each fluctuation to be canceled by another, or by a series of smaller ones in the opposite direction. So eventually the most likely sum, in the sense that there are the most ways to realize it, will be a sum in which every fluctuation is canceled by another, a sum of zero (relative to the mean).” ([McElreath, 2020, p. 73](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=92&annotation=PIK9MN9I))
  
@@ -71,17 +68,17 @@ of the The British Journal for the Philosophy of Science.
 :::::
 
 
-### Normal by multiplication
+#### Normal by multiplication
 
 This is not only valid for addition but also for multiplication of small
 values: Multiplying small numbers is approximately the same as addition.
 
-### Normal by log-multipliation
+#### Normal by log-multipliation
 
 But even the multiplication of large values tend to produce Gaussian
 distributions on the log scale.
 
-### Using Gaussian distributions
+#### Using Gaussian distributions
 
 The justifications for using the Gaussian distribution fall into two
 broad categories:
@@ -129,7 +126,7 @@ For example `dnorm(0,0,0.1)` which is the way to make R calculate $p(0 \mid 0, 0
 
 
 
-## Model describing language
+### Model describing language
 
 :::::{.my-procedure}
 :::{.my-procedure-header}
@@ -155,7 +152,7 @@ For example `dnorm(0,0,0.1)` which is the way to make R calculate $p(0 \mid 0, 0
 ::::
 :::::
 
-### Re-describing the globe tossing model
+#### Re-describing the globe tossing model
 
 :::::{.my-example}
 :::{.my-example-header}
@@ -200,9 +197,7 @@ with deterministic definitions in them.
 :::::
 
 
-
-
-## Gaussian model of height {#sec-gaussian-model-of-height}
+### Gaussian model of height {#sec-gaussian-model-of-height}
 
 In this section we want a single measurement variable to model as a Gaussian distribution. It is a preparation for the linear regression model in @sec-linear-prediction-a  where we will construct and add a predictor variable to the model. 
 
@@ -210,7 +205,7 @@ In this section we want a single measurement variable to model as a Gaussian dis
 
 
 
-### The data
+#### The data
 
 :::::{.my-resource}
 :::{.my-resource-header}
@@ -345,7 +340,7 @@ before using {**brms**} as it is necessary in the Kurz's {**tidyverse**}
 :::::
 
 
-#### Show the data
+##### Show the data
 
 :::::{.my-example}
 :::{.my-example-header}
@@ -565,7 +560,7 @@ Again this printing method does not give a data summary as is featured in @exm-s
 
 
 
-#### Select the height data of adults
+##### Select the height data of adults
 
 > “All we want for now are heights of adults in the sample. The reason to filter out nonadults for now is that height is strongly correlated with age, before adulthood.” ([McElreath, 2020, p. 80](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=99&annotation=VCYRP6W4))
 
@@ -631,11 +626,11 @@ dplyr::glimpse(d2_b)
 :::::
 
 
-### The model
+#### The model
 
 Our goal is to model the data using a Gaussian distribution.
 
-#### Plot the distribution of heights
+##### Plot the distribution of heights
 
 :::::{.my-example}
 :::{.my-example-header}
@@ -946,7 +941,7 @@ so we'll just remove it with `scale_y_continuous(NULL, breaks = NULL)`.
 ::::
 :::::
 
-#### Prior predictive simulation
+##### Prior predictive simulation
 
 :::::{.my-important}
 :::{.my-important-header}
@@ -1180,7 +1175,7 @@ than this.
 :::::
 
 
-### Grid approximation of the posterior distribution
+#### Grid approximation of the posterior distribution
 
 We are going to map out the posterior distribution through brute force
 calculations.
@@ -1392,7 +1387,6 @@ containing data frames into rows and columns.
 | Contour plot                   | rethinking::contour_xyz() | ggplot2::geom_contour() |
 | Heat map                       | rethinking::image_xyz()   | ggplot2::geom_raster()  |
 : Function equivalence between Original and Tidyverse
-{#tbl-functions-equivalence-rethinking-tidyverse}
 
 
 :::::{.my-note}
@@ -1418,10 +1412,11 @@ There are several related function for `base::expand.grid()` in {**tidyverse**}:
 
 
 
-### Sampling from the posterior {#sec-chap04-sampling-heights-from-posterior}
+#### Sampling from the posterior {#sec-chap04-sampling-heights-from-posterior}
 
 > “To study this posterior distribution in more detail, again I’ll push the flexible approach of sampling parameter values from it. This works just like it did in @cnj-chap03-sample-posterior-globe-tossing, when you sampled values of $p$ from the posterior distribution for the globe tossing example.” ([McElreath, 2020, p. 85](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=104&annotation=L8LYZ2VZ))
 
+##### Samples
 
 :::::{.my-procedure}
 :::{.my-procedure-header}
@@ -1550,7 +1545,7 @@ The density of points is highest in the center, reflecting the most plausible co
 :::::
 
 
-#### Marginal posterior densities of μ and σ
+##### Marginal posterior densities of μ and σ
 
 The jargon `r glossary("Marginal Distribution", "marginal")` here means "averaging over the other parameters."
 
@@ -1710,7 +1705,7 @@ plot_mu_b + plot_sigma_b
 ::::
 :::::
 
-#### Posterior compatibility intervals (PIs)
+##### Posterior compatibility intervals (PIs)
 
 Since the drawn samples of @exm-chap04-sampling-heights-from-posterior are just vectors of numbers, you can compute any statistic from them that you could from ordinary data: mean, median, or quantile, for example.
 
@@ -2033,7 +2028,7 @@ Compare the left panel with @fig-posterior-sample-b and the right panel with the
 
 
 
-### Finding the posterior distribution with quadratic approximation
+#### Finding the posterior distribution with quadratic approximation
 
 > “To build the quadratic approximation, we’ll use `quap()`, a command in the {**rethinking**} package. The `quap()` function works by using the model definition you were introduced to earlier in this chapter. Each line in the definition has a corresponding definition in the form of R code. The engine inside quap then uses these definitions to define the posterior probability at each combination of parameter values. Then it can climb the posterior distribution and find the peak, its `r glossary("MAP")` (**Maximum A Posteriori** estimate). Finally, it estimates the quadratic curvature at the MAP to produce an approximation of the posterior distribution. Remember: This procedure is very similar to what many non-Bayesian procedures do, just without any priors.” ([McElreath, 2020, p. 87](zotero://select/groups/5243560/items/NFUEVASQ), parenthesis and emphasis are mine) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=106&annotation=FFDN2FE2))
 
@@ -2172,7 +2167,6 @@ b: Finding the posterior distribution with `brms::brm()`
 
 ```{r}
 #| label: chap04-m4-1b
-#| cache: true
 
 ## R code 4.26b ######################
 data(package = "rethinking", list = "Howell1")
@@ -2204,22 +2198,9 @@ m4.1b
 
 The `brms::brm()` function returns a "brmsfit" object.
 
-If you don't want to specify the result more in detail (for instance to change the PI) than you get the same result with `brms:::print.brmsfit(m4.1b)` and `brms:::summary.brmsfit(m4.1b)`.
+The convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` are described in detail in [@vehtari2021].
 
-:::::{.my-resource}
-:::{.my-resource-header}
-Description of the convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` 
-:::
-::::{.my-resource-container}
-
-- The convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` are described in detail in [@vehtari2021].
-- The code for the paper is available on Github (https://github.com/avehtari/rhat_ess).
-- Examples and even a larger variety of numerical experiments are available in the online appendix at https://avehtari.github.io/rhat_ess/rhat_ess.html.
-
-
-::::
-:::::
-
+If you don't want to specify the result more in detail (for instance to change the PI) than you get the same result with `brms:::print.brmsfit(m4.1b)` and `brms:::summary.brmsfit(m41b)`.
 
 ::::
 :::::
@@ -2268,18 +2249,7 @@ brms:::print.brmsfit(m4.1b, prob = .89)
 
 ***
 
-:::::{.my-resource}
-:::{.my-resource-header}
-Description of the convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` 
-:::
-::::{.my-resource-container}
-
-- The convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` are described in detail in [@vehtari2021].
-- The code for the paper is available on Github (https://github.com/avehtari/rhat_ess).
-- Examples and even a larger variety of numerical experiments are available in the online appendix at https://avehtari.github.io/rhat_ess/rhat_ess.html.
-
-::::
-:::::
+The convergence diagnostics `Rhat`, `Bulk_ESS`, and `Tail_ESS` are described in detail in [@vehtari2021].
 
 `brms:::summary.brmsfit()` results in the same output `as brms:::print.brmsfit()`. Both return a `brmssummary` object. But there are some internal differences:
 
@@ -2519,9 +2489,9 @@ Subsetting the `summary.brmsfit()` output of the `brmssummary` object with `$fix
 :::::
 
 
-### Sampling
+#### Sampling
 
-#### Sampling from `rethinking::quap()`
+##### Sampling from `rethinking::quap()`
 
 How do we get samples from the quadratic approximate posterior distribution?
 
@@ -2843,7 +2813,7 @@ How to interpret covariances?
 
 
 
-#### Sampling from a `brms::brm()` fit
+##### Sampling from a `brms::brm()` fit
 
 In contrast to the {**rethinking**} approach the {**brms**} doesn't seem to have the same convenience functions and therefore we have to use different workarounds to get the same results. To get equivalent output it is the best strategy to put the Hamilton Monte Carlo (`r glossary("HMC")`) chains in a data frame and then apply the appropriate functions.
 
@@ -3135,7 +3105,7 @@ Kurz didn't mention my suggestion to use skimr::skim() to get tiny histograms as
 
 
 
-## Linear prediction {#sec-linear-prediction-a}
+### Linear prediction {#sec-linear-prediction-a}
 
 > “What we’ve done above is a Gaussian model of height in a population of adults. But it doesn’t really have the usual feel of “regression” to it. Typically, we are interested in modeling how an outcome is related to some other variable, a `r glossary("predictor variable")`. If the predictor variable has any statistical association with the outcome variable, then we can use it to predict // the outcome. When the predictor variable is built inside the model in a particular way, we’ll have `r glossary("linear regression")`.” ([McElreath, 2020, p. 91/92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=UYJ937ER))
 
@@ -3192,7 +3162,7 @@ b: Scatterplot of adult height versus weight (Tidyverse)
 
 ## R code 4.37b #####################
 d2_b |> 
-    ggplot2::ggplot(ggplot2::aes(height, weight)) + 
+    ggplot2::ggplot(aes(height, weight)) + 
     ggplot2::geom_point() +
     ggplot2::theme_bw()
 ```
@@ -3210,9 +3180,9 @@ predict height.
 
 > “To make this vague observation into a more precise quantitative model that relates values of `weight` to plausible values of `height`, we need some more technology. How do we take our Gaussian model from @sec-gaussian-model-of-height and incorporate predictor variables?” ([McElreath, 2020, p. 92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=BEMZLGBA))
 
-### The linear model strategy
+#### The linear model strategy
 
-#### Model definition
+##### Model definition
 
 > “The `r glossary("linear model")` strategy instructs the golem to assume that the predictor variable has a constant and additive relationship to the mean of the outcome. The golem then computes the posterior distribution of this constant relationship.” ([McElreath, 2020, p. 92](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=111&annotation=FU3R3CJZ))
 
@@ -3263,7 +3233,7 @@ Remember @eq-height-linear-model-m4-1:
 :::::{.my-theorem}
 :::{.my-theorem-header}
 :::::: {#thm-linear-heights-model}
-: Define the linear model heights against weights (V1)
+: Define the linear model `heights` against `weights`
 ::::::
 :::
 ::::{.my-theorem-container}
@@ -3276,7 +3246,7 @@ h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\
 \beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
 \end{align*}
-$$ {#eq-height-weight-linear-model-v1-m4-3}
+$$ {#eq-height-weight-linear-model2-m4-3}
 
 Compare the differences with definition inside the Tab "only height".
 
@@ -3315,9 +3285,9 @@ Compare the differences with definition inside the Tab "only height".
 
 
 
-#### Linear model {#sec-chap04-linear-model}
+##### Linear model {#sec-chap04-linear-model}
 
-> “The value $x_{i}$ [in the second line of @eq-height-weight-linear-model-v1-m4-3]
+> “The value $x_{i}$ [in the second line of @eq-height-weight-linear-model1-m4-3]
 is just the weight value on row $i$. It refers to the same individual as
 the height value, $h_{i}$, on the same row. The parameters $\alpha$ and
 $\beta$ are more mysterious. Where did they come from? We made them up.
@@ -3343,7 +3313,7 @@ The second line $μ_{i} = \alpha + \beta(x_{i}-\overline{x})$ of the model defin
 >
 > Jointly these two parameters ask the golem to find a line that relates x to h, a line that passes through α when x_{i} = \overline{x} and has slope $\beta$.” ([McElreath, 2020, p. 94](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=113&annotation=Y36FAY8E))
 
-#### Priors {#sec-chap04-priors}
+##### Priors {#sec-chap04-priors}
 
 > "The prior for $\beta$ in @eq-height-weight-linear-model1-m4-3 deserves
 explanation. Why have a Gaussian prior with mean zero? This prior places
@@ -3758,106 +3728,65 @@ A book wide treatment is: Chambers, C. (2017). Seven Deadly Sins of Psychology: 
 ::::
 :::::
 
+# 2nd PASS: STOPPED HERE
 
-### Finding the posterior distribution
+```{r}
+## ************************** ############
+## I STOPPED HERE (ORIGINAL) #############
+## ************************** ############
+```
 
-In @exm-lm-height-weight we have compared the linear heights model (@eq-height-linear-model2-m4-1) with the linear model heights against weights (@eq-height-weight-linear-model-v1-m4-3). Now we repeat the linear model heights against weights and compare it with the corresponding R Code.
 
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-lm-height-weight-code-m4-3}
-: Compare formula and R code for linear model heights against weights (V2) 
-::::::
-:::
-::::{.my-example-container}
 
-::: {.panel-tabset}
+#### Finding the posterior distribution
 
-###### Formula
+The code needed to approximate the posterior is a straightforward
+modification of the kind of code you've already seen. All we have to do
+is incorporate our new model for the mean into the model specification
+inside `rethinking::quap()` and be sure to add a prior for the new
+parameter, `β`. Let's repeat the model definition, now with the
+corresponding R code as footnotes:
 
-:::::{.my-theorem}
-:::{.my-theorem-header}
-:::::: {#thm-linear-heights-model-v2-m4-3}
-: Define the linear model heights against weights (V2): Formula
-::::::
-:::
-::::{.my-theorem-container}
+------------------------------------------------------------------------
+
+::: {#def-height-weight-linear-model2-m4.3}
+###### Linear model height against weight (Version 2 of m4.3)
 
 $$
 \begin{align*}
 h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\ 
 μ_{i} = \alpha + \beta(x_{i}-\overline{x}) \space \space (2) \\
 \alpha \sim \operatorname{Normal}(178, 20) \space \space (3)  \\ 
-\beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
-\sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
-\end{align*}
-$$ {#eq-height-weight-linear-model2-m4-3}
-
-
-::::
-:::::
-
-
-
-###### R Code
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-lm-code-v2-m4-3}
-: Define the linear model heights against weights (V2): R Code
-::::::
-:::
-::::{.my-r-code-container}
+\beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
+\sigma \sim \operatorname{Uniform}(0, 50)  \space \space (5) \\    
+\end{align*} 
+$$ {#eq-height-weight-linear-model2-m4.3}
 
 ```         
-height ~ dnorm(mu, sigma)     # (1)
-mu <- a + b * (weight - xbar) # (2)
-a ~ dnorm(178, 20)            # (3)        
-b ~ dlnorm(0, 10)             # (4)        
-sigma ~ dunif(0, 50)          # (5)       
+height ~ dnorm(mu, sigma)     # <1>
+mu <- a + b * (weight - xbar) # <2>
+a ~ dnorm(178, 20)            # <3>
+b ~ dlnorm(0, 10)             # <4>
+sigma ~ dunif(0, 50)          # <5>
 ```
+:::
 
-
-::::
-:::::
+------------------------------------------------------------------------
 
 Notice that the linear model, in the R code on the right-hand side, uses
 the R assignment operator, `<-` instead of the symbol `=`.
 
-:::
-
-::::
-:::::
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-find-post-dist-m4-3}
-: Find the posterior distribution of the linear height-weight model
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### Original1
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-find-post-dist-m4-3-a}
-a: Find the posterior distribution of the linear height-weight model (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
 ```{r}
-#| label: find-post-dist-m4-3a
+#| label: find-post-dist-m4.3
+#| attr-source: '#lst-find-post-dist-m4.3 lst-cap="Find the posterior distribution of the linear height-weight model: rethinking version"'
 
-## R code 4.42a #############################
+## R code 4.42 #############################
 
 # define the average weight, x-bar
 xbar_a <- mean(d2_a$weight)
 
 # fit model
-m4.3a <- rethinking::quap(
+m4.3 <- rethinking::quap(
   alist(
     height ~ dnorm(mu, sigma),
     mu <- a + b * (weight - xbar_a),
@@ -3869,34 +3798,30 @@ m4.3a <- rethinking::quap(
 )
 
 # summary result
-## R code 4.44a ############################
-rethinking::precis(m4.3a)
+## R code 4.44 ############################
+rethinking::precis(m4.3)
 ```
 
+You can usefully think of as assigning to $y = log(x)$ the order of
+magnitude of $x = exp(y)$. The function is the reverse, turning a
+magnitude into a value. These definitions will make a mathematician
+shriek. But much of our computational work relies only on these
+intuitions.
 
-::::
-:::::
-
-
-###### Original2 (log)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-find-post-dist-log-m4-3a_2}
-a: Find the posterior distribution of the linear height-weight model: Log version (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
+These definitions allow the Log-Normal prior for `β` to be coded another
+way. Instead of defining a parameter `β`, we define a parameter that is
+the logarithm of `β` and then assign it a normal distribution. Then we
+can reverse the logarithm inside the linear model. It looks like this:
 
 ```{r}
-#| label: find-post-dist-log-m4-3a_2
+#| label: find-post-dist2-a
+#| attr-source: '#lst-find-post-dist2-a lst-cap="Find the posterior distribution of the linear height-weight model (log version): rethinking version"'
 
-## R code 4.43a ############################
-m4.3a_2 <- rethinking::quap(
+## R code 4.43 ############################
+m4.3b <- rethinking::quap(
   alist(
     height ~ dnorm(mu, sigma),
-    mu <- a + exp(log_b) * (weight - xbar_a),
+    mu <- a + exp(log_b) * (weight - xbar),
     a ~ dnorm(178, 20),
     log_b ~ dnorm(0, 1),
     sigma ~ dunif(0, 50)
@@ -3904,13 +3829,8 @@ m4.3a_2 <- rethinking::quap(
   data = d2_a
 )
 
-rethinking::precis(m4.3a_2)
+rethinking::precis(m4.3b)
 ```
-
-
-
-::::
-:::::
 
 Note the `exp(log_b)` in the definition of `mu`. This is the same model
 as `m4.3`. It will make the same predictions. But instead of `β` in the
@@ -3918,216 +3838,35 @@ posterior distribution, you get `log((β)`. It is easy to translate
 between the two, because $\beta = exp(log(\beta))$. In code form:
 `b <- exp(log_b)`.
 
+#### Interpreting the posterior distribution
 
-###### Tidyverse
+Statistical models are hard to interpret. There are two broad categories
+of interpretation: - reading tables - plotting simulation
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-find-post-dist-m4-3b_2}
-b: Find the posterior distribution of the linear height-weight model (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+Plotting posterior distributions and posterior predictions is better
+than attempting to understand a table.
 
+##### Table of marginal distributions
 
-```{r}
-#| label: find-post-dist-m4-3b
-#| cache: true
-
-d2_b <-
-  d2_b |> 
-  dplyr::mutate(weight_c = weight - base::mean(weight))
-
-m4.3b <- 
-  brms::brm(data = d2_b, 
-      family = gaussian,
-      height ~ 1 + weight_c,
-      prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(lognormal(0, 1), class = b, lb = 0),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "brm_fits/m04.03b")
-
-brms:::summary.brmsfit(m4.3b)
-```
-
-
-::::
-:::::
-
-Remember: The detailed explication of the syntax for the following `brms::brm()` function is in the "Tidyverse" tab of @exm-chap04-m4-1.
-
-Unlike with McElreath's `rethinking::quap()` formula syntax, Kurz is not
-aware if we can just specify something like `weight – xbar` in the
-`formula` argument in `brms::brm()`.
-
-However, the alternative is easy: Just make a new variable in the data
-that is equivalent to `weight – mean(weight)`. We'll call it `weight_c`.
-
-###### Tidyverse2 (log)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-find-post-dist-log-m4-3b_2}
-Find the posterior distribution of the linear height-weight model (log version) (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+I have already included the summary (`precis()`) for the `m4.3` model in
+@lst-find-post-dist-m4.3. But I will repeat it to inspect the marginal
+posterior distributions of the parameters in detail:
 
 ```{r}
-#| label: find-post-dist-log-m4-3b_2
-#| cache: true
+#| label: table-summary-m4.3
+#| attr-source: '#lst-table-summary-m4.3 lst-cap="Display the marginal posterior distributions of the parameters: rethinking version"'
 
-m4.3b_2 <- 
-  brms::brm(data = d2_b, 
-      family = gaussian,
-      brms::bf(height ~ a + exp(lb) * weight_c,
-         a ~ 1,
-         lb ~ 1,
-         nl = TRUE),
-      prior = c(brms::prior(normal(178, 20), class = b, nlpar = a),
-                brms::prior(normal(0, 1), class = b, nlpar = lb),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "brm_fits/m04.03b_2")
 
-brms:::summary.brmsfit(m4.3b_2)
+## R code 4.44 ################
+rethinking::precis(m4.3)
+
 ```
 
-
-Remember: The detailed explication of the syntax for the following `brms::brm()` function is in the "Tidyverse" tab of @exm-chap04-m4-1.
-
-The difference is for the $\beta$ parameter, which we called `lb` in the
-`m4.3b_2` model. If we term that parameter from `m4.3b` as $\beta^{m4.3b}$
-and the one from our new log model $\beta^{m4.3b_2}$, it turns out that
-$\beta^{m4.3b} = exp(\beta^{m4.3b_2})$.
-
-::::
-:::::
-
-Compare the result with the previous tab "Tidyverse" in @cnj-find-post-dist-m4-3b_2.
-
-###### fixef
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-fixef-m4-3b}
-b: Extract and compare the population-level (fixed) effects from object `m4.3b` and the form log version `m4.3b_2`
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-fixed-effects-m4-3b
-#| results: hold
-
-brms::fixef(m4.3b)["weight_c", "Estimate"]
-brms::fixef(m4.3b_2)["lb_Intercept", "Estimate"] |> exp()
-```
-
-::::
-:::::
-
-They're the same within simulation variance.
-
-###### Trace plot
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-trace-plot-m4-3b}
-Display trace plots (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: trace-plot-m4-3b_2
-
-plot(m4.3b, widths = c(1, 2))
-```
-
-::::
-:::::
-
-:::
-
-
-::::
-:::::
-
-
-To understand the differences in syntax between {**rethinking**} and {**brms**} it is also quite revealing to look at @tbl-mirror-rethinking-tidyverse. I have inserted the following table from Kurz’ explanation of model `b4.3`.
-
-| {**rethinking**} package                                    | {**brms**} package:   |
-|------------------------------------|------------------------------------|
-| $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$ | `family = gaussian`                        |
-| $\mu_i = \alpha + \beta \text{weight}_i$                    | `height ~ 1 + weight_c`                 |
-| $\alpha \sim \operatorname{Normal}(178, 20)$                | `prior(normal(178, 20), class = Intercept` |
-| $\beta \sim \operatorname{Log-Normal}(0, 1)$                | `prior(lognormal(0, 1), class = b)`        |
-| $\sigma \sim \operatorname{Uniform}(0, 50)$                 | `prior(uniform(0, 50), class = sigma)`     |
-
-: Compare statistical notation of rethinking with brms package {#tbl-mirror-rethinking-tidyverse}
-
-
-
-### Interpreting the posterior distribution
-
-:::::{.my-important}
-:::{.my-important-header}
-What do parameters mean?
-:::
-::::{.my-important-container}
-
-“Posterior probabilities of parameter values describe the relative compatibility of different states of the world with the data, according to the model. These are small world (@sec-chap02) numbers.” ([McElreath, 2020, p. 99](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=118&annotation=N3YFPKMW))
-
-::::
-:::::
-
-Statistical models are hard to interpret. Plotting posterior distributions and posterior predictions is better than attempting to understand a table.
-
-#### Table of marginal distributions
-
-There are many different options in the tidyverse approach, repsectively with {**brms**}. The most
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-chap04-table-interpretation}
-Inspect the marginal posterior distributions of the parameters
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### precis (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-inspect-lm-table-a}
-a: Inspect the marginal posterior distributions of the parameters (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-inspect-lm-table-4-3a
-
-
-## R code 4.44 ##########
-rethinking::precis(m4.3a)
-```
-
-***
+**Interpreting the result of `rethinking::precis(m4.3)`**
 
 1.  First row: quadratic approximation for $\alpha$
 2.  Second row: quadratic approximation for $\beta$
 3.  Third row: quadratic approximation for $\sigma$
-
-
-::::
-:::::
 
 Let's focus on b ($\beta$), because it's the new parameter. Since
 ($\beta$) is a slope, the value 0.90 can be read as *a person 1 kg
@@ -4140,438 +3879,112 @@ because the model only considered lines. It just says that, if you are
 committed to a line, then lines with a slope around 0.9 are plausible
 ones.
 
-###### vcov (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-lm-vcov-a}
-b: Display variance-covariance matrix (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-The numbers in the default `rethinking::precis()` output aren’t sufficient to describe the quadratic posterior completely. Therefore we also need to inspect the variance-covariance matrix.
+Remember, the numbers in the default precis output aren't sufficient to
+describe the quadratic posterior completely. For that, we also require
+the variance-covariance matrix.
 
 ```{r}
-#| label: chap04-lm-vcov-m4-3a
+#| label: var-cov-matrix-m4.3
+#| attr-source: '#lst-var-cov-matrix-m4.3 lst-cap="Calculate the variance-covariance matrix for model m4.3"'
 
-## R code 4.45 ################
-round(rethinking::vcov(m4.3a), 3)
+## R code 4.45 ######################
+round(rethinking::vcov(m4.3), 3)
 ```
 
-
-::::
-:::::
-
-There is very little covariation among the parameters in this case.
-
-###### pairs (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-lm-pairs-a}
-b: Display variance-covariance matrix (Original)
-::::::
-:::
-::::{.my-r-code-container}
+There is very little covariation among the parameters in this case. The
+lack of covariance among the parameters results from
+`r glossary("centering")`.
 
 ```{r}
-#| label: chap04-lm-pairs-m4-3a
+#| label: fig-marg-post-cov-m4.3
+#| fig-cap: "The marginal posteriors and the covariance matrix for model m4.3"
+#| attr-source: '#lst-var-cov-matrix-m4.3 lst-cap="Show the marginal posteriors and covariance matrix for model m4.3"'
 #| warning: false
 
-rethinking::pairs(m4.3a)
+rethinking::pairs(m4.3)
 ```
 
+##### Plotting posterior inference against the data
 
-::::
-:::::
+It's almost always much more useful to plot the posterior inference
+against the data. Not only does plotting help in interpreting the
+posterior, but it also provides an informal check on model assumptions.
 
-The graphic shows both the marginal posteriors and the covariance.
+We're going to start with a simple version of that task, superimposing
+just the posterior mean values over the height and weight data. Then
+we'll slowly add more and more information to the prediction plots,
+until we've used the entire posterior distribution.
 
-###### brms (T)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-post-summary-b}
-b: Display the marginal posterior distributions of the parameters (brms)
-::::::
-:::
-::::{.my-r-code-container}
-
+We'll start with just the raw data and a single line. The code below
+plots the raw data, computes the posterior mean values for `a` and `b`,
+then draws the implied line:
 
 ```{r}
-#| label: chap04-post-summary-m4-3b
-
-brms::posterior_summary(m4.3b, probs = c(0.055, 0.945))[1:3, ] |> 
-  round(digits = 2)
-```
-
-
-Looking up `brms::posterior_summary()` I learned that the "function
-mainly exists to retain backwards compatibility". It will eventually be replaced by functions of the {**posterior**} package". ([brms](https://paul-buerkner.github.io/brms/reference/posterior_summary.html))
-
-
-::::
-:::::
-
-
-:::::{.my-watch-out}
-:::{.my-watch-out-header}
-WATCH OUT! How to insert coefficients into functions with {**brms**}?
-:::
-::::{.my-watch-out-container}
-
-> {**brms**} does not allow users to insert coefficients into functions
-like `exp()` within the conventional `formula` syntax. We can fit a
-{**brms**} model like McElreath's `m4.3a` if we adopt what's called the
-[non-linear
-syntax](https://cran.r-project.org/web/packages/brms/vignettes/brms_nonlinear.html).
-The non-linear syntax is a lot like the syntax McElreath uses in
-{**rethinking**} in that it typically includes both predictor and
-variable names in the `formula`. ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#overthinking-logs-and-exps-oh-my.))
-
-Kurz promises to explain later in his ebook what non-linear syntax exactly means. 
-
-::::
-:::::
-
-###### draws1
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-post-summarize-draws-m4-3b}
-b: Display the marginal posterior distributions of the parameters with `summarize_draws()` from {**posterior**}
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-post-summarize-draws-m4-3b
-
-posterior::summarize_draws(m4.3b, "mean", "median", "sd", 
-                           ~quantile(., probs = c(0.055, 0.945)),
-                           .num_args = list(sigfig = 2))[1:3, ]
-```
-::::
-:::::
-
-###### draws2
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-summary-draws-m4-3b}
-b: Display the marginal posterior distributions of the parameters of `brms::as_draws_array()` objects
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-summary-draws-m4-3b
-
-## summary for draws object
-summary(brms::as_draws_array(m4.3b))[1:3, ]
-
-```
-::::
-:::::
-
-
-###### vcov1 (T)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-vcov1-b}
-b: Display variance-covariance matrix (brms)
-::::::
-:::
-::::{.my-r-code-container}
-
-
-```{r}
-#| label: chap04-vcov-m4-3b
-
-brms:::vcov.brmsfit(m4.3b) |> 
-  round(3)
-```
-
-We got the variance/covariance matrix of the `intercept` and
-`weight_c` coefficient but not $\sigma$ however. To get that, we'll have to extract the posterior draws and use the `cov()` function, instead. (See next tab "vcov2 (T)")
-
-
-
-::::
-:::::
-
-###### vcov2 (T)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-vcov2-b}
-b: Variance-covariance matrix with {**posterior**} draws objects (brms)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-cov-m4-3b
-#| warning: false
-
-brms::as_draws_df(m4.3b) |>
-  dplyr::select(b_Intercept:sigma) |>
-  stats::cov() |>
-  base::round(digits = 3)
-```
-::::
-:::::
-
-
-
-###### pairs (T)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-lm-pairs-b}
-b: Display variance-covariance matrix (brms)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-lm-pairs-m4-3b
-
-brms:::pairs.brmsfit(m4.3b)
-```
-
-
-::::
-:::::
-
-The graphic shows both the marginal posteriors and the covariance.
-
-:::
-
-::::
-:::::
-
-
-#### Plotting posterior inference against the data
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-chap04-plot-post-inf-against-data}
-: Height plotted against weight with linear regression (line at the posterior mean)
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### Original
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-plot-raw-data-line-m4-3a}
-a: Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: fig-raw-data-line-m4-3a
+#| label: fig-raw-data-line-m4.3
 #| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: rethinking version"
+#| attr-source: '#lst-fig-raw-data-line-m4.3 lst-cap="Height against weight with linear regression"'
 
-## R code 4.46a ############################################
+## R code 4.46 ############################################
 plot(height ~ weight, data = d2_a, col = rethinking::rangi2)
-post_m4.3a <- rethinking::extract.samples(m4.3a)
-a_map <- mean(post_m4.3a$a)
-b_map <- mean(post_m4.3a$b)
-curve(a_map + b_map * (x - xbar_a), add = TRUE)
+post_m4.3 <- rethinking::extract.samples(m4.3)
+a_map <- mean(post_m4.3$a)
+b_map <- mean(post_m4.3$b)
+curve(a_map + b_map * (x - xbar), add = TRUE)
 ```
-
-::::
-:::::
 
 Each point in this plot is a single individual. The black line is
-defined by the mean slope $\beta$ and mean intercept $\alpha$. This is not a bad
+defined by the mean slope `β` and mean intercept `α`. This is not a bad
 line. It certainly looks highly plausible. But there are an infinite
-number of other highly plausible lines near it. See next tab
+number of other highly plausible lines near it. Let's draw those too.
 
+##### Adding uncertainty around the mean
 
-###### Tidyverse1
+Plots of the average line, like in @fig-raw-data-line-m4.3, are useful
+for getting an impression of the magnitude of the estimated influence of
+a variable. But they do a poor job of communicating uncertainty.
+Remember, the posterior distribution considers every possible regression
+line connecting height to weight. It assigns a relative plausibility to
+each. This means that each combination of `α` and `β` has a posterior
+probability. It could be that there are many lines with nearly the same
+posterior probability as the average line. Or it could be instead that
+the posterior distribution is rather narrow near the average line.
 
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-plot-raw-data-line-m4-3b}
-b: Height in centimeters (vertical) plotted against weight_c (horizontal), with the line at the posterior mean plotted in black (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+So how can we get that uncertainty onto the plot? Together, a
+combination of `α` and `β` define a line. And so we could sample a bunch
+of lines from the posterior distribution. Then we could display those
+lines on the plot, to visualize the uncertainty in the regression
+relationship.
+
+To better appreciate how the posterior distribution contains lines, we
+work with all of the samples from the model.
 
 ```{r}
-#| label: fig-raw-data-line-m4-3b
+#| label: collect-post-samples-a
 
-d2_b |>
-  ggplot2::ggplot(ggplot2::aes(x = weight_c, y = height)) +
-  ggplot2::geom_abline(intercept = brms:::fixef.brmsfit(m4.3b)[1], 
-              slope     = brms:::fixef.brmsfit(m4.3b)[2]) +
-  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
-  ggplot2::theme_bw()
+## R code 4.47 ################
+# post_m4.3 <- rethinking::extract.samples(m4.3) # already in previous listing
+post_m4.3[1:5, ]
 ```
 
-Note how the breaks on our `x`-axis look off. That's because we fit the
-model with `weight_c` and we plotted the points in that metric, too.
-Since we computed `weight_c` by subtracting the mean of weight from the
-data, we can adjust the `x`-axis break point labels by simply adding
-that value back. (See next tab "Tidyverse2")
+Each row is a correlated random sample from the joint posterior of all
+three parameters, using the covariances provided by
+`rethinking::vcov(m4.3)` (@lst-var-cov-matrix-m4.3). The paired values
+of `a` and `b` on each row define a line. The average of very many of
+these lines is the posterior mean line. But the scatter around that
+average is meaningful, because it alters our confidence in the
+relationship between the predictor and the outcome.
 
-::::
-:::::
-
-Further note the use of the `brms:::fixef.brmsfit()` function within
-`ggplot2::geom_abline()`. The function extracts the population-level
-('fixed') effects from a `brmsfit` object. 
-
-
-###### Tidyverse2
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-plot-raw-data-line2-m4-3b}
-b: Height in centimeters (vertical) plotted against weight_c (horizontal), with the line at the posterior mean plotted in black (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
+So now let's display a bunch of these lines, so you can see the scatter.
+This lesson will be easier to appreciate, if we use only some of the
+data to begin. Then you can see how adding in more data changes the
+scatter of the lines. So we'll begin with just the first 10 cases in
+`d2_a`. The following code extracts the first 10 cases and re-estimates
+the model:
 
 ```{r}
-#| label: fig-raw-data-line2-b4.3
-#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: tidyverse version"
+#| label: extract-10-re-est-mod-a
 
-labels <-
-  c(-10, 0, 10) + base::mean(d2_b$weight) |> 
-  base::round(digits = 0)
-
-d2_b |>
-  ggplot2::ggplot(ggplot2::aes(x = weight_c, y = height)) +
-  ggplot2::geom_abline(intercept = brms::fixef(m4.3b, probs = c(0.055, 0.945))[[1]], 
-              slope     = brms::fixef(m4.3b, probs = c(0.055, 0.945))[[2]]) +
-  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
-  ggplot2::scale_x_continuous("weight",
-                     breaks = c(-10, 0, 10),
-                     labels = labels) +
-  ggplot2::theme_bw()
-```
-
-
-::::
-:::::
-
-Note the use of the `brms:::fixef.brmsfit()` function within
-`ggplot2::geom_abline()`. The function extracts the population-level
-('fixed') effects from a `brmsfit` object. 
-
-
-
-:::
-
-::::
-:::::
-
-
-:::::{.my-note}
-:::{.my-note-header}
-What are population-level ("fixed") effects?
-:::
-::::{.my-note-container}
-I didn't know what it meant exactly that `brms::fixef()` extracts the population-level ('fixed') effect from a `brmsfit` object. After reading other books I now understand that this means effects of the whole population in contrast to effects on the idividual level (so-called "random effect"). (The terms "fixed" and "random" effects are misleading, as both effects are random.)
-
-> “Generally, these are the three types of parameters in multi-level models: the population-level estimate (commonly called fixed effects), the participant-level estimates (random effects) and the participant-level variation.” ([Schmettow, 2022, p. 268](zotero://select/groups/5254846/items/HCW7A9WK)) ([pdf](zotero://open-pdf/groups/5254846/items/WF7URHBJ?page=276&annotation=E5FND2P9))
-
-> “There is a lot of confusion about the type of models that we deal with in this chapter. They have also been called hierarchical models or mixed effects models. The “mixed” stands for a mixture of so called fixed effects and random effects. The problem is: if you start by understanding what fixed effects and random effects are, confusion is programmed, not only because there exist several very different definitions. In fact, it does not matter so much whether an estimate is a fixed effect or random effect. As we will see, you can construct a multi-level model by using just plain descriptive summaries. What matters is that a model contains estimates on population level and on participant level. The benefit is, that a multi-level model can answer the same question for the population as a whole and for every single participant.” ([Schmettow, 2022, p. 278](zotero://select/groups/5254846/items/HCW7A9WK)) ([pdf](zotero://open-pdf/groups/5254846/items/WF7URHBJ?page=286&annotation=N4M4YSCS))
-
-
-
-
-:::::{.my-resource}
-:::{.my-resource-header}
-Fixed and random effects
-:::
-::::{.my-resource-container}
-After I googled it turned out that there is a great discussion about [Fixed Effects in Linear Regression](https://statisticsglobe.com/fixed-effects-linear-regression) and generally about fixed, random and mixed models (See Cross Validated [here](https://stats.stackexchange.com/questions/4700/what-is-the-difference-between-fixed-effect-random-effect-and-mixed-effect-mode) and [here](https://stats.stackexchange.com/questions/21760/what-is-a-difference-between-random-effects-fixed-effects-and-marginal-model)).
-
-There is also a glossary entry in [statistics.com](https://www.statistics.com/glossary/fixed-effects/).
-
-And last but not least there are academic papers on this topic:
-
-- [Let's Talk About Fixed Effects](https://link.springer.com/article/10.1007/s11577-020-00699-8)), 
-- tutorials ([Fixed Effects Regression](https://www.econometrics-with-r.org/10-3-fixed-effects-regression.html),
-- [Fixed or Random Effects](https://bookdown.org/Yuleng/polimethod/fixed.html)) and 
-- R packages ([fixest]https://lrberge.github.io/fixest/index.html, see it's
-- [introduction](https://lrberge.github.io/fixest/articles/fixest_walkthrough.html)) dedicated especially to this subject. 
-::::
-:::::
-
-
-::::
-:::::
-
-
-
-
-#### Adding uncertainty around the mean
-
-> “Plots of the average line, like @fig-raw-data-line-m4-3a, are useful for getting an impression of the magnitude of the estimated influence of a variable. But they do a poor job of communicating uncertainty. Remember, the posterior distribution considers every possible regression line connecting height to weight. It assigns a relative plausibility to each. This means that each combination of $\alpha$ and $\beta$ has a posterior probability. It could be that there are many lines with nearly the same posterior probability as the average line. Or it could be instead that the posterior distribution is rather narrow near the average line.” ([McElreath, 2020, p. 101](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=120&annotation=YN73Y4A4))
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-chap04-uncertainty-around-mean}
-: Inspect the uncertainty aroumnd the mean
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### rows (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-show-some-post-samples-m4-3a}
-a: Show some posterior data rows (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-show-some-post-samples-m4-3a
-#| warning: false
-
-## R code 4.47a ################
-# post_m4.3 <- rethinking::extract.samples(m4.3a) # already in previous listing
-set.seed(4)
-bayr::as_tbl_obs(post_m4.3a)
-```
-
-::::
-:::::
-
-> “Each row is a correlated random sample from the joint posterior of all three parameters, using the covariances provided by `vcov(m4.3a)` in Tab "vcov (O)" in @exm-chap04-table-interpretation. The paired values of `a` and `b` on each row define a line. The average of very many of these lines is the posterior mean line. But the scatter around that average is meaningful, because it alters our confidence in the relationship between the predictor and the outcome” ([McElreath, 2020, p. 101](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=120&annotation=KS7NLQ9U))
-
-
-###### plot1 (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-plot-10-points-m4-3a}
-a: Plot 20 sampled lines of 10 data points to the uncertainty around the mean  (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: fig-chap04-plot-10-points-m4-3a
-#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3a. 20 lines sampled from 10 data points of the posterior distribution, showing the uncertainty in the regression relationship (Original)"
-
-## R code 4.48a ##########################
+## R code 4.48 ##########################
 N10_a <- 10
 dN10_a <- d2_a[1:N10_a, ]
 mN10_a <- rethinking::quap(
@@ -4585,10 +3998,19 @@ mN10_a <- rethinking::quap(
   data = dN10_a
 )
 
-## R code 4.49a ##############################
+```
+
+Now let's plot 20 of these lines for the 10 data points, to see what the
+uncertainty looks like.
+
+```{r}
+#| label: fig-plot-lines-10-points-a
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3. 20 lines sampled from 10 data points of the posterior distribution, showing the uncertainty in the regression relationship: rethinking version"
+#| attr-source: '#lst-fig-plot-lines-10-points-a lst-cap="20 samples from the quadratic approximate posterior distribution for m4.3 with 10 data points"'
+
+## R code 4.49 ##############################
 # extract 20 samples from the posterior
-set.seed(4)
-post_20_m4.3a <- rethinking::extract.samples(mN10_a, n = 20)
+post_20_m4.3 <- rethinking::extract.samples(mN10_a, n = 20)
 
 # display raw data and sample size
 plot(dN10_a$weight, dN10_a$height,
@@ -4599,34 +4021,35 @@ mtext(rethinking:::concat("N = ", N10_a))
 
 # plot the lines, with transparency
 for (i in 1:20) {
-  curve(post_20_m4.3a$a[i] + post_20_m4.3a$b[i] * (x - mean(dN10_a$weight)),
+  curve(post_20_m4.3$a[i] + post_20_m4.3$b[i] * (x - mean(dN10_a$weight)),
     col = rethinking::col.alpha("black", 0.3), add = TRUE
   )
 }
 
 ```
 
+The result is shown in the upper-left plot in FIGURE 4.7. By plotting
+multiple regression lines, sampled from the posterior, it is easy to see
+both the highly confident aspects of the relationship and the less
+confident aspects. The cloud of regression lines displays greater
+uncertainty at extreme values for weight.
 
-::::
-:::::
+The other plots in FIGURE 4.7 show the same relationships, but for
+increasing amounts of data. Just re-use the code from before, but change
+N \<- 10 to some other value. Notice that the cloud of regression lines
+grows more compact as the sample size increases. This is a result of the
+model growing more confident about the location of the mean.
 
-> “By plotting multiple regression lines, sampled from the posterior, it is easy to see both the highly confident aspects of the relationship and the less confident aspects. The cloud of regression lines displays greater uncertainty at extreme values for weight.” ([McElreath, 2020, p. 102](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=121&annotation=CX5K4AHV))
-
-###### plot2 (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-plot-50-points-m4-3a}
-a: Plot 20 sampled lines of 50 data points to the uncertainty around the mean  (Original)
-::::::
-:::
-::::{.my-r-code-container}
+Plot 20 lines sampled from 50 data points of the posterior distribution
 
 ```{r}
-#| label: fig-chap04-plot-50-points-m4-3a
-#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3a. 20 lines sampled from 50 data points of the posterior distribution, showing the uncertainty in the regression relationship (Original)"
+#| label: fig-plot-lines-50-points-a
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3. 20 lines sampled from 50 data points of the posterior distribution, showing the uncertainty in the regression relationship: rethinking version"
+#| attr-source: '#lst-fig-plot-lines-50-points-a lst-cap="20 samples from the quadratic approximate posterior distribution for m4.3 with 50 data points"'
 
-## R code 4.48a ######################
+
+
+## R code 4.48, 4.49 ######################
 N50_a <- 50
 dN50_a <- d2_a[1:N50_a, ]
 mN50_a <- rethinking::quap(
@@ -4640,10 +4063,8 @@ mN50_a <- rethinking::quap(
   data = dN50_a
 )
 
-## R code 4.49a ######################
 # extract 20 samples from the posterior
-set.seed(4)
-post_50_m4.3a <- rethinking::extract.samples(mN50_a, n = 20)
+post_50_m4.3 <- rethinking::extract.samples(mN50_a, n = 20)
 
 # display raw data and sample size
 plot(dN50_a$weight, dN50_a$height,
@@ -4654,31 +4075,19 @@ mtext(rethinking:::concat("N = ", N50_a))
 
 # plot the lines, with transparency
 for (i in 1:20) {
-  curve(post_50_m4.3a$a[i] + post_50_m4.3a$b[i] * (x - mean(dN50_a$weight)),
+  curve(post_50_m4.3$a[i] + post_50_m4.3$b[i] * (x - mean(dN50_a$weight)),
     col = rethinking::col.alpha("black", 0.3), add = TRUE
   )
 }
 
 ```
 
-::::
-:::::
-
-> “Notice that the cloud of regression lines grows more compact as the sample size increases. This is a result of the model growing more confident about the location of the mean.” ([McElreath, 2020, p. 102](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=121&annotation=92MJX4AG))
-
-###### plot3 (O)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-plot-352-points-m4-3a}
-a: Plot 20 sampled lines of 352 data points to the uncertainty around the mean  (Original)
-::::::
-:::
-::::{.my-r-code-container}
+Plot 20 lines sampled from 352 data points of the posterior distribution
 
 ```{r}
-#| label: fig-chap04-plot-352-points-m4-3a
-#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3a. 20 lines sampled from all 352 data points of the posterior distribution, showing the uncertainty in the regression relationship."
+#| label: fig-plot-lines-all-352-points-a
+#| fig-cap: "Samples from the quadratic approximate posterior distribution for the height/weight model, m4.3. 20 lines sampled from all 352 data points of the posterior distribution, showing the uncertainty in the regression relationship."
+#| attr-source: '#lst-fig-plot-lines-all-352-points-a lst-cap="20 Samples from the quadratic approximate posterior distribution for m4.3 with all data"'
 
 ## R code 4.48, 4.49 ###########################
 N352_a <- 352
@@ -4695,7 +4104,7 @@ mN352_a <- rethinking::quap(
 )
 
 # extract 20 samples from the posterior
-post_352_m4.3a <- rethinking::extract.samples(mN352_a, n = 20)
+post_352_m4.3 <- rethinking::extract.samples(mN352_a, n = 20)
 
 # display raw data and sample size
 plot(dN352_a$weight, dN352_a$height,
@@ -4706,206 +4115,14 @@ mtext(rethinking:::concat("N = ", N352_a))
 
 # plot the lines, with transparency
 for (i in 1:20) {
-  curve(post_352_m4.3a$a[i] + post_352_m4.3a$b[i] * (x - mean(dN352_a$weight)),
+  curve(post_352_m4.3$a[i] + post_352_m4.3$b[i] * (x - mean(dN352_a$weight)),
     col = rethinking::col.alpha("black", 0.3), add = TRUE
   )
 }
 
 ```
 
-::::
-:::::
-
-> “Notice that the cloud of regression lines grows more compact as the sample size increases. This is a result of the model growing more confident about the location of the mean.” ([McElreath, 2020, p. 102](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=121&annotation=92MJX4AG))
-
-###### rows (T)
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-show-some-post-samples-m4-3b}
-b: Extract the iteration of the Hamiliton Monte Carlo (`r glossary("HMC")` chains into a data frame and show 8 rows (Tidyverse)"
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-show-some-post-samples-m4-3b
-#| warning: false
-
-post3_b <- brms::as_draws_df(m4.3b)
-set.seed(4)
-bayr::as_tbl_obs(post3_b)
-```
-
-::::
-:::::
-
-Instead of `rethinking::extract.samples()` the {**brms**} packages
-extract all the posterior draws with `brms::as_draws_df()`. We have
-already done this with model `m4.1b` (@exm-chap04-sampling-brm-m4-1b in tab "draws1").
-
-###### plots (T)
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-plot-352-points-m4-3a}
-b: Plot 20 sampled lines of 10, 50, 150 and 352 data points to the uncertainty around the mean  (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-plot-sampled-lines-m4-3b
-#| warning: false
-#| cache: true
-
-## 1. Calculate all four models ################
-dN10_b <- 10
-
-m4.3b_010 <- 
-  brms::brm(data = d2_b |>
-      dplyr::slice(1:dN10_b),  # note our tricky use of `N` and `slice()`
-      family = gaussian,
-      height ~ 1 + weight_c,
-      prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(lognormal(0, 1), class = b),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "brm_fits/m04.03b_010")
-
-dN50_b <- 50
-
-m4.3b_050 <- 
-  brms::brm(data = d2_b |>
-      dplyr::slice(1:dN50_b), 
-      family = gaussian,
-      height ~ 1 + weight_c,
-      prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(lognormal(0, 1), class = b),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "brm_fits/m04.03b_050")
-
-dN150_b <- 150
-
-m4.3b_150 <- 
-  brms::brm(data = d2_b |>
-      dplyr::slice(1:dN150_b), 
-      family = gaussian,
-      height ~ 1 + weight_c,
-      prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(lognormal(0, 1), class = b),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "brm_fits/m04.03b_150")
-
-dN352_b <- 352
-
-m4.3b_352 <- 
-  brms::brm(data = d2_b |>
-      dplyr::slice(1:dN352_b), 
-      family = gaussian,
-      height ~ 1 + weight_c,
-      prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(lognormal(0, 1), class = b),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "brm_fits/m04.03b_352")
-
-
-## 2. put model chains into dfs ##########
-post010_m4.3b <- brms::as_draws_df(m4.3b_010)
-post050_m4.3b <- brms::as_draws_df(m4.3b_050)
-post150_m4.3b <- brms::as_draws_df(m4.3b_150)
-post352_m4.3b <- brms::as_draws_df(m4.3b_352)
-
-
-## 3. prepare plots ##########
-p10 <- 
-  ggplot2::ggplot(data =  d2_b[1:10, ], 
-         ggplot2::aes(x = weight_c, y = height)) +
-  ggplot2::geom_abline(data = post010_m4.3b |> dplyr::slice(1:20),
-              ggplot2::aes(intercept = b_Intercept, slope = b_weight_c),
-              linewidth = 1/3, alpha = .3) +
-  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
-  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight_c),
-                  ylim = base::range(d2_b$height)) +
-  ggplot2::labs(subtitle = "N = 10")
-
-p50 <-
-  ggplot2::ggplot(data =  d2_b[1:50, ], 
-         ggplot2::aes(x = weight_c, y = height)) +
-  ggplot2::geom_abline(data = post050_m4.3b |> dplyr::slice(1:20),
-              ggplot2::aes(intercept = b_Intercept, slope = b_weight_c),
-              linewidth = 1/3, alpha = .3) +
-  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
-  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight_c),
-                  ylim = base::range(d2_b$height)) +
-  ggplot2::labs(subtitle = "N = 50")
-
-p150 <-
-  ggplot2::ggplot(data =  d2_b[1:150, ], 
-         ggplot2::aes(x = weight_c, y = height)) +
-  ggplot2::geom_abline(data = post150_m4.3b |> dplyr::slice(1:20),
-              ggplot2::aes(intercept = b_Intercept, slope = b_weight_c),
-              linewidth = 1/3, alpha = .3) +
-  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
-  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight_c),
-                  ylim = base::range(d2_b$height)) +
-  ggplot2::labs(subtitle = "N = 150")
-
-p352 <- 
-  ggplot2::ggplot(data =  d2_b[1:352, ], 
-         ggplot2::aes(x = weight_c, y = height)) +
-  ggplot2::geom_abline(data = post352_m4.3b |> dplyr::slice(1:20),
-              ggplot2::aes(intercept = b_Intercept, slope = b_weight_c),
-              linewidth = 1/3, alpha = .3) +
-  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
-  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight_c),
-                  ylim = base::range(d2_b$height)) +
-  ggplot2::labs(subtitle = "N = 352")
-
-## 4. display plots {patchwork} ########
-library(patchwork)
-(p10 + p50 + p150 + p352) &
-  ggplot2::scale_x_continuous("weight",
-                     breaks = c(-10, 0, 10),
-                     labels = labels) &
-  ggplot2::theme_bw()
-```
-
-::::
-:::::
-
-> “Notice that the cloud of regression lines grows more compact as the sample size increases. This is a result of the model growing more confident about the location of the mean.” ([McElreath, 2020, p. 102](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=121&annotation=92MJX4AG))
-
-:::
-
-
-::::
-:::::
-
-***
-
-
-# 2nd PASS: STOPPED HERE {.unnumbered}
-
-```{r}
-## ************************** ############
-## I STOPPED HERE (ORIGINAL) #############
-## ************************** ############
-```
-
-
-
-
-
-#### Plotting regression intervals and contours
+##### Plotting regression intervals and contours
 
 The cloud of regression lines in @fig-plot-lines-10-points-a,
 @fig-plot-lines-50-points-a and @fig-plot-lines-all-352-points-a is an
@@ -5152,17 +4369,17 @@ Automated tools like link save effort, but they are never as flexible as
 the code you can write yourself.
 :::
 
-#### Prediction intervals
+##### Prediction intervals
 
 Now let's walk through generating an 89% prediction interval for actual
 heights, not just the average height, `μ`. This means we'll incorporate
 the standard deviation `σ` and its uncertainty as well. Remember, the
-first line of the statistical model in @eq-height-weight-linear-model2-m4-3 is:
+first line of the statistical model in @eq-height-weight-linear-model2-m4.3 is:
 
 ------------------------------------------------------------------------
 
 ::: {#def-height-weight-linear-model-first-line-m4.3}
-###### Remember the first line of @eq-height-weight-linear-model2-m4-3
+###### Remember the first line of @eq-height-weight-linear-model2-m4.3
 
 $$
 h_{i} \sim \operatorname{Normal}(μ_{i}, σ)
@@ -5331,7 +4548,7 @@ head(height.PI)[ , 1:6]
 head(height3.PI)[ , 1:6]
 ```
 
-## Curves from lines
+### Curves from lines
 
 We'll consider two commonplace methods that use linear regression to
 build curves. The first is `r glossary("polynomial regression")`. The
@@ -5339,7 +4556,7 @@ second is `r glossary("spline")`. Both approaches work by transforming a
 single predictor variable into several synthetic variables. But splines
 have some clear advantages.
 
-### Polynomial regression
+#### Polynomial regression
 
 Polynomial regression uses powers of a variable -- squares and cubes --
 as extra predictors. This is an easy way to build curved associations.
@@ -5720,7 +4937,7 @@ axis(side = 1, at = at_a, labels = round(labels, 1)) # 3
 
 Take a look at the help `?axis` for more details.
 
-### Splines
+#### Splines
 
 The second way to introduce a curve is to construct something known as a
 `r glossary("B-spline", "spline")`. The word spline originally referred
@@ -5792,7 +5009,7 @@ Procedure for generating B-splines
 ::::
 ***
 
-#### Choice of knots
+##### Choice of knots
 
 Remember, the knots are just values of year that serve as pivots for our
 spline. Where should the knots go? There are different ways to answer
@@ -5814,7 +5031,7 @@ num_knots15_a <- 15
                            probs = seq(0, 1, length.out = num_knots15_a)))
 ```
 
-#### Choice of polynomial degree
+##### Choice of polynomial degree
 
 The next choice is polynomial degree. This determines how basis
 functions combine, which determines how the parameters interact to
@@ -5863,7 +5080,7 @@ for (i in 1:ncol(B_a)) lines(d5_a$year, B_a[, i])
 The plot shows, just like the top in FIGURE 4.12., the basis functions.
 However now more of these functions overlap.
 
-#### Parameter weights for each basis function
+##### Parameter weights for each basis function
 
 Now to get the parameter weights for each basis function, we need to
 actually define the model and make it run. The model is just a linear
@@ -5965,7 +5182,7 @@ year is not really a causal variable, only a proxy for features of each
 year. In the practice problems below, you'll compare this trend to the
 temperature record, in an attempt to explain those wiggles.
 
-#### Matrix multiplication in the spline model {#sec-matrix-multiplication}
+##### Matrix multiplication in the spline model {#sec-matrix-multiplication}
 
 Matrix algebra is a new way to represent ordinary algebra. It is often
 much more compact. So to make model m4.7 easier to program, we used a
@@ -6011,7 +5228,7 @@ rethinking::shade(mu_PI_cbl2_a, d5_a$year,
 
 ```
 
-### Smooth functions for a rough world
+#### Smooth functions for a rough world
 
 The splines in the previous section are just the beginning. A entire
 class of models, `r glossary("generalized additive model")`, focuses on
@@ -6050,7 +5267,8 @@ Resources for GAMs
 ***
 
 
-# I STOPPED HERE (TIDYVERSE) {.unnumbered}
+
+# I STOPPED HERE (TIDYVERSE)
 
 ```{r}
 ## ************************** ############
@@ -6058,6 +5276,159 @@ Resources for GAMs
 ## ************************** ############
 ```
 
+
+***
+
+#### Finding the posterior distribution
+
+Unlike with McElreath's `rethinking::quap()` formula syntax, Kurz is not
+aware if we can just specify something like `weight – xbar` in the
+`formula` argument in `brms::brm()`.
+
+However, the alternative is easy: Just make a new variable in the data
+that is equivalent to `weight – mean(weight)`. We'll call it `weight_c`.
+
+```{r}
+#| label: create-weight-diff-var-b
+#| attr-source: '#lst-create-weight-diff-var-b lst-cap="Create a new variable in the data equivalent to weight - mean(height): tidyverse version"'
+
+
+d2_b <-
+  d2_b |> 
+  mutate(weight_c = weight - mean(weight))
+```
+
+Remember: The detailed explication of the syntax for the following `brms::brm()` function is in @exm-chap04-m4-1.
+
+To understand the differences in syntax between {**rethinking**} and {**brms**} it is also quite revealing to look at @tbl-mirror-rethinking-tidyverse.
+
+I have inserted the following table from Kurz’ explanation of model `b4.3`.
+
+> Unlike with McElreath's {**rethinking**} package, the conventional
+`brms::brm()` syntax doesn't mirror the statistical notation. But here
+are the analogues to the exposition at the bottom of page 97:
+
+| {**rethinking**} package                                    | {**brms**} package:   |
+|------------------------------------|------------------------------------|
+| $\text{height}_i \sim \operatorname{Normal}(\mu_i, \sigma)$ | `family = gaussian`                        |
+| $\mu_i = \alpha + \beta \text{weight}_i$                    | `height ~ 1 + weight_c`                 |
+| $\alpha \sim \operatorname{Normal}(178, 20)$                | `prior(normal(178, 20), class = Intercept` |
+| $\beta \sim \operatorname{Log-Normal}(0, 1)$                | `prior(lognormal(0, 1), class = b)`        |
+| $\sigma \sim \operatorname{Uniform}(0, 50)$                 | `prior(uniform(0, 50), class = sigma)`     |
+
+: Compare statistical notation of rethinking with brms package {#tbl-mirror-rethinking-tidyverse}
+
+***
+
+
+
+```{r}
+#| label: find-and-summarize-post-dist-b
+#| attr-source: '#lst-find-and-summarize-post-dist-b lst-cap="Find the posterior distribution of the linear height-weight model: tidyverse version"'
+
+b4.3 <- 
+  brms::brm(data = d2_b, 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b, lb = 0),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03")
+
+# brms:::summary.brmsfit(b4.3)
+```
+
+Here are the trace plots.
+
+```{r}
+#| label: fig-find-post-dist-b
+#| fig-cap: "Find the posterior distribution of the linear height-weight model: tidyverse version"
+
+plot(b4.3, widths = c(1, 2))
+```
+
+{**brms**} does not allow users to insert coefficients into functions
+like exp() within the conventional `formula` syntax. We can fit a
+{**brms**} model like McElreath's `m4.3b` if we adopt what's called the
+[non-linear
+syntax](https://cran.r-project.org/web/packages/brms/vignettes/brms_nonlinear.html).
+The non-linear syntax is a lot like the syntax McElreath uses in
+{**rethinking**} in that it typically includes both predictor and
+variable names in the `formula`. Since this is so early in the book, I
+won't go into a full-blown explanation, here. There will be many more
+opportunities to practice with the non-linear syntax in the chapters to
+come.
+
+```{r}
+#| label: find-post-dist2-b
+#| attr-source: '#lst-find-post-dist2-b lst-cap="Find the posterior distribution of the linear height-weight model (log version): tidyverse version"'
+
+b4.3b <- 
+  brms::brm(data = d2_b, 
+      family = gaussian,
+      brms::bf(height ~ a + exp(lb) * weight_c,
+         a ~ 1,
+         lb ~ 1,
+         nl = TRUE),
+      prior = c(brms::prior(normal(178, 20), class = b, nlpar = a),
+                brms::prior(normal(0, 1), class = b, nlpar = lb),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03b")
+```
+
+If you execute `summary(b4.3b)`, you'll see the intercept and `σ`
+summaries for this model are about the same as those for `b4.3`, above.
+
+```{r}
+#| label: summarize-post-dist2-b
+#| attr-source: '#lst-summarize-post-dist2-b lst-cap="Summarize the posterior distribution of the linear height-weight model (log version): tidyverse version"'
+
+brms:::summary.brmsfit(b4.3b)
+```
+
+The difference is for the β parameter, which we called `lb` in the
+`b4.3b` model. If we term that parameter from `b4.3` as $\beta^{b4.3}$
+and the one from our new model $\beta^{b4.3b}$, it turns out that
+$\beta^{b4.3} = exp(\beta^{b4.3b})$.
+
+```{r}
+#| label: extract-fixed-effects-b
+#| attr-source: '#lst-extract-foxed-effects-b lst-cap="Extract and compare the population-level (fixed) effects from object b4.3 and b4.3b"'
+
+brms::fixef(b4.3)["weight_c", "Estimate"]
+brms::fixef(b4.3b)["lb_Intercept", "Estimate"] |> exp()
+```
+
+They're the same within simulation variance.
+
+#### Interpreting the posterior distribution
+
+##### Tables of marginal distribution
+
+With a little `[]` subsetting we can exclude the log posterior from our
+summary for `b4.3`.
+
+```{r}
+#| label: table-summary-b4.3
+#| attr-source: '#lst-table-summary-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: brms version"'
+
+brms::posterior_summary(b4.3)[1:3, ] |> 
+  round(digits = 2)
+```
+
+Without the subsetting we will get 2 more lines:
+
+```{r}
+#| label: table-summary2-b4.3
+#| attr-source: '#lst-table-summary2-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: brms version"'
+
+brms::posterior_summary(b4.3) |> 
+  round(digits = 2)
+```
 
 ::: callout-note
 ###### TODO: Interpret printout {.unnumbered}
@@ -6069,23 +5440,281 @@ Resources for GAMs
 -   `lprior` is -- I assume -- the log prior.
 -   `l__` is what??
 :::
+
+Looking up `brms::posterior_summary()` I learned that the "function
+mainly exists to retain backwards compatibility. It will eventually be
+replaced by functions of the {**posterior**} package".
+
+One of the following examples suggests to convert the `brmsfit` object
+into a `draws` object and then to use `posterior::summarise_draws()`.
+But reading the help file of `posterior::summarise_draws()` it turned
+out that it "will convert an object to a draws object if it isn't
+already".
+
+```{r}
+#| label: table-summary3-b4.3
+#| attr-source: '#lst-table-summary3-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: posterior version"'
+
+posterior::summarize_draws(b4.3, posterior::default_summary_measures(), 
+                           .num_args = list(sigfig = 2))[1:3, ]
+
+
+```
+
+@lst-table-summary3-b4.3 is the default call using
+`posterior::default_summary_measures()`. This returns the default
+measures. But we can adapt this standard summary to get a very similar
+result a in @lst-table-summary-m4.3.
+
+```{r}
+#| label: table-summary4-b4.3
+#| attr-source: '#lst-table-summary4-b4.3 lst-cap="Display the marginal posterior distributions of the parameters: posterior version"'
+
+posterior::summarize_draws(b4.3, "mean", "median", "sd", 
+                           ~quantile(., probs = c(0.055, 0.945)),
+                           .num_args = list(sigfig = 2))[1:3, ]
+```
+
+But don't forget that there exists also `summary()` as an alias either
+for `brmsfit` or `draws` objects which can be used for a standardized
+output:
+
+```{r}
+#| label: table-summary5-b4.3
+#| attr-source: '#lst-table-summary5-b4.3 lst-cap="Display and compare the marginal posterior distributions of the parameters of the brms and the posterior version"'
+
+## summary for brmsfit object
+summary(b4.3)
+
+## summary for draws object
+summary(brms::as_draws_array(b4.3))[1:3, ]
+
+```
+
+If we put our {**brms**} fit into the `brms:::vcov.brmsfit()` function,
+we'll get the variance/covariance matrix of the `intercept` and
+`weight_c` coefficient.
+
+```{r}
+#| label: var-cov-matrix-b4.3
+#| attr-source: '#lst-var-cov-matrix-b4.3 lst-cap="Calculate the variance-covariance matrix for model b4.3"'
+
+brms:::vcov.brmsfit(b4.3) |> 
+  round(3)
+```
+
+No `σ`, however. To get that, we'll have to extract the posterior draws
+and use the `cov()` function, instead.
+
+```{r}
+#| label: var-cov-matrix2-b4.3
+#| attr-source: '#lst-var-cov-matrix2-b4.3 lst-cap="Calculate the variance-covariance matrix for model b4.3 with {posterior} draws objects"'
+
+brms::as_draws_df(b4.3) |>
+  select(b_Intercept:sigma) |>
+  cov() |>
+  round(digits = 3)
+```
+
+The `pairs()` function will work for a brms fit much like it would one
+from rethinking. It will show "both the marginal posteriors and the
+covariance".
+
+```{r}
+#| label: fig-marg-post-cov-b4.3
+#| fig-cap: "The marginal posteriors and the covariance matrix for model b4.3"
+#| attr-source: '#lst-vfig-marg-post-cov-b4.3 lst-cap="Show the marginal posteriors and covariance matrix for model m4.3"'
+
+brms:::pairs.brmsfit(b4.3)
+```
+
 ##### Plotting posterior inference around the mean
 
+Here is the code for Figure 4.6.
+
+```{r}
+#| label: fig-raw-data-line-b4.3
+#| fig-cap: "Height in centimeters (vertical) plotted against weight_c (horizontal), with the line at the posterior mean plotted in black: tidyverse version"
 
 
+d2_b |>
+  ggplot(aes(x = weight_c, y = height)) +
+  geom_abline(intercept = brms:::fixef.brmsfit(b4.3)[1], 
+              slope     = brms:::fixef.brmsfit(b4.3)[2]) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  theme_classic()
+```
 
+Note how the breaks on our `x`-axis look off. That's because we fit the
+model with `weight_c` and we plotted the points in that metric, too.
+Since we computed `weight_c` by subtracting the mean of weight from the
+data, we can adjust the `x`-axis break point labels by simply adding
+that value back.
 
+```{r}
+#| label: fig-raw-data-line2-b4.3
+#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: tidyverse version"
+#| attr-source: '#lst-fig-raw-data-line2-b4.3 lst-cap="Reproducing Figure 4.6 of SR2 with adjusted x-axis"'
 
+labels <-
+  c(-10, 0, 10) + mean(d2_b$weight) |> 
+  round(digits = 0)
+
+d2_b |>
+  ggplot(aes(x = weight_c, y = height)) +
+  geom_abline(intercept = brms::fixef(b4.3, probs = c(0.055, 0.945))[[1]], 
+              slope     = brms::fixef(b4.3, probs = c(0.055, 0.945))[[2]]) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  scale_x_continuous("weight",
+                     breaks = c(-10, 0, 10),
+                     labels = labels) +
+  theme_bw() +
+  theme(panel.grid = element_blank())
+```
+
+Furthermore note the use of the `brms:::fixef.brmsfit()` function within
+`ggplot2::geom_abline()`. The function extracts the population-level
+('fixed') effects from a `brmsfit` object. 
+
+::: callout-note
+###### Extract population-level ("fixed") effects {#sec-fixed-effects}
+
+I do not know what it means exactly that `brms::fixef()` extracts the population-level ('fixed') effect from a `brmsfit` object. After I googled it turned out that there is a great discussion about [Fixed Effects in Linear Regression](https://statisticsglobe.com/fixed-effects-linear-regression) and generally about fixed, random and mixec models (See Cross Validated [here](https://stats.stackexchange.com/questions/4700/what-is-the-difference-between-fixed-effect-random-effect-and-mixed-effect-mode) and [here](https://stats.stackexchange.com/questions/21760/what-is-a-difference-between-random-effects-fixed-effects-and-marginal-model)).
+
+At the moment I do not understand background and essence of this differentiation. What follows is a quote and summary of short glossary entry in [statistics.com](https://www.statistics.com/glossary/fixed-effects/).
+
+> The term “fixed effects” (as contrasted with “random effects”) is related to how particular coefficients in a model are treated – as fixed or random values. Which approach to choose depends on both the nature of the data and the objective of the study. A fixed effect approach can be used for both random and non-random samples. Random effect models are usually applied only to random samples. 
+
+Following the rest of the glossary entry in statistics.com:
+
+Suppose the data at hand are values of the annual income of 100 school teachers – T1: $N_{1}=30$ males and T2: $N_{2}=70$ females.
+
+1. Suppose the 100 individuals has been drawn randomly from a population, for example, from all school teachers of New York.
+    a. If the question of interest is the average income of New York school teachers, then the random effects approach is reasonable. We treat $T_{i}$ as values of a random variable taking on two values – $T_{1}$ and $T_{2}$ . For example, we simply use the mean of the 100 values as an estimate of the average income of New York teachers.
+    b. If the question of interest is the average income of female and male teachers separately, then we treat $T_{1}$ and $T_{2}$ as two fixed values.
+2. Suppose a researcher decided to pick up $N_{1}=30$ male teachers randomly from all male teachers of New York, and $N_{2}=70$ female teachers from all female teachers. In this case, only the fixed effect approach is reasonable – because the $N_{1}$ values $T_{1}$ and the $N_{2}$ values of $T_{1}$ in the sample of 100 have not been drawn randomly from the population of interest.
+
+There are also academic papers on this topic ([Let's Talk About Fixed Effects](https://link.springer.com/article/10.1007/s11577-020-00699-8)), tutorials ([Fixed Effects Regression](https://www.econometrics-with-r.org/10-3-fixed-effects-regression.html), [Fixed or Random Effects](https://bookdown.org/Yuleng/polimethod/fixed.html)) and R packages ([fixest]https://lrberge.github.io/fixest/index.html, see it's [introduction](https://lrberge.github.io/fixest/articles/fixest_walkthrough.html)) dedicated especially to this subject. 
+
+:::
+
+Let's try and see what `brms::fixef()` produces:
+
+```{r}
+#| label: using-fixef-b
+#| attr-source: '#lst-using-fixef-b lst-cap="Extract population-level estimates from a brmsfit object"'
+#| code-summary: "Extract population-level estimates from a brmsfit object"
+
+brms::fixef(b4.3, probs = c(0.055, 0.945))
+```
+
+So the function `ggplot2::geom_abline()` has used the intercept (`a`)
+and the slope (`b`) of the estimate column.
+
+::: callout-note
+###### My code changes in using the `brms::fixef()` in @lst-fig-raw-data-line2-b4.3
+
+1. Slightly different use of the extracting operator `[`
+
+Instead of using `[1]` and `[2]` I have used `[[1]]` and `[[2]]`.
+
+> `[` selects sub-lists: it always returns a list. If you use it with a
+> single positive integer, it returns a list of length one. `[[` selects
+> an element within a list. (from [Advanced
+> R](https://adv-r.hadley.nz/subsetting.html#subsetting-answers), 2nd
+> ed.)
+
+2. Different percentiles
+
+McElreath uses a 89% probability mass as CI (`r glossary("compatibility interval")`, aka credible interval or confidence interval). But the default value for the `probs` arguments is `c(0.025, 0.975)`, a 95% interval. To reproduce the Figure 4.6 I have therefore used `probs = c(0.055, 0.945)`.
+
+3. Direct function call
+
+`brms::fixef(x)` is equivalent to `brms:::fixef.brmsfit(x)` if
+`x` is a `brmsfit` object.
+:::
 
 
 
 
 ##### Adding uncertainty around the mean
 
+Instead of `rethinking::extract.samples()` the {**brms**} packages
+extract all the posterior draws with `brms::as_draws_df()`. We have
+already done this with @lst-put-hmc-into-df-b. We just repeat this code
+here using `dplyr::slice(1:6)` instead of `utils::head()`
 
+```{r}
+#| label: put-hmc-into-df2-b
+#| attr-source: '#lst-put-hmc-into-df2-b lst-cap="Extract the iteration of the Hamiliton Monte Carlo (HMC) chains into a data frame"'
 
+post_b <- brms::as_draws_df(b4.3)
+post_b |>
+  slice(1:6)
+```
 
 Here are the four models leading up to Figure 4.7:
+
+```{r}
+#| label: calc-all-four-models-b
+#| attr-source: '#lst-calc-all-four-models-b lst-cap="Calculate all four models"'
+
+dN10_b <- 10
+
+b4.3_010 <- 
+  brms::brm(data = d2_b |>
+        slice(1:dN10_b),  # note our tricky use of `N` and `slice()`
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_010")
+
+dN50_b <- 50
+
+b4.3_050 <- 
+  brms::brm(data = d2_b |>
+        slice(1:dN50_b), 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_050")
+
+dN150_b <- 150
+
+b4.3_150 <- 
+  brms::brm(data = d2_b |>
+        slice(1:dN150_b), 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_150")
+
+dN352_b <- 352
+
+b4.3_352 <- 
+  brms::brm(data = d2_b |>
+        slice(1:dN352_b), 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "fits/b04.03_352")
+```
 
 Here are the trace plots and coefficient summaries from these four
 models.
@@ -6095,17 +5724,17 @@ models.
 #| attr-source: '#lst-trace-plots-cov-sum-b lst-cap="Trace plots and coefficient summaries from all four models"'
 
 
-# plot(b4.3_010)
-# print(b4.3_010)
-# 
-# plot(b4.3_050)
-# print(b4.3_050)
-# 
-# plot(b4.3_150)
-# print(b4.3_150)
-# 
-# plot(b4.3_352)
-# print(b4.3_352)
+plot(b4.3_010)
+print(b4.3_010)
+
+plot(b4.3_050)
+print(b4.3_050)
+
+plot(b4.3_150)
+print(b4.3_150)
+
+plot(b4.3_352)
+print(b4.3_352)
 ```
 
 ::: callout-note
@@ -6119,13 +5748,65 @@ In the above example it is difficult to decide if this is the case because the c
 
 We'll need to put the chains of each model into data frames.
 
+```{r}
+#| label: put-chain-into-model-b
+#| #| attr-source: #lst-put-chain-into-model-b lst-cap="Put the chains of each model into data frames"'
+
+post010_b4.3 <- brms::as_draws_df(b4.3_010)
+post050_b4.3 <- brms::as_draws_df(b4.3_050)
+post150_b4.3 <- brms::as_draws_df(b4.3_150)
+post352_b4.3 <- brms::as_draws_df(b4.3_352)
+```
+
 Here is the code for the four individual plots:
 
 ```{r}
 #| label: calc-code-for-plots-b
 #| attr-source: '#lst-calc-code-for-plots-b lst-cap="Prepare data for four individual plots"'
 
+p5 <- 
+  ggplot(data =  d2_b[1:10, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post010_b4.3 |> slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 10")
 
+p6 <-
+  ggplot(data =  d2_b[1:50, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post050_b4.3 |> slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 50")
+
+p7 <-
+  ggplot(data =  d2_b[1:150, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post150_b4.3 |> slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 150")
+
+p8 <- 
+  ggplot(data =  d2_b[1:352, ], 
+         aes(x = weight_c, y = height)) +
+  geom_abline(data = post352_b4.3 |> slice(1:20),
+              aes(intercept = b_Intercept, slope = b_weight_c),
+              linewidth = 1/3, alpha = .3) +
+  geom_point(shape = 1, size = 2, color = "royalblue") +
+  coord_cartesian(xlim = range(d2_b$weight_c),
+                  ylim = range(d2_b$height)) +
+  labs(subtitle = "N = 352")
 ```
 
 Now we can combine the ggplots with patchwork syntax to make the full
@@ -6139,7 +5820,11 @@ version of Figure 4.7.
 
 # library(patchwork) ## already in setup chunk
 
-
+(p5 + p6 + p7 + p8) &
+  scale_x_continuous("weight",
+                     breaks = c(-10, 0, 10),
+                     labels = labels) &
+  theme_classic()
 ```
 
 ##### Plotting regression intervals and contours
@@ -7962,7 +7647,7 @@ We are using the same procedure as in {@sec-gaussian-model-height-r}:
 
 1. Construct the model specification: As always we have to construct sensible priors. It helps to plot a `r glossary("prior predictive simulation")`. In comparison to @eq-height-linear-model-m4-1 we have to add a prior for the new
 parameter, `β`. It turned out that this prior has to be in log-scale to prevent height and weight values below zero.
-2. Then we have to incorporate our new model @eq-height-weight-linear-model2-m4-3 for the mean into the model specification inside `rethinking::quap()`
+2. Then we have to incorporate our new model @eq-height-weight-linear-model2-m4.3 for the mean into the model specification inside `rethinking::quap()`
 3. With the resulting model we are able to plot the posterior inference
 against the data. 
 
