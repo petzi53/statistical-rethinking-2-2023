@@ -563,6 +563,27 @@ d_b |>
 :::
 :::
 
+###### slice_sample()
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-show-data-slice-sample}
+: Show a random number of data records
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: chap04-show-data-slice-sample
+
+set.seed(4)
+d_b |> 
+  dplyr::slice_sample(n = 6)
+```
+
+::::
+:::::
+
+
 ###### as_tbl_obs()
 
 ::: my-r-code
@@ -3189,7 +3210,7 @@ a: Plot the samples distribution from the multi-dimensional posterior
 #| label: fig-chap04-plot-m4-1a
 #| fig-cap: "Samples distribution from the multi-dimensional posterior"
 
-## plot sample posterior  ##################
+## plot sample posterior a  ##################
 plot(post3_a, col = rethinking::col.alpha(rethinking:::rangi2, 0.1))
 ```
 
@@ -4411,6 +4432,7 @@ b: Find the posterior distribution of the linear height-weight model
 :::
 
 ::: my-r-code-container
+
 ```{r}
 #| label: find-post-dist-m4-3b
 #| cache: true
@@ -4460,7 +4482,7 @@ version) (Tidyverse)
 #| label: find-post-dist-log-m4-3b_2
 #| cache: true
 
-m4.3b_2 <- 
+m4.3b_log <- 
   brms::brm(data = d2_b, 
       family = gaussian,
       brms::bf(height ~ a + exp(lb) * weight_c,
@@ -4472,18 +4494,18 @@ m4.3b_2 <-
                 brms::prior(uniform(0, 50), class = sigma, ub = 50)),
       iter = 2000, warmup = 1000, chains = 4, cores = 4,
       seed = 4,
-      file = "brm_fits/m04.03b_2")
+      file = "brm_fits/m04.03b_log")
 
-brms:::summary.brmsfit(m4.3b_2)
+brms:::summary.brmsfit(m4.3b_log)
 ```
 
 Remember: The detailed explication of the syntax for the following
 `brms::brm()` function is in the "Tidyverse" tab of @exm-chap04-m4-1.
 
 The difference is for the $\beta$ parameter, which we called `lb` in the
-`m4.3b_2` model. If we term that parameter from `m4.3b` as
-$\beta^{m4.3b}$ and the one from our new log model $\beta^{m4.3b_2}$, it
-turns out that $\beta^{m4.3b} = exp(\beta^{m4.3b_2})$.
+`m4.3b_log` model. If we term that parameter from `m4.3b` as
+$\beta^{m4.3b}$ and the one from our new log model $\beta^{m4.3b_log}$, it
+turns out that $\beta^{m4.3b} = exp(\beta^{m4.3b_log})$.
 :::
 :::
 
@@ -4496,7 +4518,7 @@ Compare the result with the previous tab "Tidyverse" in
 ::: my-r-code-header
 ::: {#cnj-chap04-fixef-m4-3b}
 b: Extract and compare the population-level (fixed) effects from object
-`m4.3b` and the form log version `m4.3b_2`
+`m4.3b` and the form log version `m4.3b_log`
 :::
 :::
 
@@ -4506,7 +4528,7 @@ b: Extract and compare the population-level (fixed) effects from object
 #| results: hold
 
 brms::fixef(m4.3b)["weight_c", "Estimate"]
-brms::fixef(m4.3b_2)["lb_Intercept", "Estimate"] |> exp()
+brms::fixef(m4.3b_log)["lb_Intercept", "Estimate"] |> exp()
 ```
 :::
 :::
@@ -4526,7 +4548,7 @@ Display trace plots (Tidyverse)
 ```{r}
 #| label: trace-plot-m4-3b_2
 
-plot(m4.3b, widths = c(1, 2))
+brms:::plot.brmsfit(m4.3b, widths = c(1, 2))
 ```
 :::
 :::
@@ -5608,7 +5630,7 @@ a: Calculate a distribution of $\mu$ for each unique weight value on the horizon
 ```{r}
 #| label: chap04-link2-m4-3a
 
-## R code 4.54 ###############################
+## R code 4.54a ###############################
 # define sequence of weights to compute predictions for
 # these values will be on the horizontal axis
 weight.seq <- seq(from = 25, to = 70, by = 1)
@@ -5924,14 +5946,14 @@ My interpretation therefore is that `stats::fitted()` is using
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
-:::::: {#cnj-chap04-link2-m4-3b}
+:::::: {#cnj-chap04-fitted2-m4-3b}
 b: Calculate a distribution of $\mu$ for each unique weight value on the horizontal axis (Tidyverse)
 ::::::
 :::
 ::::{.my-r-code-container}
 
 ```{r}
-#| label: chap04-link2-m4-3b
+#| label: chap04-fitted2-m4-3b
 
 weight_seq <- 
   tibble::tibble(weight = 25:70) |> 
@@ -6016,27 +6038,44 @@ data](https://www.theanalysisfactor.com/wide-and-long-data/).
 ::::
 :::::
 
-###### sum
+###### fitted3
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
-:::::: {#cnj-chap04-sum-dist-weight-m4-3b}
-b: Summary of the distribution for each weight value (Original)
+:::::: {#cnj-chap04-fitted3-mean-m4-3b}
+b: Draws predicted *mean* response values from the posterior predictive distribution (Tidyverse)
 ::::::
 :::
 ::::{.my-r-code-container}
 
 ```{r}
-#| label: chap04-sum-dist-weight-m4-3b
+#| label: chap04-fitted3-mean-m4-3b
 
 mu_summary_m4.3b <-
   brms:::fitted.brmsfit(m4.3b, 
-         newdata = weight_seq) |>
+         newdata = weight_seq,
+         probs = c(0.055, 0.945)) |>
   tibble::as_tibble() |>
   dplyr::bind_cols(weight_seq)
 
-head(mu_summary_m4.3b)
+set.seed(4)
+mu_summary_m4.3b |> 
+  dplyr::slice_sample(n = 6)
 ```
+
+
+:::::{.my-note}
+:::{.my-note-header}
+How to change the {**brms**) default CI value form 95% to 89%?
+:::
+::::{.my-note-container}
+
+In {**brms**} I had to change the `probs` argument to `c(0.055, 0.945)` and the resulting third and fourth vectors from the `fitted()` object to `Q5.5` and `Q94.5`. This was necessary to get the same 89% interval as in the book version. The default `probs` value for `brms:::fitted.brmsfit()` would have been `c(0.025, 0.975)` resulting in quantiles of `Q2.5` and `Q97.5`. The Q prefix stands for quantile. See [Rename summary columns of predict() and related methods](https://github.com/paul-buerkner/brms/issues/425).
+
+::::
+:::::
+
+
 
 
 
@@ -6062,7 +6101,7 @@ a: The !Kung height data with 89% compatibility interval of the mean indicated b
 d2_b |>
   ggplot2::ggplot(ggplot2::aes(x = weight, y = height)) +
   ggplot2::geom_smooth(data = mu_summary_m4.3b,
-              ggplot2::aes(y = Estimate, ymin = Q2.5, ymax = Q97.5),
+              ggplot2::aes(y = Estimate, ymin = Q5.5, ymax = Q94.5),
               stat = "identity",
               fill = "grey70", color = "black", alpha = 1, linewidth = 1/2) +
   ggplot2::geom_point(color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
@@ -6073,11 +6112,11 @@ d2_b |>
 ::::
 :::::
 
-If you wanted to use intervals other than the default 95% ones, you'd
+If you wanted to use intervals other than the default 89% ones, you'd
 include the `probs` argument like this:
 `brms:::fitted.brmsfit(b4.3, newdata = weight.seq, probs = c(.25, .75))`.
 The resulting third and fourth vectors from the `fitted()` object would
-be named `Q25` and `Q75` instead of the default `Q2.5` and `Q97.5`. The
+be named `Q25` and `Q75` instead of the default `Q5.5` and `Q94.5`. The
 [Q prefix](https://github.com/paul-buerkner/brms/issues/425) stands for
 quantile.
 
@@ -6108,6 +6147,521 @@ reference manual](https://cran.r-project.org/web/packages/brms/brms.pdf).
 ::::
 :::::
 
+
+
+#### Prediction intervals
+
+> “What you’ve done so far is just use samples from the posterior to visualize the uncertainty in $μ_{i}$, the linear model of the mean.” ([McElreath, 2020, p. 107](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=126&annotation=DK5AQD7T))
+
+> “Now let’s walk through generating an 89% prediction interval for actual heights, not just the average height, $\mu$. This means we’ll incorporate the standard deviation $\sigma$ and its uncertainty as well.” ([McElreath, 2020, p. 107](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=126&annotation=YPK9QEW5))
+
+
+::: my-procedure
+::: my-procedure-header
+::: {#prp-chap04-sim-heights-m3-4}
+: Simulating heights
+:::
+:::
+
+::: my-procedure-container
+1.  For any unique weight value, you sample from a Gaussian distribution
+    -   with the correct mean $\mu$ for that weight,
+    -   using the correct value of $\sigma$ sampled from the posterior
+        distribution.
+2.  Do this
+    -   for every sample from the posterior,
+    -   for every weight value.
+3.  You will end up with a collection of simulated heights
+    -   that embody the uncertainty in the posterior
+    -   as well as the uncertainty in the Gaussian distribution of
+        heights.
+:::
+:::
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-chap04-predict-intervals}
+: Generate an 89% prediction interval for actual heights
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### sim1 (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-sim-post-m4-3a}
+a: Simulation of the posterior observations (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-sim-post-m4-3a
+
+## R code 4.59a #######################
+sim.height_m4.3a <- rethinking::sim(m4.3a, data = list(weight = weight.seq))
+str(sim.height_m4.3a)
+```
+
+This matrix is much like the earlier one in tab 'sum' of @exm-chap04-generating-predictions-and-intervals-m4-3a, but it contains
+simulated heights, not distributions of plausible average height, $\mu$.
+
+
+::::
+:::::
+
+
+###### PI (O)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-sum-pi-heights-m4-3a}
+a: Summarize simulated heights of the 89% posterior prediction interval of
+observable heights (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-sum-pi-heights-m4-3a
+
+## R code 4.60a ###################
+height.PI_m4.3a <- apply(sim.height_m4.3a, 2, rethinking::PI, prob = 0.89)
+```
+
+
+`height.PI_m4-3a` contains the 89% posterior prediction interval of
+observable (according to the model) heights, across the values of weight
+in `weight.seq`.
+
+::::
+:::::
+
+###### plot1 (0)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-plot-heights-m4-3a}
+a: 89% prediction interval for height, as a function of weight by sampling 1e3 times (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-plot-heights-m4-3a
+#| fig-cap: "89% prediction interval for height, as a function of weight. The solid line is the average line for the mean height at each weight. The two shaded regions show different 89% plausible regions. The narrow shaded interval around the line is the distribution of μ. The wider shaded region represents the region within which the model expects to find 89% of actual heights in the population, at each weight."
+#| results: hold
+
+## R code 4.61a ##################
+# plot raw data
+plot(height ~ weight, d2_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5))
+
+# draw MAP line
+graphics::lines(weight.seq, mu_46.mean_m4.3a)
+
+# draw PI region for line
+# rethinking::shade(mu_46.PI_m4.3a, weight.seq)
+
+# draw HPDI region for line
+mu_46.HPDI_m4.3a <- apply(mu_46_m4.3a, 2, 
+                      rethinking::HPDI, prob = .89)
+rethinking::shade(mu_46.HPDI_m4.3a, weight.seq)
+
+# draw PI region for simulated heights
+rethinking::shade(height.PI_m4.3a, weight.seq)
+
+
+```
+
+> “Notice that the outline for the wide shaded interval is a little rough. This is the simulation variance in the tails of the sampled Gaussian values. If it really bothers you, increase the number of samples you take from the posterior distribution. The optional $n$ parameter for `sim.height_m4.3a` controls how many samples are used.” ([McElreath, 2020, p. 109](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=128&annotation=69UVQJZI))
+
+Try for example $1e4$ samples. 
+
+> “Run the plotting code again, and you’ll see the shaded boundary smooth out some.” ([McElreath, 2020, p. 109](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=128&annotation=ACYS7GCU)) 
+
+See the next tab 'plot2'.
+
+::::
+:::::
+
+###### plot2 (0)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-plot-heights-m4-3a}
+a: 89% prediction interval for height, as a function of weight by sampling 1e4 times (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-plot-heights2-m4-3a
+#| fig-cap: "89% prediction interval for height, as a function of weight. Shaded boundary smoothed out by sampling 1e4 times instead of the standard value of 1e3"
+
+## R code 4.59a adapted ################
+sim2.height_m4.3a <- rethinking::sim(m4.3a, data = list(weight = weight.seq), n = 1e4)
+
+## R code 4.60a adapted ################
+height2.PI_m4.3a <- apply(sim2.height_m4.3a, 2, rethinking::PI, prob = 0.89)
+
+## R code 4.61a ##################
+
+# plot raw data
+plot(height ~ weight, d2_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5))
+
+mu_46.HPDI_m4.3a <- apply(mu_46_m4.3a, 2,
+                      rethinking::HPDI, prob = 0.89)
+
+# draw MAP line
+graphics::lines(weight.seq, mu_46.mean_m4.3a)
+
+# draw HPDI region for line
+rethinking::shade(mu_46.HPDI_m4.3a, weight.seq)
+
+# draw PI region for simulated heights
+rethinking::shade(height2.PI_m4.3a, weight.seq)
+```
+::::
+:::::
+
+> “With extreme percentiles, it can be very hard to get out all of the roughness. Luckily, it hardly matters, except for aesthetics. Moreover, it serves to remind us that all statistical inference is approximate. The fact that we can compute an expected value to the 10th decimal place does not imply that our inferences are precise to the 10th decimal place” ([McElreath, 2020, p. 109](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=128&annotation=NZMP7RDP))
+
+###### sim2 (0)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-sim2-heights-m4-3a}
+a: Writing you own `rethinking:sim()` function
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: writing-sim-function-a
+#| results: hold
+
+## R code 4.63a ########################################
+
+# post <- extract.samples(m4.3)
+# weight.seq <- 25:70
+post_m4.3a <- rethinking::extract.samples(m4.3a)
+sim.height2_m4.3a <- sapply(weight.seq, function(weight) {
+  rnorm(
+    n = nrow(post_m4.3a),
+    mean = post_m4.3a$a + post_m4.3a$b * (weight - xbar),
+    sd = post_m4.3a$sigma
+  )
+})
+height2.PI_m4.3a <- apply(sim.height2_m4.3a, 2, rethinking::PI, prob = 0.89)
+head(height.PI_m4.3a)[ , 1:6]
+head(height2.PI_m4.3a)[ , 1:6]
+```
+
+::::
+:::::
+
+The small differences are the result of the randomized sampling process.
+
+
+###### predict1 (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-predict-post-m4-3b}
+b: Predict the posterior observations (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-predict-post-m4-3b
+
+pred_height_m4.3b <-
+  brms:::predict.brmsfit(m4.3b,
+          newdata = weight_seq,
+          probs = c(0.055, 0.945)) |>
+  tibble::as_tibble() |>
+  dplyr::bind_cols(weight_seq)
+
+set.seed(4)
+pred_height_m4.3b |>
+  dplyr::slice_sample(n = 6)
+```
+
+The `predict()` code looks a lot like what we used for the tab in fitted3 of @exm-chap04-generating-predictions-and-intervals-m4-3b.
+
+
+::::
+:::::
+
+:::::{.my-important}
+:::{.my-important-header}
+{**brms**} equivalence of `rethinking::link()` and `rethinking::sim()`
+:::
+::::{.my-important-container}
+Much as `brms:::fitted.brmsfit()` was our analogue to
+`rethinking::link()`, `brms:::predict.brmsfit()` is our analogue to
+`rethinking::sim()`. ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#prediction-intervals.))
+
+***
+
+- **link**: Computes the value of each linear model at each sample for each case in the data.
+- **sim**: Uses the model definition from a `map` or `map2stan` fit to simulate outcomes that average over the posterior distribution. 
+- **fitted.brmsfit**: Compute posterior draws of the expected value of the posterior predictive distribution. Returns an array of predicted *mean* response values.
+- **predict.brmsfit**: Compute posterior draws of the posterior predictive distribution. Returns an array of predicted response values. 
+
+
+::::
+:::::
+
+###### plot1 (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-predict-plot1-m4-3b}
+b: Plot 89% prediction interval for height, as a function of weight with 2e3 iterations (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-predict-plot1-m4-3b
+#| fig-cap: "89% prediction interval for height, as a function of weight. The solid line is the average line for the mean height at each weight. The two shaded regions show different 89% plausible regions. The narrow shaded interval around the line is the distribution of μ. The wider shaded region represents the region within which the model expects to find 89% of actual heights in the population, at each weight. (Tidyverse)"
+
+d2_b |>
+  ggplot2::ggplot(ggplot2::aes(x = weight)) +
+  ggplot2::geom_ribbon(data = pred_height_m4.3b, 
+              ggplot2::aes(ymin = Q5.5, ymax = Q94.5),
+              fill = "grey83") +
+  ggplot2::geom_smooth(data = mu_summary_m4.3b,
+              ggplot2::aes(y = Estimate, ymin = Q5.5, ymax = Q94.5),
+              stat = "identity",
+              fill = "grey70", color = "black", alpha = 1, linewidth = 1/2) +
+  ggplot2::geom_point(ggplot2::aes(y = height),
+             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
+  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight),
+                  ylim = base::range(d2_b$height)) +
+  ggplot2::theme_bw()
+```
+To smooth out the rough shaded interval we would have in the {**brms**}
+model fitting approach to refit `m4.3b` into `m4.3b_smooth` after specifying a larger number of post-warmup iterations with alterations to the `iter` and `warmup`
+parameters.
+
+::::
+:::::
+
+###### plot2 (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-predict-plot2-m4-3b}
+b: Plot 89% prediction interval for height, as a function of weight with 2e4 iterations (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-predict-plot2-m4-3b
+#| fig-cap: "89% prediction interval for height, as a function of weight. The solid line is the average line for the mean height at each weight. The two shaded regions show different 89% plausible regions. The narrow shaded interval around the line is the distribution of μ. The wider shaded region represents the region within which the model expects to find 89% of actual heights in the population, at each weight. (Tidyverse)"
+#| cache: true
+
+m4.3b_smooth <- 
+  brms::brm(data = d2_b, 
+      family = gaussian,
+      height ~ 1 + weight_c,
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b, lb = 0),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 20000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brm_fits/m04.03b_smooth")
+
+mu_summary_m4.3b_smooth <-
+  brms:::fitted.brmsfit(m4.3b_smooth, 
+         newdata = weight_seq,
+         probs = c(0.055, 0.945)) |>
+  tibble::as_tibble() |>
+  dplyr::bind_cols(weight_seq)
+
+pred_height_m4.3b_smooth <-
+  brms:::predict.brmsfit(m4.3b_smooth,
+          newdata = weight_seq,
+          probs = c(0.055, 0.945)) |>
+  tibble::as_tibble() |>
+  dplyr::bind_cols(weight_seq)
+
+
+d2_b |>
+  ggplot2::ggplot(ggplot2::aes(x = weight)) +
+  ggplot2::geom_ribbon(data = pred_height_m4.3b_smooth, 
+              ggplot2::aes(ymin = Q5.5, ymax = Q94.5),
+              fill = "grey83") +
+  ggplot2::geom_smooth(data = mu_summary_m4.3b_smooth,
+              ggplot2::aes(y = Estimate, ymin = Q5.5, ymax = Q94.5),
+              stat = "identity",
+              fill = "grey70", color = "black", alpha = 1, linewidth = 1/2) +
+  ggplot2::geom_point(ggplot2::aes(y = height),
+             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
+  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight),
+                  ylim = base::range(d2_b$height)) +
+  ggplot2::theme_bw()
+```
+
+
+::::
+:::::
+
+This is the same graphic as in tab 'plot1' but with a factor 10 more iterations to smooth out the rough shaded interval.
+
+###### predict2 (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-predict2-manually-m4-3b}
+b: Write you own predict for the posterior observations: Model-based predictions without {**brms**} and `predict()`: mean with quantiles of 0.055 and .945 (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-predict2-manually-m4-3b
+#| fig-cap: "Model-based predictions without {brms} and pedict(): mean with quantiles of 0.055 and 0.945"
+
+set.seed(4)
+
+post_m4.3b |> 
+  tidyr::expand_grid(weight = 25:70) |> 
+  dplyr::mutate(weight_c = weight - base::mean(d2_b$weight)) |> 
+  dplyr::mutate(sim_height = stats::rnorm(dplyr::n(),
+                            mean = b_Intercept + b_weight_c * weight_c,
+                            sd   = sigma)) |> 
+  dplyr::group_by(weight) |> 
+  dplyr::summarise(mean = base::mean(sim_height),
+            ll   = stats::quantile(sim_height, prob = .055),
+            ul   = stats::quantile(sim_height, prob = .945)) |> 
+  
+  # plot
+  ggplot2::ggplot(ggplot2::aes(x = weight)) +
+  ggplot2::geom_smooth(ggplot2::aes(y = mean, ymin = ll, ymax = ul),
+              stat = "identity",
+              fill = "grey83", color = "black", alpha = 1, linewidth = 1/2) +
+  ggplot2::geom_point(data = d2_b,
+             ggplot2::aes(y = height),
+             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
+  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight),
+                           ylim = base::range(d2_b$height)) +
+  ggplot2::theme_bw()
+```
+Here we followed McElreath's example and calculated our model-based predictions "by
+hand". Instead of relying on base R `apply()` and `sapply()`, the main
+action in the {**tidyverse**} approach is in `tidyr::expand_grid()`, the second
+`dplyr::mutate()` line with `stats:rnomr()` and the `dplyr::group_by()` + `dplyr::summarise()` combination.
+
+We specifically left out the `fitted()` intervals to make it more
+apparent what we were simulating. 
+
+::::
+:::::
+
+###### predict3 (T)
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-predict3-manually-m4-3b}
+b: Write you own predict for the posterior observations, now using {**tidybayes**} HDI of 89%: mode with quantiles of 0.055 and 0.945
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-predict3-manually-m4-3b
+#| fig-cap: "Model-based predictions without {brms} and predict(): now using mode of HDI of 89% from {**tidybayes**}: mean with quantiles of 0.055 and .945"
+
+
+set.seed(4)
+
+post_m4.3b |> 
+  tidyr::expand_grid(weight = 25:70) |> 
+  dplyr::mutate(weight_c = weight - base::mean(d2_b$weight)) |> 
+  dplyr::mutate(sim_height = stats::rnorm(dplyr::n(),
+                            mean = b_Intercept + b_weight_c * weight_c,
+                            sd   = sigma)) |> 
+  # dplyr::group_by(weight) |> 
+  # dplyr::summarise(mean = base::mean(sim_height),
+  #           ll   = stats::quantile(sim_height, prob = .055),
+  #           ul   = stats::quantile(sim_height, prob = .945)) |> 
+  
+  dplyr::group_by(weight) |> 
+  tidybayes::mode_hdi(sim_height, .width = .89) |> 
+  
+  # plot
+  ggplot2::ggplot(ggplot2::aes(x = weight)) +
+  ## instead of "aes(y = mean, ymin = ll, ymax = ul)"
+  ggplot2::geom_smooth(ggplot2::aes(y = .point, ymin = .lower, ymax = .upper),
+              stat = "identity",
+              fill = "grey83", color = "black", alpha = 1, linewidth = 1/2) +
+  ggplot2::geom_point(data = d2_b,
+             ggplot2::aes(y = height),
+             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
+  ggplot2::coord_cartesian(xlim = base::range(d2_b$weight),
+                           ylim = base::range(d2_b$height)) +
+  ggplot2::labs(y = "mode") +
+  ggplot2::theme_bw()
+```
+Here we replaced that three-line summarize() code with a single line of
+`tidybayes::mean_qi(sim_height)`, or whatever combination of central
+tendency and interval type you wanted (here we used: `tidybayes::mode_hdi(sim_height, .width = .89)`).
+
+
+::::
+:::::
+
+
+:::
+
+::::
+:::::
+
+
+
+
+
+Let's try this out:
+
+```{r}
+#| label: fig-predict-manually2-b
+#| attr-source: '#lst-fig-predict-manually2-b lst-cap="Model-based predictions without {brms} and pedict(): mean with width .89"'
+
+set.seed(4)
+
+post_b |> 
+  tidyr::expand_grid(weight = 25:70) |> 
+  mutate(weight_c = weight - mean(d2_b$weight)) |> 
+  mutate(sim_height = rnorm(n(),
+                            mean = b_Intercept + b_weight_c * weight_c,
+                            sd   = sigma)) |> 
+  group_by(weight) |> 
+  tidybayes::mean_qi(sim_height, .width = .89) |> 
+  
+  # plot
+  ggplot(aes(x = weight)) +
+  geom_smooth(aes(y = .point, ymin = .lower, ymax = .upper),
+              stat = "identity",
+              fill = "grey83", color = "black", alpha = 1, linewidth = 1/2) +
+  geom_point(data = d2_b,
+             aes(y = height),
+             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
+  coord_cartesian(xlim = range(d2_b$weight),
+                  ylim = range(d2_b$height)) +
+  theme(text = element_text(family = "Times"),
+        panel.grid = element_blank())
+```
+
+
+
 # 2nd PASS: STOPPED HERE {.unnumbered}
 
 ```{r}
@@ -6118,185 +6672,6 @@ reference manual](https://cran.r-project.org/web/packages/brms/brms.pdf).
 
 
 
-#### Prediction intervals
-
-Now let's walk through generating an 89% prediction interval for actual
-heights, not just the average height, `μ`. This means we'll incorporate
-the standard deviation `σ` and its uncertainty as well. Remember, the
-first line of the statistical model in
-@eq-height-weight-linear-model2-m4-3 is:
-
-------------------------------------------------------------------------
-
-::: {#def-height-weight-linear-model-first-line-m4.3}
-###### Remember the first line of @eq-height-weight-linear-model2-m4-3
-
-$$
-h_{i} \sim \operatorname{Normal}(μ_{i}, σ)
-$$ {#eq-height-weight-linear-model-first-line-m4.3}
-:::
-
-------------------------------------------------------------------------
-
-What you've done so far is just use samples from the posterior to
-visualize the uncertainty in $μ_{i}$, the linear model of the mean. But
-actual predictions of heights depend also upon the distribution in the
-first line. The Gaussian distribution on the first line tells us that
-the model expects observed heights to be distributed around `μ`, not
-right on top of it. And the spread around `μ` is governed by `σ`. All of
-this suggests we need to incorporate `σ` in the predictions.
-
-Imagine simulating heights. For any unique weight value, you sample from
-a Gaussian distribution with the correct mean `μ` for that weight, using
-the correct value of σ sampled from the same posterior distribution. If
-you do this for every sample from the posterior, for every weight value
-of interest, you end up with a collection of simulated heights that
-embody the uncertainty in the posterior as well as the uncertainty in
-the Gaussian distribution of heights.
-
-There is a tool called `rethinking::sim()` which does this simulation of
-the posterior observations:
-
-```{r}
-#| label: simulate-post-dist-a
-#| attr-source: '#lst-simulate-post-dist-a lst-cap="Simulation of the posterior observations"'
-
-## R code 4.59 #######################
-sim.height <- rethinking::sim(m4.3, data = list(weight = weight.seq))
-str(sim.height)
-```
-
-This matrix is much like the earlier one, `mu`, but it contains
-simulated heights, not distributions of plausible average height, `μ`.
-
-We can summarize these simulated heights in the same way we summarized
-the distributions of `μ`, by using apply:
-
-```{r}
-#| label: sum-sim-heights-a
-#| attr-source: '#lst-sum-sim-heights-a lst-cap="Summarize simulted heights"'
-
-## R code 4.60 ###################
-height.PI <- apply(sim.height, 2, rethinking::PI, prob = 0.89)
-```
-
-Now `height.PI` contains the 89% posterior prediction interval of
-observable (according to the model) heights, across the values of weight
-in `weight.seq`.
-
-Let's plot everything we've built up: (1) the average line, (2) the
-shaded region of 89% plausible `μ`, and (3) the boundaries of the
-simulated heights the model expects.
-
-```{r}
-#| label: fig-pred-interval-height-a
-#| fig-cap: "89% prediction interval for height, as a function of weight. The solid line is the average line for the mean height at each weight. The two shaded regions show different 89% plausible regions. The narrow shaded interval around the line is the distribution of μ. The wider shaded region represents the region within which the model expects to find 89% of actual heights in the population, at each weight."
-#| attr-source: '#lst-fig-pred-interval-height-a lst-cap="89% prediction interval for height, as a function of weight"'
-
-## R code 4.61 ##################
-# plot raw data
-plot(height ~ weight, d2_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5))
-
-# draw MAP line
-graphics::lines(weight.seq, mu3.mean)
-
-# draw HPDI region for line
-rethinking::shade(mu3.CI, weight.seq)
-
-# draw PI region for simulated heights
-rethinking::shade(height.PI, weight.seq)
-
-
-```
-
-Notice that the outline for the wide shaded interval is a little rough.
-This is the simulation variance in the tails of the sampled Gaussian
-values. If it really bothers you, increase the number of samples you
-take from the posterior distribution. The optional n parameter for
-`sim.height` controls how many samples are used. Try for example 1e4
-samples and run the plotting code again. You'll see the shaded boundary
-smooth out some.
-
-With extreme percentiles, it can be very hard to get out all of the
-roughness. Luckily, it hardly matters, except for aesthetics. Moreover,
-it serves to remind us that all statistical inference is approximate.
-The fact that we can compute an expected value to the 10th decimal place
-does not imply that our inferences are precise to the 10th decimal
-place.
-
-```{r}
-#| label: fig-pred-interval-height2-a
-#| fig-cap: "89% prediction interval for height, as a function of weight. Shaded boundary smoothed out by sampling 1e4 times instead of the standard value of 1e3"
-#| attr-source: '#lst-fig-pred-interval-height2-a lst-cap="89% prediction interval for height, as a function of weight"'
-
-## R code 4.62 (4.59 & 4.60) ###################
-
-## R code 4.59 ################
-sim2.height <- rethinking::sim(m4.3, data = list(weight = weight.seq), n = 1e4)
-height2.PI <- apply(sim2.height, 2, rethinking::PI, prob = 0.89)
-
-## R code 4.61 ##################
-# plot raw data
-plot(height ~ weight, d2_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5))
-
-# draw MAP line
-graphics::lines(weight.seq, mu3.mean)
-
-# draw HPDI region for line
-rethinking::shade(mu3.CI, weight.seq)
-
-# draw PI region for simulated heights
-rethinking::shade(height2.PI, weight.seq)
-```
-
-Just like with `rethinking::link()`, it's useful to know a little about
-how `rethinking::sim()` operates. For every distribution like `dnorm`,
-there is a companion simulation function. For the Gaussian distribution,
-the companion is `rnorm`, and it simulates sampling from a Gaussian
-distribution. What we want R to do is simulate a height for each set of
-samples, and to do this for each value of weight. The following will do
-it:
-
-```{r}
-#| label: writing-sim-function-a
-#| attr-source: '#lst-writing-sim-function-a lst-cap="Writing you own rethinking:sim() function"'
-
-## R code 4.63 ########################################
-
-post_m4.3 <- rethinking::extract.samples(m4.3)
-# post <- extract.samples(m4.3)
-# weight.seq <- 25:70
-sim3.height <- sapply(weight.seq, function(weight) {
-  rnorm(
-    n = nrow(post_m4.3),
-    mean = post_m4.3$a + post_m4.3$b * (weight - xbar),
-    sd = post_m4.3$sigma
-  )
-})
-height3.PI <- apply(sim3.height, 2, rethinking::PI, prob = 0.89)
-```
-
-The values in `height.PI` will be practically identical to the ones
-computed in the main text and displayed in FIGURE 4.10.
-
-```{r}
-#| label: compare-height-PIs-str--a
-#| attr-source: '#lst-compare-height-PIs-str-a lst-cap="Compare height3.PI with height.PI using str()"'
-
-str(height.PI)
-str(height3.PI)
-
-```
-
-Small differences are the result of the randomized sampling process:
-
-```{r}
-#| label: compare-height-PIs-head-a
-#| attr-source: '#lst-compare-height-PIs-head-a lst-cap="Compare height3.PI with height.PI using head()"'
-
-head(height.PI)[ , 1:6]
-head(height3.PI)[ , 1:6]
-```
 
 ## Curves from lines
 
@@ -7031,188 +7406,8 @@ Resources for GAMs
 
 ##### Prediction intervals
 
-We've only been plotting the `μ` part. In order to bring in the
-variability expressed by `σ`, we'll have to switch to the `predict()`
-function. Much as `brms:::fitted.brmsfit()` was our analogue to
-`rethinking::link()`, `brms:::predict.brmsfit()` is our analogue to
-`rethinking::sim()`.
 
-We can reuse our `weight_seq` data from before. The `predict()` code
-looks a lot like what we used for `fitted()`. Compare
-@lst-calc-dist-mu-unique-with-fitted.brmsfit-b with
-@lst-calc-pred-height-with-predict.brmsfit-b.
 
-```{r}
-#| label: calc-pred-height-with-predict.brmsfit-b
-#| attr-source: '#lst-calc-pred-height-with-predict.brmsfit-b lst-cap="Calculate the prediction of heights: tidyverse version"'
-
-pred_height <-
-  brms:::predict.brmsfit(b4.3,
-          newdata = weight_seq) |>
-  data.frame() |>
-  bind_cols(weight_seq)
-  
-pred_height |>
-  slice(1:6)
-```
-
-This time the summary information in our data frame is for, as McElreath
-put it, "simulated heights, not distributions of plausible average
-height, `μ`" (p. 108). Another way of saying that is that these
-simulations are the joint consequence of both `μ` and `σ`, unlike the
-results of `fitted()`, which only reflect `μ`.
-
-Figure 4.10 shows how you might visualize them:
-
-```{r}
-#| label: fig-reproduce-figure-4.10
-#| fig-cap: "89% prediction interval for height, as a function of weight. The solid line is the average line for the mean height at each weight. The two shaded regions show different 89% plausible regions. The narrow shaded interval around the line is the distribution of μ. The wider shaded region represents the region within which the model expects to find 89% of actual heights in the population, at each weight. (tidyverse version)"
-
-d2_b |>
-  ggplot(aes(x = weight)) +
-  geom_ribbon(data = pred_height, 
-              aes(ymin = Q2.5, ymax = Q97.5),
-              fill = "grey83") +
-  geom_smooth(data = mu_summary,
-              aes(y = Estimate, ymin = Q2.5, ymax = Q97.5),
-              stat = "identity",
-              fill = "grey70", color = "black", alpha = 1, linewidth = 1/2) +
-  geom_point(aes(y = height),
-             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
-  coord_cartesian(xlim = range(d2_b$weight),
-                  ylim = range(d2_b$height)) +
-  theme(text = element_text(family = "Times"),
-        panel.grid = element_blank())
-```
-
-To smooth out the rough shaded interval we would have in the {**brms**}
-model fitting approach to refit `b4.3` after specifying a larger number
-of post-warmup iterations with alterations to the `iter` and `warmup`
-parameters.
-
-::: callout-note
-###### TODO: Smooth boundary {.unnumbered}
-
-I should try to smooth out the grey boundary, because it would give me
-more experiences how to use the different parameters to fit models with
-the {**brms**} approach.
-
-This experiment would also an occasion to change the intervals from the
-default 95% ones to the 89% McElreath's is using. See his hint in the
-paragraph before displaying Figure 10 how to change it in the
-{**rethinking**} version.
-
-In {**brms**} I would have to change the `probs` argument to
-brms:::fitted.brmsfit(b4.3, newdata = weight.seq, probs = c(0.055,
-0.945)). The resulting third and fourth vectors from the fitted() object
-would be named Q5.5 and Q94.5 instead of the default Q2.5 and Q97.5. The
-Q prefix stands for quantile. See [Rename summary columns of predict()
-and related methods](https://github.com/paul-buerkner/brms/issues/425).
-:::
-
-Next we follow McElreath's example and do our model-based predictions by
-hand. Instead of relying on base R `apply()` and `sapply()`, the main
-action in the tidyverse approach is in `expand_grid()`, the second
-`mutate()` line and the `group_by()` + `summarise()` combination.
-
-```{r}
-#| label: fig-predict-manually-b
-#| fig-cap: "Model-based predictions without {brms} and pedict(): mean with quantiles of 0.25 and .975"
-#| attr-source: '#lst-fig-predict-manually-b lst-cap="Model-based predictions without {brms} and pedict(): mean with quantiles of 0.25 and .975"'
-
-set.seed(4)
-
-post_b |> 
-  tidyr::expand_grid(weight = 25:70) |> 
-  mutate(weight_c = weight - mean(d2_b$weight)) |> 
-  mutate(sim_height = rnorm(n(),
-                            mean = b_Intercept + b_weight_c * weight_c,
-                            sd   = sigma)) |> 
-  group_by(weight) |> 
-  summarise(mean = mean(sim_height),
-            ll   = quantile(sim_height, prob = .025),
-            ul   = quantile(sim_height, prob = .975)) |> 
-  
-  # plot
-  ggplot(aes(x = weight)) +
-  geom_smooth(aes(y = mean, ymin = ll, ymax = ul),
-              stat = "identity",
-              fill = "grey83", color = "black", alpha = 1, linewidth = 1/2) +
-  geom_point(data = d2_b,
-             aes(y = height),
-             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
-  coord_cartesian(xlim = range(d2_b$weight),
-                  ylim = range(d2_b$height)) +
-  theme(text = element_text(family = "Times"),
-        panel.grid = element_blank())
-```
-
-We specifically left out the `fitted()` intervals to make it more
-apparent what we were simulating. You might also note that we could have
-easily replaced that three-line summarize() code with a single line of
-`tidybayes::mean_qi(sim_height)`, or whatever combination of central
-tendency and interval type you wanted (e.g.,
-`tidybayes::mode_hdi(sim_height, .width = .89)`)
-
-Let's try this out:
-
-```{r}
-#| label: fig-predict-manually2-b
-#| attr-source: '#lst-fig-predict-manually2-b lst-cap="Model-based predictions without {brms} and pedict(): mean with width .89"'
-
-set.seed(4)
-
-post_b |> 
-  tidyr::expand_grid(weight = 25:70) |> 
-  mutate(weight_c = weight - mean(d2_b$weight)) |> 
-  mutate(sim_height = rnorm(n(),
-                            mean = b_Intercept + b_weight_c * weight_c,
-                            sd   = sigma)) |> 
-  group_by(weight) |> 
-  tidybayes::mean_qi(sim_height, .width = .89) |> 
-  
-  # plot
-  ggplot(aes(x = weight)) +
-  geom_smooth(aes(y = .point, ymin = .lower, ymax = .upper),
-              stat = "identity",
-              fill = "grey83", color = "black", alpha = 1, linewidth = 1/2) +
-  geom_point(data = d2_b,
-             aes(y = height),
-             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
-  coord_cartesian(xlim = range(d2_b$weight),
-                  ylim = range(d2_b$height)) +
-  theme(text = element_text(family = "Times"),
-        panel.grid = element_blank())
-```
-
-```{r}
-#| label: fig-predict-manually3-b
-#| attr-source: '#lst-fig-predict-manually3-b lst-cap="Model-based predictions without {brms} and pedict(): mode with width .89"'
-
-set.seed(4)
-
-post_b |> 
-  tidyr::expand_grid(weight = 25:70) |> 
-  mutate(weight_c = weight - mean(d2_b$weight)) |> 
-  mutate(sim_height = rnorm(n(),
-                            mean = b_Intercept + b_weight_c * weight_c,
-                            sd   = sigma)) |> 
-  group_by(weight) |> 
-  tidybayes::mode_hdi(sim_height, .width = .89) |> 
-  
-  # plot
-  ggplot(aes(x = weight)) +
-  geom_smooth(aes(y = .point, ymin = .lower, ymax = .upper),
-              stat = "identity",
-              fill = "grey83", color = "black", alpha = 1, linewidth = 1/2) +
-  geom_point(data = d2_b,
-             aes(y = height),
-             color = "navyblue", shape = 1, size = 1.5, alpha = 2/3) +
-  coord_cartesian(xlim = range(d2_b$weight),
-                  ylim = range(d2_b$height)) +
-  theme(text = element_text(family = "Times"),
-        panel.grid = element_blank())
-```
 
 ::: callout-note
 ###### TODO: .width vs. ll/ul {.unnumbered}
@@ -7291,7 +7486,7 @@ we need to use the `coef` argument when we want their priors to differ.
 #| label: fig-brm-parabolic
 #| attr-source: '#lst-fig-brm-parabolic lst-cap="Plot the posterior distribution of a parabolic model of height on weight calculated with brms::brm()"'
 
-plot(b4.5, widths = c(1, 2))
+brms:::plot.brmsfit(b4.5, widths = c(1, 2))
 ```
 
 ::: callout-note
