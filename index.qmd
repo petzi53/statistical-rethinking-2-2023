@@ -17,7 +17,7 @@ panels](https://quarto.org/docs/interactive/layout.html#tabset-panel)
 and include the exercises under the practice section. I will also
 reformat the text by including different special callout boxes linked by
 numbered and named references. This second draft has stopped within
-@sec-chap04 e.g. it has finished $\approx 18\%$ of the book content.
+@sec-chap04 e.g. it has finished $\approx 19\%$ of the book content.
 :::
 
 ## Content and Goals of this Book {.unnumbered}

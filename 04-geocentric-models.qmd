@@ -7404,23 +7404,6 @@ Resources for GAMs
 ```
 
 
-##### Prediction intervals
-
-
-
-
-::: callout-note
-###### TODO: .width vs. ll/ul {.unnumbered}
-:::
-
-Revise @sec-sampling-to-summarize to understand better the difference
-between width (= defined probability mass, for example .89) and ll/ul (=
-defined boundaries, for example .025 and .975).
-
-What is the equivalent of width .89 (defined in probability mass) in
-defined boundaries under the assumption of a Gaussian distribution?
-Solution: .055 and.945!
-
 ### Curves from lines
 
 #### Polynomial regression
