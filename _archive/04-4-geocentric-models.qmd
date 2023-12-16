@@ -6994,6 +6994,65 @@ a: Posterior distribution of the linear height-weight model with the full !Kung 
 ::::{.my-r-code-container}
 
 
+```{r}
+#| label: fig-linear-ok-data-m4-4a
+#| fig-cap: "Posterior distribution of the linear height-weight model with the full !Kung data set (Original)"
+
+
+## R code 4.42a #############################
+# define the average weight, x-bar
+xbar_m4.4a <- mean(d_a$weight)
+
+# fit model
+m4.4a <- rethinking::quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + b * (weight - xbar_m4.4a),
+    a ~ dnorm(178, 20),
+    b ~ dlnorm(0, 1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = d_a
+)
+
+
+## R code 4.46a ############################################
+plot(height ~ weight, data = d_a, col = rethinking::rangi2)
+post_m4.4a <- rethinking::extract.samples(m4.4a)
+a_map_m4.4a <- mean(post_m4.4a$a)
+b_map_m4.4a <- mean(post_m4.4a$b)
+curve(a_map_m4.4a + b_map_m4.4a * (x - xbar_m4.4a), add = TRUE)
+
+## R code 4.58a ################################
+mu.link_m4.4a <- function(weight) post_m4.4a$a + post_m4.4a$b * (weight - xbar_m4.4a)
+weight.seq_m4.4a <- seq(from = 0, to = 70, by = 1)
+mu_m4.4a <- sapply(weight.seq_m4.4a, mu.link_m4.4a)
+mu.mean_m4.4a <- apply(mu_m4.4a, 2, mean)
+mu.CI_m4.4a <- apply(mu_m4.4a, 2, rethinking::PI, prob = 0.89)
+
+
+## R code 4.59a #######################
+sim.height_m4.4a <- rethinking::sim(m4.4a, data = list(weight = weight.seq_m4.4a))
+
+## R code 4.60a ###################
+height.PI_m4.4a <- apply(sim.height_m4.4a, 2, rethinking::PI, prob = 0.89)
+
+## R code 4.61a ##################
+# plot raw data
+# plot(height ~ weight, d_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5))
+
+# draw MAP line
+graphics::lines(weight.seq_m4.4a, mu.mean_m4.4a)
+
+# draw HPDI region for line
+rethinking::shade(mu.CI_m4.4a, weight.seq_m4.4a)
+
+# draw PI region for simulated heights
+rethinking::shade(height.PI_m4.4a, weight.seq_m4.4a)
+
+
+```
+
 
 ```{r}
 #| label: fig-linear-full-data-m4-4a
@@ -7385,406 +7444,6 @@ WATCH OUT! Models are just geocentric descriptions, not more!
 
 
 
-#### Converting back to natural scale
-
-
-
-:::::{.my-procedure}
-:::{.my-procedure-header}
-From Z-scores to natural scale
-:::
-::::{.my-procedure-container}
-> “The plots in @exm-fig-different-regressions have standard units on the horizontal axis. These units are sometimes called `r glossary("z-score", "z-scores")`. But suppose you fit the model using standardized variables, but want to plot the estimates on the original scale.” ([McElreath, 2020, p. 114](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=133&annotation=HZCU5QEE))
-
-***
-
-0.  Turn off the horizontal axis when plotting the raw data.
-1.  Define the location of the labels, in standardized units.
-2.  Takes standardized units and converts them back to the natural
-    scale.
-3.  Explicitly construct and then draw the axis with values from the natural scale.
-::::
-:::::
-
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-ID-text}
-: From Z-scores back to natural scale
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### Original
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-standardized-natural-scale-a}
-a: From Z-scores back to natural scale (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: fig-chap04-standardized-natural-scale-a
-#| fig-cap: "Height against weight: Standarzided but with natural scale (Original)"
-
-## R code 4.71a #############
-plot(height ~ weight_s, d_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5), xaxt = "n", xlab = "Weight in kg", ylab = "Height in cm")
-
-at_a <- c(-2, -1, 0, 1, 2)                           # 1
-labels <- at_a * sd(d_a$weight) + mean(d_a$weight)   # 2
-axis(side = 1, at = at_a, labels = round(labels, 1)) # 3
-```
-1.  Defines the location of the labels, in standardized units.
-2.  Takes standardized units and converts them back to the original
-    scale.
-3.  Draws the axis.
-
-Take a look at the help `?axis` for more details.
-::::
-:::::
-
-
-###### Tidyverse
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-standardized-natural-scale-b}
-b: From Z-scores back to natural scale (Tidyverse)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: fig-chap04-standardized-natural-scale-b
-
-at_b <- c(-2, -1, 0, 1, 2)
-
-## plot linear model ############
-ggplot2::ggplot(data = d_m4.4b, 
-     ggplot2::aes(x = weight_s)) +
-ggplot2::geom_ribbon(data = pred_m4.4b, 
-            ggplot2::aes(ymin = Q5.5, ymax = Q94.5),
-            fill = "grey83") +
-ggplot2::geom_smooth(data = fitd_m4.4b,
-            ggplot2::aes(y = Estimate, ymin = Q5.5, ymax = Q94.5),
-            stat = "identity",
-            fill = "grey70", color = "black", alpha = 1, linewidth = 1/4) +
-ggplot2::geom_point(ggplot2::aes(y = height),
-           color = "navyblue", shape = 1, size = 1.5, alpha = 1/3) +
-ggplot2::labs(subtitle = "linear", 
-              y = "height in cm", x = "weight in kg") +
-ggplot2::coord_cartesian(xlim = base::range(d_m4.4b$weight_s),
-                         ylim = base::range(d_m4.4b$height)) +
-ggplot2::theme_bw() +
-  
-# here it is!
-ggplot2::scale_x_continuous("standardized weight converted back: Weight in kg",
-                   breaks = at_a,
-                   labels = base::round(at_b*sd(d_m4.4b$weight) + 
-                            base::mean(d_m4.4b$weight), 1))
-```
-
-::::
-:::::
-
-:::
-
-::::
-:::::
-
-
-### Splines
-
-#### How do splines work?
-
-> “The second way to introduce a curve is to construct something known as a spline. The word spline originally referred to a long, thin piece of wood or metal that could be anchored in a few places in order to aid drafters or designers in drawing curves. In statistics, a spline is a smooth function built out of smaller, component functions. There are actually many types of splines. The `r glossary("b-spline")` we’ll look at here is commonplace. The “B” stands for “basis,” which here just means “component.” B-splines build up wiggly functions from simpler less-wiggly components. Those components are called basis functions.” ([McElreath, 2020, p. 114](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=133&annotation=3RJEARGI))
-
-> “The short explanation of B-splines is that they divide the full range of some predictor variable, like `year`, into parts. Then they assign a parameter to each part. These parameters are gradually turned on and off in a way that makes their sum into a fancy, wiggly curve.” ([McElreath, 2020, p. 115](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=134&annotation=YGZ4PE5G))
-
-> “With B-splines, just like with polynomial regression, we do this by generating new predictor variables and using those in the linear model, $\mu_{i}$. Unlike polynomial regression, B-splines do not directly transform the predictor by squaring or cubing it. Instead they invent a series of entirely new, synthetic predictor variables. Each of these synthetic variables exists only to gradually turn a specific parameter on and off within a specific range of the real predictor variable. Each of the synthetic variables is called a `r glossary("basis function")`.” ([McElreath, 2020, p. 115](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=134&annotation=4HL4NXBW))
-
-:::::{.my-theorem}
-:::{.my-theorem-header}
-:::::: {#thm-chap04-b-splines}
-: Linear model with B-splines
-::::::
-:::
-::::{.my-theorem-container}
-$$
-\mu_{i} = \alpha + w_{1}B_{i,1} + w_{2}B_{i,2} + w_{3}B_{i,3} + ...
-$$
-> “… $B_{i,n}$ is the $n$-th basis function’s value on row $i$, and the $w$ parameters are corresponding weights for each. The parameters act like slopes, adjusting the influence of each basis function on the mean $\mu_{i}$. So really this is just another linear regression, but with some fancy, synthetic predictor variables.” ([McElreath, 2020, p. 115](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=134&annotation=H5Y2V6Y3))
-
-:::::{.my-procedure}
-:::{.my-procedure-header}
-:::::: {#prp-chap04-b-splines-m4-7a}
-: How to generate B-splines?
-::::::
-:::
-::::{.my-procedure-container}
-1.  Choose the number and distribution of `r glossary("knots")`
-2.  Choose the `r glossary("polynomial degree")`
-3.  Get the parameter weights for each basis function (define the model
-    and make it run)
-::::
-:::::
-
-::::
-:::::
-
-
-
-:::::{.my-example}
-:::{.my-example-header}
-:::::: {#exm-chap04-fit-cherry-blossoms-m4-7a}
-: Fit Cherry Blossoms data
-::::::
-:::
-::::{.my-example-container}
-
-::: {.panel-tabset}
-
-###### data
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-load-data-d2-m4-7a}
-a: Load Cherry Blossoms data, filter by complete cases and display summary `precis` (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-load-data-d-m4-7a
-
-## R code 4.72 modified ######################
-data(package = "rethinking", list = "cherry_blossoms")
-d_m4.7a <- cherry_blossoms
-d2_m4.7a <- d_m4.7a[ complete.cases(d_m4.7a$doy) , ] # complete cases on doy
-rethinking::precis(d2_m4.7a)
-```
-The original data set has 1,215 observation but only 827 records have values in day-of-year (`doy`, Day of the year of first blossom) column.
-::::
-:::::
-
-See `?cherry_blossoms` for details and sources.
-
-###### plot
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-plot-d2-m4-7a}
-a: Display raw data for `doy` (Day of the year of first blossom) against the year
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: fig-chap04-plot-d2-m4-7a
-#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year: base R version"
-
-plot(doy ~ year, data = d2_m4.7a, col = rethinking::rangi2)
-```
-
-
-> “We’re going to work with the historical record of first day of blossom, `doy`, for now. It ranges from 86 (late March) to 124 (early May). The years with recorded blossom dates run from 812 `r glossary("CE/AD", "CE")` to 2015 CE.” ([McElreath, 2020, p. 114](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=133&annotation=QTB8HPTD))
-::::
-:::::
-
-###### knots
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-knots-m4-7a}
-a: Choose number of knots and distribute them over the data points of the `year` variable. (Original)
-::::::
-:::
-::::{.my-r-code-container}
-```{r}
-#| label: chap04-knots-m4-7a
-#| fig-cap: "Choose knots and divide data points of the year variable into 15 segments for fitting B-splines in the next step (Original)"
-
-## R code 4.73a complete cases on doy ##########
-num_knots <- 15                                  # (1) number of cutpoints
-knot_list <- quantile(d2_m4.7a$year,             # (2) divide regions for fitting
-      probs = seq(0, 1, length.out = num_knots))
-print(tibble::enframe(knot_list), n = 15)        # (3) display knot_list
-
-```
-
-**Explanation of code lines**
-
-(1) **num_knots**: Specifiy the number of cutpoints that define different regions (or partitions) for a variable. Here were 15 knots chosen.
-(2) **knot_list**: Vector that divides the available rows of variable `year` into 15 parts named after the percentiles. It is important to understand that not the range of the variable `year` was divided but the availabe data points.
-(3) I have `knot_list` wrapped into a `tibble` and output with `print(tibble::enframe(knot_list), n = 15)`, so that one can inspect the content of the vector more easily.
-
-::::
-:::::
-
-
-
-###### str
-
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-str-splines-m4-7a}
-a: Basis functions of a cubic spline (degree = 3) with 15 areas (knots) to fit. (Original)
-::::::
-:::
-::::{.my-r-code-container}
-```{r}
-#| label: chap04-str-splines-m4-7a
-#| fig-cap: "Show structure of B-splines data (Original)"
-
-## R code 4.74a ################
-B_m4.7a <- splines::bs(d2_m4.7a$year,            # (1) generate B-splines
-  knots = knot_list[-c(1, num_knots)],           # (2) knots without first & last
-  degree = 3, intercept = FALSE )                 # (3) polynomial (cubic) degree
-str(B_m4.7a)                                     # (4) show data structure                                   
-```
-
-**Explanation of code lines**
-
-(1) The function `splines::bs()` generate the B-spline basis matrix for a polynomial spline: 
-(2) `knots` is generated without the two boundary knots (fist and last knot) that are placed at the minimum and maximum of the variable. These two knots are excluded to prevent reduncancies as `splines::bs()` places by default knots at the boundaries. So we have 13 internal knots. 
-(3) With `degree = 3` a cubic B-spline is chosen. For degree 1, (= line), two basis functions combine at each point. For degree 2 (= quadratic), three functions combine at each point. For degree 3 (= cubic), there are four basis functions combined. This should give enough flexibility for each region to fit. Beside we chose `intercept = TRUE` but the difference to FALSE is marginal. The first B-spline (third hill) starts with $1.0$ instead of $0$.
-
-In the data structure you can see that there are two "Boundary.knots" at year $812$ and $2015$. These two years are in fact the first and last value of the `year` variable:
-
-- `dplyr::first(d2_m4.7a$year)`: `r dplyr::first(d2_m4.7a$year)`
-- `dplyr::last(d2_m4.7a$year)` : `r dplyr::last(d2_m4.7a$year)`
-
-
-::::
-:::::
-
-
-###### basis
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-basis-splines-m4-7a}
-: Draw raw basis functions for the year variable for 15 areas (knots) and degree 3 (= cubic polynomial) (Original)
-::::::
-:::
-::::{.my-r-code-container}
-```{r}
-#| label: fig-chap04-basis-splines-m4-7a
-#| fig-cap: "Draw raw basis functions B-splines for the year variable for 15 areas (knots) and degree 3 (cubic polynomial) (Original)"
-
-## R code 4.75a #############
-plot(NULL, xlim = range(d2_m4.7a$year),     
-  ylim = c(0, 1), xlab = "year", ylab = "basis")  
-for (i in 1:ncol(B_m4.7a)) 
-  lines(d2_m4.7a$year, B_m4.7a[, i])
-```
-
-::::
-:::::
-
-
-
-###### fit
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-chap04-fit-model-precis-m4-7a}
-b: Fit model and show summary (Original)
-::::::
-:::
-::::{.my-r-code-container}
-
-```{r}
-#| label: chap04-fit-model-precis-m4-7a
-#| cache: true
-
-## R code 4.76a ############
-m4.7a <- rethinking::quap(
-  alist(
-    D ~ dnorm(mu, sigma),
-    mu <- a + B_m4.7a %*% w,
-    a ~ dnorm(100, 10),
-    w ~ dnorm(0, 10),
-    sigma ~ dexp(1)
-  ),
-  data = list(D = d2_m4.7a$doy, B_m4.7a = B_m4.7a),
-  start = list(w = rep(0, ncol(B_m4.7a)))
-)
-
-rethinking::precis(m4.7a, depth = 2)
-```
-
-::::
-:::::
-
-###### weighted
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-weighted-splines-m4-7a}
-: Numbered R Code Title
-::::::
-:::
-::::{.my-r-code-container}
-```{r}
-#| label: fig-chap04-weighted-splines-m4-7a
-#| fig-cap: "Draw weighted basis functions (B-splines) for the year variable for 15 areas (knots) and degree 3 (cubic polynomial) (Original)"
-
-## R code 4.77a #############
-post_m4.7a <- rethinking::extract.samples(m4.7a)
-w_m4.7a <- apply(post_m4.7a$w, 2, mean)
-plot(NULL,
-  xlim = base::range(d2_m4.7a$year), ylim = c(-6, 6),
-  xlab = "year", ylab = "basis * weight"
-)
-for (i in 1:ncol(B_m4.7a)) 
-    lines(d2_m4.7a$year, w_m4.7a[i] * B_m4.7a[, i])
-
-```
-
-::::
-:::::
-
-
-###### plot
-
-:::::{.my-r-code}
-:::{.my-r-code-header}
-:::::: {#cnj-fig-chap04-plot-post-m4-7a}
-: Plot the 97% posterior interval for $\mu$, at each year
-::::::
-:::
-::::{.my-r-code-container}
-```{r}
-#| label: fig-chap04-plot-post-m4-7a
-#| fig-cap: "The sum of the weighted basis functions, at each point, produces the spline, displayed as a 97% posterior interval of μ"
-
-## R code 4.78a ###############
-mu_m4.7a <- rethinking::link(m4.7a)
-mu_PI_m4.7a <- apply(mu_m4.7a, 2, rethinking::PI, 0.97)
-plot(d2_m4.7a$year, d2_m4.7a$doy, 
-     col = rethinking::col.alpha(rethinking::rangi2, 0.3), pch = 16)
-rethinking::shade(mu_PI_m4.7a, d2_m4.7a$year, 
-     col = rethinking::col.alpha("black", 0.5))
-```
-
-::::
-:::::
-
-
-
-:::
-
-::::
-:::::
-
-***
 
 # 2nd PASS: STOPPED HERE {.unnumbered}
 
@@ -7796,6 +7455,121 @@ rethinking::shade(mu_PI_m4.7a, d2_m4.7a$year,
 
 
 
+#### Converting back to natural scale
+
+> “The plots in Figure 4.11 have standard units on the horizontal axis. These units are sometimes called z-scores. But suppose you fit the model using standardized variables, but want to plot the estimates on the original scale.” ([McElreath, 2020, p. 114](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=133&annotation=HZCU5QEE))
+
+The plots @fig-find-post-full-data-a, @fig-polynomial-regression-a and
+@fig-cubic-regression-a have standard units on the horizontal axis.
+These units are sometimes called `z-scores`. But suppose you fit the
+model using standardized variables, but want to plot the estimates on
+the original scale. All that's really needed is first to turn off the
+horizontal axis when you plot the raw data:
+
+```{r}
+#| label: fig-x-axis-turned-off-a
+#| fig-cap: "Cubic regression with x-axis turned off: Rethinking version"
+#| attr-source: '#lst-fig-x-axis-turned-off-a lst-cap="Cubic regression with x-axis turned off: Rethinking version"'
+
+## R code 4.70 ###########
+plot(height ~ weight_s, d_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5), xaxt = "n")
+```
+
+The `xaxt` at the end there turns off the horizontal axis. Then you
+explicitly construct the axis, using the `graphics::axis()` function.
+
+```{r}
+#| label: fig-cubic-regression-natural-scale-a
+#| fig-cap: "Cubic regression with x-axis in natural scale: Rehtinking version"
+#| attr-source: '#lst-fig-cubic-regression-natural-scale-a lst-cap="Cubic regression with x-axis in natural scale: Rehtinking version"'
+
+## R code 4.71 #############
+
+plot(height ~ weight_s, d_a, col = rethinking::col.alpha(rethinking::rangi2, 0.5), xaxt = "n")
+
+at_a <- c(-2, -1, 0, 1, 2)                           # 1
+labels <- at_a * sd(d_a$weight) + mean(d_a$weight)   # 2
+axis(side = 1, at = at_a, labels = round(labels, 1)) # 3
+```
+
+1.  Defines the location of the labels, in standardized units.
+2.  Takes standardized units and converts them back to the original
+    scale.
+3.  Draws the axis.
+
+Take a look at the help `?axis` for more details.
+
+### Splines
+
+The second way to introduce a curve is to construct something known as a
+`r glossary("B-spline", "spline")`. The word spline originally referred
+to a long, thin piece of wood or metal that could be anchored in a few
+places in order to aid drafters or designers in drawing curves. In
+statistics, a spline is a smooth function built out of smaller,
+component functions. There are actually many types of splines. The
+`r glossary("B-spline")` we'll look at here is commonplace. The "B"
+stands for "basis," which here just means "component." B-splines build
+up wiggly functions from simpler less-wiggly components. Those
+components are called basis functions. While there are fancier splines,
+we want to start B-splines because they force you to make a number of
+choices that other types of splines automate. You'll need to understand
+B-splines before you can understand fancier splines.
+
+To see how B-splines work, we'll need an example that is much
+wigglier---that's a scientific term---than the !Kung stature data.
+Cherry trees blossom all over Japan in the spring each year, and the
+tradition of flower viewing follows. The timing of the blossoms can vary
+a lot by year and century. Let's load a thousand years of blossom dates:
+
+```{r}
+#| label: load-cherry-blossoms-data-a
+#| attr-source: '#lst-load-cherry-blossoms-data-a lst-cap="Load Cherry Blossoms data and display summary (rethinking version)"'
+
+## R code 4.72 modified ######################
+data(package = "rethinking", list = "cherry_blossoms")
+d4_a <- cherry_blossoms
+rethinking::precis(d4_a)
+```
+
+See `?cherry_blossoms` for details and sources. We're going to work with
+the historical record of the **d**ay **o**f **y**ear of first bloom,
+`doy`, for now. It ranges from 86 (late March) to 124 (early May). The
+years with recorded blossom dates run from 812 CE to 2015 CE. You should
+go ahead and plot `doy` against year to see. There might be some wiggly
+trend in that cloud. It's hard to tell. (For the abbreviation CE see:
+[Common Era (CE) and Before Common Era
+(BCE)](https://www.timeanddate.com/calendar/ce-bce-what-do-they-mean.html))
+
+```{r}
+#| label: fig-scatterplot-cbl-a
+#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year: base R version"
+#| attr-source: '#lst-fig-scatterplot-cbl-a lst-cap="Display raw data for `doy` against the year: base R version"'
+
+plot(doy ~ year, data = d4_a)
+```
+
+There might be some wiggly trend in that cloud. It's hard to tell.
+
+Let's try extracting a trend with a `r glossary("B-spline")`. B-splines
+divide the full range of some predictor variable, like `year`, into
+parts. Then they assign a parameter to each part. These parameters are
+gradually turned on and off in a way that makes their sum into a fancy,
+wiggly curve.
+
+------------------------------------------------------------------------
+
+::: {#prp-procedure-for-generating-b-splines}
+Procedure for generating B-splines
+
+::: callout-important
+1.  Choose the number and distribution of knots
+2.  Choose the polynomial degree
+3.  Get the parameter weights for each basis function (define the model
+    and make it run)
+:::
+:::
+
+------------------------------------------------------------------------
 
 #### Choice of knots
 
@@ -8066,6 +7840,35 @@ Resources for GAMs
 ## ************************** ############
 ```
 
+
+### Curves from lines
+
+**Converting back to natural scale** You can apply McElreath's
+conversion trick within the {**ggplot2**} environment, too. Here it is
+with the cubic model.
+
+```{r}
+#| label: fig-cubic-regression-natural-scale-b
+#| attr-source: '#lst-fig-cubic-regression-natural-scale-b lst-cap="Cubic regression with x-axis in natural scale: tidyverse version"'
+
+at_b <- c(-2, -1, 0, 1, 2)
+
+ggplot(data = d3_b, 
+       aes(x = weight_s)) +
+  geom_ribbon(data = pred_cub, 
+              aes(ymin = Q2.5, ymax = Q97.5),
+              fill = "grey83") +
+  geom_point(aes(y = height),
+             color = "navyblue", shape = 1, size = 1.5, alpha = 1/3) +
+  coord_cartesian(xlim = range(d3_b$weight_s)) +
+  theme(text = element_text(family = "Times"),
+        panel.grid = element_blank()) +
+  
+  # here it is!
+  scale_x_continuous("standardized weight converted back",
+                     breaks = at_a,
+                     labels = round(at_b*sd(d3_b$weight) + mean(d3_b$weight), 1))
+```
 
 #### Splines
 
