@@ -9,15 +9,8 @@ nameref:
 # Preface {.unnumbered}
 
 ::: {.callout-note style="color: blue;"}
-This is work in progress: I have finished in a first draft the first 4
-chapters, e.g., $\approx 23\%$ of the book content.
+This is work in progress: At the moment I am working on the practice section of chapter 4, e.g., I have finished $\approx 20\%$ of the book content. 
 
-I am working on a second draft where I will use [Quarto tabset
-panels](https://quarto.org/docs/interactive/layout.html#tabset-panel)
-and include the exercises under the practice section. I will also
-reformat the text by including different special callout boxes linked by
-numbered and named references. This second draft has stopped within
-@sec-chap04 e.g. it has finished $\approx 19\%$ of the book content.
 :::
 
 ## Content and Goals of this Book {.unnumbered}
@@ -351,7 +344,7 @@ HTML table, taken from the [README.md file for the 2023
 lectures](https://github.com/rmcelreath/stat_rethinking_2023/blob/main/README.md#calendar--topical-outline).
 
 | Week \## | Meeting date | Reading             | Lectures                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-|--------------|--------------|--------------|-----------------------------|
+|----------------|----------------|----------------|--------------------------|
 | Week 01  | 06 January   | Chapters 1, 2 and 3 | \[1\] \<[Golem of Prague](https://www.youtube.com/watch?v=FdnMWdICdRs&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=1)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-01)\> <br> \[2\] \<[Garden of Forking Data](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02)\>                                                        |
 | Week 02  | 13 January   | Chapter 4           | \[3\] \<[Geocentric Models](https://www.youtube.com/watch?v=tNOu-SEacNU&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=3)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-03)\> <br> \[4\] \<[Categories and Curves](https://www.youtube.com/watch?v=F0N4b7K_iYQ&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=4)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-04)\>                                                       |
 | Week 03  | 20 January   | Chapters 5 and 6    | \[5\] \<[Elemental Confounds](https://www.youtube.com/watch?v=mBEA7PKDmiY&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=5)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-05)\> <br> \[6\] \<[Good and Bad Controls](https://www.youtube.com/watch?v=uanZZLlzKHw&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=6)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-06)\>                                                     |
@@ -421,4 +414,3 @@ These solutions are written by members of the #RStats community and are
 not authorized by Richard McElreath, the author of Statistical
 Rethinking.
 :::
-

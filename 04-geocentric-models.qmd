@@ -25,15 +25,6 @@ Learning Objectives:
 :::
 :::
 
-**File setup**
-
-```{r}
-#| label: setup
-#| results: hold
-
-# library(tidyverse)
-# library(patchwork)
-```
 
 ## Why normal distributions? {#sec-why-normal-dist-a}
 
@@ -7536,12 +7527,12 @@ $$
 ::::
 :::::
 
-
+#### Original fit
 
 :::::{.my-example}
 :::{.my-example-header}
 :::::: {#exm-chap04-fit-cherry-blossoms-m4-7a}
-: Fit Cherry Blossoms data
+: Fit Cherry Blossoms data (Original)
 ::::::
 :::
 ::::{.my-example-container}
@@ -7553,7 +7544,7 @@ $$
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-chap04-load-data-d2-m4-7a}
-a: Load Cherry Blossoms data, filter by complete cases and display summary `precis` (Original)
+a: Load Cherry Blossoms data, filter by complete cases and display summary `precis`
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -7585,7 +7576,7 @@ a: Display raw data for `doy` (Day of the year of first blossom) against the yea
 
 ```{r}
 #| label: fig-chap04-plot-d2-m4-7a
-#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year: base R version"
+#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year (Original)"
 
 plot(doy ~ year, data = d2_m4.7a, col = rethinking::rangi2)
 ```
@@ -7594,6 +7585,8 @@ plot(doy ~ year, data = d2_m4.7a, col = rethinking::rangi2)
 > “We’re going to work with the historical record of first day of blossom, `doy`, for now. It ranges from 86 (late March) to 124 (early May). The years with recorded blossom dates run from 812 `r glossary("CE/AD", "CE")` to 2015 CE.” ([McElreath, 2020, p. 114](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=133&annotation=QTB8HPTD))
 ::::
 :::::
+
+You can see that the `doy` data are sparse in the early years. Their number increases steadily approaching the year 2000.
 
 ###### knots
 
@@ -7617,49 +7610,107 @@ print(tibble::enframe(knot_list), n = 15)        # (3) display knot_list
 
 ```
 
+The locations of the knotsare part of the model. Therefore you are responsible for them. We placed the knots at different evenly-spaced quantiles of the predictor variable.
+
 **Explanation of code lines**
 
-(1) **num_knots**: Specifiy the number of cutpoints that define different regions (or partitions) for a variable. Here were 15 knots chosen.
-(2) **knot_list**: Vector that divides the available rows of variable `year` into 15 parts named after the percentiles. It is important to understand that not the range of the variable `year` was divided but the availabe data points.
+(1) **num_knots**: Specify the number of cutpoints that define different regions (or partitions) for a variable. Here were 15 knots chosen.
+(2) **knot_list**: Vector that divides the available rows of variable `year` into 15 parts named after the percentiles. It is important to understand that not the range of the variable `year` was divided but the available data points.
 (3) I have `knot_list` wrapped into a `tibble` and output with `print(tibble::enframe(knot_list), n = 15)`, so that one can inspect the content of the vector more easily.
 
 ::::
 :::::
 
+Again you can see that the `doy` data are sparse in the early years. Starting with a the 16th century the we get similar intervals for the distances between years. This can be inspected better graphically in the next "parts" tab.
+
+###### parts
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-plot-parts-d2-m4-7a}
+a: Plot data with equally number of `doy` data points for each segment against `year` 
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-chap04-plot-parts-d2-m4-7a
+#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year with vertical lines at the knots positions (Original)"
+
+plot(doy ~ year, data = d2_m4.7a, col = rethinking::rangi2)
+abline(v = knot_list)
+```
+::::
+:::::
+
+Starting with a the 16th century the we get similar intervals for the distances between years, e.g. the number of `doy` data points is approximately evenly distributed (59 - 67 years)
+
+```{r}
+#| label: chap04-knot_list-diff-d2-m4-7a
+
+knot_list2 <- tibble::enframe(knot_list) |> 
+  dplyr::mutate(diff = round(value - dplyr::lag(value), 0))
+print(knot_list2, n = 15)
+```
 
 
-###### str
+
+###### calc
 
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-chap04-str-splines-m4-7a}
-a: Basis functions of a cubic spline (degree = 3) with 15 areas (knots) to fit. (Original)
+a: Calculate basis functions of a cubic spline (degree = 3) with 15 areas (knots) to fit (Original)
 ::::::
 :::
 ::::{.my-r-code-container}
 ```{r}
 #| label: chap04-str-splines-m4-7a
-#| fig-cap: "Show structure of B-splines data (Original)"
 
 ## R code 4.74a ################
 B_m4.7a <- splines::bs(d2_m4.7a$year,            # (1) generate B-splines
   knots = knot_list[-c(1, num_knots)],           # (2) knots without first & last
-  degree = 3, intercept = FALSE )                 # (3) polynomial (cubic) degree
-str(B_m4.7a)                                     # (4) show data structure                                   
+  degree = 3,                                    # (3) polynomial (cubic) degree
+  intercept = TRUE)                              # (4) intercept
+str(B_m4.7a)                                     # (5) show data structure                                   
 ```
 
 **Explanation of code lines**
 
-(1) The function `splines::bs()` generate the B-spline basis matrix for a polynomial spline: 
-(2) `knots` is generated without the two boundary knots (fist and last knot) that are placed at the minimum and maximum of the variable. These two knots are excluded to prevent reduncancies as `splines::bs()` places by default knots at the boundaries. So we have 13 internal knots. 
-(3) With `degree = 3` a cubic B-spline is chosen. For degree 1, (= line), two basis functions combine at each point. For degree 2 (= quadratic), three functions combine at each point. For degree 3 (= cubic), there are four basis functions combined. This should give enough flexibility for each region to fit. Beside we chose `intercept = TRUE` but the difference to FALSE is marginal. The first B-spline (third hill) starts with $1.0$ instead of $0$.
+(1) The function `splines::bs()` generate the B-spline basis matrix for
+    a polynomial spline:
+(2) `knots` is generated without the two boundary knots (fist and last
+    knot) that are placed at the minimum and maximum of the variable.
+    These two knots are excluded with the tricky code `knot_list[-c(1, num_knots)]` to prevent redundancies as
+    `splines::bs()` places by default knots at the boundaries. So we
+    have 13 internal knots.
+(3) With `degree = 3` a cubic B-spline is chosen. The polynomial degree determines how basis functions combine, which determines how the parameters interact to
+produce the spline. For degree 1, (=
+    line), two basis functions combine at each point. For degree 2 (=
+    quadratic), three functions combine at each point. For degree 3 (=
+    cubic), there are four basis functions combined. This should give
+    enough flexibility for each region to fit.
+(4) McElreath chose `intercept = TRUE`: \> "We'll also have an intercept
+    to capture the average blossom day. This will make it easier to
+    define priors on the basis weights, because then we can just
+    conceive of each as a deviation from the intercept." ([McElreath,
+    2020, p. 117](zotero://select/groups/5243560/items/NFUEVASQ))
+    ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=136&annotation=9MA7DU8W))\
+    Kurz mentioned ominously: "For reasons I'm not prepared to get into,
+    here, splines don't always include intercept parameters. Indeed, the
+    `bs()` default is `intercept = FALSE`."
+    ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#splines.)).\
+    I do not know exactly what's the result of choosing
+    `intercept = TRUE` as the difference to FALSE is marginal. The first
+    B-spline (third hill) starts on the left edge of the graph with
+    $1.0$ instead of $0$.
+(5) In the data structure you can see in the second to last line, that there are two
+    "Boundary.knots" at year $812$ and $2015$. These two years are in
+    fact the first and last value of the `year` variable:
 
-In the data structure you can see that there are two "Boundary.knots" at year $812$ and $2015$. These two years are in fact the first and last value of the `year` variable:
-
-- `dplyr::first(d2_m4.7a$year)`: `r dplyr::first(d2_m4.7a$year)`
-- `dplyr::last(d2_m4.7a$year)` : `r dplyr::last(d2_m4.7a$year)`
-
+-   `dplyr::first(d2_m4.7a$year)`: `r dplyr::first(d2_m4.7a$year)`
+-   `dplyr::last(d2_m4.7a$year)` : `r dplyr::last(d2_m4.7a$year)`
 
 ::::
 :::::
@@ -7670,7 +7721,7 @@ In the data structure you can see that there are two "Boundary.knots" at year $8
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-fig-chap04-basis-splines-m4-7a}
-: Draw raw basis functions for the year variable for 15 areas (knots) and degree 3 (= cubic polynomial) (Original)
+a: Draw raw basis functions for the year variable for 15 areas (knots) and degree 3 (= cubic polynomial) (Original)
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -7688,14 +7739,53 @@ for (i in 1:ncol(B_m4.7a))
 ::::
 :::::
 
+###### formula
 
 
-###### fit
+:::::{.my-theorem}
+:::{.my-theorem-header}
+:::::: {#thm-theorem-text}
+a: Linear model for Cherry Blossoms data
+::::::
+:::
+::::{.my-theorem-container}
+
+$$
+\begin{align*}
+\text{day of year}_{i} \sim \operatorname{Normal}(\mu_{i}, \sigma) \\
+\mu_{i} = \alpha + {\sum_{k=1}^K w_{k} B_{k, i}} \\
+\alpha \sim \operatorname{Normal}(100, 10) \\
+w_{j} \sim \operatorname{Normal}(0, 10) \\
+\sigma \sim \operatorname{Exponential}(1)
+\end{align*}
+$${#eq-lm-blossoms}
+
+***
+> where $\alpha$ is the intercept, $B_{k, i}$ is the value of the $k^\text{th}$ bias function on the $i^\text{th}$ row of the data, and $w_k$ is the estimated regression weight for the corresponding $k^\text{th}$ bias function. (](https://bookdown.org/content/4857/geocentric-models.html#splines.))
+
+::::
+:::::
+
+> “[The model] is multiplying each basis value by a corresponding parameter $w_{k}$ and then adding up all $K$ of those products. This is just a compact way of writing a linear model. The rest should be familiar. … the $w$ priors influence how wiggly the spline can be.” ([McElreath, 2020, p. 118](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=137&annotation=Z6NJ85VE))
+
+> “This is also the first time we’ve used an `r glossary("exponential distribution")` as a `r glossary("prior probability", "prior")`. Exponential distributions are useful priors for scale parameters, parameters that must be positive. The prior for $\sigma$ is exponential with a rate of $1$. The way to read an exponential distribution is to think of it as containing no more information than an average deviation. That average // is the inverse of the rate. So in this case it is $1/1 = 1$. If the rate were $0.5$, the mean would be $1/0.5 = 2$. We’ll use exponential priors for the rest of the book, in place of uniform priors. It is much more common to have a sense of the average deviation than of the maximum.” ([McElreath, 2020, p. 118/119](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=138&annotation=N2XUQTJB))
+
+:::::{.my-resource}
+:::{.my-resource-header}
+Exponential distributions in R
+:::
+::::{.my-resource-container}
+To learn more about the exponential distribution and it's single parameter $\lambda$ lambda), which is also called the *rate* and how to apply it in R read [Exponential distribution in R](https://r-coder.com/exponential-distribution-r/).
+::::
+:::::
+
+
+###### quap
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-chap04-fit-model-precis-m4-7a}
-b: Fit model and show summary (Original)
+a: Fit model and show summary (Original)
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -7720,15 +7810,40 @@ m4.7a <- rethinking::quap(
 rethinking::precis(m4.7a, depth = 2)
 ```
 
+The model conforms to the content in tab "formula".
+
+> “To build this model in quap, we just need a way to do that sum. The easiest way is to use matrix multiplication.” ([McElreath, 2020, p. 119](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=138&annotation=3EWHEG6T))
+
+> “Matrix algebra is just a new way to represent ordinary algebra. It is often much more compact. So to make model `m4.7a` easier to program, we used a matrix multiplication of the basis matrix `B_m4.7a` by the vector of parameters $w$: ([McElreath, 2020, p. 120](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=139&annotation=FXMD6NR9
+
+$$B %\*% w$$. 
+
+
+> This notation is just linear algebra shorthand for (1) multiplying each element of the vector w by each value in the corresponding row of B and then (2) summing up each result.” ([McElreath, 2020, p. 120](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=139&annotation=FXMD6NR9))
+
+The difference between matrix multiplication and traditional style is seen in the line with the basis matrix `B_m4.7a`
+
+$$
+\begin{align*}
+\text{mu <- a + B %*% w, (1)} \\
+\text{mu <- a + sapply(1:827, function(i) sum(B[i, ] * w)), (2)} \\
+\end{align*}
+$$
+(1) Matrix multiplication
+(2) Less elegant code but with the same result
+
+
 ::::
 :::::
+
+We looked with `precis(m4.7a, depth = 2)` at the posterior means. We see 17 $w$ parameters. But this didn't help much. We need to plot the posterior prediction (see last tab "plot2")
 
 ###### weighted
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-fig-chap04-weighted-splines-m4-7a}
-: Numbered R Code Title
+a: Draw weighted basis functions (B-splines)
 ::::::
 :::
 ::::{.my-r-code-container}
@@ -7748,22 +7863,27 @@ for (i in 1:ncol(B_m4.7a))
 
 ```
 
+
+To get the parameter weights for each basis function, we had to define the model (tab "formula") and make it run (tab "fit").
+
 ::::
 :::::
 
+Compare the weighted basis functions with the raw basis function (tab "basis") and with the wiggles in the Cherry Blossoms data (tab "plot2").
 
-###### plot
+
+###### plot2
 
 :::::{.my-r-code}
 :::{.my-r-code-header}
 :::::: {#cnj-fig-chap04-plot-post-m4-7a}
-: Plot the 97% posterior interval for $\mu$, at each year
+a: Plot the 97% posterior interval for $\mu$, at each year
 ::::::
 :::
 ::::{.my-r-code-container}
 ```{r}
 #| label: fig-chap04-plot-post-m4-7a
-#| fig-cap: "The sum of the weighted basis functions, at each point, produces the spline, displayed as a 97% posterior interval of μ"
+#| fig-cap: "Posterior prediction: The sum of the weighted basis functions, at each point, produces the spline, displayed as a 97% posterior interval of μ"
 
 ## R code 4.78a ###############
 mu_m4.7a <- rethinking::link(m4.7a)
@@ -7777,6 +7897,618 @@ rethinking::shade(mu_PI_m4.7a, d2_m4.7a$year,
 ::::
 :::::
 
+> “The spline is much wigglier now. Something happened around 1500, for example. If you add more knots, you can make this even wigglier. You might wonder how many knots is correct. We’ll be ready to address that question in a few more chapters” ([McElreath, 2020, p. 119](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=138&annotation=Z5X4FZCM))
+
+:::
+
+::::
+:::::
+
+#### Tidyverse fit
+
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-chap04-fit-cherry-blossoms-m4-7b}
+b: Fit Cherry Blossoms data (Tidyverse)
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### data
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-load-data-d2-m4-7b}
+b: Load Cherry Blossoms data, complete cases and display summary
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r}
+#| label: load-cherry-blossoms-data-m4-7b
+
+## R code 4.72b modified ######################
+data(package = "rethinking", list = "cherry_blossoms")
+d_m4.7b <- cherry_blossoms
+
+d2_m4.7b <- 
+  d_m4.7b |> 
+  tidyr::drop_na(doy)
+
+
+# ground-up tidyverse way to summarize
+(
+    d2_m4.7b |> 
+      tidyr::gather() |> 
+      dplyr::group_by(key) |> 
+      dplyr::summarise(mean = base::mean(value, na.rm = T),
+                sd   = stats::sd(value, na.rm = T),
+                ll   = stats::quantile(value, prob = .055, na.rm = T),
+                ul   = stats::quantile(value, prob = .945, na.rm = T)) |> 
+      dplyr::mutate(dplyr::across(where(is.double), 
+                                  \(x) round(x, digits = 2)))
+)
+
+```
+
+Within the tidyverse, we can drop NA's with the `tidyr::drop_na()` function. -- This is a much easier way than my
+approach originally used with `dplyr::filter()` (See also the different ways in
+[StackOverflow](https://stackoverflow.com/questions/70848048/filtering-any-missing-values-in-r/70848085)
+
+::::
+:::::
+
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! `across()` supersedes the family of "scoped variants" like `mutate_if()`
+:::
+::::{.my-watch-out-container}
+
+I am using [Kurz](https://bookdown.org/content/4857/geocentric-models.html#splines)’ "ground-up {**tidyverse**} way" to summarize the data. But instead of the superseded `dplyr::mutate_if()` function I used the new `dplyr::across()`. At first I wrote `dplyr::mutate(dplyr::across(where(is.double), round, digits = 2))` but after I warning I changed it to an anonymous function:
+
+```
+  # Previously
+  across(a:b, mean, na.rm = TRUE)
+
+  # Now
+  across(a:b, \(x) mean(x, na.rm = TRUE))
+```
+
+::::
+:::::
+
+
+###### skim
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-skim-d2-m4-7b}
+b: Display summary with `skimr::skim()`
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: summarize-data-with-skim-m4-7b
+
+d2_m4.7b |>
+  skimr::skim()
+```
+
+Kurz's version does not have the mini histograms. I added another
+summary with `skimr::skim()` to add tiny graphics.
+
+::::
+:::::
+
+###### plot
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-ID-text}
+b: Display raw data for `doy` (Day of the year of first blossom) against the year
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r fig.height=3, fig.width=7}
+#| label: fig-chap04-plot-d2-m4-7b
+#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year (Tidyverse)"
+#| fig-heights: 3
+#| fig-width: 7
+
+d2_m4.7b |> 
+  ggplot2::ggplot(ggplot2::aes(x = year, y = doy)) +
+  ## color from https://www.colorhexa.com/ffb7c5
+  ggplot2::geom_point(color = "#ffb7c5", alpha = 1/2) +
+  ggplot2::theme() +
+  ggplot2::theme(panel.grid = ggplot2::element_blank(),
+    panel.background = ggplot2::element_rect(fill = "#4f455c"))
+
+## color from https://www.colordic.org/w/, 
+## inspired by 
+## https://chichacha.netlify.com/2018/11/29/plotting-traditional-colours-of-japan/
+
+```
+
+By default {**ggplot2**} removes missing data records with a warning. But I had already removed missing data for the `doy` variable (see: tab "data").
+
+::::
+:::::
+
+###### knots
+
+::: {.callout-note style="color: blue;"}
+This is the same code and text as in tab "knots" of @exm-chap04-fit-cherry-blossoms-m4-7a.
+:::
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-knots-m4-7b}
+b: Choose number of knots and distribute them over the data points of the `year` variable.
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: chap04-knots-m4-7b
+#| fig-cap: "Choose knots and divide data points of the year variable into 15 segments for fitting B-splines in the next step (Tidyverse)"
+
+## R code 4.73b complete cases on doy ##########
+num_knots_b <- 15                                  # (1) number of cutpoints
+knot_list_b <- quantile(d2_m4.7b$year,             # (2) divide regions for fitting
+      probs = seq(0, 1, length.out = num_knots_b))
+print(tibble::enframe(knot_list_b), n = 15)        # (3) display knot_list
+
+```
+
+The locations of the knots are part of the model. Therefore you are responsible for them. We placed the knots at different evenly-spaced quantiles of the predictor variable.
+
+**Explanation of code lines**
+
+(1) **num_knots_b**: Specify the number of cutpoints that define different regions (or partitions) for a variable. Here were 15 knots chosen.
+(2) **knot_list_b**: Vector that divides the available rows of variable `year` into 15 parts named after the percentiles. It is important to understand that not the range of the variable `year` was divided but the available data points.
+(3) I have `knot_list` wrapped into a `tibble` and output with `print(tibble::enframe(knot_list_b), n = 15)`, so that one can inspect the content of the vector more easily.
+
+::::
+:::::
+
+Again you can see that the `doy` data are sparse in the early years. Starting with a the 16th century the we get similar intervals for the distances between years. This can be inspected better graphically in the next "parts" tab.
+
+###### parts
+
+::: {.callout-note style="color: blue;"}
+TThe code is different but the text is the same as in tab "parts" of @exm-chap04-fit-cherry-blossoms-m4-7a.
+:::
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-plot-parts-d2-m4-7a}
+b: Plot data with equally number of `doy` data points for each segment against `year` 
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r, fig.height=3, fig.width=7}
+#| label: fig-chap04-plot-parts-d2-m4-7b
+#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year with vertical lines at the knots positions (Tidyverse)"
+#| fig-height: 3
+#| fig-width: 7
+
+d2_m4.7b |> 
+  ggplot2::ggplot(ggplot2::aes(x = year, y = doy)) +
+  ggplot2::geom_vline(xintercept = knot_list_b, 
+             color = "white", alpha = 1/2) +
+  ggplot2::geom_point(color = "#ffb7c5", alpha = 1/2) +
+  ggplot2::theme_bw() +
+  ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#4f455c"),
+        panel.grid = ggplot2::element_blank())
+```
+
+::::
+:::::
+
+
+
+Starting with a the 16th century the we get similar intervals for the distances between years, e.g. the number of `doy` data points is approximately evenly distributed (59 - 67 years)
+
+```{r}
+#| label: chap04-knot_list-diff-d2-m4-7b
+
+knot_list2 <- tibble::enframe(knot_list) |> 
+  dplyr::mutate(diff = round(value - dplyr::lag(value), 0))
+print(knot_list2, n = 15)
+```
+
+
+
+###### calc
+
+::: {.callout-note style="color: blue;"}
+This is the same code and text as in tab "calc" of @exm-chap04-fit-cherry-blossoms-m4-7a.
+:::
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-str-splines-m4-7b}
+b: Calculate basis functions of a cubic spline (degree = 3) with 15 areas (knots) to fit
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-str-splines-m4-7b
+
+## R code 4.74b ################
+B_m4.7b <- splines::bs(d2_m4.7b$year,            # (1) generate B-splines
+  knots = knot_list_b[-c(1, num_knots_b)],       # (2) knots without first & last
+  degree = 3,                                    # (3) polynomial (cubic) degree
+  intercept = TRUE)                              # (4) intercept
+str(B_m4.7b)                                     # (5) show data structure
+```
+
+**Explanation of code lines**
+
+(1) The function `splines::bs()` generate the B-spline basis matrix for
+    a polynomial spline:
+(2) `knots` is generated without the two boundary knots (fist and last
+    knot) that are placed at the minimum and maximum of the variable.
+    These two knots are excluded with the tricky code `knot_list[-c(1, num_knots)]` to prevent redundancies as
+    `splines::bs()` places by default knots at the boundaries. So we
+    have 13 internal knots.
+(3) With `degree = 3` a cubic B-spline is chosen. The polynomial degree determines how basis functions combine, which determines how the parameters interact to
+produce the spline. For degree 1, (=
+    line), two basis functions combine at each point. For degree 2 (=
+    quadratic), three functions combine at each point. For degree 3 (=
+    cubic), there are four basis functions combined. This should give
+    enough flexibility for each region to fit.
+(4) McElreath chose `intercept = TRUE`: \> "We'll also have an intercept
+    to capture the average blossom day. This will make it easier to
+    define priors on the basis weights, because then we can just
+    conceive of each as a deviation from the intercept." ([McElreath,
+    2020, p. 117](zotero://select/groups/5243560/items/NFUEVASQ))
+    ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=136&annotation=9MA7DU8W))\
+    Kurz mentioned ominously: "For reasons I'm not prepared to get into,
+    here, splines don't always include intercept parameters. Indeed, the
+    `bs()` default is `intercept = FALSE`."
+    ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#splines.)).\
+    I do not know exactly what's the result of choosing
+    `intercept = TRUE` as the difference to FALSE is marginal. The first
+    B-spline (third hill) starts on the left edge of the graph with
+    $1.0$ instead of $0$.
+(5) In the data structure you can see in the second to last line, that there are two
+    "Boundary.knots" at year $812$ and $2015$. These two years are in
+    fact the first and last value of the `year` variable:
+
+-   `dplyr::first(d2_m4.7b$year)`: `r dplyr::first(d2_m4.7b$year)`
+-   `dplyr::last(d2_m4.7b$year)` : `r dplyr::last(d2_m4.7b$year)`
+
+::::
+:::::
+
+###### basis
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-basis-splines-m4-7b}
+a: Draw raw basis functions for the year variable for 15 areas (knots) and degree 3 (= cubic polynomial)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r, fig.height=3, fig.width=7}
+#| label: fig-chap04-basis-splines-m4-7b
+#| fig-cap: "Draw raw basis functions B-splines for the year variable for 15 areas (knots) and degree 3 (cubic polynomial) (Tidyverse)"
+#| fig-height: 3
+#| fig-width: 7
+
+# wrangle a bit
+d_B_m4.7b <-
+  B_m4.7b |> 
+  base::as.data.frame() |> 
+  rlang::set_names(stringr::str_c(0, 1:9), 10:17) |>  
+  dplyr::bind_cols(dplyr::select(d2_m4.7b, year)) |> 
+  tidyr::pivot_longer(-year,
+               names_to = "bias_function",
+               values_to = "bias")
+
+# plot
+d_B_m4.7b |> 
+  ggplot2::ggplot(ggplot2::aes(x = year, y = bias, group = bias_function)) +
+  ggplot2::geom_vline(xintercept = knot_list_b, color = "white", alpha = 1/2) +
+  ggplot2::geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
+  ggplot2::ylab("bias value") +
+  ggplot2::theme_bw() +
+  ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#4f455c"),
+        panel.grid = ggplot2::element_blank())
+```
+
+
+::::
+:::::
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Warning with `tibble::as_tibble()` instead of `base::as.data.frame()`
+:::
+::::{.my-watch-out-container}
+At first I used as always `tibble::as_tibble()`. But this generated a warning message.
+
+> Don't know how to automatically pick scale for object of type <bs/basis/matrix>. Defaulting to continuous.
+
+I learned that it has to do with the difference of a variable name versus a function name in `aes()`. For instance "mean" versus variable "Mean" ([statology](https://www.statology.org/r-dont-know-how-to-automatically-pick-scale-for-object-type-function/)) or "sample" versus "Sample" ([StackOverflow](https://stackoverflow.com/questions/22058322/ggplot-error-dont-know-how-to-automatically-pick-scale-for-object-of-type-func)).
+
+But why this is the case with `tibble::as_tibble()` but not with `base::as.data.frame()` I do not know. Perhaps it has to do with the somewhat stricter tibble naming rules? (see: [tibble overview](https://tibble.tidyverse.org/) and [tbl_df class](https://tibble.tidyverse.org/reference/tbl_df-class.html)).
+::::
+:::::
+
+
+
+###### facet
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-facets-m4-7b}
+b: Basis functions of a cubic spline with 15 knots broken up in different facets
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r, fig.height=10}
+#| label: fig-chap04-facets-m4-7b
+#| fig-cap: "Basis functions of a cubic spline with 15 knots broken up in different facets"
+#| fig-height: 10
+
+d_B_m4.7b |> 
+  dplyr::mutate(bias_function = stringr::str_c("bias function ", 
+                               bias_function)) |> 
+  ggplot2::ggplot(ggplot2::aes(x = year, y = bias)) +
+  ggplot2::geom_vline(xintercept = knot_list_b, 
+             color = "white", alpha = 1/2) +
+  ggplot2::geom_line(color = "#ffb7c5", linewidth = 1.5) +
+  ggplot2::ylab("bias value") +
+  ggplot2::theme_bw() +
+  ggplot2::theme(panel.background = ggplot2::element_rect(fill = "#4f455c"),
+        panel.grid = ggplot2::element_blank(),
+        strip.background = ggplot2::element_rect(
+          fill = scales::alpha("#ffb7c5", .25), color = "transparent"),
+        strip.text = ggplot2::element_text(
+          size = 8, margin = ggplot2::margin(0.1, 0, 0.1, 0, "cm"))) +
+  ggplot2::facet_wrap(~ bias_function, ncol = 1)
+```
+
+To see what's going on in that plot, we tool Kurz code to break the graphic up for displaying all basis function in an extra slot with `ggplot2::facet_wrap()`.
+
+::::
+:::::
+
+###### exp
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-exp-prior-m4-7b}
+b: Using the density of the exponential distribution `dexp()` to show the prior
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r, fig.heigt=2.5, fig.width=4}
+#| label: fig-chap04-exp-prior-m4-7b
+#| fig-cap: "Using the density of the exponential distribution `dexp()` to show the prior"
+#| fig-width: 4
+#| fig-height: 2.5
+
+tibble::tibble(x = base::seq(from = 0, to = 10, by = 0.1)) |> 
+  dplyr::mutate(d = stats::dexp(x, rate = 1)) |> 
+  
+  ggplot2::ggplot(ggplot2::aes(x = x, y = d)) +
+  ggplot2::geom_area(fill = "grey") +
+  ggplot2::scale_y_continuous(NULL, breaks = NULL) +
+  ggplot2::theme_bw()
+```
+
+::::
+:::::
+
+We used the `dexp()` function for the model (see tab "formula" in @exm-chap04-fit-cherry-blossoms-m4-7a). To get a sense of what that prior looks like, we displayed the `dexp()` function.
+
+###### matrix
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-wrangle-d3-m4-7b}
+b: Add B-splines matrix for 15 knots to the data frame by creating a new data frame
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-wrangle-d3-m4-7b
+
+d3_m4.7b <-
+  d2_m4.7b |> 
+  dplyr::mutate(B_m4.7b = B_m4.7b) 
+
+# take a look at the structure of the new data frame
+d3_m4.7b |> 
+  dplyr::glimpse()
+```
+::::
+:::::
+
+In R code 4.76a (tab "quap" in @exm-chap04-fit-cherry-blossoms-m4-7b), McElreath
+defined his data in a list (`list(D = d2_m4.7a$doy, B_m4.7a = B_m4.7a)`). The approach with {**brms**} will be a little different. We'll add the `B_m4.7b` matrix to our `d2_m4.7b` data frame and name the results as `d3_m4.7b`.
+
+
+> In the `d3_m4.7b` data, columns `year` through `temp_lower` are all standard
+data columns. The `B_m4-7b` column is a *matrix column*, which contains the
+same number of rows as the others, but also smuggled in 17 columns
+*within* that column. Each of those 17 columns corresponds to one of our
+synthetic $B_{k}$ variables. The advantage of such a data structure is
+we can simply define our `formula` argument as $doy \sim 1 + B_m4-7b$, where
+`B_m4-7b` is a stand-in for `B_m4-7b.1 + B_m4-7b.2 + ... + B_m4-7b.17`. ([Kurz](https://bookdown.org/content/4857/geocentric-models.html#splines.)) 
+
+See next tab "brm".
+
+###### brm
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-fit-model-m4-7b}
+b: Fit model m4.7b with `brms::brm()`
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-fit-model-m4-7b
+#| cache: true
+
+m4.7b <- 
+  brms::brm(data = d3_m4.7b,
+      family = gaussian,
+      doy ~ 1 + B_m4.7b,
+      prior = c(brms::prior(normal(100, 10), class = Intercept),
+                brms::prior(normal(0, 10), class = b),
+                brms::prior(exponential(1), class = sigma)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brm_fits/m04.07b")
+
+brms:::print.brmsfit(m4.7b)
+```
+
+::::
+:::::
+
+> Each of the 17 columns in our `B` matrix was assigned its
+own parameter. If you fit this model using McElreath's rethinking code,
+you'll see the results are very similar. (Kurz, ibid.)
+
+###### glimpse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-glimpse-model-m4-7b}
+b: Glimpse at transformed data of model `m4.7b` to draw objects
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: chap04-glimpse-model-m4-7b
+
+post_m4.7b <- brms::as_draws_df(m4.7b)
+
+glimpse(post_m4.7b)
+```
+
+::::
+:::::
+
+We used `brms::as_draws_df()` to transform `m4.7b` to a `draw`
+object so that it can processed easier by the {**posterior**} package.
+
+###### weighted
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-weighted-m4-7b}
+b: Weight each basis function by its corresponding parameter
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r, fig.height=3, fig.width=7}
+#| label: fig-chap04-weighted-m4-7b
+#| fig-cap: "Each basis function weighted by its corresponding parameter"
+#| fig-height: 3
+#| fig-width: 7
+#| warning: false
+
+post_m4.7b |> 
+  dplyr::select(b_B_m4.7b1:b_B_m4.7b17) |> 
+  rlang::set_names(base::c(stringr::str_c(0, 1:9), 10:17)) |> 
+  tidyr::pivot_longer(tidyselect::everything(), 
+                      names_to = "bias_function") |> 
+  dplyr::group_by(bias_function) |> 
+  dplyr::summarise(weight = base::mean(value)) |> 
+  ## add weight column to year & bias via "bias_function"
+  dplyr::full_join(d_B_m4.7b, by = "bias_function") |> 
+  
+  # plot
+  ggplot2::ggplot(ggplot2::aes(x = year, 
+                        y = bias * weight, 
+                        group = bias_function)) +
+  ggplot2::geom_vline(xintercept = knot_list_b, 
+                      color = "white", alpha = 1/2) +
+  ggplot2::geom_line(color = "#ffb7c5", 
+                     alpha = 1/2, linewidth = 1.5) +
+  ggplot2::theme_bw() +
+  ggplot2::theme(panel.background = 
+                 ggplot2::element_rect(fill = "#4f455c"),
+                 panel.grid = ggplot2::element_blank()) 
+```
+
+> In case you missed it, the main action in the {**ggplot2**} code was `y = bias * weight`, where we defined the $y$-axis as the product of `bias` and `weight`. This is fulfillment of the $w_k B_{k, i}$ parts of the model. (Kurz, ibid.)
+
+
+::::
+:::::
+
+###### plot2
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-chap04-post-m4-7b}
+b: Expected values of the posterior predictive distribution
+::::::
+:::
+::::{.my-r-code-container}
+
+
+```{r, fig.height=3, fig.width=7}
+#| label: fig-chap04-post-pred-dist-m4-7b
+#| fig-cap: "Expected values of the posterior predictive distribution"
+#| fig-height: 3
+#| fig-width: 7
+
+f_m4.7b <- brms:::fitted.brmsfit(m4.7b, probs = c(0.055, 0.945))
+
+f_m4.7b |> 
+  base::as.data.frame() |> 
+  dplyr::bind_cols(d3_m4.7b) |> 
+  
+  ggplot2::ggplot(ggplot2::aes(x = year, y = doy, 
+                               ymin = Q5.5, ymax = Q94.5)) + 
+  ggplot2::geom_vline(xintercept = knot_list_b, 
+                      color = "white", alpha = 1/2) +
+  ggplot2::geom_hline(yintercept = 
+                      brms::fixef(m4.7b, 
+                                  probs = c(0.055, 0.945))[1, 1], 
+                      color = "white", linetype = 2) +
+  ggplot2::geom_point(color = "#ffb7c5", alpha = 1/2) +
+  ggplot2::geom_ribbon(fill = "white", alpha = 2/3) +
+  ggplot2::labs(x = "year", y = "day in year") +
+  ggplot2::theme_bw() +
+  ggplot2::theme(panel.background = 
+                 ggplot2::element_rect(fill = "#4f455c"),
+                 panel.grid = ggplot2::element_blank())
+```
+
+> If it wasn’t clear, the dashed horizontal line intersecting a little above $100$ on the $y$-axis is the posterior mean for the intercept. (Kurz, ibid.)
+
+In contrast to Kurz’ code I have used `probs = c(0.055, 0.945)` to get the same 89% (Q5.5 and Q94.5) intervals as in the book.
+
+::::
+:::::
 
 
 :::
@@ -7784,255 +8516,16 @@ rethinking::shade(mu_PI_m4.7a, d2_m4.7a$year,
 ::::
 :::::
 
-***
-
-# 2nd PASS: STOPPED HERE {.unnumbered}
-
-```{r}
-## ************************** ############
-## I STOPPED HERE (ORIGINAL) #############
-## ************************** ############
-```
-
-
-
-
-#### Choice of knots
-
-Remember, the knots are just values of year that serve as pivots for our
-spline. Where should the knots go? There are different ways to answer
-this question. You can, in principle, put the knots wherever you like.
-Their locations are part of the model, and you are responsible for them.
-Let's do what we did in the simple example above, place the knots at
-different evenly-spaced quantiles of the predictor variable. This gives
-you more knots where there are more observations. We used only 5 knots
-in the first example. Now let's go for 15:
-
-```{r}
-#| label: choose-knots-a
-#| attr-source: '#lst-choose-knots-a lst-cap="Choose the knots that serve as pivots for the spline: rethinking version"'
-
-## R code 4.73 ####################
-d5_a <- d4_a[complete.cases(d4_a$doy), ] # complete cases on doy
-num_knots15_a <- 15
-(knot_list15_a <- quantile(d5_a$year, 
-                           probs = seq(0, 1, length.out = num_knots15_a)))
-```
-
-#### Choice of polynomial degree
-
-The next choice is polynomial degree. This determines how basis
-functions combine, which determines how the parameters interact to
-produce the spline. For degree 1, as in FIGURE 4.12, two basis functions
-combine at each point. For degree 2, three functions combine at each
-point. For degree 3, four combine. R already has a nice function that
-will build basis functions for any list of knots and degree. This code
-will construct the necessary basis functions for a degree 3 (cubic)
-spline:
-
-```{r}
-#| label: compute-b-spline-matrix-a
-#| attr-source: '#lst-compute-b-spline-matrix-a lst-cap="Compute the B-spline basis matrix for a cubic spline (degree 3): rethinking version"'
-
-## R code 4.74 #######################
-B_a <- splines::bs(d5_a$year,
-  knots = knot_list15_a[-c(1, num_knots15_a)],
-  degree = 3, intercept = TRUE
-)
-```
-
-The B-spline basis matrix B_a should have 827 rows and 17 columns. Lets
-check it:
-
--   Number of rows = `r nrow(B_a)`
--   Number of columns = `r ncol(B_a)`
-
-Each row is a year, corresponding to the rows in the d5_a data frame.
-Each column is a basis function, one of our synthetic variables defining
-a span of years within which a corresponding parameter will influence
-prediction.
-
-To display the basis functions, just plot each column against year:
-
-```{r}
-#| label: fig-b-spline-matrix-a
-#| fig-cap: "B-spline basis matrix for a cubic spline (degree 3): rethinking version"
-#| attr-source: '#lst-fig-b-spline-matrix-a lst-cap="B-spline basis matrix for a cubic spline (degree 3): rethinking version"'
-
-## R code 4.75 #############################
-plot(NULL, xlim = range(d5_a$year), ylim = c(0, 1), xlab = "year", ylab = "basis")
-for (i in 1:ncol(B_a)) lines(d5_a$year, B_a[, i])
-
-```
-
-The plot shows, just like the top in FIGURE 4.12., the basis functions.
-However now more of these functions overlap.
-
-#### Parameter weights for each basis function
-
-Now to get the parameter weights for each basis function, we need to
-actually define the model and make it run. The model is just a linear
-regression. The synthetic basis functions do all the work. We'll use
-each column of the matrix `B_a` as a variable. We'll also have an
-intercept to capture the average blossom day. This will make it easier
-to define priors on the basis weights, because then we can just conceive
-of each as a deviation from the intercept.
-
-This is also the first time we've used an
-`r glossary("exponential distribution")` as a prior. Exponential
-distributions are useful priors for scale parameters, parameters that
-must be positive. The prior for `σ` is exponential with a rate of 1. The
-way to read an exponential distribution is to think of it as containing
-no more information than an average deviation. That average is the
-inverse of the rate. So in this case it is $1/1 = 2$. If the rate were
-0.5, the mean would be$1/0.5 = 2$. We'll use exponential priors for the
-rest of the book, in place of uniform priors. It is much more common to
-have a sense of the average deviation than of the maximum.
-
-To build this model in `rethinking::quap()`, we just need a way to do
-that sum. The easiest way is to use matrix multiplication.
-@sec-matrix-multiplication has more details about why this works. The
-only other trick is to use a start list for the weights to tell
-`rethinking::quap()` how many there are.
-
-```{r}
-#| label: fit-model-m4.7
-#| attr-source: '#lst-fit-model-m4.7 lst-cap="Fit the model of B-spline basis matrix m4.7"'
-
-## R code 4.76 ################################
-m4.7 <- rethinking::quap(
-  alist(
-    D ~ dnorm(mu, sigma),
-    mu <- a + B %*% w,
-    a ~ dnorm(100, 10),
-    w ~ dnorm(0, 10),
-    sigma ~ dexp(1)
-  ),
-  data = list(D = d5_a$doy, B = B_a),
-  start = list(w = rep(0, ncol(B_a)))
-)
-```
-
-A summary with `rethinking::precis` won't reveal much.
-
-```{r}
-#| label: summarize-model-m4.7
-#| attr-source: '#lst-summarize-model-m4.7 lst-cap="Summarize model m4.7"'
-
-rethinking::precis(m4.7,depth = 2)
-```
-
-You should see 17 `w` parameters. But you can't tell what the model
-thinks from the parameter summaries. Instead we need to plot the
-posterior predictions. First, here are the weighted basis functions:
-
-```{r}
-#| label: fig-weighted-basis-function
-#| fig-cap: "Weighted basis functions"
-#| attr-source: '#lst-fig-weighted-basis-function lst-cap="Weighted basis functions"'
-
-## R code 4.77 #################
-post5_a <- rethinking::extract.samples(m4.7)
-w <- apply(post5_a$w, 2, mean)
-plot(NULL,
-  xlim = range(d5_a$year), ylim = c(-6, 6),
-  xlab = "year", ylab = "basis * weight"
-)
-for (i in 1:ncol(B_a)) lines(d5_a$year, w[i] * B_a[, i])
-
-```
-
-And finally we will plot the 97% posterior interval for `μ`, at each
-year:
-
-```{r}
-#| label: fig-PI-cbl-a
-#| fig-cap: "97% posterior interval for μ, at each year"
-#| attr-source: '#lst-fig-PI-cbl-a lst-cap="97% posterior interval for μ, at each year"'
-
-## R code 4.78 ######################
-mu_cbl_a <- rethinking::link(m4.7)
-mu_PI_cbl_a <- apply(mu_cbl_a, 2, rethinking::PI, 0.97)
-plot(d5_a$year, d5_a$doy, 
-     col = rethinking::col.alpha(rethinking::rangi2, 0.3), pch = 16)
-rethinking::shade(mu_PI_cbl_a, d5_a$year, 
-                  col = rethinking::col.alpha("black", 0.5))
-
-```
-
-The spline is much wigglier now. Something happened around 1500, for
-example. If you add more knots, you can make this even wigglier. You
-might wonder how many knots is correct. We'll be ready to (re)address
-that question in a few more chapters.
-
-Distilling the trend across years provides a lot of information. But
-year is not really a causal variable, only a proxy for features of each
-year. In the practice problems below, you'll compare this trend to the
-temperature record, in an attempt to explain those wiggles.
-
-#### Matrix multiplication in the spline model {#sec-matrix-multiplication}
-
-Matrix algebra is a new way to represent ordinary algebra. It is often
-much more compact. So to make model m4.7 easier to program, we used a
-matrix multiplication of the basis matrix `B_a` by the vector of
-parameters w: `B %*% w`. This notation is just linear algebra shorthand
-for (1) multiplying each element of the vector `w` by each value in the
-corresponding row of `B_a` and then (2) summing up each result. You
-could also fit the same model with the following less-elegant code:
-
-```{r}
-#| label: fit-model-m4.7alt-a
-#| attr-source: '#lst-fit-model-m4.7alt-a lst-cap="Fit model m4.7 with less-elegant code in matrix multiplication"'
-
-## R code 4.79 ################################
-m4.7alt <- rethinking::quap(
-  alist(
-    D ~ dnorm(mu, sigma),
-    mu <- a + sapply(1:827, function(i) sum(B[i, ] * w)),
-    a ~ dnorm(100, 1),
-    w ~ dnorm(0, 10),
-    sigma ~ dexp(1)
-  ),
-  data = list(D = d5_a$doy, B = B_a),
-  start = list(w = rep(0, ncol(B_a)))
-)
-rethinking::precis(m4.7alt, depth = 2)
-
-```
-
-Besides that @lst-fit-model-m4.7alt-a is not elegant you will notice
-that it need also more time to compile. Although all models are cached
-it seems that @lst-fit-model-m4.7alt-a needs more time to check that it
-is the same code.
-
-```{r}
-#| label: fig-PI-cbl2-a
-#| fig-cap: "97% posterior interval for μ, at each year: Alternate matrix multiplication"
-#| attr-source: '#lst-fig-PI-cbl-a lst-cap="97% posterior interval for μ, at each year with matrix multiplication manually"'
-
-## R code 4.78 ######################
-mu_cbl2_a <- rethinking::link(m4.7alt)
-mu_PI_cbl2_a <- apply(mu_cbl2_a, 2, rethinking::PI, 0.97)
-plot(d5_a$year, d5_a$doy, 
-     col = rethinking::col.alpha(rethinking::rangi2, 0.3), pch = 16)
-rethinking::shade(mu_PI_cbl2_a, d5_a$year, 
-                  col = rethinking::col.alpha("black", 0.5))
-
-```
 
 ### Smooth functions for a rough world
 
-The splines in the previous section are just the beginning. A entire
-class of models, `r glossary("generalized additive model")`, focuses on
-predicting an outcome variable using smooth functions of some predictor
-variables.
+> “The splines in the previous section are just the beginning. A entire class of models, generalized additive models (`r glossary("GAM")`s), focuses on predicting an outcome variable using smooth functions of some predictor variables.” ([McElreath, 2020, p. 120](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=139&annotation=UX53SXQD))
 
-------------------------------------------------------------------------
-
-::: {#prp-resources-for-gams}
-Resources for GAMs
-
-::: callout-tip
+:::::{.my-resource}
+:::{.my-resource-header}
+Resources for working with Generalized Additive Models (GAMs)
+:::
+::::{.my-resource-container}
 -   Wood, S. N. (2017). Generalized Additive Models: An Introduction
     with R, Second Edition (2nd ed.). Taylor & Francis Inc.
 -   SemanticScholar: [Series of paper dedicated to
@@ -8049,723 +8542,14 @@ Resources for GAMs
 
 ------------------------------------------------------------------------
 
--   Adam Shaif: What is Gneralised Additive Model? ([Medium member
+-   Adam Shaif: What is Generalised Additive Model? ([Medium member
     story](https://towardsdatascience.com/generalised-additive-models-6dfbedf1350a))
 -   Eugenio Anello: Generalized Additive Models with R ([Medium member
     story](https://pub.towardsai.net/generalized-additive-models-with-r-5f01c8e52089))
-:::
-:::
 
-------------------------------------------------------------------------
+***
 
-# I STOPPED HERE (TIDYVERSE) {.unnumbered}
-
-```{r}
-## ************************** ############
-## I STOPPED HERE (TIDYVERSE) #############
-## ************************** ############
-```
-
-
-#### Splines
-
-```{r}
-#| label: load-cherry-blossoms-data-b
-#| attr-source: '#lst-load-cherry-blossoms-data-b lst-cap="Load Cherry Blossoms data and display summary (tidyverse version)"'
-
-## R code 4.72 modified ######################
-data(package = "rethinking", list = "cherry_blossoms")
-d4_b <- cherry_blossoms
-
-
-# ground-up tidyverse way to summarize
-(
-d4.2_b <- 
-    d4_b |> 
-      gather() |> 
-      group_by(key) |> 
-      summarise(mean = mean(value, na.rm = T),
-                sd   = sd(value, na.rm = T),
-                ll   = quantile(value, prob = .055, na.rm = T),
-                ul   = quantile(value, prob = .945, na.rm = T)) |> 
-      mutate_if(is.double, round, digits = 2) 
-)
-
-d4.2_b |> 
-  skimr::skim()
-
-
-
-```
-
-Kurz's version does not have the mini histograms. I added another
-summary with `skimr::skim()` to add tiny graphics.
-
-```{r}
-#| label: fig-scatterplot-cbl-b
-#| fig-cap: "Display raw data for `doy` (Day of the year of first blossom) against the year: tidyverse version"
-#| warning: true
-
-d4_b |> 
-  ggplot(aes(x = year, y = doy)) +
-  # color from here: https://www.colorhexa.com/ffb7c5
-  geom_point(color = "#ffb7c5", alpha = 1/2) +
-  theme_bw() +
-  theme(panel.grid = element_blank(),
-        # color from here: https://www.colordic.org/w/, inspired by https://chichacha.netlify.com/2018/11/29/plotting-traditional-colours-of-japan/
-        panel.background = element_rect(fill = "#4f455c"))
-
-```
-
-By default {**ggplots**} removes missing data records with a warning. It
-turns out there are cases with missing data for the `doy` variable.
-
-```{r}
-#| label: doy-missing-data
-#| attr-source: '#lst-doy-missing-data lst-cap="Display missing data of the day of the year variable `doy`"'
-
-d4_b |> 
-  count(is.na(doy)) |> 
-  mutate(percent = 100 * n / sum(n))
-```
-
-Let's follow McElreath and make a subset of the data that excludes cases
-with missing data in `doy.` Within the tidyverse, we might do so with
-the `tidyr::drop_na()` function. -- This is a much easier way than my
-approach using `dplyr::filter()` (See
-[StackOverflow](https://stackoverflow.com/a/70848085/7322615):
-
-```{r}
-#| label: remove-missing-data-records
-#| attr-source: '#lst-remove-missing-data-records lst-cap="Remove records of missing data for the two interesting variable `doy` and `year`"'
-
-d5_b <- 
-    d4_b |> 
-        filter(if_all(.col = c(year, doy), .fns = Negate(is.na)))
-d5_b
-```
-
-But it worked and resulted in the same 827 records.
-
-##### Choice of knots
-
-Now we start with the spline procedure as mentioned in
-@prp-procedure-for-generating-b-splines with choosing number and
-location of knots:
-
-```{r}
-#| label: choose-knots-b
-#| attr-source: '#lst-choose-knots-b lst-cap="Choose the knots that serve as pivots for the spline: tiyverse version"'
-
-num_knots15_b <- 15
-knot_list15_b <- quantile(d5_b$year, 
-          probs = seq(from = 0, to = 1, length.out = num_knots15_b))
-knot_list15_b
-```
-
-```{r}
-#| label: fig-chosen-knots-b
-#| fig-cap: "Show scatterplot with chosen knots: tiyverse version"
-#| attr-source: '#lst-fig-chosen-knots-b lst-cap="Scatterplot with chosen knots: tiyverse version"'
-
-d5_b |> 
-  ggplot(aes(x = year, y = doy)) +
-  geom_vline(xintercept = knot_list15_b, 
-             color = "white", alpha = 1/2) +
-  geom_point(color = "#ffb7c5", alpha = 1/2) +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank())
-```
-
-##### Choice of polynomial degree
-
-```{r}
-#| label: compute-b-spline-matrix-b
-#| attr-source: '#lst-compute-b-spline-matrix-b lst-cap="Compute the B-spline basis matrix for a cubic spline (degree 3): tidyverse version"'
-
-B_b <- splines::bs(d5_b$year,
-        knots = knot_list15_b[-c(1, num_knots15_b)], 
-        degree = 3, 
-        intercept = TRUE)
-```
-
-Look closely at McElreath's tricky `knot_list[-c(1, num_knots)]` code.
-Whereas `knot_list` contains 15 ordered `year` values, McElreath shaved
-off the first and last `year` values with `knot_list[-c(1, num_knots)]`,
-leaving 13. This is because, by default, the `bs()` function places
-knots at the boundaries. Since the first and 15^th^ values in
-`knot_list15_b` were boundary values for `year`, we removed them to
-avoid redundancies. We can confirm this with the code, below.
-
-```{r}
-#| label: show-data-structure-b
-#| attr-source: '#lst-show-data-structure-b lst-cap="Show data structure to verify that `splines::bs()` adds the boundary knots"'
-
-B_b |> str()
-```
-
-Look at the second to last line,
-`- attr(*, "Boundary.knots")= int [1:2] 812 2015`. Those default
-`"Boundary.knots"` are the same as `knot_list15_b[c(1, num_knots)]`.
-Let's confirm.
-
-```{r}
-#| label: boundary-knots
-#| attr-source: '#lst-boundary-knots lst-cap="Boundary knots"'
-knot_list15_b[c(1, num_knots15_b)]
-```
-
-By the `degree = 3` argument, we indicated we wanted a cubic spline.
-McElreath used `degree = 1` for Figure 4.12. For reasons I'm not
-prepared to get into, here, {**splines**} don't always include intercept
-parameters. Indeed, the `splines::bs()` default is `intercept = FALSE`.
-McElreath's code indicated he wanted to fit a B-spline that included an
-intercept. Thus: `intercept = TRUE`.
-
-Here's how we might make our version of the top panel of Figure 4.13.
-
-```{r}
-#| label: fig-basis-functions-b
-#| fig-cap: "Basis functions of a cubic spline with 15 knots"
-#| attr-source: '#lst-fig-basis-functions-b lst-cap="Basis functions of a cubic spline with 15 knots"'
-
-# wrangle a bit
-b_b <-
-  B_b |> 
-  data.frame() |> 
-  set_names(str_c(0, 1:9), 10:17) |>  
-  bind_cols(select(d5_b, year)) |> 
-  pivot_longer(-year,
-               names_to = "bias_function",
-               values_to = "bias")
-
-# plot
-b_b |> 
-  ggplot(aes(x = year, y = bias, group = bias_function)) +
-  geom_vline(xintercept = knot_list15_b, color = "white", alpha = 1/2) +
-  geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
-  ylab("bias value") +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank())
-```
-
-To elucidate what's going on in that plot, we might break it up with
-`ggplot2::facet_wrap()`.
-
-```{r}
-#| label: fig-facet-basis-functions-b
-#| fig-cap: "Basis functions of a cubic spline with 15 knots broken up in different facets"
-#| fig-height: 10
-#| attr-source: '#lst-fig-facet-basis-functions-b lst-cap="Basis functions of a cubic spline with 15 knots broken up in different facets"'
-
-b_b |> 
-  mutate(bias_function = str_c("bias function ", 
-                               bias_function)) |> 
-  ggplot(aes(x = year, y = bias)) +
-  geom_vline(xintercept = knot_list15_b, 
-             color = "white", alpha = 1/2) +
-  geom_line(color = "#ffb7c5", linewidth = 1.5) +
-  ylab("bias value") +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank(),
-        strip.background = element_rect(fill = scales::alpha("#ffb7c5", .25), color = "transparent"),
-        strip.text = element_text(size = 8, margin = margin(0.1, 0, 0.1, 0, "cm"))) +
-  facet_wrap(~ bias_function, ncol = 1)
-```
-
-##### Parameter weights for each basis function
-
-To get the parameter weights for each basis function, we need to
-actually define the model and make it run. The model is just a linear
-regression. The synthetic basis functions do all the work. We'll use
-each column of the matrix `B2_b` as a variable. We'll also have an
-intercept to capture the average blossom day. This will make it easier
-to define priors on the basis weights, because then we can just conceive
-of each as a deviation from the intercept.
-
-Our model will follow the form:
-
-------------------------------------------------------------------------
-
-::: {#def-spines-blossom-model}
-$$ \begin{align*}
-\text{day\_in\_year}_i \sim \operatorname{Normal}(\mu_i, \sigma) \\
-\mu_i  = \alpha + {\sum_{k=1}^K w_k B_{k, i}} \\
-\alpha \sim \operatorname{Normal}(100, 10) \\
-w_j \sim \operatorname{Normal}(0, 10) \\
-\sigma \sim \operatorname{Exponential}(1)
-\end{align*}
-$$ {#eq-spines-blossom-model}
-
-where $\alpha$ is the intercept, $B_{k, i}$ is the value of the
-$k^\text{th}$ bias function on the $i^\text{th}$ row of the data, and
-$w_k$ is the estimated regression weight for the corresponding
-$k^\text{th}$ bias function.
-
-As for the new parameter type for $\sigma$, the exponential distribution
-is controlled by a single parameter, $\lambda$, which is also called the
-*rate*. As it turns out, the mean of the exponential distribution is the
-inverse of the rate, $1 / \lambda$.
-:::
-
-------------------------------------------------------------------------
-
-We are going to use the `dexp()` function to get a sense of what that
-prior looks like.
-
-```{r}
-#| label: fig-exponential-prior-b
-#| fig-cap: "Using the density of the exponential distribution `dexp()` to show the prior"
-#| fig-width: 4
-#| fig-height: 2.5
-#| attr-source: '#lst-fig-exponential-prior-b lst-cap="Using the density of the exponential distribution to show the prior"'
-
-tibble(x = seq(from = 0, to = 10, by = 0.1)) |> 
-  mutate(d = dexp(x, rate = 1)) |> 
-  
-  ggplot(aes(x = x, y = d)) +
-  geom_area(fill = "#ffb7c5") +
-  scale_y_continuous(NULL, breaks = NULL) +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank())
-```
-
-> We'll use exponential priors for the rest of the book, in place of
-> uniform priors. It is much more common to have a sense of the average
-> deviation than of the maximum. (McElreath)
-
-Before fitting this model in {**brms**}, we will take a minor detour on
-the data structure. In his R code 4.76 (@lst-fit-model-m4.7), McElreath
-defined his data in a list, `list( D=d5_a$doy , B = B_a)`. Our approach
-will be a little different. Here, we'll add the `B_b` matrix to our
-`d5_b` data frame and name the results as `d6_b`.
-
-```{r}
-#| label: add-matrix-to-df-b
-#| attr-source: '#lst-add-matrix-to-df-b lst-cap="Add B-splines matrix for 15 knots to the data frame by creating a new data frame"'
-
-d6_b <-
-  d5_b |> 
-  mutate(B = B_b) 
-
-# take a look at the structure of the new data frame d6_b
-d6_b |> glimpse()
-```
-
-In the `d6_b` data, columns `year` through `temp_lower` are all standard
-data columns. The `B` column is a *matrix column*, which contains the
-same number of rows as the others, but also smuggled in 17 columns
-*within* that column. Each of those 17 columns corresponds to one of our
-synthetic $B_{k}$ variables. The advantage of such a data structure is
-we can simply define our `formula` argument as $doy \sim 1 + B$, where
-`B` is a stand-in for `B.1 + B.2 + ... + B.17`.
-
-Here's how we fit the model:
-
-```{r}
-#| label: fit-model-b4.8
-#| attr-source: '#lst-fit-model-b4.8 lst-cap="Fit model b4.8"'
-
-b4.8 <- 
-  brms::brm(data = d6_b,
-      family = gaussian,
-      doy ~ 1 + B,
-      prior = c(brms::prior(normal(100, 10), class = Intercept),
-                brms::prior(normal(0, 10), class = b),
-                brms::prior(exponential(1), class = sigma)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "fits/b04.08")
-```
-
-Here is the model summary:
-
-```{r}
-#| label: summarize-model-b4.8
-#| attr-source: '#lst-summarize-model-b4.8 lst-cap="Summarize model b4.8"'
-
-brms:::print.brmsfit(b4.8)
-```
-
-In @lst-summarize-model-b4.8 I have used this time the full call for the
-generic function of `print()`. Just using `print()` would have been
-enough, but I wanted to check if I have understood the concept of a
-generic S3 method. The help file pf `print()` says:
-
-> It is a generic function which means that new printing methods can be
-> easily added for new classes.
-
-::: callout-note
-TODO: Read [S3 Chapter](https://adv-r.hadley.nz/s3.html) of Advanced R
-:::
-
-Look at that. Each of the 17 columns in our `B` matrix was assigned its
-own parameter. If you fit this model using McElreath's rethinking code,
-you'll see the results are very similar. Anyway, McElreath's comments
-are in line with the general consensus on spline modes: the parameter
-estimates are very difficult to interpret directly. It's often easier to
-just plot the results.
-
-First we'll use `brms::as_draws_df()` to transform `d6_b` to a `draw`
-object so that it can processed easier by the {**posterior**} package.
-(??)
-
-```{r}
-#| label: transform-to-draw-objects
-#| attr-source: '#lst-transform-to-draw-objects lst-cap="Transform data of model b4.8 to draw objects"'
-
-post6_b <- brms::as_draws_df(b4.8)
-
-glimpse(post6_b)
-```
-
-With a little wrangling, we can use summary information from `post6_b`
-to make our version of the middle panel of Figure 4.13.
-
-```{r}
-#| label: fig-basis-fun-weighted-b
-#| fig-cap: "Each basis function weighted by its corresponding parameter"
-#| attr-source: '#lst-fig-basis-fun-weighted-b lst-cap="Weight each basis function by its corresponding parameter"'
-
-post6_b |> 
-  select(b_B1:b_B17) |> 
-  set_names(c(str_c(0, 1:9), 10:17)) |> 
-  pivot_longer(everything(), names_to = "bias_function") |> 
-  group_by(bias_function) |> 
-  summarise(weight = mean(value)) |> 
-  full_join(b_b, by = "bias_function") |> 
-  
-  # plot
-  ggplot(aes(x = year, y = bias * weight, group = bias_function)) +
-  geom_vline(xintercept = knot_list15_b, color = "white", alpha = 1/2) +
-  geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank()) 
-```
-
-In case you missed it, the main action in the {**ggplot2**} code was
-`y = bias * weight`, where we defined the $y$-axis as the product of
-`bias` and `weight`. This is fulfillment of the $w_k B_{k, i}$ parts of
-the model.
-
-Now here's how we might use `brms:::fitted.brmsfit()` to get the
-*expected values of the posterior predictive distribution* to make the
-lower plot of Figure 4.13.
-
-```{r}
-#| label: fig-post-pred-dist-b
-#| fig-cap: "Expected values of the posterior predictive distribution"
-#| attr-source: '#lst-fig-post-pred-dist-b lst-cap="Expected values of the posterior predictive distribution"'
-
-f <- brms:::fitted.brmsfit(b4.8)
-
-f |> 
-  data.frame() |> 
-  bind_cols(d6_b) |> 
-  
-  ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) + 
-  geom_vline(xintercept = knot_list15_b, color = "white", alpha = 1/2) +
-  geom_hline(yintercept = brms::fixef(b4.8)[1, 1], color = "white", linetype = 2) +
-  geom_point(color = "#ffb7c5", alpha = 1/2) +
-  geom_ribbon(fill = "white", alpha = 2/3) +
-  labs(x = "year",
-       y = "day in year") +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank())
-```
-
-If it wasn't clear, the dashed horizontal line intersecting a little
-above 100 on the $y$-axis is the posterior mean for the intercept.
-
-##### Model with five knots
-
-Now let's use our skills to remake the simpler model expressed in Figure
-4.12. This model, recall, is based on 5 knots.
-
-```{r}
-#| label: fit-5-knot-model-b
-#| attr-source: '#lst-fit-5-knot-model-b lst-cap="Fit model with only 5 knots"'
-
-# redo the `B` splines
-num_knots5_b <- 5
-knot_list5_b <- quantile(d5_b$year, 
-             probs = seq(from = 0, to = 1, length.out = num_knots5_b))
-
-B5_b <- splines::bs(d5_b$year,
-        knots = knot_list5_b[-c(1, num_knots5_b)], 
-        # this makes the splines liner rater than cubic
-        degree = 1, 
-        intercept = TRUE)
-
-# define a new data frame (d7_b)
-d7_b <- 
-  d5_b |> 
-  mutate(B = B5_b)
-
-b4.9 <- 
-  brms::brm(data = d7_b,
-      family = gaussian,
-      formula = doy ~ 1 + B,
-      prior = c(brms::prior(normal(100, 10), class = Intercept),
-                brms::prior(normal(0, 10), class = b),
-                brms::prior(exponential(1), class = sigma)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "fits/b04.09")
-```
-
-Review the new model summary.
-
-```{r}
-#| label: print-5-knot-model-b
-#| attr-source: '#lst-print-5-knot-model-b lst-cap="Print summary of 5 knot model"'
-
-print(b4.9)
-```
-
-Here we do all the work in bulk to make and save the three subplots for
-Figure 4.12.
-
-```{r}
-#| label: prepare-3-subplots-figure-4.12-b
-#| attr-source: '#lst-prepare-3-subplots-figure-4.12-b lst-cap="Prepare three subplots for Figure 4.12"'
-
-## top
-## wrangle a bit
-
-b5_b <-
-  invoke(data.frame, d7_b) |> 
-  pivot_longer(starts_with("B"),
-               names_to = "bias_function",
-               values_to = "bias")
-  
-# plot
-p10 <- 
-  b5_b |> 
-  ggplot(aes(x = year, y = bias, group = bias_function)) +
-  geom_vline(xintercept = knot_list5_b, color = "white", alpha = 1/2) +
-  geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
-  scale_x_continuous(NULL, breaks = NULL) +
-  ylab("bias value")
-
-## middle
-# wrangle
-p11 <-
-  brms::as_draws_df(b4.9) |> 
-  select(b_B1:b_B5) |> 
-  set_names(str_c("B.", 1:5)) |> 
-  pivot_longer(everything(), names_to = "bias_function") |> 
-  group_by(bias_function) |> 
-  summarise(weight = mean(value)) |> 
-  full_join(b5_b, by = "bias_function") |> 
-  
-  # plot
-  ggplot(aes(x = year, y = bias * weight, group = bias_function)) +
-  geom_vline(xintercept = knot_list5_b, color = "white", alpha = 1/2) +
-  geom_line(color = "#ffb7c5", alpha = 1/2, linewidth = 1.5) +
-  scale_x_continuous(NULL, breaks = NULL)
-
-## bottom
-# wrangle
-f2_b <- fitted(b4.9)
-
-p12 <-
-  f2_b |> 
-  data.frame() |> 
-  bind_cols(d7_b) |> 
-  
-  # plot
-  ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) + 
-  geom_vline(xintercept = knot_list5_b, color = "white", alpha = 1/2) +
-  geom_hline(yintercept = brms::fixef(b4.9)[1, 1], color = "white", linetype = 2) +
-  geom_point(color = "#ffb7c5", alpha = 1/2) +
-  geom_ribbon(fill = "white", alpha = 2/3) +
-  labs(x = "year",
-       y = "day in year")
-```
-
-Now combine the subplots with {**patchwork**} syntax and behold their
-glory.
-
-```{r}
-#| label: fig-subplots-figure-4.12-b
-#| fig-cap: "Subplots of Figure 4.12"
-#| attr-source: '#lst-fig-subplots-figure-4.12-b lst-cap="Subplots of Figure 4.12"'
-
-# library(patchwork) ## already in setup chunk
-(p10 / p11 / p12) &
-  theme_bw() &
-  theme(panel.background = element_rect(fill = "#4f455c"),
-        panel.grid = element_blank())
-```
-
-#### Smooth functions for a rough world
-
-Taking the reference to Woods Book about Additive Generalized Models
-(see @prp-resources-for-gams) Kurz adds two bonus section:
-
--   Smooth functions with `brms::s()` and
--   Group predictors with matrix columns
-
-I will include these two addition without completely understanding the
-code at the moment (2023-08-18) hoping that I will come later to these
-two section with a richer knowledge.
-
-But there is already one important learning I have gotten from the bonus
-section: It is evident that fitting models in different circumstances is
--- with minor changes -- follow always the same procedures with almost
-the same R code.
-
-### Bonus sections
-
-#### Smooth functions with `brms::s()`
-
-We might use the `brms::get_prior()` function to get a sense of how to
-set up the priors when using `brms::s()`
-
-```{r}
-#| label: get-priors-bonus
-#| attr-source: '#lst-get-prior-bonus lst-cap="Get priors when using `brms::s()`"'
-
-brms::get_prior(data = d5_b,
-          family = gaussian,
-          doy ~ 1 + s(year))
-```
-
-We have an overall intercept (`class = Intercept`), a single $\beta$
-parameter for year (`class = b`), a $\sigma$ parameter
-(`class = sigma`), and an unfamiliar parameter of `class = sds`. I'm not
-going to go into that last parameter in any detail, here. We'll need to
-work our way up through @sec-chap13-models-with-memory and the
-multilevel model to get a full picture of what it means. The important
-thing to note here is that the priors for our `s()`-based alternative to
-the B-spline models, above, are going to look a little different. Here's
-how we might fit a model `b4.10` as an alternative to `b4.8`.
-
-```{r}
-#| label: fit-bosus-model-b4.10
-#| attr-source: '#lst-fit-bosus-model-b4.10 lst-cap="Fit bonus model using `brms::s()`"'
-
-b4.10 <-
-  brms::brm(data = d5_b,
-      family = gaussian,
-      doy ~ 1 + s(year),
-      prior = c(brms::prior(normal(100, 10), class = Intercept),
-                brms::prior(normal(0, 10), class = b),
-                brms::prior(student_t(3, 0, 5.9), class = sds),
-                brms::prior(exponential(1), class = sigma)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      control = list(adapt_delta = .99),
-      file = "fits/b04.10")
-
-```
-
-```{r}
-#| label: print-summary-model-b4.10
-#| attr-source: '#lst-print-summary-model-b4.10 lst-cap="Summarize b4.10 model"'
-
-print(b4.10)
-```
-
-Our intercept and σ summaries are similar to those we got from `b4.8`.
-The rest looks different and maybe a little disorienting. Here's what
-happens when we use `brms:::fitted.brmsfit()` to plot the implications
-of the model.
-
-```{r}
-#| label: plot-implications-model-b4.10
-#| attr-source: '#lst-plot-implications-model-b4.10 lst-cap="Implication of model b4.10"'
-
-fitted(b4.10) |> 
-  data.frame() |> 
-  bind_cols(select(d5_b, year, doy)) |> 
-  
-  ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) +
-  geom_hline(yintercept = brms::fixef(b4.10)[1, 1], color = "white", linetype = 2) +
-  geom_point(color = "#ffb7c5", alpha = 1/2) +
-  geom_ribbon(fill = "white", alpha = 2/3) +
-  labs(subtitle = "b4.7 using s(year)",
-       y = "day in year") +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"), 
-        panel.grid = element_blank())
-```
-
-That smooth doesn't look quite the same. Hopefully this isn't terribly
-surprising. We used a function from a different package and ended up
-with a different underlying statistical model. In fact, we didn't even
-use a B-spline. The default for `s()` is to use what's called a *thin
-plate* regression spline. If we'd like to fit a B-spline, we have to set
-`bs = "bs"`. Here's an example:
-
-```{r}
-#| label: fit-model-b4.11
-#| attr-source: '#lst-fit-model-b4.11 lst-cap="Fit bonus model b4.11"'
-
-b4.11 <-
-  brms::brm(data = d5_b,
-      family = gaussian,
-      doy ~ 1 + s(year, bs = "bs", k = 19),
-      prior = c(brms::prior(normal(100, 10), class = Intercept),
-                brms::prior(normal(0, 10), class = b),
-                brms::prior(student_t(3, 0, 5.9), class = sds),
-                brms::prior(exponential(1), class = sigma)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      control = list(adapt_delta = .99),
-      file = "fits/b04.11")
-```
-
-```{r}
-#| label: print-summary-model-b4.11
-#| attr-source: '#lst-print-summary-model-b4.11 lst-cap="Summarize b4.11 model"'
-
-print(b4.11)
-```
-
-Now here's the depiction of our `s()`-based B-spline model:
-
-```{r}
-#| label: plot-bonus-model-b4.11
-#| attr-source: '#lst-plot-bonus-model-b4.11 lst-cap="B-splines of model b4.11 using `brms::s()`"'
-
-fitted(b4.11) |> 
-  data.frame() |> 
-  bind_cols(select(d5_b, year, doy)) |> 
-  
-  ggplot(aes(x = year, y = doy, ymin = Q2.5, ymax = Q97.5)) +
-  geom_hline(yintercept = brms::fixef(b4.11)[1, 1], color = "white", linetype = 2) +
-  geom_point(color = "#ffb7c5", alpha = 1/2) +
-  geom_ribbon(fill = "white", alpha = 2/3) +
-  labs(subtitle = 'b4.7_bs using s(year, bs = "bs")',
-       y = "day in year") +
-  theme_bw() +
-  theme(panel.background = element_rect(fill = "#4f455c"), 
-        panel.grid = element_blank())
-```
-
-There are still important differences between the underlying statistical
-model for `b4.11` and the earlier `b4.8`. Kurz says that he doesn't want
-to go into the details why this is the case. For me this missing
-explication is both confusing and frustrating! I hope that with more
-knowledge and experience in fitting models I will be able to fill the
-gaps.
-
-------------------------------------------------------------------------
-
-::: {#prp-resources-for-gams2}
-Again: Resources for GAMs
-
-::: callout-tip
-This is an addition to the in @prp-resources-for-gams already collected
-resources on `r glossary("Generalized Additive Model", "GAMS")`.
+In the bonus section [Kurz](https://bookdown.org/content/4857/geocentric-models.html#summary-first-bonus-smooth-functions-with-brmss) added some more references for GAMs:
 
 -   For more on the B-splines and smooths, more generally, check out the
     blog post by the great [Gavin Simpson](https://twitter.com/ucfagls),
@@ -8779,7 +8563,7 @@ resources on `r glossary("Generalized Additive Model", "GAMS")`.
     additive models with R and mgcv](https://youtu.be/sgw4cu8hrZM).
 -   Ross offers a free online course covering {**mgcv**}, called [GAMS
     in R](https://noamross.github.io/gams-in-r-course/), and he
-    maintains a GitHub repo cataloguing other GAM-related resources,
+    maintains a GitHub repo cataloging other GAM-related resources,
     called [Resources for learning about and using GAMs in
     R](https://github.com/noamross/gam-resources).
 -   For specific examples of fitting various GAMS with {**brms**}, check
@@ -8790,579 +8574,15 @@ resources on `r glossary("Generalized Additive Model", "GAMS")`.
     thing](https://www.tjmahr.com/random-effects-penalized-splines-same-thing/),
     where he outlined the connections between penalized smooths, such as
     you might fit with {**mgcv**}, with the multilevel model, which
-    we'll learn all about starting in @sec-chap13-models-with-memory,
-    which helps explain what's going on with the `s()` function in our
-    last two models, `b4.10` and `b4.11`.
-:::
-:::
-
-------------------------------------------------------------------------
-
-#### Group predictors with matrix columns
-
-When we fit `b4.8`, our direct {**brms**} analogue to McElreath's
-`m4.7`, we used a compact syntax to pass a matrix column of predictors
-into the `formula.` If memory serves, this is one of the only places in
-the text where we see this. It would be easy for the casual reader to
-think this was only appropriate for something like a spline model. But
-that's not the case. One could use the matrix-column trick as a general
-approach. In this bonus section, we'll explore how.
-
-In Section 11.2.6 of their book "Regression and Other Stories", Gelman,
-Hill, and Vehtari worked through an example of a multiple regression
-model,
-
-------------------------------------------------------------------------
-
-::: {#def-multiple-regression-model}
-Example of a multiple regression model
-
-$$
-\begin{align*}
-y_i & \sim \operatorname{Normal}(\mu_i, \sigma) \\
-\mu_i & = \alpha + \theta z_i + \sum_{k = 1}^K b_k x_{k, i} \\
-& \text{<priors>},
-\end{align*}
-$$ {#eq-multiple-regression-model}
-:::
-
-------------------------------------------------------------------------
-
-where $y_i$ was some continuous variable collected across participants,
-$i$. The $\alpha$ term was the intercept and the $\theta$ term was the
-regression slope for a binary variable $z$--we'll practice with binary
-predictors in the section for categorical-variables in @sec-chap05. More
-to our interest, the last portion of the equation is a compact way to
-convey there are $K$ additional predictors and their associated
-regression coefficients, which we might more explicitly express as
-$\beta_1 x_{1, i} + \cdots + \beta_k x_{k, i}$, where $K \geq 1$. In
-this particular example, $K = 10$, meaning there were ten $x_{k, i}$
-predictors, making this an example of a model with 11 total predictor
-variables.
-
-Riffing off of Gelman and colleagues, here's how you might simulate data
-of this kind.
-
-```{r}
-#| label: simulate-data-multiple-regression-b
-#| attr-source: '#lst-simulate-data-multiple-regression-b lst-cap="Simulate data for multiple regression analysis"'
-
-# how many cases would you like?
-n8_b <- 100
-
-# how many continuous x predictor variables would you like?
-k8_b <- 10
-
-# simulate a dichotomous dummy variable for z
-# simulate an n by k array for X
-set.seed(4)
-
-d8_b <- 
-  tibble(z = sample(0:1, size = n8_b, replace = T),
-         X = array(runif(n8_b * k8_b, min = 0, max = 1), dim = c(n8_b, k8_b)))
-
-# set the data-generating parameter values
-a8_b     <- 1
-theta8_b <- 5
-b8_b     <- 1:k8_b
-sigma8_b <- 2
-
-# simulate the criterion
-d9_b <-
-  d8_b |> 
-  mutate(y = as.vector(a8_b + X %*% b8_b + theta8_b * z + rnorm(n8_b, mean = 0, sd = sigma8_b)))
-
-# check the data structure
-d9_b |> 
-  glimpse()
-```
-
-Although our `d9_b` tibble has only three columns, the `X` column is a
-matrix column into which we've smuggled ten columns more. Here's how we
-might access them more directly.
-
-```{r}
-#| label: access-nested-df
-#| attr-source: '#lst-access-nested-df lst-cap="Acess nested data frame in tibble"'
-
-d9_b |> 
-  pull(X) |> 
-  glimpse()
-```
-
-See? There's an $100 \times 10$ data matrix in there.
-
-Here's how to fit the full model with {**brms**} where we use the
-compact matrix-column syntax in the `formula` argument.
-
-```{r}
-#| label: fit-model-b4.12-b
-#| attr-source: '#lst-fit-model-b4.12-b lst-cap="Fit model b4.12"'
-
-b4.12 <-
-  brms::brm(data = d9_b,
-      family = gaussian,
-      y ~ 1 + z + X,
-      prior = c(brms::prior(normal(0, 2), class = Intercept),
-                brms::prior(normal(0, 10), class = b),
-                brms::prior(exponential(1), class = sigma)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "fits/b04.12")
-```
-
-Check the parameter summary.
-
-```{r}
-#| label: print-summary-model-b4.12-b
-#| attr-source: '#lst-print-summary-model-b4.12-b lst-cap="Summarize model b4.12"'
-
-print(b4.12)
-```
-
-**brms** automatically numbered our $K = 10$ `X` variables as `X1`
-through `X10`. As far as applications go, I'm not sure where I'd use
-this way of storing and modeling data in real life. But maybe some of
-y'all work in domains where this is just the right way to approach your
-data needs. If so, good luck and happy modeling.
-
-## `SYNOPSIS`
-
-### Original
-
-The chapter introduces linear regression as a Bayesian procedure.
-
-#### Why are normal distributions normal?
-
-It starts with answering the question: Why are normal distributions
-normal? Any process that adds together random values from the same
-distribution converges to a normal. Why? Because the different
-fluctuations around the mean cancel one another out. The result is a
-Gaussian distribution.
-
-#### A language for describing models
-
-Then a formal language for describing models is presented. To know this
-language is important because it closes the gap between scientific
-knowledge resp. assumptions and the statistical model. Models are
-mappings of one set of variables through a probability distribution onto
-another set of variables. In these language for models, defines the
-first line the likelihood function used in
-`r glossary("Bayes’ theorem")`. The other lines define priors.
-
-The procedure: 1. First, we recognize a set of variables to work with.
-Some of these variables are observable. We call these *data.* Others are
-unobservable things like rates and averages. We call these *parameters.*
-2. We define each variable either in terms of the other variables or in
-terms of a probability distribution. 3. The combination of variables and
-their probability distributions defines a *joint generative model* that
-can be used both to simulate hypothetical observations as well as
-analyze real ones.
-
-#### Gaussian model of heights {#sec-gaussian-model-of-heights-r}
-
-With the dataset of adults (age \>=18) of the !Kung San foraging people
-our goal is to model the height values using a Gaussian distribution. To
-define the heights as normally distributed with a mean `μ` and standard
-deviation `σ`, we write $h_i \sim \operatorname{Normal}(\mu, \sigma)$.
-To complete the model we need prior for the mean
-$\mu \sim \operatorname{Normal}(178, 20)$ and the standard deviation
-$\sigma \sim \operatorname{Uniform}(0, 50)$.
-
-The prior for `μ` is a broad Gaussian prior, centered on 178 cm, with
-95% of probability between 178 ± 40 cm. It range from 138 cm to 218 cm
-encompasses a huge range of plausible mean heights for human
-populations. So domain-specific information has gone into this prior.
-The `σ` prior is a flat prior, an uniform one, that functions just to
-constrain `σ` to have positive probability between zero and 50 cm.
-
-##### Plotting the priors
-
-------------------------------------------------------------------------
-
-::: {#prp-always-plot-priors}
-Always plot the priors!
-
-::: callout-important
-Ir is important to plot your priors, so you have a sense of the
-assumption they build into your model.
-:::
-:::
-
-------------------------------------------------------------------------
-
-`graphics::curve()` draws a curve corresponding to a function over the
-interval `[from, to]`. How to use the interval? Experiment with it to
-get a range that will show all possible values.
-
-------------------------------------------------------------------------
-
-::: {#prp-knowledge-priors}
-Using scientific knowledge to build priors
-
-::: callout-important
-Very useful is the knowledge that if you double $\sigma$ and subtract
-resp. add that value to the mean, then you will get an area where 95% of
-all expected values should be found.
-
-For instance a standard deviation of 20 cm with a mean of 178 cm would
-imply that 95% of individual heights lie between 138 cm and 218 cm.
-That's a very large range. The same calculation happens with $\sigma$
-where a standard deviation of 50 means that 95% of all values lie in the
-range of 100 cm.
-
-Using scientific knowledge to build priors is not cheating. The
-important thing is that your priors are not based on the values in the
-data, but only on what you know about the data before you see it.
-:::
-:::
-
-------------------------------------------------------------------------
-
-```{r}
-#| label: fig-priors-r
-#| fig-cap: "Plotting priors of the height model: rethinking version"
-#| attr-source: '#lst-ig-priors-r lst-cap="Plot priors of height model: rethinking version"'
-
-## R code 4.12 & 4.13 ##############
-curve(dnorm(x, 178, 20), from = 100, to = 250)
-curve(dunif(x, 0, 50), from = -10, to = 60)
-```
-
-##### Prior predictive simulation
-
-It'll help to see what these priors imply about the distribution of
-individual heights. The `r glossary("prior predictive simulation")` is
-an essential part of your modeling. Once you've chosen priors these
-imply a joint prior distribution of individual heights. By simulating
-from this distribution, you can see what your choices imply about
-observable height.
-
-You can quickly simulate heights by sampling from the prior, like you
-sampled from the posterior back in @sec-sampling-the-imaginary.
-Remember, every posterior is also potentially a prior for a subsequent
-analysis, so you can process priors just like posteriors.
-
-Instead of using the density family of distributions when plotting the
-priors we are going now to use the random family of distributions (i.e.,
-using `rnorm()` and `runif()` instead of `dnorm()` and `dunif()`.
-
-```{r}
-#| label: fig-prior-predictive-sim-r
-#| fig-cap: "Simulate heights by sampling from the prior: rethinking version"
-#| attr-source: '#lst-fig-prior-predictive-sim-r lst-cap="Heights by sampling from the prior: rethinking version"'
-
-set.seed(4) # to make example reproducible
-## R code 4.14 #######################################
-sample_mu_r <- rnorm(1e4, 178, 20)
-sample_sigma_r <- runif(1e4, 0, 50)
-prior_h_r <- rnorm(1e4, sample_mu_r, sample_sigma_r)
-rethinking::dens(prior_h_r, norm.comp = TRUE)
-```
-
-#### EMPTY: Grid approximation of the posterior distribution
-
-#### EMPTY: Sampling from the posterior
-
-#### Finding the posterior distribution with quap
-
-I skipped the grid approximation and the sampling from it. It has mostly
-only educational value as it works only with a few parameters and is
-computationally expensive. Besides it has complex code that has no
-additional conceptual value to understand the purpose of the procedure.
-
-------------------------------------------------------------------------
-
-::: {#prp-using-quap}
-`rethinking:quap()` has three parts to complete
-
-::: note-important
-1.  A formula or `base::alist()` of formulas that define the likelihood
-    and priors.
-2.  A data frame or list containing the data.
-3.  Some options like start values of method for search optimization.
-    Note that the list of start values is a regular `list()`, not an
-    `alist()` like the formula list is.
-:::
-:::
-
-------------------------------------------------------------------------
-
-```{r}
-#| label: post-dist-quap-r4.1
-#| attr-source: '#lst-post-dist-quap-r4-1 lst-cap="Finding the posterior distribution with rethinking::quap(): Model r4.1"'
-
-## R code 4.26 modified #############
-data(package = "rethinking", list = "Howell1")
-d_r <- Howell1
-d2_r <- d_r[d_r$age >= 18, ]
-
-## R code 4.27 & 4.28 modified ##############
-r4.1 <- rethinking::quap(
-    alist(
-        height ~ dnorm(mu, sigma),
-        mu ~ dnorm(178, 20),
-        sigma ~ dunif(0, 50)
-    ),
-    data = d2_r
-)
-
-## R code 4.29 ###########
-rethinking::precis(r4.1)
-```
-
-#### Sampling from the quap
-
-I skip the long and diffusing discussion about the
-`r glossary("dispersion matrix", "covariance matrix")`.
-
-Instead of sampling single values from a simple Gaussian distribution,
-we sample vectors of values from a multi-dimensional Gaussian
-distribution. The {**rethinking**} package provides a convenience
-function to do exactly that:
-
-```{r}
-#| label: extract-samples-r4.1
-#| attr-source: '#lst-extract-samples-r4.1 lst-cap="Extract sample vectors of values from the multi-dimensional Gaussian distribution of r4.1: rethinking version"'
-
-
-## R code 4.34 #######################
-post_r <- rethinking::extract.samples(r4.1, n = 1e4)
-rethinking::precis(post_r)
-```
-
-We have ended up with a data frame, `post_t`, with 10,000 (1e4) rows and
-two columns, one column for `μ` and one for `σ`. Each value is a sample
-from the posterior, so the mean and standard deviation of each column
-will be very close to the `r glossary("MAP")` values from
-@lst-post-dist-quap-r4-1.
-
-#### Linear prediction
-
-How do we take our Gaussian model from @sec-gaussian-model-of-heights-r
-that finally resulted in the `r glossary("prior predictive simulation")`
-of @fig-prior-predictive-sim-r and add
-`r glossary("predictor variable", "predictor variables")` to it?
-
-I we plot height against weight of our data in `d2_r` we will
-intuitively see that there is a relationship. How to make this vague
-observation into a more precise quantitative
-`r glossary("statistical model")`?
-
-We are using the same procedure as in {@sec-gaussian-model-height-r}:
-
-1.  Construct the model specification: As always we have to construct
-    sensible priors. It helps to plot a
-    `r glossary("prior predictive simulation")`. In comparison to
-    @eq-height-linear-model-m4-1 we have to add a prior for the new
-    parameter, `β`. It turned out that this prior has to be in log-scale
-    to prevent height and weight values below zero.
-2.  Then we have to incorporate our new model
-    @eq-height-weight-linear-model2-m4-3 for the mean into the model
-    specification inside `rethinking::quap()`
-3.  With the resulting model we are able to plot the posterior inference
-    against the data.
-
-##### Step 1: Construct model with sensible priors
-
-------------------------------------------------------------------------
-
-::: {#def-height-weight-linear-model-r4.3}
-###### Linear model height against weight (model r4.3)
-
-$$
-\begin{align*}
-h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\ 
-μ_{i} = \alpha + \beta(x_{i}-\overline{x}) \space \space (2) \\
-\alpha \sim \operatorname{Normal}(178, 20) \space \space (3)  \\ 
-\beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
-\sigma \sim \operatorname{Uniform}(0, 50)  \space \space (5) \\    
-\end{align*} 
-$$ {#eq-height-weight-linear-model-r4.3}
-:::
-
-------------------------------------------------------------------------
-
-##### Step 2: Incorporate new model into quap function
-
-```{r}
-#| label: find-post-dist-r4.3
-#| attr-source: '#lst-find-post-dist-r4.3 lst-cap="Find the posterior distribution of the linear height-weight model: rethinking version"'
-
-## R code 4.42 #############################
-
-# define the average weight, x-bar
-xbar_r <- mean(d2_r$weight)
-
-# fit model
-r4.3 <- rethinking::quap(
-  alist(
-    height ~ dnorm(mu, sigma),
-    mu <- a + b * (weight - xbar_r),
-    a ~ dnorm(178, 20),
-    b ~ dlnorm(0, 1),
-    sigma ~ dunif(0, 50)
-  ),
-  data = d2_r
-)
-
-# summary result
-## R code 4.44 ############################
-rethinking::precis(r4.3)
-```
-
-##### Step 3: Plot the posterior inference
-
-```{r}
-#| label: fig-raw-data-line-r4.3
-#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: rethinking version"
-#| attr-source: '#lst-fig-raw-data-line-r4.3 lst-cap="Height against weight with linear regression"'
-
-## R code 4.46 ############################################
-plot(height ~ weight, data = d2_r, col = rethinking::rangi2)
-post_r4.3 <- rethinking::extract.samples(r4.3)
-a_map <- mean(post_r4.3$a)
-b_map <- mean(post_r4.3$b)
-curve(a_map + b_map * (x - xbar_r), add = TRUE)
-```
-
-## STOPPED ORIGINAL HERE! (2023-08-20)
-
-### Tidyverse
-
-#### EMPTY: Why are normal distribution normal?
-
-#### EMPTY: A language for describing models
-
-#### Gausian model of heights
-
-##### Plotting the priors
-
-```{r}
-#| label: fig-priors-t
-#| fig-cap: "Plotting priors of the height model: tidyverse version"
-#| attr-source: '#lst-ig-priors-t lst-cap="Plot priors of height model: tidyverse version"'
-
-tibble(x = seq(from = 100, to = 250, by = .1)) |> 
-ggplot(aes(x = x, y = dnorm(x, mean = 178, sd = 20))) +
-geom_line() 
-
-tibble(x = seq(from = -10, to = 60, by = .1)) |>
-ggplot(aes(x = x, y = dunif(x, min = 0, max = 50))) +
-geom_line()
-```
-
-##### Prior predictive simulation
-
-We simulate from both priors at once to get a
-`r glossary("prior predictive simulation")` of `heights.`
-
-```{r}
-#| label: fig-prior-predictive-sim-t
-#| fig-cap: "Simulate heights by sampling from the prior: tidyverse version"
-#| attr-source: '#lst-fig-prior-predictive-sim-t lst-cap="Heights by sampling from the prior: tidyverse version"'
-
-set.seed(4)
-
-# simulation
-  tibble(sample_mu    = rnorm(1e4, mean = 178, sd  = 20),
-         sample_sigma = runif(1e4, min = 0, max = 50)) |> 
-  mutate(height = rnorm(1e4, mean = sample_mu, sd = sample_sigma)) |> 
-  
-# plot
-  ggplot(aes(x = height)) +
-  geom_density(fill = "deepskyblue")
-```
-
-In contrast to @fig-prior-predictive-sim2-a where we have seen negative
-heights and giants of more than 5 meter, the prior predictive simulation
-here is better but still -- with our world knowledge - not realistic as
-there never have been people of about three meter. But [Robert Pershing
-Wadlow](https://en.wikipedia.org/wiki/Robert_Wadlow) as the largest man
-ever measured with 2.72 meter is pretty near of the maximum height in
-@fig-prior-predictive-sim-t.
-
-#### Finding the posterior distribution with brm
-
-```{r}
-#| label: fig-post-dist-brm-t
-#| fig-cap: "Posterior Distribution of height model"
-#| attr-source: '#lst-fig-post-dist-brm-t lst-cap="Posterior Distribution of height model with `brms::brm()`"'
-
-data(package = "rethinking", list = "Howell1")
-d_t <- Howell1
-d2_t <- d_t[d_r$age >= 18, ]
-
-t4.1 <- 
-  brms::brm(data = d2_t, 
-      family = gaussian,
-      height ~ 1,
-      prior = c(brms::prior(normal(178, 20), class = Intercept),
-                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
-      iter = 2000, warmup = 1000, chains = 4, cores = 4,
-      seed = 4,
-      file = "fits/t04.01")
-
-print(t4.1)
-```
-
-The `summary()` functions for `brmsfit` objects gives identical results.
-A slightly different output results from a Stan-like summary with
-`t4.1$fit`.
-
-To get different intervals than the 95% default values you can use the
-`prob` argument for the `print()` or `summary()` function, for instance
-`summary(t4.1, prob = .89)`.
-
-#### Sampling from a brm() fit
-
-Again I will skip some details of the complex and confusing
-`r glossary("dispersion matrix")` discussion. The important thing in the
-tidyverse framework is, that we have to put the `r glossary("HMC")`
-chains result of `brms::brm()` in a data frame. We do that with the
-important `brms::as_draws_df()` function:
-
-```{r}
-#| label: sample-post-dist-t4.1
-#| attr-source: '#lst-sample-post-dist-t4.1 lst-cap="Sample posterior distribution from t4.1"'
-
-post_t <- brms::as_draws_df(t4.1)
-head(post_t)
-```
-
-From here we can compute `r glossary("covariance")` and
-`r glossary("correlation")`.
-
-```{r}
-#| label: cov-t4.1
-#| attr-source: '# lst-cov-t4.1 lst-cap="Compute covariance matrix for model t.41"'
-
-post_t |> 
-    select(b_Intercept:sigma) |> 
-    cov()
-```
-
-```{r}
-#| label: cor-t4.1
-#| attr-source: '# lst-cor-t4.1 lst-cap="Compute correlation matrix for model t.41"'
-
-post_t |> 
-    select(b_Intercept:sigma) |> 
-    cor()
-```
-
-------------------------------------------------------------------------
-
-::: callout-note
-###### TODO attr-source
-
-Check if all code chunk have an `attr-source:` attribute. The last one I
-did was in @lst-fig-sim-heights-only-with-priors-b.
-:::
-
-------------------------------------------------------------------------
-
-## STOPPED TIDYVERSE HERE! (B: 2023-08-20)
+    we'll learn all about starting in @sec-chap13.
+    
+::::
+:::::
+
+In this reference Kurz announces that in @sec-chap13 we will understand better what's going on with the `s()` function that he described in his first bonus section. As I didn't understand this bonus section I skipped it and will come back to this section when I have understood more on GAMs and related model fitting procedures. 
+
+In the second bonus section Kurz explained that compact syntax to pass a matrix column of predictors into the formula as used in tab "matrix" in @exm-chap04-fit-cherry-blossoms-m4-7b was not an isolated trick but is a general approach. He referenced an example of a multiple regression
+model in Section 11.2.6 of the book "Regression and Other Stories", by Gelman, Hill, and Vehtari. I skip this second bonus section too as I do not have sufficient knowledge to fully understand the procedure.
 
 ## Practice
 
