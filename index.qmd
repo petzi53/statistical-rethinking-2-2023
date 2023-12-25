@@ -15,23 +15,6 @@ This is work in progress: At the moment I am working on the practice section of 
 
 ## Content and Goals of this Book {.unnumbered}
 
-::: my-watch-out
-::: my-watch-out-header
-Rules of second draft not yet explained in the following passages
-:::
-
-::: my-watch-out-container
-In the second draft I have used a different organization. The following
-text does not yet reflect these new callout boxes and the rules that now
-apply. I have postponed to adapt the explications until I have more
-experiences about their usefulness. I think this will be the case after
-I have finished to reformat the end of chapter 4 with the rules of the
-second draft.
-:::
-:::
-
-### Text Passages {.unnumbered}
-
 This book collects personal notes during reading of Statistical
 Rethinking by Richard McElreath. I am using the [second
 edition](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919)
@@ -55,6 +38,88 @@ the files conform to the section numbers of the [second edition of the
 printed
 book](https://www.routledge.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
 
+
+::: my-watch-out
+::: my-watch-out-header
+WATCH OUT: This is my personal learning material and is therefore not an
+authoritative textbook!
+:::
+
+::: my-watch-out-container
+I wrote this book as a text for others to read because that forces me to
+be become explicit and explain all my learning outcomes more carefully.
+Please keep in mind that this text is not written by an expert but by a
+learner. In spite of replicating most of the content it may contain many
+mistakes. All these misapprehensions and errors are my responsibility.
+:::
+:::
+
+
+## Text Passages {.unnumbered}
+
+My text consists mostly of quotes from the first edition of Harris’
+book. I converted my kindle book into a PDF file which I copied via the
+annotation system in [Zotero](https://www.zotero.org/) into my Quarto
+files.
+
+::: my-example
+::: my-example-header
+::: {#exm-preface-quote}
+: Quote
+:::
+:::
+
+::: my-example-container
+
+> “Bayesian inference is really just counting and comparing of possibilities.” ([McElreath, 2020, p. 20](zotero://select/groups/5243560/items/NFUEVASQ)) ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=39&annotation=JYNC25AE))
+:::
+:::
+
+\@exm-preface-quote has links to my PDF and also to my annotation of
+the PDF. These links are a practical way for me to get the context of
+the quote. But as the linked PDF is saved locally at my hard disk these
+links do not work for you! (There is an option about [Zotero
+groups](https://www.zotero.org/groups) to share files, but the PDF is
+not free to use and so I can't offer this possibility.)
+
+Often I made minor editing (e.g., shorting the text) or put the content
+in my own wording. In this case I couldn't quote the text as it does not
+represent a specific annotation in my Zotero file. In this case I ended
+the paraphrase with `(McElreath ibid.)`.
+
+In any case most of the text in this Quarto book is not mine but coming
+from different resources (McElreath’ book or video lectures, [Kurz’ website](https://bookdown.org/content/4857/), R help files, packages vignettes, …). Most of
+the time I have put my own personal notes into a notes box as shown in
+@exm-preface-note.
+
+::: my-example
+::: my-example-header
+::: {#exm-preface-note}
+: Personal note
+:::
+:::
+
+::: my-example-container
+::: my-note
+::: my-note-header
+::: {#cor-preface-note-example}
+: This is a personal note
+:::
+:::
+
+::: my-note-container
+In this kind of box I will write my personal thoughts and reflections.
+Usually this box will appear stand-alone (without the wrapping example
+box).
+:::
+:::
+:::
+:::
+
+In any case I am the only responsible person for this text, especially
+if I have used code from the resources wrongly or misunderstood a quoted
+text passage.
+
 Sections with the
 
 -   header "Original" refers to the original book
@@ -64,92 +129,62 @@ Sections with the
 -   header "Reconsideration" refers to sections with my personal
     comments.
 
-My text and code consists mostly of quotes from the - second book
-edition 2020 or - from the text of Robert McElreath's video lectures
-2023 or - from Solomon Kurz's tidyverse / brms version or - from Vincent
-Arel-Bundock converted Stan code version.
 
-Often I made minor editing (e.g., shorting the text) or put the content
-in my own wording. But almost all of my text of this Quarto book are not
-mine, but is coming from the resources mentioned above. Therefore I had
-many times not indicated these quotes. If you follow the book or the
-other resources you will note the similarities and know to which
-paragraph or section I am referring. And you will also realize whenever
-the text passage reflects my own thoughts. In any case I am the only
-responsible person for this text, especially if I have used code from
-the resources wrongly or misunderstood a quoted text passage.
 
-::: callout-warning
-###### Warning
-
-I wrote this book as a text for others to read because that forces me to
-be become explicit and explain all my learning outcomes more carefully.
-Please keep in mind that this text is not written by an expert but by a
-learner. In spite of replicating most of the content it may contain many
-mistakes. All these misapprehensions and errors are my responsibility.
-:::
-
-### Code Chunks {.unnumbered}
+## Code Chunks {.unnumbered}
 
 Packages {**rethinking**} and {**brms**} have similar tasks. Therefore
 they share a lot of identical function name. Kurz has unloaded the
 {**rethinking**} package when it came to explain {**brms**} function and
 to prevent name conflicts. But this approach is not efficient for the
 structure of my documents where I have constantly changed between these
-two packages. So I just loaded with `base::library()` only the
-{**tidyverse**} meta packages with it attached nine packages:
-{**dplyr**}, {**forcats**}, {**ggplot2**}, {**lubridate**}, {**purrr**},
-{**readr**}, {**stringr**}, {**tibble**}, and {**tidyr**}.
+two packages. So I have used the advice "Qualifying namespace" from the [Google’s R Style Guide](https://google.github.io/styleguide/Rguide.html). 
 
-Whenever I used another packages I called the function with the package
-name in front with the syntax `<package name>::<function name>()`.
+Whenever I used a function I called the function with the package name in front with the syntax `<package name>::<function name>()`. Besides preventing conflicts with functions of identical names
+from different packages it helps to learn (or remember) which function
+belongs to which package. I think this justifies the small overhead and
+helps to make R code chunks self-sufficient. (No previous package
+loading, or library calls in the setup chunk.) To foster learning the
+relation between function and package I embrace the package name with
+curly brakes and format it in bold.
 
 To prevent conflicts in chunk names, objects and variables I added the
 following suffix to the end of the name:
 
--   suffix `a` for the original book version in the main text
--   suffix `b` for the {**tidyverse**} / {**brms**} version in the main
-    text
--   suffix `c` for the {**rstan**} version in the main text (not used)
--   suffix `ea`for the book version (R Base / {**rethinking**}) of the
-    exercises
--   suffix `eb`for the {**tidyverse**} / {**brms**} version of the
-    exercises
--   suffix `r` for the {**rethinking**} version in the synopsis
--   suffix `s` for the Stan {**rstan**} version in the synopsis
--   suffix `t` for the {**tidyverse**} / {**brms**} version in the
-    synopsis
+-   suffix `a` for the original book version
+-   suffix `b` for the {**tidyverse**} / {**brms**} version
+
+To distinguish the models I used
+
+- m<chapter-number>.<running.number>a for the original book version
+- m<chapter-number>.<running.number>b for the {**tidyverse**} / {**brms**}
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-preface-model-name}
+: Name of models
+::::::
+:::
+::::{.my-example-container}
+
+- The model name `m4.3a` refers to the third {**rethinking**} model in the fourth chapter.
+- The model name `m2.1b` refers to the first {**tidyberse**}/{**brms**} model in the second chapter.
+- To refer to graphics, code snippets etc. I have the dot replaced by a dash, for instance `#| label: chap04-precis2-m4-1a` is the chunk label in the fourth chapter using the second version of the `precis` summary for model `m4.1a`.
+::::
+:::::
+
+
 
 I am not using the exact code snippets for my replications because I am
 not only replicating the code to see how it works but also to change the
-values of parameters to observe their influences. Especially when it
-comes to plotting I try to use
-[ggplot2](https://ggplot2.tidyverse.org/reference/index.html) instead
-the base plotting system I have no experience at all.
+values of parameters to observe their influences. 
 
-As I have already some experiences with the {**tidyverse**} approach I
-do not include all code snippets from Kurz's version. I am concentrating
-to learn Bayesian statistics and if there are no conceptual news for me
-I am not going to include the corresponding passages.
+My focus is on learning Bayesian statistics. Therefore I have not replicated all code snippets from Kurz’ version in case they have no relation to Bayesian statistics but are just graphics explaining general procedures.
 
 This is my first book using [Quarto](https://quarto.org/) instead of
 [bookdown](https://bookdown.org/yihui/bookdown/) I am using these notes
 therefore also to learn Quarto. As a result you will find sometimes
 remarks or call-out blocks to my Quarto experiences.
-
-### Synopsis {.unnumbered}
-
-At the end of each chapter I summarize the rationale for the used
-techniques. It is more than a summary because it goes into details of
-code chunks. But I will leave out all supporting or illustrating
-passages and focus on a holistic point of view. The code chunks are
-somewhat cleaned so that the most important code snippets to understand
-the technique are in the center.
-
-This synopsis gives me another occasion to digest the main points and
-try out the most important code chunks of the text. I will use the same
-names for code chunks, objects and variables as in the main text but
-with different suffixes (`r`, `s`, `t` instead of `a`, `b`, `c`).
 
 ## Get Code Examples {.unnumbered}
 
@@ -157,109 +192,112 @@ Go to the [book website](https://xcelab.net/rm/statistical-rethinking/)
 and download the [R code
 examples](http://xcelab.net/rmpubs/sr2/code.txt) for the book.
 
+***
+
 ```{r}
-#| label: download-code-examples
+#| label: preface-download-code-examples
 #| eval: false
+#| attr-source: '#lst-preface-download-code-examples lst-cap="Download R code for book examples (not evaluated here)"'
 
 dir.create("R")
 download.file("http://xcelab.net/rmpubs/sr2/code.txt", "R/code.R")
 
 ```
 
-::: callout-caution
-###### Caution
-
-There are big differences between the code snippets of the 2nd edition
-collected in [code.txt](http://xcelab.net/rmpubs/sr2/code.txt) and the
-new version preparing the 3rd book version. These new code snippets can
-be found in the slides and/or in the videos. I will always refer to the
-place where they can be found.
-
-Additionally you will find all the scripts supporting the animation in
-the lectures at the [new 2023 github
-repo](https://github.com/rmcelreath/stat_rethinking_2023).
-:::
+***
 
 The style of the code snippets is not the [tidyverse
 style](https://style.tidyverse.org/index.html). For instance: The equal
-sign `=` is not embedded between spaces but a list of variables,
+sign `=` is not embedded between spaces or a list of variables,
 separated by comas has in front and before the coma a space.
-
-```{r}
-#| label: code-style-orig
-#| eval: false
-
-sample <- c("W","L","W","W","W","L","W","L","W")
-W <- sum(sample=="W") # number of W observed
-L <- sum(sample=="L") # number of L observed
-p <- c(0,0.25,0.5,0.75,1) # proportions W
-ways <- sapply( p , function(q) (q*4)^W * ((1-q)*4)^L )
-prob <- ways/sum(ways)
-cbind( p , ways , prob )
-
-```
 
 I have converted the original code style with the RStudio addin
 {**styler**} package to tidyverse style: Assuming that the default value
 of the style transformer is `styler::tidyverse_style()` I selected the
 code snippet I wanted to convert and called the addin which ran
-`styler:::style_selection()`. As an example: The transformation of the
-above code snippet resulted into the code below:
+`styler:::style_selection()`. See @exm-preface-tab-example
+
+To facilitate the comparison of {**rethinking**} and {**tidyberse**}/{**brms**} code I have used tabs. This has the disadvantage that one cannot jump directly to links under the tabs. In this case I have linked to the wrapping example and indicated the specific tab where the R code can be found. With graphic it is easier, because if you hover over the links you see the original graphic in a smaller overlay. This is very convenient for comparison of two different graphics (for instance the same graphic with {**rethinking**} versus {**tidyverse**} coding). Try it out and hover over @fig-preview-code-style-tidyverse.
+
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-preface-tab-example}
+: Comparison of code snippets in {**rethinking**} and {**tidyverse**} style
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-code-name-a}
+a: Code snippet 2.7 (rethinking style)
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
-#| label: code-style-new
-#| eval: false
+#| label: fig-preview-code-style-original
+#| fig-cap: "Globe tossing data with n = 9 tosses and w = 6 waters. (Produced with rethinking code style)"
 
-sample <- c("W", "L", "W", "W", "W", "L", "W", "L", "W")
-W <- sum(sample == "W") # number of W observed
-L <- sum(sample == "L") # number of L observed
-p <- c(0, 0.25, 0.5, 0.75, 1) # proportions W
-ways <- sapply(p, function(q) (q * 4)^W * ((1 - q) * 4)^L)
-prob <- ways / sum(ways)
-cbind(p, ways, prob)
+
+## R code 2.7 ###############
+# analytical calculation
+W <- 6
+L <- 3
+curve( dbeta( x , W+1 , L+1 ) , from=0 , to=1 )
+# quadratic approximation
+curve( dnorm( x , 0.67 , 0.16 ) , lty=2 , add=TRUE )
 ```
+
+::::
+:::::
+
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-code-name-b}
+b: Code snippet 2.7 (tidyverse style)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-preview-code-style-tidyverse
+#| fig-cap: "Globe tossing data with n = 9 tosses and w = 6 waters. (Produced with tidyverse code style)"
+
+## R code 2.7 ###############
+# analytical calculation
+W <- 6
+L <- 3
+curve(dbeta(x, W + 1, L + 1), from = 0, to = 1)
+# quadratic approximation
+curve(dnorm(x, 0.67, 0.16), lty = 2, add = TRUE)
+```
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+To give a better orientation inside RStudio I have R code snippets segmented as in the example above ("## R code 2.7 ##################"). In RStudio one can detect these lines easy as they are displayed as bold headers. This is very helpful for the navigation inside the Quarto file.
 
 As copy & paste from the slides does not work I downloaded the PDF of
 the Speaker deck slides. But still, it didn't work always. In that case
 I used [TextSniper](https://textsniper.app/ "App for text recognition")
 and formatted manually. But these copy & paste problems only arise when
 using new code, prepared for the 3rd edition. With the book (2nd ed.) I
-do not have problems to copy the code snippets via calibre with the ePUB
-eBook version.
+do not have problems to copy the code snippets via [calibre](https://calibre-ebook.com/) with the ePUB eBook version.
 
-### Setup Chunks {.unnumbered}
-
-At first I tried to collect all necessary package to load with
-`library()` in the `setup` chunk (See [Quarto equivalent to RMarkdown
-setup
-chunk](https://community.rstudio.com/t/quarto-equivalent-to-rmarkdown-setup-chunk/153018)).
-The idea was to be able to run individual calling functions from
-different packages for test purposes and not to have to run all code
-chunks of the very long files. Additionally I tried to prevent conflicts
-of function names with the `conflicts_prefer()` function of the
-{**conflicted**} package in each setup file.
-
-But it turned out that this was not a feasible approach: I noticed
-between packages with similar purpose (in my case between
-{**rethinking**} and {\*\*brms\*}) too many conflicts. Furthermore many
-of these conflicts are hidden because the came from imports from other
-packages.
-
-I will therefore just load the meta package {**tidverse**} in the setup
-chunks of every files. To prevent conflict with function names I will
-call functions of other packages with the syntax \<package
-name\>::\<function()\>. This has the additional advantage to learn from
-which package the function comes from. And my aim to be able to run code
-chunks separately is also possible.
-
-I will differentiate between "base R" referring to all packages loaded
-automatically after starting R and the package {**base**} itself, that
-is part of the collection of "base R" packages.
-
-If you find errors please do not hesitate to write issues or PRs on my
-[GitHub site](https://github.com/petzi53/statistical-rethinking-2-2023).
-I really appreciate it to learn from more experienced R users! It
-shortens the learning paths of self-directed learners.
 
 ## Package Installation {.unnumbered}
 
@@ -285,15 +323,20 @@ compile the libraries with `cmdstanr::install_cmdstan()`.
 To check the result of my installation I ran
 `check_cmdstan_toolchain()`.
 
+***
+
 ```{r}
-#| label: install-cmdstanr
+#| label: preview-install-cmdstanr
 #| eval: false
+#| attr-source: '#lst-preview-install-cmdstanr lst-cap="Install the `cmdstanr` package (not evaluated here)"'
 
 install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 cmdstanr::install_cmdstan()
 cmdstanr::check_cmdstan_toolchain()
 
 ```
+
+***
 
 The command for downloaded `cmdstanr` did not install the vignettes,
 which take a long time to build, but they are always available online at
@@ -314,14 +357,66 @@ of the book -- they can all be downloaded from CRAN.
 I had already devtools installed, therefore I deleted it from the list
 of installed packages.
 
+***
+
 ```{r}
-#| label: install-packages
+#| label: preview-install-packages
 #| eval: false
+#| attr-source: '#lst-preview-install-packages lst-cap="Install packages (not evaluated here)"'
 
 install.packages(c("coda","mvtnorm", "loo","dagitty","shape"))
 devtools::install_github("rmcelreath/rethinking")
 
 ```
+
+***
+
+
+## Solutions
+
+There are several websites with book solutions. They have different quality and not always exhaustive. For the purpose of comparison I have consulted mostly the following two collection of solutions:
+
+-   [Statistical Rethinking: Slution (2nd edition)](https://sr2-solutions.wjakethompson.com/) by [Jake
+    Thompson](https://github.com/wjakethompson). It seems to me that he is a very experienced data scientist and he also using the {**tidyverse**} style and the {**brms**} package.
+- [Statistical Rethinking](https://www.erikkusch.com/courses/rethinking/) by [Erik Kusch](https://www.erikkusch.com/).
+- [A Short Guide to Statistical Rethinking²](https://rgoswami.me/posts/some-sol-sr2/) by [Rohit Goswami](https://rgoswami.me/about/).
+- 
+
+I have also found two GitHub repos with solutions. The result of these solutions are not accessible online. One has to fork these repos and compile them to see the results.
+
+-   [GitHub solutions by *Taras
+    Svirskyi*](https://github.com/jffist/statistical-rethinking-solutions)
+    *(jffist)*
+-   [GitHub solutions by William
+    Wolf](https://github.com/cavaunpeu/statistical-rethinking)
+    *(cavaunpeu)*
+
+
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! Solutions are not authorized by the book author
+:::
+::::{.my-watch-out-container}
+These solutions are written by members of the #RStats community and are
+not authorized by Richard McElreath, the author of Statistical
+Rethinking.
+
+::::
+:::::
+
+:::::{.my-important}
+:::{.my-important-header}
+Help appreciated!
+:::
+::::{.my-important-container}
+If you find errors in this Quarto book or want to add some comment please do not hesitate to write issues or PRs on my
+[GitHub site](https://github.com/petzi53/statistical-rethinking-2-2023).
+I really appreciate it to learn from more experienced R users! It
+shortens the learning paths of self-directed learners.
+::::
+:::::
+
 
 ## Course Schedule
 
@@ -343,6 +438,14 @@ A better overview with links to videos and slides provides the following
 HTML table, taken from the [README.md file for the 2023
 lectures](https://github.com/rmcelreath/stat_rethinking_2023/blob/main/README.md#calendar--topical-outline).
 
+:::::{.my-resource}
+:::{.my-resource-header}
+Links to videos and slides
+:::
+::::{.my-resource-container}
+
+
+
 | Week \## | Meeting date | Reading             | Lectures                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 |----------------|----------------|----------------|--------------------------|
 | Week 01  | 06 January   | Chapters 1, 2 and 3 | \[1\] \<[Golem of Prague](https://www.youtube.com/watch?v=FdnMWdICdRs&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=1)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-01)\> <br> \[2\] \<[Garden of Forking Data](https://www.youtube.com/watch?v=R1vcdhPBlXA&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=2)\> \<[Slides](https://speakerdeck.com/rmcelreath/statistical-rethinking-2023-lecture-02)\>                                                        |
@@ -356,7 +459,16 @@ lectures](https://github.com/rmcelreath/stat_rethinking_2023/blob/main/README.md
 | Week 09  | 03 March     | Chapter 15          | \[17\] \<[Measurement](https://www.youtube.com/watch?v=mt9WKbQJrI4&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=17)\> \<[Slides](https://github.com/rmcelreath/stat_rethinking_2023/raw/main/slides/Lecture_17-measurement.pdf)\> <br> \[18\] \<[Missing Data](https://www.youtube.com/watch?v=Oeq6GChHOzc&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=18)\> \<[Slides](https://github.com/rmcelreath/stat_rethinking_2023/raw/main/slides/Lecture_18-missing_data.pdf)\>                         |
 | Week 10  | 10 March     | Chapters 16 and 17  | \[19\] \<[Generalized Linear Madness](https://www.youtube.com/watch?v=zffwg0xDOgE&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=19)\> \<[Slides](https://github.com/rmcelreath/stat_rethinking_2023/raw/main/slides/Lecture_19-GenLinearMadness.pdf)\> <br> \[20\] \<[Horoscopes](https://www.youtube.com/watch?v=qwF-st2NGTU&list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus&index=20&pp=sAQB)\> \<[Slides](https://github.com/rmcelreath/stat_rethinking_2023/raw/main/slides/Lecture_20-horoscopes.pdf)\> |
 
-## Important Links
+::::
+:::::
+
+## Some Additional Links
+
+:::::{.my-resource}
+:::{.my-resource-header}
+Additional material
+:::
+::::{.my-resource-container}
 
 -   You can purchase *Statistical Rethinking: A Bayesian Course in R and
     Stan* from [CRC
@@ -387,30 +499,7 @@ lectures](https://github.com/rmcelreath/stat_rethinking_2023/blob/main/README.md
     inference](https://cran.r-project.org/package=LearnBayes) with
     vignettes as short guides.
 
-**Solutions**:
+::::
+:::::
 
-There are two different bookdown websites with book solutions:
 
--   [Solutions for the 1st
-    edition](https://bookdown.org/bgautijonsson/statistical_rethinking_solutions/)
-    by *Brynjólfur Gauti Jónsson* and
--   [Solutions for the 2nd
-    edition](https://github.com/wjakethompson/sr2-solutions) by *Jake
-    Thompson.*
-
-I have also found two GitHub repos with solutions:
-
--   [GitHub solutions by *Taras
-    Svirskyi*](https://github.com/jffist/statistical-rethinking-solutions)
-    *(jffist)*
--   [GitHub solutions by William
-    Wolf](https://github.com/cavaunpeu/statistical-rethinking)
-    *(cavaunpeu)*
-
-::: callout-caution
-###### Caution
-
-These solutions are written by members of the #RStats community and are
-not authorized by Richard McElreath, the author of Statistical
-Rethinking.
-:::

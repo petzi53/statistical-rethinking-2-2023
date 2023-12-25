@@ -169,7 +169,7 @@ $p(0 \mid 0, 0.1)$ results to `r dnorm(0,0,0.1)`.
 ::: my-procedure
 ::: my-procedure-header
 ::: {#prp-model-language}
-: General recept for describing models
+: General receipt for describing models
 :::
 :::
 
@@ -736,7 +736,7 @@ Gaussian distribution (Original)
 #| label: fig-dist-heights-a
 #| fig-cap: "The distribution of the heights data, overlaid by an ideal Gaussian distribution (Original)"
 
-rethinking::dens(d2_a$height, adj= 1, norm.comp = TRUE)
+rethinking::dens(d2_a$height, adj = 1, norm.comp = TRUE)
 ```
 :::
 :::
@@ -866,8 +866,8 @@ $$ {#eq-height-normal-dist}
 $$
 \begin{align*}
 h_{i} \sim \operatorname{Normal}(\mu, \sigma) \space \space (1) \\ 
-μ \sim \operatorname{Normal}(178, 20)  \space \space (2) \\ 
-μ \sim \operatorname{Uniform}(0, 50)   \space \space (3)      
+\mu \sim \operatorname{Normal}(178, 20)  \space \space (2) \\ 
+\sigma \sim \operatorname{Uniform}(0, 50)   \space \space (3)      
 \end{align*}
 $$ {#eq-height-linear-model-m4-1}
 
@@ -1059,7 +1059,7 @@ density, so we'll just remove it with
 :::
 :::
 
-#### Prior predictive simulation
+#### Prior predictive simulation {#sec-prior-predictive-sim}
 
 ::: my-important
 ::: my-important-header
@@ -1078,8 +1078,7 @@ Simulate the prior predictive distribution!
 To see the difference we will look at two prior predictive
 distributions:
 
-1.  The first one with our reflections and data from
-    @eq-height-linear-model-m4-1.
+1.  The first one with our reflections and data from @eq-height-linear-model-m4-1.
 2.  For the second predictive distribution we will choose a much flatter
     and less informative prior for $\mu$, like
     $\mu \sim Normal(178, 100)$. Priors with such large standard
@@ -3337,11 +3336,11 @@ first element in the matrix it did for {**rethinking**}. That is, it
 appears `brms::vcov.brmsfit()` only returns the variance/covariance
 matrix for the single-level `_β_` parameters.
 
-If we want the same information, we put the HMC chains in a data frame
+If we want the same information as with `rethinking::vcov()`, we have to put the `r glossary("HMC")` chains in a data frame
 with the `brms::as_draws_df()` function as shown in the next tab
 "draws".
 
-###### draws1
+###### draws
 
 ::: my-r-code
 ::: my-r-code-header
@@ -3754,7 +3753,7 @@ h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\
 \beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
 \end{align*}
-$$ {#eq-height-weight-linear-model-v1-m4-3}
+$$ {#eq-height-weight-linear-model1-m4-3}
 
 Compare the differences with definition inside the Tab "only height".
 :::
@@ -3791,7 +3790,7 @@ Compare the differences with definition inside the Tab "only height".
 #### Linear model {#sec-chap04-linear-model}
 
 > "The value $x_{i}$ [in the second line of
-> @eq-height-weight-linear-model-v1-m4-3] is just the weight value on
+> @eq-height-weight-linear-model1-m4-3] is just the weight value on
 > row $i$. It refers to the same individual as the height value,
 > $h_{i}$, on the same row. The parameters $\alpha$ and $\beta$ are more
 > mysterious. Where did they come from? We made them up. The parameters
@@ -3819,7 +3818,7 @@ model definition in @eq-height-weight-linear-model2-m4-3 tells us
 >     line. Better to think of it as a rate of change in expectation.
 >
 > Jointly these two parameters ask the golem to find a line that relates
-> x to h, a line that passes through α when x\_{i} = \overline{x} and
+> x to h, a line that passes through α when $x_{i} = \overline{x}$ and
 > has slope $\beta$." ([McElreath, 2020, p.
 > 94](zotero://select/groups/5243560/items/NFUEVASQ))
 > ([pdf](zotero://open-pdf/groups/5243560/items/CPFRPHX8?page=113&annotation=Y36FAY8E))
@@ -4266,7 +4265,7 @@ Psychology: A Manifesto for Reforming the Culture of Scientific Practice
 
 In @exm-lm-height-weight we have compared the linear heights model
 (@eq-height-linear-model2-m4-1) with the linear model heights against
-weights (@eq-height-weight-linear-model-v1-m4-3). Now we repeat the
+weights (@eq-height-weight-linear-model1-m4-3). Now we repeat the
 linear model heights against weights and compare it with the
 corresponding R Code.
 
@@ -4285,7 +4284,7 @@ corresponding R Code.
 ::: my-theorem
 ::: my-theorem-header
 ::: {#thm-linear-heights-model-v2-m4-3}
-: Define the linear model heights against weights (V2): Formula
+: Formula of the linear model heights against weights (V2)
 :::
 :::
 
@@ -4295,7 +4294,7 @@ $$
 h_{i} \sim \operatorname{Normal}(μ_{i}, σ) \space \space (1) \\ 
 μ_{i} = \alpha + \beta(x_{i}-\overline{x}) \space \space (2) \\
 \alpha \sim \operatorname{Normal}(178, 20) \space \space (3)  \\ 
-\beta \sim \operatorname{Normal}(0,10) \space \space (4) \\
+\beta \sim \operatorname{Log-Normal}(0,10) \space \space (4) \\
 \sigma \sim \operatorname{Uniform}(0, 50) \space \space (5)      
 \end{align*}
 $$ {#eq-height-weight-linear-model2-m4-3}
@@ -4307,7 +4306,7 @@ $$ {#eq-height-weight-linear-model2-m4-3}
 ::: my-r-code
 ::: my-r-code-header
 ::: {#cnj-lm-code-v2-m4-3}
-: Define the linear model heights against weights (V2): R Code
+: R Code of the linear model heights against weights (V2)
 :::
 :::
 
@@ -4562,7 +4561,7 @@ In the above example it is difficult to decide if this is the case
 because the color differences of the different chains are weak. But it
 is general difficult to inspect trace plot, therefore McElreath proposes
 trace rank plots or `r glossary("trank plot")` (his terminus) in
-@sec-checking-the-chain.
+@sec-chap09.
 :::
 :::
 :::
@@ -4674,7 +4673,7 @@ also need to inspect the variance-covariance matrix.
 ```{r}
 #| label: chap04-lm-vcov-m4-3a
 
-## R code 4.45 ################
+## R code 4.45a ################
 round(rethinking::vcov(m4.3a), 3)
 ```
 :::
@@ -4748,7 +4747,7 @@ exactly means.
 :::
 :::
 
-###### draws1
+###### draws1 (T)
 
 ::: my-r-code
 ::: my-r-code-header
@@ -4769,7 +4768,7 @@ posterior::summarize_draws(m4.3b, "mean", "median", "sd",
 :::
 :::
 
-###### draws2
+###### draws2 (T)
 
 ::: my-r-code
 ::: my-r-code-header
@@ -4908,14 +4907,14 @@ infinite number of other highly plausible lines near it. See next tab
 ::: my-r-code-header
 ::: {#cnj-chap04-plot-raw-data-line-m4-3b}
 b: Height in centimeters (vertical) plotted against weight_c
-(horizontal), with the line at the posterior mean plotted in black
-(Tidyverse)
+(horizontal), with the line at the posterior mean plotted in black with standardized centered weight values (Tidyverse)
 :::
 :::
 
 ::: my-r-code-container
 ```{r}
 #| label: fig-raw-data-line-m4-3b
+#| fig-cap: "Height in centimeters (vertical) plotted against weight_c (horizontal), with the line at the posterior mean plotted in black with standardized centered weight values (Tidyverse)"
 
 d2_b |>
   ggplot2::ggplot(ggplot2::aes(x = weight_c, y = height)) +
@@ -4943,15 +4942,14 @@ Further note the use of the `brms:::fixef.brmsfit()` function within
 ::: my-r-code-header
 ::: {#cnj-chap04-plot-raw-data-line2-m4-3b}
 b: Height in centimeters (vertical) plotted against weight_c
-(horizontal), with the line at the posterior mean plotted in black
-(Tidyverse)
+(horizontal), with the line at the posterior mean plotted in black with centered weights in kg (Tidyverse)
 :::
 :::
 
 ::: my-r-code-container
 ```{r}
-#| label: fig-raw-data-line2-b4.3
-#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black: tidyverse version"
+#| label: fig-raw-data-line2-m4-3b
+#| fig-cap: "Height in centimeters (vertical) plotted against weight in kilograms (horizontal), with the line at the posterior mean plotted in black with centered weights in kg (Tidyverse)"
 
 labels <-
   c(-10, 0, 10) + base::mean(d2_b$weight) |> 
@@ -5673,7 +5671,7 @@ for (i in 1:100) {
 :::::
 At each weight value in `weight.seq`, a pile of computed $\mu$ values are
 shown. Each of these piles is a Gaussian distribution, like that in tab "dens" of
-@exm-chap04-gnerating-predictions-and-intervals. You can see now that the amount of
+@exm-chap04-generating-predictions-and-intervals-m4-3a. You can see now that the amount of
 uncertainty in $\mu$ depends upon the value of `weight`. And this is the
 same fact you saw in @exm-chap04-uncertainty-around-mean.
 
@@ -8588,64 +8586,525 @@ model in Section 11.2.6 of the book "Regression and Other Stories", by Gelman, H
 
 Problems are labeled Easy (E), Medium (M), and Hard (H).
 
-### 4E1
+### Easy
 
-In the model definition below, which line is the likelihood?
+#### 4E1
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4E1: In the model definition below, which line is the `r glossary("likelihood")`?
+:::
+::::{.my-exercise-container}
 
 $$
+\begin{align*}
 y_{i} \sim \operatorname{Normal}(\mu, \sigma) \\
 \mu \sim \operatorname{Normal}(0, 10) \\
 \sigma \sim \operatorname{Exponential}(1)
+\end{align*}
 $$ {#eq-4e1}
 
-**My answer**: $y_{i} \sim \operatorname{Normal}(\mu, \sigma)$, the
-other lines are priors.
+***
 
-### 4E2
+In this kind of model description the first line is always the likelihood, the other lines are the priors.
 
-In the model definition just above, how many parameters are in the
-posterior distribution?
+::::
+:::::
 
-**My answer**: Just one.
+#### 4E2
 
-::: callout-warning
-#### Wrong Answer
-
-In the definition @eq-4e1 $y_{i}$ is not to be estimated, but represents
-the data we have at hand and want to understand through parameters.
-Erroneously I took this for the parameter. The correct answer is $\mu$
-and §\sigma\$ as both are the parameters which we attempt to estimate.
-So the correct answer is: Two
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4E2: In the model definition @eq-4e1, how many `r glossary("parameter")`s are in the `r glossary("posterior distribution")`?
 :::
+::::{.my-exercise-container}
+There are two priors: $\mu$ and $\sigma$.
+::::
+:::::
 
-### 4E3
+#### 4E3
 
-Using the model definition above, write down the appropriate form of
-`r glossary("Bayes’ theorem")` that includes the proper likelihood and
-priors.
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4E3: Using the model definition @eq-4e1, write down the appropriate form of `r glossary("Bayes’ theorem")` that includes the proper likelihood and `r glossary("prior probability", "priors")`.
 
-### 4E4
+:::
+::::{.my-exercise-container}
 
-In the model definition below, which line is the linear model?
+Remember @eq-in-words:
 
 $$
+\text{Posterior} = \frac{\text{Probability of data} \times \text{Prior}}{\text{Average probability of data}}
+$$
+$$
+Pr{(\mu, \sigma\mid y)} = \frac{\operatorname{Normal}(\mu, \sigma)\operatorname{Normal}(0, 10)\operatorname{Exponential}(1)}{\int\int\operatorname{Normal}(\mu, \sigma)\operatorname{Normal}(0, 10)\operatorname{Exponential}(1)d\mu d\sigma} 
+$${#eq-4e3}
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! I didn't know the answer and had to look it up at the [solutions by Jake Thompson](https://sr2-solutions.wjakethompson.com/linear-models-causal-inference#chapter-4).
+:::
+:::::
+
+
+
+::::
+:::::
+
+
+
+#### 4E4
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4E4: In the model definition below, which line is the linear model?
+:::
+::::{.my-exercise-container}
+
+$$
+\begin{align*}
 y_{i} \sim \operatorname{Normal}(\mu, \sigma) \\
 \mu_{i} = \alpha + \beta{x_{i}} \\
 \alpha \sim \operatorname{Normal}(0, 10) \\
 \beta \sim \operatorname{Normal}(0, 1) \\
 \sigma \sim \operatorname{Exponential}(1)
-$$ **My answer**: $\mu_{i} = \alpha + \beta{x_{i}}$
+\end{align*}
+$$ {#eq-4e4}
 
-### 4E5
+***
 
-In the model definition just above, how many parameters are in the
+The second line ($\mu_{i} = \alpha + \beta{x_{i}}$) is the linear model.
+::::
+:::::
+
+#### 4E5
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4E5: In the model definition @eq-4e4, how many parameters are in the
 posterior distribution?
+:::
+::::{.my-exercise-container}
 
-**My answer**: There are three parameters.
+:::::{.my-important}
+:::{.my-important-header}
+Distinguish between deterministic (`=`) and stochastic (`~`) equations!
+:::
+:::::
+
+> There are now three model parameters: $\alpha, \beta$, and \sigma$. The mean, $\mu$  is no longer a parameter, as it is defined deterministically, as a function of other parameters in the model.
+
+:::::{.my-watch-out}
+:::{.my-watch-out-header}
+WATCH OUT! $\alpha$ and $\beta$ are unobserved variables and therefore parameters!
+:::
+::::{.my-watch-out-container}
+
+Here comes my completely wrong answer:
+
+> There are two parameters in the posterior distribution: $\mu$ and $\sigma$.
+ 
+I did not understand, that $\mu$ is not a `r glossary("parameter")` anymore and thought --- exactly the reverse --- that $\alpha$ and $\beta$ are not parameters but $\mu$ and $\sigma$.
+::::
+:::::
+
+::::
+:::::
+
+### Middle
+
+#### 4M1 {#sec-4m1}
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4M1: For the model definition below, simulate observed $y$ values from the prior (not the posterior).
+:::
+::::{.my-exercise-container}
+
+$$
+\begin{align*}
+y_{i} \sim \operatorname{Normal}(\mu, \sigma) \\
+\mu \sim \operatorname{Normal}(0, 10) \\
+\sigma \sim \operatorname{Exponential}(1)
+\end{align*}
+$$
+
+See the discussion under @sec-prior-predictive-sim and the code in @exm-prior-predictive-sim.
+
+***
+
+::: {.panel-tabset}
+
+###### Original
+
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-exercise-4m1a}
+a: Exercise 4M1a: Simulate observed $y$ values from the prior
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: fig-exercise-4m1a
+#| fig-cap: "Simulate observed y values from the prior"
+
+k.sim_4m1a <- 1e4
+set.seed(4) # to make exercise reproducible
+
+## R code 4.14a adapted #######################################
+sample_mu_4m1a <- rnorm(k.sim_4m1a, mean = 0, sd = 10)
+sample_sigma_4m1a <- rexp(k.sim_4m1a, rate = 1)
+priors_4m1a <- rnorm(k.sim_4m1a, sample_mu_4m1a, sample_sigma_4m1a)
+rethinking::dens(priors_4m1a, 
+                 adj = 1, 
+                 norm.comp = TRUE,
+                 show.zero = TRUE,
+                 col = "red")
+```
+
+::::
+:::::
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-exercise-4m1b}
+b: Exercise 4M1b: Simulate observed $y$ values from the prior
+::::::
+:::
+::::{.my-r-code-container}
+```{r}
+#| label: fig-exercise-4m1b
+#| fig-cap: "Simulate observed y values from the prior"
+
+k.sim_4m1b <- 1e4
+set.seed(4) # to make exercise reproducible
+
+## R code 4.14b #######################################
+
+sim_4m1b <-
+  tibble::tibble(
+    sample_mu_4m1b = stats::rnorm(k.sim_4m1b, mean = 0, sd  = 10),
+    sample_sigma_4m1b = stats::rexp(k.sim_4m1b, rate = 1)) |> 
+  dplyr::mutate(priors_4m1b = stats::rnorm(k.sim_4m1b, 
+                                           mean = sample_mu_4m1b, 
+                                           sd = sample_sigma_4m1b))
+  
+sim_4m1b |> 
+  ggplot2::ggplot(ggplot2::aes(x = priors_4m1b)) +
+  ggplot2::geom_density(color = "red") +
+  ggplot2::stat_function(
+        fun = dnorm,
+        args = with(sim_4m1b, 
+               c(mean = mean(priors_4m1b), 
+                 sd = sd(priors_4m1b)))
+        ) +
+  ggplot2::theme_bw()
+
+
+
+```
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+#### 4M2
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-4m2}
+: Translate the model of @sec-4m1 into a `quap()` and `brm()` formula
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### quap()
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-code-4m2a}
+a: Translate the model of @sec-4m1 into a `quap()` formula. (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-4m2a
+
+flist_4m2a <- 
+  alist(
+    y ~ dnorm(mu, sigma),
+    mu ~ dnorm(0,10),
+    sigma ~ dexp(1)
+  )
+
+flist_4m2a
+```
+
+
+::::
+:::::
+
+
+###### brm()
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-code-4m2b}
+b: Translate the model of @sec-4m1 into a `quap()` formula. (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: exercise-4m2b
+#| eval: false
+
+exr_4m2b <- 
+  brms::brm(
+      data = d2_b, 
+      family = gaussian(),
+      formula = y ~ 1,
+      prior = c(brms::prior(normal(0, 10), class = Intercept),
+                brms::prior(exponential(1), class = sigma)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brm_fits/m04.4m2b")
+```
+
+::::
+:::::
+
+:::
+
+::::
+:::::
+
+#### 4M3
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-4m3}
+: Translate the `quap()` model formula below into a mathematical model definition
+::::::
+:::
+::::{.my-example-container}
+
+```
+y ~ dnorm(mu ,sigma), 
+mu <- a + b * x, 
+a ~ dnorm(0, 10), 
+b ~ dunif(0, 1),
+sigma ~ dexp(1)
+```
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-code-4m3a}
+: Translate the `quap()` model formula into a mathematical model definition
+::::::
+:::
+::::{.my-r-code-container}
+
+$$
+\begin{align*}
+y_{i} \sim Normal(\mu_{i},\sigma) \\
+\mu_{i} = \alpha + \beta x_{i} \\
+\alpha \sim Normal(0, 10) \\
+\beta \sim Uniform(0, 1) \\
+\sigma \sim Exponential(1)
+\end{align*}
+$$
+
+::::
+:::::
+
+
+::::
+:::::
+
+#### 4M4
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4M4: A sample of students is measured for height each year for 3 years. After the third year, you want to fit a linear regression predicting height using year as a predictor. Write down the mathematical model definition for this regression, using any variable names and priors you choose. Be prepared to defend your choice of priors.
+:::
+::::{.my-exercise-container}
+
+$$
+\begin{align*}
+height_{i} \sim Normal(\mu_{i}, \sigma) \\
+\mu_{i} = \alpha + \beta(x_{i} - \overline{x}) \\
+\alpha \sim Normal(180, 20) \\
+\beta \sim Log-Normal(0, 10) \\
+\sigma \sim Exponential(1)
+\end{align*}
+$$
+
+
+
+
+::::
+:::::
+
+#### 4M7
+
+:::::{.my-exercise}
+:::{.my-exercise-header}
+Exercise 4M7: Refit model `m4.3` from the chapter, but omit the mean weight `xbar` this time. Compare the new model’s posterior to that of the original model. In particular, look at the covariance among the parameters. What is different? Then compare the posterior predictions of both models.
+:::
+::::{.my-exercise-container}
+
+:::::{.my-example}
+:::{.my-example-header}
+:::::: {#exm-ID-text}
+: Example 4M7: Refit model `m4.3` without mean weight `xbar`
+::::::
+:::
+::::{.my-example-container}
+
+::: {.panel-tabset}
+
+###### Original
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-4m7a}
+a: Example 4M7a: Refit model `m4.3a` without mean weight `xbar` (Original)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-4m7a
+#| results: hold
+#| fig-cap: "Plotting posterior inference against the data (Original)"
+
+## R code 4.42a adapted #############################
+
+# fit model
+exr_4m7a <- rethinking::quap(
+  alist(
+    height ~ dnorm(mu, sigma),
+    mu <- a + (b * weight),
+    a ~ dnorm(178, 20),
+    b ~ dlnorm(0, 1),
+    sigma ~ dunif(0, 50)
+  ),
+  data = d2_a
+)
+
+## R code 4.44a ############################
+cat("**************** Summary **********************\n")
+rethinking::precis(exr_4m7a)
+
+## R code 4.45 ################
+cat("\n\n*************** Covariances ********************\n")
+round(rethinking::vcov(exr_4m7a), 3)
+
+# rethinking::pairs(exr_4m7a)
+
+## R code 4.46a ############################################
+plot(height ~ weight, data = d2_a, col = rethinking::rangi2)
+post_exr_4m7a <- rethinking::extract.samples(exr_4m7a)
+a_map <- mean(post_exr_4m7a$a)
+b_map <- mean(post_exr_4m7a$b)
+curve(a_map + (b_map * x) , add = TRUE)
+```
+
+::::
+:::::
+
+
+###### Tidyverse
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-fig-4m7b}
+b: Example 4M7a: Refit model `m4.3b` without mean weight `xbar` (Tidyverse)
+::::::
+:::
+::::{.my-r-code-container}
+
+```{r}
+#| label: fig-exercise-4m7b
+#| cache: true
+#| results: hold
+#| fig-cap: "Plotting posterior inference against the data (Tidyverse)"
+#| warning: false
+
+exr_4m7b <- 
+  brms::brm(data = d2_b, 
+      formula = height ~ 1 + weight,
+      family = gaussian(),
+      prior = c(brms::prior(normal(178, 20), class = Intercept),
+                brms::prior(lognormal(0, 1), class = b, lb = 0),
+                brms::prior(uniform(0, 50), class = sigma, ub = 50)),
+      iter = 2000, warmup = 1000, chains = 4, cores = 4,
+      seed = 4,
+      file = "brm_fits/exr_4m7b")
+
+cat("**************** Summary **********************\n")
+brms:::summary.brmsfit(exr_4m7b)
+
+cat("\n\n*************** Covariances ********************\n")
+brms::as_draws_df(exr_4m7b) |>
+  dplyr::select(b_Intercept:sigma) |>
+  stats::cov() |>
+  base::round(digits = 3)
+
+d2_b |>
+  ggplot2::ggplot(ggplot2::aes(x = weight, y = height)) +
+  ggplot2::geom_abline(
+    intercept = brms::fixef(exr_4m7b, probs = c(0.055, 0.945))[[1]], 
+    slope     = brms::fixef(exr_4m7b, probs = c(0.055, 0.945))[[2]]) +
+  ggplot2::geom_point(shape = 1, size = 2, color = "royalblue") +
+  ggplot2::labs(x = "weight", y = "height") +
+  ggplot2::theme_bw()
+```
+
+::::
+:::::
+
+:::
+
+In contrast to the `vcov()` values of the centered weight version in @exm-chap04-table-interpretation we have now big covariances. But the posterior predictions of both models (centered and uncentered version) are nearly the same. Compare with @fig-raw-data-line-m4-3a (Original) and @fig-raw-data-line2-m4-3b (Tidyverse).
+
+::::
+:::::
+
+***
+
+
+::::
+:::::
+
+
+
+## Session Info
+
+:::::{.my-r-code}
+:::{.my-r-code-header}
+:::::: {#cnj-chap04-session-info}
+: Session Info
+::::::
+:::
+::::{.my-r-code-container}
 
 ```{r}
 #| label: session-info
-#| attr-source: '#lst-session-info lst-cap="Session info"'
 
 sessionInfo()
 ```
+
+::::
+:::::
+
