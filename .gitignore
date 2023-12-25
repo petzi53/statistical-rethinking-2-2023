@@ -4,4 +4,5 @@
 .Ruserdata
 
 /.quarto/
-Test*.*
+_my-tests
+_archive
